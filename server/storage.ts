@@ -53,7 +53,9 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id, 
+      avatarUrl: insertUser.avatarUrl || null,
       tier: "free",
+      role: "user",
       tokensUsed: 0,
       tokenLimit: 10,
       resetDate: now,
@@ -98,6 +100,7 @@ export class MemStorage implements IStorage {
     const session: ChatSession = { 
       ...insertSession, 
       id,
+      title: insertSession.title || null,
       createdAt: now,
       updatedAt: now
     };
@@ -129,6 +132,10 @@ export class MemStorage implements IStorage {
     const message: Message = { 
       ...insertMessage, 
       id,
+      audioUrl: insertMessage.audioUrl || null,
+      sentiment: insertMessage.sentiment || null,
+      sentimentScore: insertMessage.sentimentScore || null,
+      metadata: insertMessage.metadata || {},
       createdAt: new Date()
     };
     this.messages.set(id, message);
@@ -142,11 +149,12 @@ export class MemStorage implements IStorage {
   async createUserProfile(insertProfile: InsertUserProfile): Promise<UserProfile> {
     const profile: UserProfile = {
       userId: insertProfile.userId,
-      currentMood: insertProfile.currentMood || "neutral",
+      currentMood: insertProfile.currentMood || null,
       moodDescription: insertProfile.moodDescription || null,
       preferences: insertProfile.preferences || {},
-      badges: insertProfile.badges || [],
-      evolutionScore: insertProfile.evolutionScore || 0,
+      badges: insertProfile.badges || null,
+      evolutionScore: insertProfile.evolutionScore || null,
+      privacySettings: insertProfile.privacySettings || {},
       updatedAt: new Date()
     };
     this.userProfiles.set(insertProfile.userId, profile);
