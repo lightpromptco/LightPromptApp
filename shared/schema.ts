@@ -44,6 +44,7 @@ export const userProfiles = pgTable("user_profiles", {
   preferences: jsonb("preferences"), // circadian settings, bot preferences, etc.
   badges: text("badges").array().default([]),
   evolutionScore: integer("evolution_score").default(0),
+  privacySettings: jsonb("privacy_settings").default({}), // privacy and consent settings
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
@@ -77,6 +78,7 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
   preferences: true,
   badges: true,
   evolutionScore: true,
+  privacySettings: true,
 });
 
 // Types

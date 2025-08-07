@@ -136,6 +136,16 @@ export function UserSettings({ user, userProfile, onClose, onLogout }: UserSetti
 
           {/* Actions */}
           <div className="border-t pt-4 space-y-3">
+            <Link href="/privacy">
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={onClose}
+              >
+                <i className="fas fa-shield-alt mr-2"></i>
+                Privacy Dashboard
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               className="w-full" 

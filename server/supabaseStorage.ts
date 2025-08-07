@@ -213,6 +213,7 @@ export class SupabaseStorage implements IStorage {
       preferences: profile.preferences || {},
       badges: profile.badges || [],
       evolution_score: profile.evolutionScore || 0,
+      privacy_settings: profile.privacySettings || {},
       updated_at: new Date().toISOString()
     };
 
@@ -230,9 +231,17 @@ export class SupabaseStorage implements IStorage {
   }
 
   async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
+    const updateData: any = { ...updates, updated_at: new Date().toISOString() };
+    
+    // Handle privacy settings mapping
+    if (updates.privacySettings) {
+      updateData.privacy_settings = updates.privacySettings;
+      delete updateData.privacySettings;
+    }
+    
     const { data, error } = await supabase
       .from('user_profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updateData)
       .eq('user_id', userId)
       .select()
       .single();
