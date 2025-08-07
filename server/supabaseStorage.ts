@@ -11,6 +11,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY || 'your-anon-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export class SupabaseStorage implements IStorage {
+  public supabase = supabase;
   
   // Users
   async getUser(id: string): Promise<User | undefined> {
