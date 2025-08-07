@@ -187,7 +187,7 @@ export const fitnessData = pgTable("fitness_data", {
 export const deviceIntegrations = pgTable("device_integrations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  deviceType: text("device_type").notNull(), // apple_health, fitbit, garmin, oura, whoop, etc.
+  deviceType: text("device_type").notNull(), // apple_health, fitbit, garmin, oura, whoop, alexa, google_assistant, etc.
   isConnected: boolean("is_connected").notNull().default(false),
   lastSync: timestamp("last_sync"),
   accessToken: text("access_token"), // encrypted token for device API
@@ -195,6 +195,147 @@ export const deviceIntegrations = pgTable("device_integrations", {
   settings: jsonb("settings").default({}), // sync preferences, data types, etc.
   metadata: jsonb("metadata").default({}), // device-specific data
   connectedAt: timestamp("connected_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Community Features
+export const communityPosts = pgTable("community_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull(), // reflection, insight, gratitude, support, etc.
+  tags: text("tags").array().default([]),
+  isAnonymous: boolean("is_anonymous").notNull().default(false),
+  likesCount: integer("likes_count").notNull().default(0),
+  commentsCount: integer("comments_count").notNull().default(0),
+  isPublished: boolean("is_published").notNull().default(true),
+  mood: text("mood"), // associated mood at time of posting
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const communityComments = pgTable("community_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  isAnonymous: boolean("is_anonymous").notNull().default(false),
+  likesCount: integer("likes_count").notNull().default(0),
+  parentCommentId: varchar("parent_comment_id"), // Self-reference without foreign key to avoid circular dependency
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const communityLikes = pgTable("community_likes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  postId: varchar("post_id").references(() => communityPosts.id, { onDelete: "cascade" }),
+  commentId: varchar("comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Astrology & SoulMap Integration
+export const astrologyProfiles = pgTable("astrology_profiles", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  birthDate: timestamp("birth_date").notNull(),
+  birthTime: text("birth_time"), // "14:30" format
+  birthLocation: text("birth_location").notNull(), // "New York, NY, USA"
+  sunSign: text("sun_sign").notNull(),
+  moonSign: text("moon_sign"),
+  risingSign: text("rising_sign"),
+  birthChart: jsonb("birth_chart").default({}), // full astrological chart data
+  personalityTraits: jsonb("personality_traits").default({}), // AI-generated insights
+  currentTransits: jsonb("current_transits").default({}), // active planetary influences
+  lastUpdated: timestamp("last_updated").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const dailyHoroscopes = pgTable("daily_horoscopes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull(),
+  sunSignReading: text("sun_sign_reading").notNull(),
+  moonPhaseReading: text("moon_phase_reading"),
+  personalizedInsight: text("personalized_insight"), // based on birth chart + current patterns
+  luckyNumbers: text("lucky_numbers").array().default([]),
+  affirmation: text("affirmation").notNull(),
+  focus: text("focus"), // love, career, health, spirituality
+  energy: text("energy"), // high, medium, low
+  planetaryInfluences: jsonb("planetary_influences").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// B2B/Enterprise Features
+export const organizations = pgTable("organizations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  domain: text("domain").unique(), // company email domain
+  industry: text("industry"),
+  size: text("size"), // small, medium, large, enterprise
+  subscriptionTier: text("subscription_tier").notNull().default("starter"), // starter, professional, enterprise
+  settings: jsonb("settings").default({}), // privacy policies, data retention, etc.
+  adminEmail: text("admin_email").notNull(),
+  billingEmail: text("billing_email"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const organizationMembers = pgTable("organization_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: text("role").notNull().default("member"), // admin, hr_manager, team_lead, member
+  department: text("department"),
+  position: text("position"),
+  managerId: varchar("manager_id").references(() => users.id),
+  permissions: jsonb("permissions").default({}), // what data they can access
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const organizationInsights = pgTable("organization_insights", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  organizationId: varchar("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull(),
+  period: text("period").notNull().default("daily"), // daily, weekly, monthly
+  totalMembers: integer("total_members").notNull(),
+  activeMembers: integer("active_members").notNull(), // members who used the platform
+  avgMoodScore: integer("avg_mood_score"), // 1-10 scale
+  avgStressLevel: integer("avg_stress_level"), // 1-10 scale
+  avgEnergyLevel: integer("avg_energy_level"), // 1-10 scale
+  reflectionsCount: integer("reflections_count").notNull().default(0),
+  habitsCompleted: integer("habits_completed").notNull().default(0),
+  recommendationsGenerated: integer("recommendations_generated").notNull().default(0),
+  wellnessScore: integer("wellness_score"), // aggregated wellness metric
+  topChallenges: text("top_challenges").array().default([]), // most common stress factors
+  insights: jsonb("insights").default({}), // AI-generated insights for leadership
+  recommendations: jsonb("recommendations").default({}), // organizational recommendations
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Multi-Factor Authentication
+export const userAuth = pgTable("user_auth", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  phoneNumber: text("phone_number"),
+  isPhoneVerified: boolean("is_phone_verified").notNull().default(false),
+  isEmailVerified: boolean("is_email_verified").notNull().default(false),
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  backupCodes: text("backup_codes").array().default([]),
+  lastVerification: timestamp("last_verification"),
+  verificationAttempts: integer("verification_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const verificationCodes = pgTable("verification_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  code: text("code").notNull(),
+  type: text("type").notNull(), // email, sms, phone_call
+  purpose: text("purpose").notNull(), // login, signup, password_reset, profile_change
+  isUsed: boolean("is_used").notNull().default(false),
+  attemptsCount: integer("attempts_count").notNull().default(0),
+  expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -335,6 +476,55 @@ export const insertDeviceIntegrationSchema = createInsertSchema(deviceIntegratio
   metadata: true,
 });
 
+export const insertCommunityPostSchema = createInsertSchema(communityPosts).pick({
+  userId: true,
+  title: true,
+  content: true,
+  category: true,
+  tags: true,
+  isAnonymous: true,
+  mood: true,
+});
+
+export const insertCommunityCommentSchema = createInsertSchema(communityComments).pick({
+  postId: true,
+  userId: true,
+  content: true,
+  isAnonymous: true,
+  parentCommentId: true,
+});
+
+export const insertAstrologyProfileSchema = createInsertSchema(astrologyProfiles).pick({
+  userId: true,
+  birthDate: true,
+  birthTime: true,
+  birthLocation: true,
+  sunSign: true,
+  moonSign: true,
+  risingSign: true,
+  birthChart: true,
+});
+
+export const insertOrganizationSchema = createInsertSchema(organizations).pick({
+  name: true,
+  domain: true,
+  industry: true,
+  size: true,
+  adminEmail: true,
+  billingEmail: true,
+  settings: true,
+});
+
+export const insertOrganizationMemberSchema = createInsertSchema(organizationMembers).pick({
+  organizationId: true,
+  userId: true,
+  role: true,
+  department: true,
+  position: true,
+  managerId: true,
+  permissions: true,
+});
+
 export const redeemAccessCodeSchema = z.object({
   code: z.string().min(1, "Access code is required"),
   email: z.string().email("Valid email is required"),
@@ -369,3 +559,18 @@ export type FitnessData = typeof fitnessData.$inferSelect;
 export type InsertFitnessData = z.infer<typeof insertFitnessDataSchema>;
 export type DeviceIntegration = typeof deviceIntegrations.$inferSelect;
 export type InsertDeviceIntegration = z.infer<typeof insertDeviceIntegrationSchema>;
+export type CommunityPost = typeof communityPosts.$inferSelect;
+export type InsertCommunityPost = z.infer<typeof insertCommunityPostSchema>;
+export type CommunityComment = typeof communityComments.$inferSelect;
+export type InsertCommunityComment = z.infer<typeof insertCommunityCommentSchema>;
+export type CommunityLike = typeof communityLikes.$inferSelect;
+export type AstrologyProfile = typeof astrologyProfiles.$inferSelect;
+export type InsertAstrologyProfile = z.infer<typeof insertAstrologyProfileSchema>;
+export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
+export type OrganizationMember = typeof organizationMembers.$inferSelect;
+export type InsertOrganizationMember = z.infer<typeof insertOrganizationMemberSchema>;
+export type OrganizationInsight = typeof organizationInsights.$inferSelect;
+export type UserAuth = typeof userAuth.$inferSelect;
+export type VerificationCode = typeof verificationCodes.$inferSelect;

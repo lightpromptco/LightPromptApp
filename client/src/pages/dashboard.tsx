@@ -198,13 +198,16 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="checkin">Daily Check-in</TabsTrigger>
+            <TabsTrigger value="checkin">Check-in</TabsTrigger>
             <TabsTrigger value="habits">Habits</TabsTrigger>
             <TabsTrigger value="fitness">Fitness</TabsTrigger>
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="integrations">Devices</TabsTrigger>
+            <TabsTrigger value="horoscope">Astrology</TabsTrigger>
+            <TabsTrigger value="community">Community</TabsTrigger>
+            <TabsTrigger value="b2b">Enterprise</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -687,6 +690,90 @@ export default function DashboardPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Alexa */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-volume-up text-blue-500 mr-2"></i>
+                    Amazon Alexa
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="alexa" className="text-sm">Voice control</Label>
+                    <Switch id="alexa" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Voice check-ins, mood tracking, guided reflections
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                    window.open('https://alexa.amazon.com/spa/index.html#skills', '_blank');
+                  }}>
+                    <i className="fas fa-microphone mr-1"></i>
+                    Enable Skill
+                  </Button>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    💡 Say "Alexa, open LightPrompt" to start voice reflections
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Google Assistant */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fab fa-google text-red-500 mr-2"></i>
+                    Google Assistant
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="google-assistant" className="text-sm">Voice control</Label>
+                    <Switch id="google-assistant" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Daily wellness prompts, habit reminders
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                    window.open('https://assistant.google.com/services/a/uid/00000012b5b5b2b8', '_blank');
+                  }}>
+                    <i className="fas fa-microphone mr-1"></i>
+                    Setup Action
+                  </Button>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    💡 Say "Hey Google, talk to LightPrompt" for guided wellness
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Siri Shortcuts */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-mobile-alt text-gray-700 mr-2"></i>
+                    Siri Shortcuts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="siri" className="text-sm">Voice shortcuts</Label>
+                    <Switch id="siri" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Quick mood check-ins, habit logging
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                    window.open('shortcuts://gallery/search?query=wellness', '_blank');
+                  }}>
+                    <i className="fas fa-plus mr-1"></i>
+                    Add Shortcuts
+                  </Button>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    💡 Say "Hey Siri, log my mood" for instant wellness tracking
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Future integrations preview */}
@@ -722,6 +809,314 @@ export default function DashboardPage() {
                     <p className="text-xs text-gray-600">Deeper pattern recognition and predictive wellness insights</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Horoscope/Astrology Tab */}
+          <TabsContent value="horoscope" className="space-y-6">
+            <Card className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <i className="fas fa-moon text-purple-500 mr-2"></i>
+                  SoulMap Astrology Insights
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Connect with cosmic rhythms and universal guidance for your wellness journey
+                </p>
+                <div className="text-xs text-gray-500 bg-white/50 p-3 rounded mt-2">
+                  🌙 <strong>Cosmic Guidance:</strong> SoulMap analyzes planetary influences, moon phases, and your birth chart to provide personalized spiritual guidance and timing for wellness practices.
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Today's Cosmic Weather */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <i className="fas fa-star text-yellow-500 mr-2"></i>
+                        Today's Cosmic Weather
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+                        <h4 className="font-semibold text-indigo-900 mb-2">Moon Phase: Waxing Crescent</h4>
+                        <p className="text-sm text-indigo-700 mb-3">
+                          Perfect energy for setting intentions and beginning new wellness habits. Your highest self encourages gentle beginnings.
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="text-xs">New Moon Energy</Badge>
+                          <Badge variant="outline" className="text-xs">Manifestation</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-amber-900 mb-2">Planetary Influence</h4>
+                        <p className="text-sm text-amber-700 mb-3">
+                          Mercury in harmony supports clear communication with your inner wisdom. Ideal time for journaling and reflection.
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="text-xs">Mercury Harmony</Badge>
+                          <Badge variant="outline" className="text-xs">Communication</Badge>
+                        </div>
+                      </div>
+
+                      <div className="text-center pt-4">
+                        <Button className="bg-gradient-to-r from-purple-500 to-violet-600">
+                          <i className="fas fa-crystal-ball mr-2"></i>
+                          Get Full Reading
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Birth Chart Setup */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <i className="fas fa-chart-pie text-purple-500 mr-2"></i>
+                        Your Birth Chart
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center py-6">
+                        <i className="fas fa-user-astronaut text-4xl text-purple-300 mb-4"></i>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Create Your Cosmic Profile</h3>
+                        <p className="text-gray-600 mb-4">Enter your birth details for personalized astrological insights</p>
+                        
+                        <div className="space-y-3 max-w-sm mx-auto">
+                          <Input placeholder="Birth date (MM/DD/YYYY)" />
+                          <Input placeholder="Birth time (HH:MM AM/PM)" />
+                          <Input placeholder="Birth location (City, State)" />
+                        </div>
+                        
+                        <Button className="mt-4 bg-gradient-to-r from-purple-500 to-violet-600">
+                          <i className="fas fa-star mr-2"></i>
+                          Generate Birth Chart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Daily Affirmation */}
+                <Card className="mt-6 bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200">
+                  <CardContent className="p-6 text-center">
+                    <i className="fas fa-heart text-rose-500 text-2xl mb-3"></i>
+                    <h3 className="text-lg font-semibold text-rose-900 mb-2">Today's Soul Affirmation</h3>
+                    <p className="text-rose-700 italic text-lg mb-4">
+                      "I trust the cosmic timing of my healing journey and honor the wisdom flowing through me."
+                    </p>
+                    <p className="text-xs text-rose-600">Channeled through SoulMap for your highest good ✨</p>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Community Tab */}
+          <TabsContent value="community" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <i className="fas fa-users text-blue-500 mr-2"></i>
+                    Wellness Community
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    Requires 3+ Reflections
+                  </Badge>
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Connect with fellow souls on their wellness journey. Share insights, support each other, and grow together.
+                </p>
+                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
+                  🌱 <strong>Sacred Space:</strong> Our community is built on respect, authenticity, and mutual growth. Complete 3 reflections to unlock access and contribute meaningfully to the collective wisdom.
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Community Access Check */}
+                <div className="text-center py-8">
+                  <i className="fas fa-seedling text-4xl text-green-300 mb-4"></i>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Continue Your Reflection Journey</h3>
+                  <p className="text-gray-600 mb-4">Complete 3 meaningful reflections to join our wellness community</p>
+                  
+                  <div className="flex items-center justify-center space-x-2 mb-6">
+                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                    <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <span className="text-sm text-gray-600 ml-2">1 of 3 reflections complete</span>
+                  </div>
+                  
+                  <Button className="bg-gradient-to-r from-green-500 to-teal-600">
+                    <i className="fas fa-comment mr-2"></i>
+                    Start Your Next Reflection
+                  </Button>
+                </div>
+
+                {/* Preview of Community Features */}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-gray-50 rounded-lg opacity-60">
+                    <h4 className="font-semibold mb-2 flex items-center">
+                      <i className="fas fa-share-alt text-blue-500 mr-2"></i>
+                      Share Insights
+                    </h4>
+                    <p className="text-xs text-gray-600">Post meaningful reflections and discoveries from your wellness journey</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg opacity-60">
+                    <h4 className="font-semibold mb-2 flex items-center">
+                      <i className="fas fa-hands-helping text-purple-500 mr-2"></i>
+                      Support Others
+                    </h4>
+                    <p className="text-xs text-gray-600">Offer encouragement and learn from the experiences of kindred spirits</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg opacity-60">
+                    <h4 className="font-semibold mb-2 flex items-center">
+                      <i className="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                      Collective Wisdom
+                    </h4>
+                    <p className="text-xs text-gray-600">Access group insights and patterns discovered by our AI across the community</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* B2B/Enterprise Tab */}
+          <TabsContent value="b2b" className="space-y-6">
+            <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <i className="fas fa-building text-slate-600 mr-2"></i>
+                  Enterprise Wellness Dashboard
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  Ethical employee wellness management with privacy-first analytics and compassionate insights.
+                </p>
+                <div className="text-xs text-gray-500 bg-white/50 p-3 rounded mt-2">
+                  🏢 <strong>Ethical Leadership:</strong> Our B2B solution prioritizes employee wellbeing while respecting privacy. All data is anonymized and focused on collective wellness patterns, not individual monitoring.
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Organization Overview */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <i className="fas fa-chart-bar text-blue-500 mr-2"></i>
+                        Wellness Overview
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">127</div>
+                          <div className="text-xs text-blue-600">Active Members</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">8.2</div>
+                          <div className="text-xs text-green-600">Avg Wellness Score</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded-lg">
+                          <div className="text-2xl font-bold text-purple-600">342</div>
+                          <div className="text-xs text-purple-600">Weekly Reflections</div>
+                        </div>
+                        <div className="text-center p-3 bg-amber-50 rounded-lg">
+                          <div className="text-2xl font-bold text-amber-600">94%</div>
+                          <div className="text-xs text-amber-600">Engagement Rate</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2">Team Wellness Trends</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Overall Mood</span>
+                            <div className="flex items-center space-x-2">
+                              <Progress value={78} className="w-20" />
+                              <span className="text-xs text-green-600">+5%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Stress Levels</span>
+                            <div className="flex items-center space-x-2">
+                              <Progress value={42} className="w-20" />
+                              <span className="text-xs text-red-600">-8%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Energy Levels</span>
+                            <div className="flex items-center space-x-2">
+                              <Progress value={65} className="w-20" />
+                              <span className="text-xs text-green-600">+12%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* AI Insights */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <i className="fas fa-brain text-purple-500 mr-2"></i>
+                        AI Leadership Insights
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+                        <h4 className="font-semibold text-indigo-900 mb-2">Positive Momentum Detected</h4>
+                        <p className="text-sm text-indigo-700 mb-3">
+                          Your team shows 15% improvement in collective energy since implementing flexible work arrangements. Consider expanding wellness initiatives during this positive trend.
+                        </p>
+                        <Badge variant="outline" className="text-xs">High Confidence</Badge>
+                      </div>
+
+                      <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-amber-900 mb-2">Preventive Recommendation</h4>
+                        <p className="text-sm text-amber-700 mb-3">
+                          Stress levels in the Engineering department are trending upward. Consider introducing midweek wellness check-ins or team mindfulness sessions.
+                        </p>
+                        <Badge variant="outline" className="text-xs">Proactive Care</Badge>
+                      </div>
+
+                      <div className="p-4 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg">
+                        <h4 className="font-semibold text-green-900 mb-2">Culture Success</h4>
+                        <p className="text-sm text-green-700 mb-3">
+                          Anonymous feedback shows 89% of employees feel psychologically safe to share wellness concerns. Your empathetic leadership is creating positive change.
+                        </p>
+                        <Badge variant="outline" className="text-xs">Cultural Win</Badge>
+                      </div>
+
+                      <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700">
+                        <i className="fas fa-download mr-2"></i>
+                        Generate Wellness Report
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Privacy & Ethics Notice */}
+                <Card className="mt-6 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-3">
+                      <i className="fas fa-shield-alt text-emerald-600 text-xl mt-1"></i>
+                      <div>
+                        <h3 className="font-semibold text-emerald-900 mb-2">Privacy-First Wellness Analytics</h3>
+                        <p className="text-sm text-emerald-800 mb-3">
+                          All employee data is fully anonymized and aggregated. Individual conversations and personal details remain completely private. Our AI focuses on collective wellness patterns to support ethical leadership decisions that benefit everyone.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline" className="text-xs bg-white">Zero Individual Tracking</Badge>
+                          <Badge variant="outline" className="text-xs bg-white">GDPR Compliant</Badge>
+                          <Badge variant="outline" className="text-xs bg-white">Ethical AI</Badge>
+                          <Badge variant="outline" className="text-xs bg-white">Employee Consent</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </TabsContent>
