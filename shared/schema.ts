@@ -567,6 +567,66 @@ export type CommunityLike = typeof communityLikes.$inferSelect;
 export type AstrologyProfile = typeof astrologyProfiles.$inferSelect;
 export type InsertAstrologyProfile = z.infer<typeof insertAstrologyProfileSchema>;
 export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
+// VibeMatch tables for soul connection discovery
+export const vibeProfiles = pgTable("vibe_profiles", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  bio: text("bio").notNull(),
+  location: text("location"), // city, state/region, country
+  latitude: text("latitude"), // for location-based matching
+  longitude: text("longitude"),
+  interests: text("interests").array().default([]), // wellness, meditation, travel, etc.
+  vibeWords: text("vibe_words").array().default([]), // energy descriptors
+  seekingConnection: text("seeking_connection").notNull(), // friendship, growth_partner, mentor, etc.
+  ageRange: text("age_range").notNull(), // "25-35", "30-40", etc.
+  profileComplete: boolean("profile_complete").default(false),
+  isVisible: boolean("is_visible").default(true), // can temporarily hide profile
+  lastActive: timestamp("last_active").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const vibeMatches = pgTable("vibe_matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  matchScore: integer("match_score").notNull(), // 0-100 compatibility score
+  status: text("status").notNull().default("pending"), // pending, liked, passed, matched
+  user1Action: text("user1_action"), // like, pass, null
+  user2Action: text("user2_action"), // like, pass, null
+  resonanceCount: integer("resonance_count").default(0), // tracks interaction quality
+  lastInteraction: timestamp("last_interaction").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const prismPoints = pgTable("prism_points", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  matchId: varchar("match_id").notNull().references(() => vibeMatches.id, { onDelete: "cascade" }),
+  userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  unlocked: boolean("unlocked").default(false),
+  user1Consent: boolean("user1_consent").default(false),
+  user2Consent: boolean("user2_consent").default(false),
+  sharedInfo: jsonb("shared_info"), // email, social media, contact info by mutual consent
+  unlockedAt: timestamp("unlocked_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const resonanceInteractions = pgTable("resonance_interactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  matchId: varchar("match_id").notNull().references(() => vibeMatches.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  interactionType: text("interaction_type").notNull(), // conversation, shared_reflection, energy_exchange
+  resonanceLevel: integer("resonance_level").notNull(), // 1-5 how deep the connection felt
+  notes: text("notes"), // optional personal notes about the interaction
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Insert schemas
+export const insertVibeProfileSchema = createInsertSchema(vibeProfiles);
+export const insertVibeMatchSchema = createInsertSchema(vibeMatches);
+export const insertPrismPointSchema = createInsertSchema(prismPoints);
+export const insertResonanceInteractionSchema = createInsertSchema(resonanceInteractions);
+
+// Type exports
 export type Organization = typeof organizations.$inferSelect;
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
 export type OrganizationMember = typeof organizationMembers.$inferSelect;
@@ -574,3 +634,11 @@ export type InsertOrganizationMember = z.infer<typeof insertOrganizationMemberSc
 export type OrganizationInsight = typeof organizationInsights.$inferSelect;
 export type UserAuth = typeof userAuth.$inferSelect;
 export type VerificationCode = typeof verificationCodes.$inferSelect;
+export type VibeProfile = typeof vibeProfiles.$inferSelect;
+export type InsertVibeProfile = z.infer<typeof insertVibeProfileSchema>;
+export type VibeMatch = typeof vibeMatches.$inferSelect;
+export type InsertVibeMatch = z.infer<typeof insertVibeMatchSchema>;
+export type PrismPoint = typeof prismPoints.$inferSelect;
+export type InsertPrismPoint = z.infer<typeof insertPrismPointSchema>;
+export type ResonanceInteraction = typeof resonanceInteractions.$inferSelect;
+export type InsertResonanceInteraction = z.infer<typeof insertResonanceInteractionSchema>;

@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
 import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern, Recommendation, FitnessData, DeviceIntegration } from '@shared/schema';
+import { VibeMatchInterface } from '@/components/VibeMatchInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -198,7 +199,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="checkin">Check-in</TabsTrigger>
             <TabsTrigger value="habits">Habits</TabsTrigger>
@@ -206,8 +207,8 @@ export default function DashboardPage() {
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
             <TabsTrigger value="integrations">Devices</TabsTrigger>
             <TabsTrigger value="horoscope">Astrology</TabsTrigger>
+            <TabsTrigger value="vibematch">VibeMatch</TabsTrigger>
             <TabsTrigger value="community">Community</TabsTrigger>
-            <TabsTrigger value="b2b">Enterprise</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -796,10 +797,24 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
-                  <i className="fas fa-users text-pink-500"></i>
+                  <i className="fas fa-mobile-alt text-blue-500"></i>
                   <div>
-                    <span className="font-medium">Vibe Match</span>
-                    <p className="text-xs text-gray-600">Connect with resonant souls based on energy, not looks</p>
+                    <span className="font-medium">Native Device APIs</span>
+                    <p className="text-xs text-gray-600">Direct Apple Health, Fitbit, and Garmin API integrations</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
+                  <i className="fas fa-home text-teal-500"></i>
+                  <div>
+                    <span className="font-medium">Smart Home Integration</span>
+                    <p className="text-xs text-gray-600">HomeKit, Philips Hue, and smart wellness device control</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
+                  <i className="fas fa-rainbow text-purple-500"></i>
+                  <div>
+                    <span className="font-medium">Siri Rainbow Screen</span>
+                    <p className="text-xs text-gray-600">Native iOS app needed for full Siri visual integration</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
@@ -982,141 +997,23 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
 
-          {/* B2B/Enterprise Tab */}
-          <TabsContent value="b2b" className="space-y-6">
-            <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200">
+          {/* VibeMatch Tab */}
+          <TabsContent value="vibematch" className="space-y-6">
+            <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <i className="fas fa-building text-slate-600 mr-2"></i>
-                  Enterprise Wellness Dashboard
+                  <i className="fas fa-heart text-pink-500 mr-2"></i>
+                  VibeMatch - Soul Connection Discovery
                 </CardTitle>
                 <p className="text-sm text-gray-600">
-                  Ethical employee wellness management with privacy-first analytics and compassionate insights.
+                  Connect with like-minded souls through interactive wellness matching. Find your tribe based on energy resonance and personal growth alignment.
                 </p>
-                <div className="text-xs text-gray-500 bg-white/50 p-3 rounded mt-2">
-                  🏢 <strong>Ethical Leadership:</strong> Our B2B solution prioritizes employee wellbeing while respecting privacy. All data is anonymized and focused on collective wellness patterns, not individual monitoring.
+                <div className="text-xs text-gray-500 bg-white/70 p-3 rounded mt-2">
+                  ✨ <strong>How it works:</strong> Complete 3 resonance matches to unlock Prism Point - your gateway to deeper connection and information exchange with matched souls.
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Organization Overview */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <i className="fas fa-chart-bar text-blue-500 mr-2"></i>
-                        Wellness Overview
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-2xl font-bold text-blue-600">127</div>
-                          <div className="text-xs text-blue-600">Active Members</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-2xl font-bold text-green-600">8.2</div>
-                          <div className="text-xs text-green-600">Avg Wellness Score</div>
-                        </div>
-                        <div className="text-center p-3 bg-purple-50 rounded-lg">
-                          <div className="text-2xl font-bold text-purple-600">342</div>
-                          <div className="text-xs text-purple-600">Weekly Reflections</div>
-                        </div>
-                        <div className="text-center p-3 bg-amber-50 rounded-lg">
-                          <div className="text-2xl font-bold text-amber-600">94%</div>
-                          <div className="text-xs text-amber-600">Engagement Rate</div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4">
-                        <h4 className="font-semibold mb-2">Team Wellness Trends</h4>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Overall Mood</span>
-                            <div className="flex items-center space-x-2">
-                              <Progress value={78} className="w-20" />
-                              <span className="text-xs text-green-600">+5%</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Stress Levels</span>
-                            <div className="flex items-center space-x-2">
-                              <Progress value={42} className="w-20" />
-                              <span className="text-xs text-red-600">-8%</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Energy Levels</span>
-                            <div className="flex items-center space-x-2">
-                              <Progress value={65} className="w-20" />
-                              <span className="text-xs text-green-600">+12%</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* AI Insights */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <i className="fas fa-brain text-purple-500 mr-2"></i>
-                        AI Leadership Insights
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
-                        <h4 className="font-semibold text-indigo-900 mb-2">Positive Momentum Detected</h4>
-                        <p className="text-sm text-indigo-700 mb-3">
-                          Your team shows 15% improvement in collective energy since implementing flexible work arrangements. Consider expanding wellness initiatives during this positive trend.
-                        </p>
-                        <Badge variant="outline" className="text-xs">High Confidence</Badge>
-                      </div>
-
-                      <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg">
-                        <h4 className="font-semibold text-amber-900 mb-2">Preventive Recommendation</h4>
-                        <p className="text-sm text-amber-700 mb-3">
-                          Stress levels in the Engineering department are trending upward. Consider introducing midweek wellness check-ins or team mindfulness sessions.
-                        </p>
-                        <Badge variant="outline" className="text-xs">Proactive Care</Badge>
-                      </div>
-
-                      <div className="p-4 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg">
-                        <h4 className="font-semibold text-green-900 mb-2">Culture Success</h4>
-                        <p className="text-sm text-green-700 mb-3">
-                          Anonymous feedback shows 89% of employees feel psychologically safe to share wellness concerns. Your empathetic leadership is creating positive change.
-                        </p>
-                        <Badge variant="outline" className="text-xs">Cultural Win</Badge>
-                      </div>
-
-                      <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700">
-                        <i className="fas fa-download mr-2"></i>
-                        Generate Wellness Report
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Privacy & Ethics Notice */}
-                <Card className="mt-6 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-3">
-                      <i className="fas fa-shield-alt text-emerald-600 text-xl mt-1"></i>
-                      <div>
-                        <h3 className="font-semibold text-emerald-900 mb-2">Privacy-First Wellness Analytics</h3>
-                        <p className="text-sm text-emerald-800 mb-3">
-                          All employee data is fully anonymized and aggregated. Individual conversations and personal details remain completely private. Our AI focuses on collective wellness patterns to support ethical leadership decisions that benefit everyone.
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="outline" className="text-xs bg-white">Zero Individual Tracking</Badge>
-                          <Badge variant="outline" className="text-xs bg-white">GDPR Compliant</Badge>
-                          <Badge variant="outline" className="text-xs bg-white">Ethical AI</Badge>
-                          <Badge variant="outline" className="text-xs bg-white">Employee Consent</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <VibeMatchInterface userId={userId!} />
               </CardContent>
             </Card>
           </TabsContent>
