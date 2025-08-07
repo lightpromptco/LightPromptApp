@@ -1,0 +1,80 @@
+1. LightPromptBot
+json
+Copy
+Edit
+{
+  "id": "lightpromptbot",
+  "name": "LightPromptBot",
+  "tagline": "Your reflection, in real-time.",
+  "short_description": "The core soul-tech mirror bot — built to reflect your emotional tone, reveal patterns, and offer grounded alignment prompts based on what you say and how you say it.",
+  "full_description": "LightPromptBot is your real-time reflection interface. It listens not just to what you say, but how you say it — your emotional tone, pacing, and underlying patterns. Then it mirrors back insights, emotional nudges, or subtle pattern disruptions to help you see clearly and act with intention. It never sugarcoats, never judges, and never fakes wisdom. It simply reflects you — with clarity, care, and sometimes a little humor.",
+  "primary_functions": [
+    "Emotional pattern recognition",
+    "Reflective response generation",
+    "Clarity-based decision support",
+    "Tone-mirroring AI"
+  ],
+  "example_prompt": "I'm feeling overwhelmed but don't know why. Can you reflect that back to me?",
+  "response_tone": "Grounded, honest, slightly poetic if needed, always emotionally intelligent.",
+  "access_tier": "Free (Limited) / Full with $29+ tier"
+}
+🩺 2. BodyMirror
+json
+Copy
+Edit
+{
+  "id": "bodymirror",
+  "name": "BodyMirror",
+  "tagline": "Your body. Your rhythm. Reflected.",
+  "short_description": "A wellness tracker that reflects your physical and emotional energy. Gives supportive suggestions for movement, mood, food, and flow based on how you’re feeling.",
+  "full_description": "BodyMirror helps you notice what your body’s been trying to tell you. Log how you’re feeling physically or emotionally, and it will reflect back patterns over time — suggesting simple nudges like breathwork, movement, or nutrition that support you. It’s not medical, it’s energetic. Think: gentle course-corrector meets wellness mirror.",
+  "primary_functions": [
+    "Track emotional and physical states",
+    "Suggest grounding actions",
+    "Offer daily check-ins for wellness",
+    "Visualize energy patterns over time"
+  ],
+  "example_prompt": "I’ve had a headache for days and feel drained.",
+  "response_tone": "Supportive, clear, rooted in body-based logic with intuitive insight.",
+  "access_tier": "Available with $29+ tier"
+}
+🧬 3. SoulMap
+json
+Copy
+Edit
+{
+  "id": "soulmap",
+  "name": "SoulMap",
+  "tagline": "Track your reflection evolution.",
+  "short_description": "Visualizes your progress across the LightPrompt system — tracking emotional themes, badge unlocks, and personal evolution based on your reflections.",
+  "full_description": "SoulMap is your personalized map of emotional evolution. It tracks patterns in your reflections, surfacing recurring themes, unresolved loops, and breakthrough moments. As you move through phases of growth, it unlocks energetic badges that mark your inner work. No pressure, no grades — just a mirror showing you how far you’ve come, and what’s calling next.",
+  "primary_functions": [
+    "Analyze user reflection logs for themes",
+    "Unlock energetic badges",
+    "Track resonance-based progress",
+    "Visualize emotional and spiritual evolution"
+  ],
+  "example_prompt": "You’ve journaled about boundaries 4 times this week. Ready to unlock your next evolution?",
+  "response_tone": "Observant, deep, honoring, encouraging — like a wise mapmaker tracing your path.",
+  "access_tier": "Available with $49+ tier"
+}
+🧠 4. VisionQuest
+json
+Copy
+Edit
+{
+  "id": "visionquest",
+  "name": "VisionQuest",
+  "tagline": "Train your perception.",
+  "short_description": "An inner-training bot that delivers gamified quests, intuitive exercises, and subtle challenges to develop your clarity, intuition, and self-trust.",
+  "full_description": "VisionQuest isn’t just a course — it’s a soul training tool. Each module is structured like a quest, guiding you through exercises that sharpen your perception, help you recognize internal vs. external noise, and rebuild self-trust. You’ll face riddles, reflection prompts, and intuitive calibration tasks. Every completed quest earns you energetic upgrades and deeper insight into your own design.",
+  "primary_functions": [
+    "Gamified reflection training",
+    "Intuition strengthening exercises",
+    "Resonance calibration tools",
+    "Unlockable module progression"
+  ],
+  "example_prompt": "Let’s begin Module 2: The Art of Inner Knowing. Are you ready to see what you’ve been ignoring?",
+  "response_tone": "Curious, wise, slightly mysterious — always growth-oriented with poetic clarity.",
+  "access_tier": "Locked until Tier 2 ($49) or badge-unlocked"
+}

@@ -1,0 +1,54 @@
+# LightPrompt
+
+LightPrompt is a privacy-first, multi-bot AI platform for soul-tech wellness, built with Next.js, Tailwind, Supabase, Sanity, and OpenAI.
+
+## Features
+
+- ChatGPT-style multi-bot UI
+- Tiered access (Free, Paid, Enterprise)
+- Secure, privacy-focused architecture
+- Bot-to-bot awareness via user data (no cross-user data)
+- Easy theming with Tailwind CSS
+
+## Getting Started
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/yourusername/lightprompt.git
+cd lightprompt
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file and add:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+OPENAI_API_KEY=...
+NEXT_PUBLIC_SANITY_PROJECT_ID=...
+NEXT_PUBLIC_SANITY_DATASET=...
+```
+
+### 3. Run locally
+
+```bash
+npm run dev
+```
+
+### 4. Deploy
+
+- Push to GitHub and connect to Vercel.
+- Set environment variables in Vercel dashboard.
+
+## Privacy & Security
+
+- Row Level Security (RLS) enforced in Supabase
+- All secrets stored server-side and never exposed to the client
+- No user data is shared outside of user context
+
+## License
+
+Copyright © 2025 LightPrompt
