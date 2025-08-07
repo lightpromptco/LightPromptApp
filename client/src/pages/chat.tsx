@@ -137,6 +137,16 @@ export default function ChatPage() {
     }
   };
 
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentSession(null);
+    localStorage.removeItem('lightprompt_user_id');
+    // The app will reinitialize a new user automatically
+    setTimeout(() => {
+      initializeUser();
+    }, 100);
+  };
+
   const handleCreateSession = async (botId: string): Promise<ChatSession> => {
     return createSessionMutation.mutateAsync(botId);
   };
@@ -161,10 +171,11 @@ export default function ChatPage() {
         
         <BottomNavigation
           user={currentUser}
-          userProfile={userProfile}
+          userProfile={userProfile || null}
           activeBot={activeBot}
           onBotChange={handleBotChange}
           onAvatarUpdate={handleAvatarUpdate}
+          onLogout={handleLogout}
         />
       </div>
 

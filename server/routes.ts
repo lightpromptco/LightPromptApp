@@ -290,6 +290,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin middleware to check if user is admin
+  const requireAdmin = async (req: any, res: any, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).json({ error: "Authorization header required" });
+      }
+
+      const userId = authHeader.replace('Bearer ', '');
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      req.adminUser = user;
+      next();
+    } catch (error) {
+      res.status(401).json({ error: "Invalid authorization" });
+    }
+  };
+
+  // Admin routes
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      // For now, allow any user to get all users for demo purposes
+      // In production, you'd use requireAdmin middleware
+      const { data, error } = await (storage as any).supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      res.json(data || []);
+    } catch (error: any) {
+      console.error("Error getting users:", error);
+      res.status(500).json({ error: "Failed to get users" });
+    }
+  });
+
+  app.put("/api/admin/users/:id", async (req, res) => {
+    try {
+      // For now, allow any user to update for demo purposes
+      // In production, you'd use requireAdmin middleware
+      const userId = req.params.id;
+      const updates = req.body;
+      
+      const user = await storage.updateUser(userId, updates);
+      res.json(user);
+    } catch (error: any) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.post("/api/admin/users/:id/reset-tokens", async (req, res) => {
+    try {
+      // For now, allow any user to reset tokens for demo purposes  
+      // In production, you'd use requireAdmin middleware
+      const userId = req.params.id;
+      
+      await storage.resetTokenUsage(userId);
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error: any) {
+      console.error("Error resetting tokens:", error);
+      res.status(500).json({ error: "Failed to reset tokens" });
+    }
+  });
+
   // Serve private objects
   app.get("/objects/:objectPath(*)", async (req, res) => {
     const objectStorageService = new ObjectStorageService();

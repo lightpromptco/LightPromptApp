@@ -8,7 +8,8 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
-  tier: text("tier").notNull().default("free"), // free, tier_29, tier_49
+  tier: text("tier").notNull().default("free"), // free, tier_29, tier_49, admin
+  role: text("role").notNull().default("user"), // user, admin
   tokensUsed: integer("tokens_used").notNull().default(0),
   tokenLimit: integer("token_limit").notNull().default(10),
   resetDate: timestamp("reset_date").notNull().defaultNow(),
