@@ -620,11 +620,55 @@ export const resonanceInteractions = pgTable("resonance_interactions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Secure chat system for matched users
+export const matchChats = pgTable("match_chats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  matchId: varchar("match_id").notNull().references(() => vibeMatches.id, { onDelete: "cascade" }),
+  senderId: varchar("sender_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  receiverId: varchar("receiver_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  message: text("message").notNull(),
+  messageType: text("message_type").notNull().default("text"), // text, reflection_prompt, energy_share
+  isReflectionResponse: boolean("is_reflection_response").default(false),
+  reflectionPromptId: varchar("reflection_prompt_id"), // links responses to prompts
+  aiModerationScore: integer("ai_moderation_score").default(100), // 0-100, higher = safer
+  aiModerationFlags: text("ai_moderation_flags").array().default([]), // inappropriate, spam, etc.
+  isHidden: boolean("is_hidden").default(false), // if flagged by AI
+  resonanceContribution: integer("resonance_contribution").default(0), // 0-1, counts toward prism unlock
+  readAt: timestamp("read_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Wellness-focused conversation prompts for matched users
+export const reflectionPrompts = pgTable("reflection_prompts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  category: text("category").notNull(), // growth, values, dreams, gratitude, etc.
+  prompt: text("prompt").notNull(),
+  description: text("description"), // what this prompt helps discover
+  difficulty: text("difficulty").notNull().default("beginner"), // beginner, intermediate, deep
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Chat safety and consent tracking
+export const chatSafetyLogs = pgTable("chat_safety_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  chatId: varchar("chat_id").notNull().references(() => matchChats.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  actionType: text("action_type").notNull(), // report, block, consent_withdraw
+  reason: text("reason"),
+  aiAssistance: boolean("ai_assistance").default(false), // if AI helped detect issue
+  resolved: boolean("resolved").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert schemas
 export const insertVibeProfileSchema = createInsertSchema(vibeProfiles);
 export const insertVibeMatchSchema = createInsertSchema(vibeMatches);
 export const insertPrismPointSchema = createInsertSchema(prismPoints);
 export const insertResonanceInteractionSchema = createInsertSchema(resonanceInteractions);
+export const insertMatchChatSchema = createInsertSchema(matchChats);
+export const insertReflectionPromptSchema = createInsertSchema(reflectionPrompts);
+export const insertChatSafetyLogSchema = createInsertSchema(chatSafetyLogs);
 
 // Type exports
 export type Organization = typeof organizations.$inferSelect;
@@ -642,3 +686,9 @@ export type PrismPoint = typeof prismPoints.$inferSelect;
 export type InsertPrismPoint = z.infer<typeof insertPrismPointSchema>;
 export type ResonanceInteraction = typeof resonanceInteractions.$inferSelect;
 export type InsertResonanceInteraction = z.infer<typeof insertResonanceInteractionSchema>;
+export type MatchChat = typeof matchChats.$inferSelect;
+export type InsertMatchChat = z.infer<typeof insertMatchChatSchema>;
+export type ReflectionPrompt = typeof reflectionPrompts.$inferSelect;
+export type InsertReflectionPrompt = z.infer<typeof insertReflectionPromptSchema>;
+export type ChatSafetyLog = typeof chatSafetyLogs.$inferSelect;
+export type InsertChatSafetyLog = z.infer<typeof insertChatSafetyLogSchema>;

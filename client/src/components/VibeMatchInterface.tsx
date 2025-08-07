@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import type { VibeProfile, VibeMatch, PrismPoint } from '@shared/schema';
+import { SecureMatchChat } from './SecureMatchChat';
 
 interface VibeMatchInterfaceProps {
   userId: string;
@@ -25,8 +26,9 @@ interface PotentialMatch {
 export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [currentView, setCurrentView] = useState<'profile' | 'discovery' | 'matches' | 'prism'>('profile');
+  const [currentView, setCurrentView] = useState<'profile' | 'discovery' | 'matches' | 'prism' | 'chat'>('profile');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [selectedMatch, setSelectedMatch] = useState<VibeMatch | null>(null);
 
   // Get user's vibe profile
   const { data: vibeProfile, isLoading: profileLoading } = useQuery<VibeProfile>({
@@ -312,6 +314,18 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
         </div>
       )}
 
+      {/* Chat View */}
+      {currentView === 'chat' && selectedMatch && (
+        <SecureMatchChat
+          match={selectedMatch}
+          currentUserId={userId}
+          onBack={() => {
+            setCurrentView('matches');
+            setSelectedMatch(null);
+          }}
+        />
+      )}
+
       {/* Matches View */}
       {currentView === 'matches' && (
         <div className="space-y-4">
@@ -319,7 +333,14 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
           {currentMatches?.length ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {currentMatches.map((match) => (
-                <Card key={match.id} className="hover:shadow-md transition-shadow">
+                <Card 
+                  key={match.id} 
+                  className="hover:shadow-md transition-shadow cursor-pointer" 
+                  onClick={() => {
+                    setSelectedMatch(match);
+                    setCurrentView('chat');
+                  }}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
