@@ -12,13 +12,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
-import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern } from '@shared/schema';
+import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern, Recommendation, FitnessData, DeviceIntegration } from '@shared/schema';
 
 interface DashboardData {
   metrics: WellnessMetric[];
   habits: Habit[];
   habitEntries: Record<string, HabitEntry[]>;
   patterns: WellnessPattern[];
+  recommendations?: Recommendation[];
+  fitnessData?: FitnessData[];
+  deviceIntegrations?: DeviceIntegration[];
   appleHealth?: any;
   homeKit?: any;
 }
@@ -195,10 +198,11 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="checkin">Daily Check-in</TabsTrigger>
             <TabsTrigger value="habits">Habits</TabsTrigger>
+            <TabsTrigger value="fitness">Fitness</TabsTrigger>
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
           </TabsList>
@@ -280,6 +284,56 @@ export default function DashboardPage() {
               </Card>
             </div>
 
+            {/* AI Recommendations */}
+            {dashboardData?.recommendations && dashboardData.recommendations.length > 0 && (
+              <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-lightbulb text-amber-500 mr-2"></i>
+                    Recommendations from Your Highest Self
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    AI-powered insights based on your wellness patterns and data
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {dashboardData.recommendations.slice(0, 2).map((rec) => (
+                    <div key={rec.id} className="p-4 bg-white rounded-lg border border-amber-100 shadow-sm">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <i className={`fas ${
+                            rec.type === 'breathwork' ? 'fa-wind text-blue-500' :
+                            rec.type === 'workout' ? 'fa-dumbbell text-green-500' :
+                            rec.type === 'nutrition' ? 'fa-apple-alt text-red-500' :
+                            'fa-heart text-purple-500'
+                          }`}></i>
+                          <h4 className="font-semibold text-gray-900">{rec.title}</h4>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {rec.duration}min
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-2">{rec.description}</p>
+                      <p className="text-xs text-amber-700 italic mb-3">{rec.reasoning}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="secondary" className="text-xs capitalize">
+                            {rec.difficulty}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {rec.confidence}% confidence
+                          </Badge>
+                        </div>
+                        <Button size="sm" variant="outline" className="text-xs">
+                          Start Now
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Recent Patterns */}
             {dashboardData?.patterns && dashboardData.patterns.length > 0 && (
               <Card>
@@ -288,6 +342,9 @@ export default function DashboardPage() {
                     <i className="fas fa-chart-line text-purple-500 mr-2"></i>
                     Recent Insights
                   </CardTitle>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded mt-2">
+                    💡 <strong>How it works:</strong> Our AI analyzes your daily check-ins to detect patterns in your mood, energy, and stress levels over time.
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {dashboardData.patterns.slice(0, 3).map((pattern) => (
@@ -319,6 +376,9 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-600">
                   Take a moment to reflect on how you're feeling today
                 </p>
+                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
+                  💡 <strong>Daily Practice:</strong> Regular check-ins help you become more aware of your emotional patterns and create a foundation for personal growth. Even 2 minutes of reflection can make a difference.
+                </div>
               </CardHeader>
               <CardContent>
                 <DailyCheckInForm 
@@ -369,6 +429,69 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
 
+          {/* Fitness Tab */}
+          <TabsContent value="fitness" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Fitness Input */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-heartbeat text-red-500 mr-2"></i>
+                    Today's Fitness & Health
+                  </CardTitle>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
+                    💡 <strong>Manual Tracking:</strong> Input your daily health metrics manually. This data helps our AI provide personalized recommendations for your wellness journey.
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <FitnessInputForm userId={userId!} />
+                </CardContent>
+              </Card>
+
+              {/* Recent Fitness Data */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-chart-area text-blue-500 mr-2"></i>
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {dashboardData?.fitnessData && dashboardData.fitnessData.length > 0 ? (
+                    <div className="space-y-3">
+                      {dashboardData.fitnessData.slice(0, 3).map((fitness) => (
+                        <div key={fitness.id} className="p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium">
+                              {new Date(fitness.date).toLocaleDateString()}
+                            </span>
+                            {fitness.workoutType && (
+                              <Badge variant="outline" className="text-xs capitalize">
+                                {fitness.workoutType}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            {fitness.weight && <div>Weight: {fitness.weight}lbs</div>}
+                            {fitness.workoutDuration && <div>Workout: {fitness.workoutDuration}min</div>}
+                            {fitness.waterIntake && <div>Water: {fitness.waterIntake}oz</div>}
+                            {fitness.sleepQuality && <div>Sleep: {fitness.sleepQuality}/10</div>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <i className="fas fa-chart-line text-3xl text-gray-300 mb-3"></i>
+                      <p className="text-gray-600">No fitness data yet</p>
+                      <p className="text-xs text-gray-500">Start tracking to see your progress</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Patterns Tab */}
           <TabsContent value="patterns" className="space-y-6">
             <Card>
@@ -377,6 +500,9 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-600">
                   AI-detected patterns in your wellness journey
                 </p>
+                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
+                  💡 <strong>Pattern Recognition:</strong> Our AI analyzes your check-ins, habits, and fitness data to identify trends. Patterns become visible after 7+ days of consistent tracking.
+                </div>
               </CardHeader>
               <CardContent>
                 {dashboardData?.patterns && dashboardData.patterns.length > 0 ? (
@@ -417,72 +543,184 @@ export default function DashboardPage() {
 
           {/* Integrations Tab */}
           <TabsContent value="integrations" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mb-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded">
+                💡 <strong>Device Integrations:</strong> Connect your health devices to automatically sync data and get more accurate insights. Each integration enhances your AI recommendations.
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Apple Health */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-base">
                     <i className="fab fa-apple text-black mr-2"></i>
                     Apple Health
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="apple-health">Sync Apple Health data</Label>
+                    <Label htmlFor="apple-health" className="text-sm">Auto-sync</Label>
                     <Switch id="apple-health" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Connect your Apple Health data to get insights from steps, heart rate, sleep, and more.
+                  <p className="text-xs text-gray-600">
+                    Steps, heart rate, sleep, workouts, mindful minutes
                   </p>
-                  <Button variant="outline" className="w-full">
-                    <i className="fas fa-link mr-2"></i>
-                    Connect Apple Health
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
                   </Button>
                 </CardContent>
               </Card>
 
+              {/* Fitbit */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-running text-green-500 mr-2"></i>
+                    Fitbit
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="fitbit" className="text-sm">Auto-sync</Label>
+                    <Switch id="fitbit" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Activity, sleep stages, heart rate variability
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Garmin */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-satellite text-blue-600 mr-2"></i>
+                    Garmin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="garmin" className="text-sm">Auto-sync</Label>
+                    <Switch id="garmin" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Training load, recovery, stress tracking
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Oura Ring */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-ring text-purple-500 mr-2"></i>
+                    Oura Ring
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="oura" className="text-sm">Auto-sync</Label>
+                    <Switch id="oura" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Sleep quality, readiness score, body temperature
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* WHOOP */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
+                    <i className="fas fa-heartbeat text-red-500 mr-2"></i>
+                    WHOOP
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="whoop" className="text-sm">Auto-sync</Label>
+                    <Switch id="whoop" />
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Strain, recovery, sleep performance
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* HomeKit */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-base">
                     <i className="fas fa-home text-blue-500 mr-2"></i>
                     HomeKit
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="homekit">Sync HomeKit sensors</Label>
+                    <Label htmlFor="homekit" className="text-sm">Auto-sync</Label>
                     <Switch id="homekit" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Track environmental factors like temperature, humidity, and air quality.
+                  <p className="text-xs text-gray-600">
+                    Temperature, humidity, air quality, light levels
                   </p>
-                  <Button variant="outline" className="w-full">
-                    <i className="fas fa-link mr-2"></i>
-                    Connect HomeKit
+                  <Button variant="outline" size="sm" className="w-full">
+                    <i className="fas fa-link mr-1"></i>
+                    Connect
                   </Button>
                 </CardContent>
               </Card>
             </div>
 
             {/* Future integrations preview */}
-            <Card className="opacity-60">
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <i className="fas fa-rocket text-purple-500 mr-2"></i>
                   Coming Soon
                 </CardTitle>
+                <div className="text-xs text-gray-500 bg-white/50 p-2 rounded mt-2">
+                  💡 <strong>Roadmap:</strong> These features are in development and will be available in future updates.
+                </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
                   <i className="fas fa-map-marker-alt text-green-500"></i>
-                  <span>GeoPrompt - Location-based wellness insights</span>
+                  <div>
+                    <span className="font-medium">GeoPrompt</span>
+                    <p className="text-xs text-gray-600">Location-based wellness insights and QR experiences</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
                   <i className="fas fa-users text-pink-500"></i>
-                  <span>Vibe Match - Connect with resonant souls</span>
+                  <div>
+                    <span className="font-medium">Vibe Match</span>
+                    <p className="text-xs text-gray-600">Connect with resonant souls based on energy, not looks</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
                   <i className="fas fa-brain text-indigo-500"></i>
-                  <span>Advanced pattern recognition with AI</span>
+                  <div>
+                    <span className="font-medium">Advanced AI</span>
+                    <p className="text-xs text-gray-600">Deeper pattern recognition and predictive wellness insights</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -665,5 +903,256 @@ function HabitCard({
         </div>
       </div>
     </div>
+  );
+}
+
+// Fitness Input Form Component
+function FitnessInputForm({ userId }: { userId: string }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState({
+    weight: '',
+    bodyFat: '',
+    waterIntake: '',
+    workoutDuration: '',
+    workoutType: '',
+    workoutIntensity: 5,
+    restingHeartRate: '',
+    bloodPressure: '',
+    sleepQuality: 5,
+    stressLevel: 5,
+    notes: '',
+  });
+
+  const fitnessMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch('/api/fitness', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          date: new Date(),
+          weight: data.weight ? parseInt(data.weight) : null,
+          bodyFat: data.bodyFat ? parseInt(data.bodyFat) : null,
+          waterIntake: data.waterIntake ? parseInt(data.waterIntake) : null,
+          workoutDuration: data.workoutDuration ? parseInt(data.workoutDuration) : null,
+          workoutType: data.workoutType || null,
+          workoutIntensity: data.workoutIntensity,
+          restingHeartRate: data.restingHeartRate ? parseInt(data.restingHeartRate) : null,
+          bloodPressure: data.bloodPressure || null,
+          sleepQuality: data.sleepQuality,
+          stressLevel: data.stressLevel,
+          notes: data.notes || null,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to save fitness data');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      toast({
+        title: "Fitness data saved!",
+        description: "Your health metrics have been recorded.",
+      });
+      // Reset form
+      setFormData({
+        weight: '',
+        bodyFat: '',
+        waterIntake: '',
+        workoutDuration: '',
+        workoutType: '',
+        workoutIntensity: 5,
+        restingHeartRate: '',
+        bloodPressure: '',
+        sleepQuality: 5,
+        stressLevel: 5,
+        notes: '',
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fitnessMutation.mutate(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="weight">Weight (lbs)</Label>
+          <Input
+            id="weight"
+            type="number"
+            placeholder="150"
+            value={formData.weight}
+            onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="bodyFat">Body Fat (%)</Label>
+          <Input
+            id="bodyFat"
+            type="number"
+            placeholder="15"
+            value={formData.bodyFat}
+            onChange={(e) => setFormData(prev => ({ ...prev, bodyFat: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="waterIntake">Water Intake (oz)</Label>
+          <Input
+            id="waterIntake"
+            type="number"
+            placeholder="64"
+            value={formData.waterIntake}
+            onChange={(e) => setFormData(prev => ({ ...prev, waterIntake: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="restingHeartRate">Resting Heart Rate (BPM)</Label>
+          <Input
+            id="restingHeartRate"
+            type="number"
+            placeholder="60"
+            value={formData.restingHeartRate}
+            onChange={(e) => setFormData(prev => ({ ...prev, restingHeartRate: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="workoutDuration">Workout Duration (min)</Label>
+          <Input
+            id="workoutDuration"
+            type="number"
+            placeholder="30"
+            value={formData.workoutDuration}
+            onChange={(e) => setFormData(prev => ({ ...prev, workoutDuration: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="workoutType">Workout Type</Label>
+          <Select value={formData.workoutType} onValueChange={(value) => setFormData(prev => ({ ...prev, workoutType: value }))}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Select workout type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cardio">Cardio</SelectItem>
+              <SelectItem value="strength">Strength Training</SelectItem>
+              <SelectItem value="yoga">Yoga</SelectItem>
+              <SelectItem value="pilates">Pilates</SelectItem>
+              <SelectItem value="running">Running</SelectItem>
+              <SelectItem value="cycling">Cycling</SelectItem>
+              <SelectItem value="swimming">Swimming</SelectItem>
+              <SelectItem value="walking">Walking</SelectItem>
+              <SelectItem value="hiit">HIIT</SelectItem>
+              <SelectItem value="stretching">Stretching</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="bloodPressure">Blood Pressure</Label>
+          <Input
+            id="bloodPressure"
+            type="text"
+            placeholder="120/80"
+            value={formData.bloodPressure}
+            onChange={(e) => setFormData(prev => ({ ...prev, bloodPressure: e.target.value }))}
+            className="mt-1"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <Label htmlFor="workoutIntensity">Workout Intensity (1-10)</Label>
+          <div className="mt-1 space-y-2">
+            <Input
+              type="range"
+              min="1"
+              max="10"
+              value={formData.workoutIntensity}
+              onChange={(e) => setFormData(prev => ({ ...prev, workoutIntensity: parseInt(e.target.value) }))}
+              className="w-full"
+            />
+            <div className="text-center text-sm text-gray-600">
+              {formData.workoutIntensity}/10
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="sleepQuality">Sleep Quality (1-10)</Label>
+          <div className="mt-1 space-y-2">
+            <Input
+              type="range"
+              min="1"
+              max="10"
+              value={formData.sleepQuality}
+              onChange={(e) => setFormData(prev => ({ ...prev, sleepQuality: parseInt(e.target.value) }))}
+              className="w-full"
+            />
+            <div className="text-center text-sm text-gray-600">
+              {formData.sleepQuality}/10
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="stressLevel">Stress Level (1-10)</Label>
+          <div className="mt-1 space-y-2">
+            <Input
+              type="range"
+              min="1"
+              max="10"
+              value={formData.stressLevel}
+              onChange={(e) => setFormData(prev => ({ ...prev, stressLevel: parseInt(e.target.value) }))}
+              className="w-full"
+            />
+            <div className="text-center text-sm text-gray-600">
+              {formData.stressLevel}/10
+            </div>
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            placeholder="How are you feeling after your workout? Any observations..."
+            value={formData.notes}
+            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+            className="mt-1"
+            rows={2}
+          />
+        </div>
+      </div>
+
+      <Button 
+        type="submit" 
+        className="w-full"
+        disabled={fitnessMutation.isPending}
+      >
+        {fitnessMutation.isPending ? (
+          <>
+            <i className="fas fa-spinner fa-spin mr-2"></i>
+            Saving...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-save mr-2"></i>
+            Save Fitness Data
+          </>
+        )}
+      </Button>
+    </form>
   );
 }

@@ -4,7 +4,8 @@ import {
   AccessCode, InsertAccessCode, WellnessMetric, InsertWellnessMetric,
   Habit, InsertHabit, HabitEntry, InsertHabitEntry,
   AppleHealthData, InsertAppleHealthData, HomeKitData, InsertHomeKitData,
-  WellnessPattern
+  WellnessPattern, Recommendation, InsertRecommendation,
+  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -69,6 +70,23 @@ export interface IStorage {
   // Wellness Patterns
   getWellnessPatterns(userId: string): Promise<WellnessPattern[]>;
   detectPatterns(userId: string): Promise<WellnessPattern[]>;
+
+  // Recommendations
+  getRecommendations(userId: string, limit?: number): Promise<Recommendation[]>;
+  createRecommendation(recommendation: InsertRecommendation): Promise<Recommendation>;
+  updateRecommendation(id: string, updates: Partial<Recommendation>): Promise<Recommendation>;
+  generateRecommendations(userId: string): Promise<Recommendation[]>;
+
+  // Fitness data
+  getFitnessData(userId: string, days?: number): Promise<FitnessData[]>;
+  createFitnessData(fitnessData: InsertFitnessData): Promise<FitnessData>;
+  getLatestFitnessData(userId: string): Promise<FitnessData | null>;
+
+  // Device integrations
+  getDeviceIntegrations(userId: string): Promise<DeviceIntegration[]>;
+  createDeviceIntegration(integration: InsertDeviceIntegration): Promise<DeviceIntegration>;
+  updateDeviceIntegration(userId: string, deviceType: string, updates: Partial<DeviceIntegration>): Promise<DeviceIntegration>;
+  syncDeviceData(userId: string, deviceType: string): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -83,6 +101,9 @@ export class MemStorage implements IStorage {
   private appleHealthData: Map<string, AppleHealthData> = new Map();
   private homeKitData: Map<string, HomeKitData> = new Map();
   private wellnessPatterns: Map<string, WellnessPattern> = new Map();
+  private recommendations: Map<string, Recommendation> = new Map();
+  private fitnessData: Map<string, FitnessData> = new Map();
+  private deviceIntegrations: Map<string, DeviceIntegration> = new Map();
 
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
@@ -509,6 +530,236 @@ export class MemStorage implements IStorage {
     }
     
     return patterns;
+  }
+
+  // Recommendations
+  async getRecommendations(userId: string, limit = 10): Promise<Recommendation[]> {
+    return Array.from(this.recommendations.values())
+      .filter(r => r.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+  }
+
+  async createRecommendation(recommendation: InsertRecommendation): Promise<Recommendation> {
+    const id = randomUUID();
+    const newRecommendation: Recommendation = {
+      id,
+      ...recommendation,
+      metadata: recommendation.metadata || {},
+      confidence: recommendation.confidence || 80,
+      instructions: recommendation.instructions || null,
+      duration: recommendation.duration || null,
+      difficulty: recommendation.difficulty || 'beginner',
+      tags: recommendation.tags || [],
+      basedOnPatterns: recommendation.basedOnPatterns || [],
+      isCompleted: false,
+      completedAt: null,
+      rating: null,
+      feedback: null,
+      createdAt: new Date(),
+    };
+    this.recommendations.set(id, newRecommendation);
+    return newRecommendation;
+  }
+
+  async updateRecommendation(id: string, updates: Partial<Recommendation>): Promise<Recommendation> {
+    const recommendation = this.recommendations.get(id);
+    if (!recommendation) throw new Error('Recommendation not found');
+    
+    const updated = { ...recommendation, ...updates };
+    this.recommendations.set(id, updated);
+    return updated;
+  }
+
+  async generateRecommendations(userId: string): Promise<Recommendation[]> {
+    // Get recent wellness data
+    const recentMetrics = await this.getWellnessMetrics(userId, 7);
+    const patterns = await this.getWellnessPatterns(userId);
+    const fitnessData = await this.getFitnessData(userId, 7);
+    
+    const recommendations: InsertRecommendation[] = [];
+    
+    // Generate recommendations based on patterns and data
+    if (recentMetrics.length > 0) {
+      const avgStress = recentMetrics.reduce((sum, m) => sum + (m.stress || 0), 0) / recentMetrics.length;
+      const avgEnergy = recentMetrics.reduce((sum, m) => sum + (m.energy || 0), 0) / recentMetrics.length;
+      
+      // High stress recommendations
+      if (avgStress > 7) {
+        recommendations.push({
+          userId,
+          type: 'breathwork',
+          title: 'Deep Breathing for Stress Relief',
+          description: 'Your stress levels have been elevated. This breathing technique will help activate your parasympathetic nervous system.',
+          reasoning: `Based on your recent stress levels (${avgStress.toFixed(1)}/10), your highest self recognizes you need grounding.`,
+          instructions: '1. Sit comfortably with your spine straight\\n2. Inhale for 4 counts through your nose\\n3. Hold for 4 counts\\n4. Exhale for 6 counts through your mouth\\n5. Repeat for 5-10 minutes',
+          duration: 10,
+          difficulty: 'beginner',
+          tags: ['stress-relief', 'breathwork', 'anxiety'],
+          confidence: 85,
+          basedOnPatterns: patterns.filter(p => p.patternType.includes('stress')).map(p => p.id),
+          metadata: { category: 'mindfulness' }
+        });
+      }
+      
+      // Low energy recommendations
+      if (avgEnergy < 4) {
+        recommendations.push({
+          userId,
+          type: 'workout',
+          title: 'Energizing Morning Flow',
+          description: 'Your energy has been lower lately. This gentle movement practice will help awaken your body and spirit.',
+          reasoning: `Your highest self sees that your energy levels (${avgEnergy.toFixed(1)}/10) need nurturing through mindful movement.`,
+          instructions: '1. Start with gentle neck rolls\n2. Cat-cow stretches (5 reps)\n3. Sun salutation A (3 rounds)\n4. Warrior II sequence\n5. Childs pose to close',
+          duration: 15,
+          difficulty: 'beginner',
+          tags: ['yoga', 'energy', 'morning'],
+          confidence: 80,
+          basedOnPatterns: patterns.filter(p => p.patternType.includes('energy')).map(p => p.id),
+          metadata: { category: 'movement' }
+        });
+      }
+      
+      // Nutrition recommendations based on mood patterns
+      const moodCounts = recentMetrics.reduce((acc, m) => {
+        if (m.mood) acc[m.mood] = (acc[m.mood] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0];
+      
+      if (dominantMood?.[0] === 'tired' || avgEnergy < 5) {
+        recommendations.push({
+          userId,
+          type: 'nutrition',
+          title: 'Nourishing Energy Bowl',
+          description: 'Your body is calling for sustained energy. This nutrient-dense meal will support your vitality.',
+          reasoning: 'Your highest self recognizes that true energy comes from nourishing your temple with wholesome foods.',
+          instructions: 'Combine: \\n• 1 cup quinoa or brown rice\\n• 1/2 avocado\\n• Handful of leafy greens\\n• 2 tbsp nuts/seeds\\n• Lemon-tahini dressing\\n• Optional: roasted vegetables',
+          duration: 20,
+          difficulty: 'beginner',
+          tags: ['nutrition', 'energy', 'wholefood'],
+          confidence: 75,
+          basedOnPatterns: [],
+          metadata: { category: 'nutrition', calories: '450-500' }
+        });
+      }
+    }
+    
+    // Create recommendations
+    const createdRecommendations = [];
+    for (const rec of recommendations) {
+      const created = await this.createRecommendation(rec);
+      createdRecommendations.push(created);
+    }
+    
+    return createdRecommendations;
+  }
+
+  // Fitness data
+  async getFitnessData(userId: string, days = 30): Promise<FitnessData[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    return Array.from(this.fitnessData.values())
+      .filter(f => f.userId === userId && new Date(f.date) >= cutoffDate)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  async createFitnessData(fitnessData: InsertFitnessData): Promise<FitnessData> {
+    const id = randomUUID();
+    const newFitnessData: FitnessData = {
+      id,
+      userId: fitnessData.userId,
+      date: fitnessData.date || new Date(),
+      weight: fitnessData.weight ?? null,
+      bodyFat: fitnessData.bodyFat ?? null,
+      muscleMass: fitnessData.muscleMass ?? null,
+      waterIntake: fitnessData.waterIntake ?? null,
+      workoutDuration: fitnessData.workoutDuration ?? null,
+      workoutType: fitnessData.workoutType ?? null,
+      workoutIntensity: fitnessData.workoutIntensity ?? null,
+      restingHeartRate: fitnessData.restingHeartRate ?? null,
+      bloodPressure: fitnessData.bloodPressure ?? null,
+      sleepQuality: fitnessData.sleepQuality ?? null,
+      stressLevel: fitnessData.stressLevel ?? null,
+      notes: fitnessData.notes ?? null,
+      source: fitnessData.source || 'manual',
+      createdAt: new Date(),
+    };
+    this.fitnessData.set(id, newFitnessData);
+    return newFitnessData;
+  }
+
+  async getLatestFitnessData(userId: string): Promise<FitnessData | null> {
+    const userFitness = Array.from(this.fitnessData.values())
+      .filter(f => f.userId === userId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    return userFitness[0] || null;
+  }
+
+  // Device integrations
+  async getDeviceIntegrations(userId: string): Promise<DeviceIntegration[]> {
+    return Array.from(this.deviceIntegrations.values()).filter(d => d.userId === userId);
+  }
+
+  async createDeviceIntegration(integration: InsertDeviceIntegration): Promise<DeviceIntegration> {
+    const id = randomUUID();
+    const newIntegration: DeviceIntegration = {
+      id,
+      userId: integration.userId,
+      deviceType: integration.deviceType,
+      isConnected: integration.isConnected || false,
+      settings: integration.settings || {},
+      metadata: integration.metadata || {},
+      lastSync: null,
+      accessToken: null,
+      refreshToken: null,
+      connectedAt: integration.isConnected ? new Date() : null,
+      createdAt: new Date(),
+    };
+    this.deviceIntegrations.set(id, newIntegration);
+    return newIntegration;
+  }
+
+  async updateDeviceIntegration(userId: string, deviceType: string, updates: Partial<DeviceIntegration>): Promise<DeviceIntegration> {
+    const existing = Array.from(this.deviceIntegrations.values())
+      .find(d => d.userId === userId && d.deviceType === deviceType);
+    
+    if (!existing) {
+      // Create new integration if doesn't exist
+      return this.createDeviceIntegration({
+        userId,
+        deviceType,
+        isConnected: updates.isConnected || false,
+        settings: updates.settings || {},
+        metadata: updates.metadata || {},
+      });
+    }
+    
+    const updated = { 
+      ...existing, 
+      ...updates,
+      connectedAt: updates.isConnected ? new Date() : existing.connectedAt
+    };
+    this.deviceIntegrations.set(existing.id, updated);
+    return updated;
+  }
+
+  async syncDeviceData(userId: string, deviceType: string): Promise<any> {
+    // Mock sync - in real implementation this would call device APIs
+    const integration = Array.from(this.deviceIntegrations.values())
+      .find(d => d.userId === userId && d.deviceType === deviceType);
+    
+    if (!integration || !integration.isConnected) {
+      throw new Error('Device not connected');
+    }
+    
+    // Update last sync time
+    await this.updateDeviceIntegration(userId, deviceType, { lastSync: new Date() });
+    
+    return { message: `Successfully synced ${deviceType} data`, timestamp: new Date() };
   }
 }
 

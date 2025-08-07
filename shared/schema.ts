@@ -143,6 +143,61 @@ export const wellnessPatterns = pgTable("wellness_patterns", {
   detectedAt: timestamp("detected_at").notNull().defaultNow(),
 });
 
+export const recommendations = pgTable("recommendations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // breathwork, workout, nutrition, mindfulness, sleep
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  reasoning: text("reasoning").notNull(), // why this recommendation was made
+  instructions: text("instructions"), // step-by-step instructions
+  duration: integer("duration"), // in minutes
+  difficulty: text("difficulty").default("beginner"), // beginner, intermediate, advanced
+  tags: text("tags").array().default([]), // yoga, cardio, meditation, etc.
+  confidence: integer("confidence").default(80), // 0-100 confidence in recommendation
+  basedOnPatterns: text("based_on_patterns").array().default([]), // pattern IDs that influenced this
+  isCompleted: boolean("is_completed").notNull().default(false),
+  completedAt: timestamp("completed_at"),
+  rating: integer("rating"), // user rating 1-5 after completion
+  feedback: text("feedback"), // user feedback
+  metadata: jsonb("metadata").default({}), // additional data like links, images, etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const fitnessData = pgTable("fitness_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull().defaultNow(),
+  weight: integer("weight"), // in pounds
+  bodyFat: integer("body_fat"), // percentage
+  muscleMass: integer("muscle_mass"), // percentage
+  waterIntake: integer("water_intake"), // in ounces
+  workoutDuration: integer("workout_duration"), // in minutes
+  workoutType: text("workout_type"), // cardio, strength, yoga, etc.
+  workoutIntensity: integer("workout_intensity"), // 1-10 scale
+  restingHeartRate: integer("resting_heart_rate"), // BPM
+  bloodPressure: text("blood_pressure"), // "120/80" format
+  sleepQuality: integer("sleep_quality"), // 1-10 scale
+  stressLevel: integer("stress_level"), // 1-10 scale
+  notes: text("notes"),
+  source: text("source").default("manual"), // manual, apple_health, fitbit, garmin, etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const deviceIntegrations = pgTable("device_integrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  deviceType: text("device_type").notNull(), // apple_health, fitbit, garmin, oura, whoop, etc.
+  isConnected: boolean("is_connected").notNull().default(false),
+  lastSync: timestamp("last_sync"),
+  accessToken: text("access_token"), // encrypted token for device API
+  refreshToken: text("refresh_token"),
+  settings: jsonb("settings").default({}), // sync preferences, data types, etc.
+  metadata: jsonb("metadata").default({}), // device-specific data
+  connectedAt: timestamp("connected_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -239,6 +294,47 @@ export const insertHomeKitDataSchema = createInsertSchema(homeKitData).pick({
   devices: true,
 });
 
+export const insertRecommendationSchema = createInsertSchema(recommendations).pick({
+  userId: true,
+  type: true,
+  title: true,
+  description: true,
+  reasoning: true,
+  instructions: true,
+  duration: true,
+  difficulty: true,
+  tags: true,
+  confidence: true,
+  basedOnPatterns: true,
+  metadata: true,
+});
+
+export const insertFitnessDataSchema = createInsertSchema(fitnessData).pick({
+  userId: true,
+  date: true,
+  weight: true,
+  bodyFat: true,
+  muscleMass: true,
+  waterIntake: true,
+  workoutDuration: true,
+  workoutType: true,
+  workoutIntensity: true,
+  restingHeartRate: true,
+  bloodPressure: true,
+  sleepQuality: true,
+  stressLevel: true,
+  notes: true,
+  source: true,
+});
+
+export const insertDeviceIntegrationSchema = createInsertSchema(deviceIntegrations).pick({
+  userId: true,
+  deviceType: true,
+  isConnected: true,
+  settings: true,
+  metadata: true,
+});
+
 export const redeemAccessCodeSchema = z.object({
   code: z.string().min(1, "Access code is required"),
   email: z.string().email("Valid email is required"),
@@ -267,3 +363,9 @@ export type InsertAppleHealthData = z.infer<typeof insertAppleHealthDataSchema>;
 export type HomeKitData = typeof homeKitData.$inferSelect;
 export type InsertHomeKitData = z.infer<typeof insertHomeKitDataSchema>;
 export type WellnessPattern = typeof wellnessPatterns.$inferSelect;
+export type Recommendation = typeof recommendations.$inferSelect;
+export type InsertRecommendation = z.infer<typeof insertRecommendationSchema>;
+export type FitnessData = typeof fitnessData.$inferSelect;
+export type InsertFitnessData = z.infer<typeof insertFitnessDataSchema>;
+export type DeviceIntegration = typeof deviceIntegrations.$inferSelect;
+export type InsertDeviceIntegration = z.infer<typeof insertDeviceIntegrationSchema>;

@@ -689,6 +689,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fitness data endpoints
+  app.get("/api/fitness/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const days = parseInt(req.query.days as string) || 30;
+      const fitnessData = await storage.getFitnessData(userId, days);
+      res.json(fitnessData);
+    } catch (error) {
+      console.error("Error fetching fitness data:", error);
+      res.status(500).json({ error: "Failed to fetch fitness data" });
+    }
+  });
+
+  app.post("/api/fitness", async (req, res) => {
+    try {
+      const fitnessData = await storage.createFitnessData(req.body);
+      res.json(fitnessData);
+    } catch (error) {
+      console.error("Error saving fitness data:", error);
+      res.status(500).json({ error: "Failed to save fitness data" });
+    }
+  });
+
+  // Recommendations endpoints
+  app.get("/api/recommendations/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const recommendations = await storage.getRecommendations(userId, limit);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch recommendations" });
+    }
+  });
+
+  app.post("/api/recommendations/generate/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const recommendations = await storage.generateRecommendations(userId);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      res.status(500).json({ error: "Failed to generate recommendations" });
+    }
+  });
+
+  app.patch("/api/recommendations/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updated = await storage.updateRecommendation(id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating recommendation:", error);
+      res.status(500).json({ error: "Failed to update recommendation" });
+    }
+  });
+
   // Development/Test endpoints
   app.post("/api/test/populate-dashboard/:userId", async (req, res) => {
     try {
