@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
 import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern, Recommendation, FitnessData, DeviceIntegration } from '@shared/schema';
 import { VibeMatchInterface } from '@/components/VibeMatchInterface';
+import { EnhancedCheckInForm } from '@/components/EnhancedCheckInForm';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -199,11 +200,10 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="checkin">Check-in</TabsTrigger>
+            <TabsTrigger value="checkin">Check-in & Health</TabsTrigger>
             <TabsTrigger value="habits">Habits</TabsTrigger>
-            <TabsTrigger value="fitness">Fitness</TabsTrigger>
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
             <TabsTrigger value="integrations">Devices</TabsTrigger>
             <TabsTrigger value="horoscope">Astrology</TabsTrigger>
@@ -372,20 +372,20 @@ export default function DashboardPage() {
             )}
           </TabsContent>
 
-          {/* Daily Check-in Tab */}
+          {/* Daily Check-in & Health Tab */}
           <TabsContent value="checkin" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Daily Wellness Check-in</CardTitle>
+                <CardTitle>Daily Wellness & Health Check-in</CardTitle>
                 <p className="text-sm text-gray-600">
-                  Take a moment to reflect on how you're feeling today
+                  Track your emotional wellbeing and physical health in one place
                 </p>
                 <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
-                  💡 <strong>Daily Practice:</strong> Regular check-ins help you become more aware of your emotional patterns and create a foundation for personal growth. Even 2 minutes of reflection can make a difference.
+                  💡 <strong>Holistic Tracking:</strong> Combined emotional and physical tracking gives our AI deeper insights for personalized recommendations. Track what feels important to you today.
                 </div>
               </CardHeader>
               <CardContent>
-                <DailyCheckInForm 
+                <EnhancedCheckInForm 
                   onSubmit={(data) => checkInMutation.mutate(data)}
                   isLoading={checkInMutation.isPending}
                   existingData={todayMetric}
@@ -433,68 +433,6 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
 
-          {/* Fitness Tab */}
-          <TabsContent value="fitness" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Fitness Input */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-heartbeat text-red-500 mr-2"></i>
-                    Today's Fitness & Health
-                  </CardTitle>
-                  <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mt-2">
-                    💡 <strong>Manual Tracking:</strong> Input your daily health metrics manually. This data helps our AI provide personalized recommendations for your wellness journey.
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <FitnessInputForm userId={userId!} />
-                </CardContent>
-              </Card>
-
-              {/* Recent Fitness Data */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-chart-area text-blue-500 mr-2"></i>
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {dashboardData?.fitnessData && dashboardData.fitnessData.length > 0 ? (
-                    <div className="space-y-3">
-                      {dashboardData.fitnessData.slice(0, 3).map((fitness) => (
-                        <div key={fitness.id} className="p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">
-                              {new Date(fitness.date).toLocaleDateString()}
-                            </span>
-                            {fitness.workoutType && (
-                              <Badge variant="outline" className="text-xs capitalize">
-                                {fitness.workoutType}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                            {fitness.weight && <div>Weight: {fitness.weight}lbs</div>}
-                            {fitness.workoutDuration && <div>Workout: {fitness.workoutDuration}min</div>}
-                            {fitness.waterIntake && <div>Water: {fitness.waterIntake}oz</div>}
-                            {fitness.sleepQuality && <div>Sleep: {fitness.sleepQuality}/10</div>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <i className="fas fa-chart-line text-3xl text-gray-300 mb-3"></i>
-                      <p className="text-gray-600">No fitness data yet</p>
-                      <p className="text-xs text-gray-500">Start tracking to see your progress</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
 
           {/* Patterns Tab */}
           <TabsContent value="patterns" className="space-y-6">
@@ -1039,6 +977,13 @@ function DailyCheckInForm({
     stress: existingData?.stress || 5,
     gratitude: existingData?.gratitude || '',
     reflection: existingData?.reflection || '',
+    // Health/fitness fields
+    weight: '',
+    workoutType: '',
+    workoutDuration: '',
+    waterIntake: '',
+    sleepHours: '',
+    sleepQuality: 5,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
