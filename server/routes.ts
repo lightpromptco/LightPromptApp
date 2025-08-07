@@ -315,18 +315,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   app.get("/api/admin/users", async (req, res) => {
     try {
-      // For now, allow any user to get all users for demo purposes
-      // In production, you'd use requireAdmin middleware
-      const { data, error } = await (storage as any).supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      res.json(data || []);
+      // Simple list of all users from in-memory storage
+      const users = Array.from((storage as any).users.values());
+      res.json(users);
     } catch (error: any) {
       console.error("Error getting users:", error);
       res.status(500).json({ error: "Failed to get users" });
+    }
+  });
+
+  // Admin override - set user to admin tier (for development)
+  app.post("/api/admin/override/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const user = await storage.updateUser(userId, { 
+        tier: 'admin',
+        role: 'admin',
+        tokenLimit: 1000 // Give admin users high token limit
+      });
+      res.json({ message: 'User granted admin access', user });
+    } catch (error: any) {
+      console.error("Error setting admin:", error);
+      res.status(500).json({ error: "Failed to set admin access" });
+    }
+  });
+
+  // Get current user's admin status
+  app.get("/api/admin/check/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ 
+        isAdmin: user.tier === 'admin' || user.role === 'admin',
+        tier: user.tier,
+        role: user.role,
+        tokenLimit: user.tokenLimit
+      });
+    } catch (error: any) {
+      console.error("Error checking admin:", error);
+      res.status(500).json({ error: "Failed to check admin status" });
     }
   });
 
