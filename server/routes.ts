@@ -5,7 +5,7 @@ import { ObjectStorageService } from "./objectStorage";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
-  insertUserProfileSchema 
+  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema 
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -357,6 +357,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error resetting tokens:", error);
       res.status(500).json({ error: "Failed to reset tokens" });
+    }
+  });
+
+  // Access code routes
+  app.post("/api/access-codes", async (req, res) => {
+    try {
+      const accessCodeData = insertAccessCodeSchema.parse(req.body);
+      const accessCode = await storage.createAccessCode(accessCodeData);
+      res.json(accessCode);
+    } catch (error: any) {
+      console.error("Error creating access code:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create access code' });
+    }
+  });
+
+  // Generate test access code (for development)
+  app.post("/api/generate-test-code", async (req, res) => {
+    try {
+      // Generate a readable access code format: XXXX-XXXX-XXXX
+      const generateReadableCode = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 12; i++) {
+          if (i > 0 && i % 4 === 0) result += '-';
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      };
+
+      let code = generateReadableCode();
+      
+      // Ensure code is unique
+      while (await storage.getAccessCode(code)) {
+        code = generateReadableCode();
+      }
+
+      // Set expiration date (1 year from now)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 365);
+
+      // Create the access code
+      const accessCode = await storage.createAccessCode({
+        code,
+        type: 'course',
+        expiresAt,
+        metadata: {
+          courseTitle: 'LightPrompt:Ed',
+          generatedAt: new Date().toISOString(),
+          tokenLimit: 50
+        }
+      });
+
+      res.json({ code, accessCode });
+    } catch (error: any) {
+      console.error("Error generating test code:", error);
+      res.status(500).json({ error: error?.message || 'Failed to generate test code' });
+    }
+  });
+
+  app.post("/api/redeem-access-code", async (req, res) => {
+    try {
+      const { code, email } = redeemAccessCodeSchema.parse(req.body);
+      
+      // Find or create user with this email
+      let user = await storage.getUserByEmail(email);
+      if (!user) {
+        user = await storage.createUser({ 
+          email, 
+          name: email.split('@')[0] // Use part before @ as default name
+        });
+      }
+
+      // Redeem the access code
+      const redeemedCode = await storage.redeemAccessCode(code, user.id);
+      
+      // Return updated user
+      const updatedUser = await storage.getUser(user.id);
+      res.json({ user: updatedUser, accessCode: redeemedCode });
+    } catch (error: any) {
+      console.error("Error redeeming access code:", error);
+      res.status(400).json({ error: error?.message || 'Failed to redeem access code' });
     }
   });
 

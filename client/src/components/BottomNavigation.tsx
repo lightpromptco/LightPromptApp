@@ -32,6 +32,7 @@ export function BottomNavigation({
     if (bot.tier === '$29+' && ['tier_29', 'tier_49', 'admin'].includes(user.tier)) return true;
     if (bot.tier === '$49+' && ['tier_49', 'admin'].includes(user.tier)) return true;
     if (bot.tier === 'Quest' && ['admin'].includes(user.tier)) return true;
+    if (bot.tier === 'Course' && (user.courseAccess || ['admin'].includes(user.tier))) return true;
     return false;
   };
 
@@ -44,7 +45,13 @@ export function BottomNavigation({
   };
 
   const handleUpgrade = () => {
-    window.open('mailto:support@lightprompt.com?subject=Upgrade%20Request&body=Hi!%20I%27d%20like%20to%20upgrade%20to%20access%20premium%20wellness%20bots.', '_blank');
+    if (showUpgradeModal?.tier === 'Course') {
+      // For course tier, redirect to access code page
+      window.location.href = '/course-access';
+    } else {
+      // For other tiers, send upgrade email
+      window.open('mailto:support@lightprompt.com?subject=Upgrade%20Request&body=Hi!%20I%27d%20like%20to%20upgrade%20to%20access%20premium%20wellness%20bots.', '_blank');
+    }
     setShowUpgradeModal(null);
   };
 
@@ -234,8 +241,17 @@ export function BottomNavigation({
                   onClick={handleUpgrade}
                   className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
                 >
-                  <i className="fas fa-rocket mr-2"></i>
-                  Upgrade to Access
+                  {showUpgradeModal.tier === 'Course' ? (
+                    <>
+                      <i className="fas fa-unlock mr-2"></i>
+                      Enter Access Code
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-rocket mr-2"></i>
+                      Upgrade to Access
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -248,7 +264,10 @@ export function BottomNavigation({
               
               {/* Footer */}
               <p className="text-xs text-gray-500 mt-4">
-                Unlock advanced wellness features with a premium subscription
+                {showUpgradeModal.tier === 'Course' 
+                  ? 'Access this bot with your LightPrompt:Ed course purchase'
+                  : 'Unlock advanced wellness features with a premium subscription'
+                }
               </p>
             </div>
           </div>

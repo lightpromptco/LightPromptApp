@@ -8,11 +8,13 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
-  tier: text("tier").notNull().default("free"), // free, tier_29, tier_49, admin
+  tier: text("tier").notNull().default("free"), // free, tier_29, tier_49, admin, course
   role: text("role").notNull().default("user"), // user, admin
   tokensUsed: integer("tokens_used").notNull().default(0),
   tokenLimit: integer("token_limit").notNull().default(10),
   resetDate: timestamp("reset_date").notNull().defaultNow(),
+  courseAccess: boolean("course_access").notNull().default(false),
+  courseAccessDate: timestamp("course_access_date"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -48,6 +50,18 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const accessCodes = pgTable("access_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  type: text("type").notNull().default("course"), // course, upgrade, etc.
+  isUsed: boolean("is_used").notNull().default(false),
+  usedBy: varchar("used_by").references(() => users.id),
+  usedAt: timestamp("used_at"),
+  expiresAt: timestamp("expires_at"),
+  metadata: jsonb("metadata").default({}), // course info, etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -81,6 +95,18 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
   privacySettings: true,
 });
 
+export const insertAccessCodeSchema = createInsertSchema(accessCodes).pick({
+  code: true,
+  type: true,
+  expiresAt: true,
+  metadata: true,
+});
+
+export const redeemAccessCodeSchema = z.object({
+  code: z.string().min(1, "Access code is required"),
+  email: z.string().email("Valid email is required"),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -90,3 +116,6 @@ export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type AccessCode = typeof accessCodes.$inferSelect;
+export type InsertAccessCode = z.infer<typeof insertAccessCodeSchema>;
+export type RedeemAccessCode = z.infer<typeof redeemAccessCodeSchema>;

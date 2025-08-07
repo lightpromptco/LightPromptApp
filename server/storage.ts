@@ -1,6 +1,7 @@
 import { 
   User, InsertUser, ChatSession, InsertChatSession, 
-  Message, InsertMessage, UserProfile, InsertUserProfile 
+  Message, InsertMessage, UserProfile, InsertUserProfile,
+  AccessCode, InsertAccessCode 
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -28,6 +29,11 @@ export interface IStorage {
   createUserProfile(profile: InsertUserProfile): Promise<UserProfile>;
   updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile>;
   
+  // Access Codes
+  getAccessCode(code: string): Promise<AccessCode | undefined>;
+  createAccessCode(accessCode: InsertAccessCode): Promise<AccessCode>;
+  redeemAccessCode(code: string, userId: string): Promise<AccessCode>;
+  
   // Usage tracking
   incrementTokenUsage(userId: string): Promise<void>;
   resetTokenUsage(userId: string): Promise<void>;
@@ -38,6 +44,7 @@ export class MemStorage implements IStorage {
   private chatSessions: Map<string, ChatSession> = new Map();
   private messages: Map<string, Message> = new Map();
   private userProfiles: Map<string, UserProfile> = new Map();
+  private accessCodes: Map<string, AccessCode> = new Map();
 
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
@@ -59,6 +66,8 @@ export class MemStorage implements IStorage {
       tokensUsed: 0,
       tokenLimit: 10,
       resetDate: now,
+      courseAccess: false,
+      courseAccessDate: null,
       createdAt: now
     };
     this.users.set(id, user);
@@ -192,6 +201,58 @@ export class MemStorage implements IStorage {
     
     const updatedUser = { ...user, tokensUsed: 0, resetDate: new Date() };
     this.users.set(userId, updatedUser);
+  }
+
+  async getAccessCode(code: string): Promise<AccessCode | undefined> {
+    return this.accessCodes.get(code);
+  }
+
+  async createAccessCode(insertAccessCode: InsertAccessCode): Promise<AccessCode> {
+    const id = randomUUID();
+    const accessCode: AccessCode = {
+      ...insertAccessCode,
+      id,
+      type: insertAccessCode.type || "course",
+      isUsed: false,
+      usedBy: null,
+      usedAt: null,
+      expiresAt: insertAccessCode.expiresAt || null,
+      metadata: insertAccessCode.metadata || {},
+      createdAt: new Date()
+    };
+    this.accessCodes.set(insertAccessCode.code, accessCode);
+    return accessCode;
+  }
+
+  async redeemAccessCode(code: string, userId: string): Promise<AccessCode> {
+    const accessCode = this.accessCodes.get(code);
+    if (!accessCode) throw new Error("Access code not found");
+    if (accessCode.isUsed) throw new Error("Access code already used");
+    if (accessCode.expiresAt && accessCode.expiresAt < new Date()) {
+      throw new Error("Access code expired");
+    }
+
+    const updatedAccessCode = {
+      ...accessCode,
+      isUsed: true,
+      usedBy: userId,
+      usedAt: new Date()
+    };
+    this.accessCodes.set(code, updatedAccessCode);
+
+    // Grant course access to user
+    const user = this.users.get(userId);
+    if (user) {
+      const updatedUser = {
+        ...user,
+        courseAccess: true,
+        courseAccessDate: new Date(),
+        tokenLimit: user.tokenLimit < 50 ? 50 : user.tokenLimit // Increase token limit for course participants
+      };
+      this.users.set(userId, updatedUser);
+    }
+
+    return updatedAccessCode;
   }
 }
 

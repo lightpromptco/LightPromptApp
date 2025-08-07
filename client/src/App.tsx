@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
 import PrivacyPage from "@/pages/privacy";
+import CourseAccessPage from "@/pages/course-access";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={ChatPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/course-access" component={CourseAccessPage} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -50,6 +50,16 @@ export const BOTS: Bot[] = [
     tier: "Quest",
     available: true,
   },
+  {
+    id: "lightprompteD",
+    name: "LightPrompt:Ed",
+    tagline: "Course reflection & integration.",
+    description: "Your dedicated learning companion for the LightPrompt:Ed course. Guides you through reflective prompts, helps integrate module insights, and supports your conscious AI journey.",
+    icon: "fas fa-graduation-cap",
+    gradient: "bg-gradient-to-br from-amber-400 to-orange-500",
+    tier: "Course",
+    available: true,
+  },
 ];
 
 export function getBotById(id: string): Bot | undefined {
