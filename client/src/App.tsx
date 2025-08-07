@@ -7,6 +7,7 @@ import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
 import PrivacyPage from "@/pages/privacy";
 import CourseAccessPage from "@/pages/course-access";
+import DashboardPage from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/admin" component={AdminPage} />
       <Route path="/privacy" component={PrivacyPage} />
       <Route path="/course-access" component={CourseAccessPage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );

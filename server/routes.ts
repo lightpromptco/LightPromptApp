@@ -5,7 +5,9 @@ import { ObjectStorageService } from "./objectStorage";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
-  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema 
+  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
+  insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
+  insertAppleHealthDataSchema, insertHomeKitDataSchema
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -479,6 +481,270 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error serving object:", error);
       res.status(404).json({ error: "Object not found" });
+    }
+  });
+
+  // Wellness Dashboard API Routes
+  
+  // Get comprehensive dashboard data
+  app.get("/api/dashboard/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      
+      // Get all dashboard data in parallel
+      const [metrics, habits, patterns, appleHealth, homeKit] = await Promise.all([
+        storage.getWellnessMetrics(userId, days),
+        storage.getUserHabits(userId),
+        storage.getWellnessPatterns(userId),
+        storage.getAppleHealthData(userId, days),
+        storage.getHomeKitData(userId, days)
+      ]);
+      
+      // Get habit entries for each habit
+      const habitEntries: Record<string, any[]> = {};
+      for (const habit of habits) {
+        habitEntries[habit.id] = await storage.getHabitEntries(habit.id, days);
+      }
+      
+      // Detect new patterns
+      await storage.detectPatterns(userId);
+      
+      res.json({
+        metrics,
+        habits,
+        habitEntries,
+        patterns,
+        appleHealth,
+        homeKit
+      });
+    } catch (error) {
+      console.error("Error getting dashboard data:", error);
+      res.status(500).json({ error: "Failed to get dashboard data" });
+    }
+  });
+  
+  // Wellness Metrics
+  app.post("/api/wellness-metrics", async (req, res) => {
+    try {
+      const metricData = insertWellnessMetricSchema.parse(req.body);
+      const metric = await storage.createWellnessMetric(metricData);
+      res.json(metric);
+    } catch (error: any) {
+      console.error("Error creating wellness metric:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create wellness metric' });
+    }
+  });
+  
+  app.get("/api/wellness-metrics/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const metrics = await storage.getWellnessMetrics(userId, days);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error getting wellness metrics:", error);
+      res.status(500).json({ error: "Failed to get wellness metrics" });
+    }
+  });
+  
+  // Habits
+  app.post("/api/habits", async (req, res) => {
+    try {
+      const habitData = insertHabitSchema.parse(req.body);
+      const habit = await storage.createHabit(habitData);
+      res.json(habit);
+    } catch (error: any) {
+      console.error("Error creating habit:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create habit' });
+    }
+  });
+  
+  app.get("/api/habits/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const habits = await storage.getUserHabits(userId);
+      res.json(habits);
+    } catch (error) {
+      console.error("Error getting habits:", error);
+      res.status(500).json({ error: "Failed to get habits" });
+    }
+  });
+  
+  app.put("/api/habits/:habitId", async (req, res) => {
+    try {
+      const { habitId } = req.params;
+      const updates = req.body;
+      const habit = await storage.updateHabit(habitId, updates);
+      res.json(habit);
+    } catch (error: any) {
+      console.error("Error updating habit:", error);
+      res.status(400).json({ error: error?.message || 'Failed to update habit' });
+    }
+  });
+  
+  app.delete("/api/habits/:habitId", async (req, res) => {
+    try {
+      const { habitId } = req.params;
+      await storage.deleteHabit(habitId);
+      res.json({ message: "Habit deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting habit:", error);
+      res.status(400).json({ error: error?.message || 'Failed to delete habit' });
+    }
+  });
+  
+  // Habit Entries
+  app.post("/api/habit-entries", async (req, res) => {
+    try {
+      const entryData = insertHabitEntrySchema.parse(req.body);
+      const entry = await storage.createHabitEntry(entryData);
+      res.json(entry);
+    } catch (error: any) {
+      console.error("Error creating habit entry:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create habit entry' });
+    }
+  });
+  
+  app.get("/api/habit-entries/:habitId", async (req, res) => {
+    try {
+      const { habitId } = req.params;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const entries = await storage.getHabitEntries(habitId, days);
+      res.json(entries);
+    } catch (error) {
+      console.error("Error getting habit entries:", error);
+      res.status(500).json({ error: "Failed to get habit entries" });
+    }
+  });
+  
+  // Apple Health Integration
+  app.post("/api/apple-health/sync", async (req, res) => {
+    try {
+      const healthData = insertAppleHealthDataSchema.parse(req.body);
+      const data = await storage.syncAppleHealthData(healthData);
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error syncing Apple Health data:", error);
+      res.status(400).json({ error: error?.message || 'Failed to sync Apple Health data' });
+    }
+  });
+  
+  app.get("/api/apple-health/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const data = await storage.getAppleHealthData(userId, days);
+      res.json(data);
+    } catch (error) {
+      console.error("Error getting Apple Health data:", error);
+      res.status(500).json({ error: "Failed to get Apple Health data" });
+    }
+  });
+  
+  // HomeKit Integration
+  app.post("/api/homekit/sync", async (req, res) => {
+    try {
+      const homeKitData = insertHomeKitDataSchema.parse(req.body);
+      const data = await storage.syncHomeKitData(homeKitData);
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error syncing HomeKit data:", error);
+      res.status(400).json({ error: error?.message || 'Failed to sync HomeKit data' });
+    }
+  });
+  
+  app.get("/api/homekit/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const data = await storage.getHomeKitData(userId, days);
+      res.json(data);
+    } catch (error) {
+      console.error("Error getting HomeKit data:", error);
+      res.status(500).json({ error: "Failed to get HomeKit data" });
+    }
+  });
+  
+  // Wellness Patterns
+  app.get("/api/patterns/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const patterns = await storage.getWellnessPatterns(userId);
+      res.json(patterns);
+    } catch (error) {
+      console.error("Error getting wellness patterns:", error);
+      res.status(500).json({ error: "Failed to get wellness patterns" });
+    }
+  });
+  
+  app.post("/api/patterns/detect/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const patterns = await storage.detectPatterns(userId);
+      res.json(patterns);
+    } catch (error) {
+      console.error("Error detecting patterns:", error);
+      res.status(500).json({ error: "Failed to detect patterns" });
+    }
+  });
+
+  // Development/Test endpoints
+  app.post("/api/test/populate-dashboard/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Create sample wellness metrics for the past week
+      const sampleMetrics = [
+        { userId, mood: "happy", energy: 8, stress: 3, gratitude: "Morning coffee and sunshine", reflection: "Started the day with intention" },
+        { userId, mood: "calm", energy: 7, stress: 4, gratitude: "Good conversation with friend", reflection: "Feeling more centered today" },
+        { userId, mood: "energetic", energy: 9, stress: 2, gratitude: "Productive work session", reflection: "Flow state achieved" },
+        { userId, mood: "tired", energy: 4, stress: 6, gratitude: "Cozy evening at home", reflection: "Need more rest" },
+        { userId, mood: "focused", energy: 6, stress: 5, gratitude: "Learning new things", reflection: "Growth mindset active" }
+      ];
+      
+      // Create sample habits
+      const sampleHabits = [
+        { userId, name: "Morning Meditation", category: "mindfulness", description: "10 minutes of quiet reflection", icon: "fas fa-om", color: "#8b5cf6" },
+        { userId, name: "Daily Walk", category: "fitness", description: "30 minute walk outside", icon: "fas fa-walking", color: "#10b981" },
+        { userId, name: "Gratitude Journal", category: "mindfulness", description: "Write 3 things I'm grateful for", icon: "fas fa-heart", color: "#f59e0b" },
+        { userId, name: "Reading", category: "learning", description: "Read for 20 minutes", icon: "fas fa-book", color: "#3b82f6" }
+      ];
+      
+      // Populate data
+      const metrics = await Promise.all(
+        sampleMetrics.map(metric => storage.createWellnessMetric(metric))
+      );
+      
+      const habits = await Promise.all(
+        sampleHabits.map(habit => storage.createHabit(habit))
+      );
+      
+      // Add some habit entries
+      const habitEntries = [];
+      for (const habit of habits) {
+        // Mark some as completed for the past few days
+        for (let i = 0; i < 3; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          habitEntries.push(await storage.createHabitEntry({
+            habitId: habit.id,
+            date,
+            completed: Math.random() > 0.3, // 70% completion rate
+            count: 1
+          }));
+        }
+      }
+      
+      res.json({
+        message: "Dashboard populated with sample data",
+        metrics: metrics.length,
+        habits: habits.length,
+        habitEntries: habitEntries.length
+      });
+    } catch (error) {
+      console.error("Error populating dashboard:", error);
+      res.status(500).json({ error: "Failed to populate dashboard" });
     }
   });
 

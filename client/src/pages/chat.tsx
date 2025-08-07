@@ -8,6 +8,7 @@ import { UsageWarning } from '@/components/UsageWarning';
 import { useCircadian } from '@/hooks/useCircadian';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'wouter';
 
 export default function ChatPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -264,8 +265,47 @@ export default function ChatPage() {
         />
       </div>
 
-      {/* Embed Mode Toggle */}
-      <div className="fixed top-6 right-6 z-50">
+      {/* Navigation & Controls */}
+      <div className="fixed top-6 right-6 z-50 flex items-center space-x-3">
+        {/* Dashboard Link */}
+        <Link href="/dashboard">
+          <Button
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg transition-all duration-300"
+            title="Wellness Dashboard"
+          >
+            <i className="fas fa-chart-line text-sm"></i>
+          </Button>
+        </Link>
+
+        {/* Test Dashboard Data Button (for development) */}
+        {currentUser && (
+          <Button
+            onClick={async () => {
+              try {
+                const response = await fetch(`/api/test/populate-dashboard/${currentUser.id}`, {
+                  method: 'POST'
+                });
+                const result = await response.json();
+                toast({
+                  title: "Dashboard populated!",
+                  description: `Added ${result.metrics} metrics, ${result.habits} habits, and ${result.habitEntries} entries.`,
+                });
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: "Failed to populate dashboard data",
+                  variant: "destructive"
+                });
+              }
+            }}
+            className="w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all duration-300"
+            title="Add sample wellness data"
+          >
+            <i className="fas fa-plus text-sm"></i>
+          </Button>
+        )}
+
+        {/* Embed Mode Toggle */}
         <Button
           onClick={toggleEmbedMode}
           className="w-10 h-10 rounded-xl bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 border border-gray-200 shadow-sm transition-all duration-300"
