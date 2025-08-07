@@ -50,7 +50,7 @@ export function BottomNavigation({
       window.location.href = '/course-access';
     } else {
       // For other tiers, send upgrade email
-      window.open('mailto:support@lightprompt.com?subject=Upgrade%20Request&body=Hi!%20I%27d%20like%20to%20upgrade%20to%20access%20premium%20wellness%20bots.', '_blank');
+      window.open('mailto:lightprompt.co@gmail.com?subject=Upgrade%20Request&body=Hi!%20I%27d%20like%20to%20upgrade%20to%20access%20premium%20wellness%20bots.', '_blank');
     }
     setShowUpgradeModal(null);
   };

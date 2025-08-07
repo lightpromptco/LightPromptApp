@@ -113,7 +113,7 @@ export function UsageWarning({ user, onDismiss }: UsageWarningProps) {
                   className="text-xs h-7 px-3 bg-white/20 hover:bg-white/30 border border-current/30"
                   onClick={() => {
                     // Could link to upgrade page in the future
-                    window.open('mailto:support@lightprompt.com?subject=Upgrade%20Request', '_blank');
+                    window.open('mailto:lightprompt.co@gmail.com?subject=Upgrade%20Request', '_blank');
                   }}
                 >
                   <i className="fas fa-crown mr-1"></i>

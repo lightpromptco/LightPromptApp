@@ -177,7 +177,7 @@ export default function CourseAccessPage() {
                   variant="outline"
                   size="sm"
                   className="mt-3"
-                  onClick={() => window.open('mailto:support@lightprompt.com?subject=Course%20Access%20Help', '_blank')}
+                  onClick={() => window.open('mailto:lightprompt.co@gmail.com?subject=Course%20Access%20Help', '_blank')}
                 >
                   <i className="fas fa-envelope mr-1"></i>
                   Contact Support
