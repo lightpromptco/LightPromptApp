@@ -24,11 +24,28 @@ export function BottomNavigation({
 }: BottomNavigationProps) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState<Bot | null>(null);
+
+  const canAccessBot = (bot: Bot) => {
+    if (!user) return false;
+    if (bot.tier === 'Free') return true;
+    if (bot.tier === '$29+' && ['tier_29', 'tier_49', 'admin'].includes(user.tier)) return true;
+    if (bot.tier === '$49+' && ['tier_49', 'admin'].includes(user.tier)) return true;
+    if (bot.tier === 'Quest' && ['admin'].includes(user.tier)) return true;
+    return false;
+  };
 
   const handleBotSelect = (bot: Bot) => {
-    if (bot.available) {
+    if (canAccessBot(bot)) {
       onBotChange(bot);
+    } else {
+      setShowUpgradeModal(bot);
     }
+  };
+
+  const handleUpgrade = () => {
+    window.open('mailto:support@lightprompt.com?subject=Upgrade%20Request&body=Hi!%20I%27d%20like%20to%20upgrade%20to%20access%20premium%20wellness%20bots.', '_blank');
+    setShowUpgradeModal(null);
   };
 
   const handleGetUploadParameters = async () => {
@@ -75,13 +92,12 @@ export function BottomNavigation({
                 <button
                   key={bot.id}
                   onClick={() => handleBotSelect(bot)}
-                  disabled={!bot.available}
                   className={`group relative flex flex-col items-center p-3 rounded-xl transition-all duration-300 min-w-[70px] ${
                     activeBot.id === bot.id 
                       ? 'bg-teal-500 text-white shadow-lg scale-105' 
-                      : bot.available 
+                      : canAccessBot(bot) 
                         ? 'hover:bg-teal-50 text-gray-600 hover:text-teal-600' 
-                        : 'opacity-50 cursor-not-allowed text-gray-400'
+                        : 'hover:bg-amber-50 text-gray-600 hover:text-amber-600 cursor-pointer'
                   }`}
                   title={bot.description}
                 >
@@ -97,9 +113,9 @@ export function BottomNavigation({
                     {bot.name.replace('Bot', '')}
                   </span>
                   
-                  {!bot.available && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-white text-xs flex items-center justify-center font-bold">
-                      {bot.tier === '$29+' ? '29' : bot.tier === '$49+' ? '49' : '✦'}
+                  {!canAccessBot(bot) && (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs flex items-center justify-center font-bold shadow-lg border-2 border-white hover:scale-110 transition-transform">
+                      <i className="fas fa-plus"></i>
                     </div>
                   )}
                   
@@ -183,6 +199,60 @@ export function BottomNavigation({
           onClose={() => setShowSettings(false)}
           onLogout={onLogout}
         />
+      )}
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="text-center">
+              {/* Bot Icon */}
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                <i className={`${showUpgradeModal.icon} text-white text-2xl`}></i>
+              </div>
+              
+              {/* Title */}
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{showUpgradeModal.name}</h3>
+              <p className="text-gray-600 mb-4">{showUpgradeModal.tagline}</p>
+              
+              {/* Description */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <p className="text-sm text-gray-700">{showUpgradeModal.description}</p>
+              </div>
+              
+              {/* Tier Badge */}
+              <div className="mb-6">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+                  <i className="fas fa-crown mr-1"></i>
+                  {showUpgradeModal.tier} Tier Required
+                </span>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleUpgrade}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                >
+                  <i className="fas fa-rocket mr-2"></i>
+                  Upgrade to Access
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowUpgradeModal(null)}
+                  className="w-full"
+                >
+                  Maybe Later
+                </Button>
+              </div>
+              
+              {/* Footer */}
+              <p className="text-xs text-gray-500 mt-4">
+                Unlock advanced wellness features with a premium subscription
+              </p>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
