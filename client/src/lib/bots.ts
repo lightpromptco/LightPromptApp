@@ -28,7 +28,7 @@ export const BOTS: Bot[] = [
     icon: "fas fa-heart",
     gradient: "bg-gradient-to-br from-emerald-400 to-teal-500",
     tier: "$29+",
-    available: false,
+    available: true,
   },
   {
     id: "soulmap",
@@ -38,7 +38,7 @@ export const BOTS: Bot[] = [
     icon: "fas fa-map",
     gradient: "bg-gradient-to-br from-purple-400 to-pink-500",
     tier: "$49+",
-    available: false,
+    available: true,
   },
   {
     id: "visionquest",
@@ -48,7 +48,7 @@ export const BOTS: Bot[] = [
     icon: "fas fa-eye",
     gradient: "bg-gradient-to-br from-indigo-400 to-purple-600",
     tier: "Quest",
-    available: false,
+    available: true,
   },
 ];
 
