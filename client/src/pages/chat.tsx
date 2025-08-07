@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, UserProfile, ChatSession } from '@shared/schema';
 import { BOTS, Bot, getBotById } from '@/lib/bots';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { ChatInterface } from '@/components/ChatInterface';
+import { UsageWarning } from '@/components/UsageWarning';
 import { useCircadian } from '@/hooks/useCircadian';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +14,8 @@ export default function ChatPage() {
   const [activeBot, setActiveBot] = useState<Bot>(BOTS[0]);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
   const [isEmbedMode, setIsEmbedMode] = useState(false);
+  const [sessionValidated, setSessionValidated] = useState(false);
+  const [lastUsageCheck, setLastUsageCheck] = useState(0);
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -20,10 +23,34 @@ export default function ChatPage() {
   // Initialize circadian theming
   useCircadian();
 
-  // Create or get user on mount
+  // Create or get user on mount and validate session
   useEffect(() => {
     initializeUser();
+    
+    // Set up session validation interval
+    const sessionInterval = setInterval(() => {
+      validateSession();
+    }, 60000); // Check every minute
+
+    // Set up usage monitoring
+    const usageInterval = setInterval(() => {
+      if (currentUser) {
+        checkUsageUpdates();
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => {
+      clearInterval(sessionInterval);
+      clearInterval(usageInterval);
+    };
   }, []);
+
+  // Monitor user changes for session validation
+  useEffect(() => {
+    if (currentUser && !sessionValidated) {
+      validateSession();
+    }
+  }, [currentUser]);
 
   // Load session when bot changes
   useEffect(() => {
@@ -42,6 +69,10 @@ export default function ChatPage() {
         const response = await fetch(`/api/users/${storedUserId}`);
         if (response.ok) {
           user = await response.json();
+          console.log('✅ Session restored for user:', user?.name);
+        } else {
+          console.log('❌ Stored user session invalid, clearing...');
+          localStorage.removeItem('lightprompt_user_id');
         }
       }
 
@@ -60,11 +91,17 @@ export default function ChatPage() {
           user = await response.json();
           if (user) {
             localStorage.setItem('lightprompt_user_id', user.id);
+            console.log('✅ New user session created:', user?.name);
+            toast({
+              title: "Welcome to LightPrompt!",
+              description: "Your session has been created. Chat data will persist across visits.",
+            });
           }
         }
       }
 
       setCurrentUser(user);
+      setLastUsageCheck(user?.tokensUsed || 0);
     } catch (error) {
       console.error('Failed to initialize user:', error);
       toast({
@@ -137,10 +174,55 @@ export default function ChatPage() {
     }
   };
 
+  // Session validation to ensure user data is fresh
+  const validateSession = useCallback(async () => {
+    const storedUserId = localStorage.getItem('lightprompt_user_id');
+    if (!storedUserId || !currentUser) return;
+
+    try {
+      const response = await fetch(`/api/users/${storedUserId}`);
+      if (response.ok) {
+        const freshUser = await response.json();
+        // Update user data if it has changed
+        if (JSON.stringify(currentUser) !== JSON.stringify(freshUser)) {
+          setCurrentUser(freshUser);
+          console.log('🔄 Session refreshed with updated user data');
+        }
+        setSessionValidated(true);
+      } else {
+        console.log('❌ Session validation failed, re-initializing...');
+        localStorage.removeItem('lightprompt_user_id');
+        setCurrentUser(null);
+        initializeUser();
+      }
+    } catch (error) {
+      console.error('Session validation error:', error);
+    }
+  }, [currentUser]);
+
+  // Check for usage updates and show warnings
+  const checkUsageUpdates = useCallback(async () => {
+    if (!currentUser) return;
+
+    // If usage has increased since last check, refresh user data
+    if (currentUser.tokensUsed > lastUsageCheck) {
+      validateSession();
+      setLastUsageCheck(currentUser.tokensUsed);
+    }
+  }, [currentUser, lastUsageCheck, validateSession]);
+
   const handleLogout = () => {
+    console.log('👋 User logging out, but will auto-create new session');
     setCurrentUser(null);
     setCurrentSession(null);
+    setSessionValidated(false);
     localStorage.removeItem('lightprompt_user_id');
+    
+    toast({
+      title: "Logged out",
+      description: "A new anonymous session will be created automatically.",
+    });
+
     // The app will reinitialize a new user automatically
     setTimeout(() => {
       initializeUser();
@@ -159,6 +241,9 @@ export default function ChatPage() {
     <>
       {/* Circadian Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-white to-gray-50 -z-10" />
+
+      {/* Usage Warning */}
+      {currentUser && <UsageWarning user={currentUser} />}
 
       {/* Main Container */}
       <div className={`${isEmbedMode ? 'embed-mode' : 'standalone-mode'}`}>

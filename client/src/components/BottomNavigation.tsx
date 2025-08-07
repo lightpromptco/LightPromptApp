@@ -160,9 +160,12 @@ export function BottomNavigation({
                   </div>
                   
                   <div className="hidden sm:block text-right">
-                    <div className="text-xs font-medium text-gray-700">{user.name}</div>
+                    <div className="flex items-center space-x-1 justify-end mb-1">
+                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                      <div className="text-xs font-medium text-gray-700">{user.name}</div>
+                    </div>
                     <div className="text-xs text-gray-500">
-                      {user.tokensUsed}/{user.tokenLimit} daily
+                      {user.tokensUsed}/{user.tokenLimit} daily • Session saved
                     </div>
                   </div>
                 </div>
