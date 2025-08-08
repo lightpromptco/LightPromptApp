@@ -41,6 +41,16 @@ export const BOTS: Bot[] = [
     available: true,
   },
   {
+    id: "geoprompt",
+    name: "GeoPrompt",
+    tagline: "Location-based wisdom.",
+    description: "Connect with meaningful places through AI-guided location reflections. Share your current space and receive contextual prompts based on where you are and how you're feeling.",
+    icon: "fas fa-map-marker-alt",
+    gradient: "bg-gradient-to-br from-green-400 to-teal-500",
+    tier: "$29+",
+    available: true,
+  },
+  {
     id: "visionquest",
     name: "VisionQuest",
     tagline: "Train your perception.",

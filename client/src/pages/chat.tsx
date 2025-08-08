@@ -281,10 +281,10 @@ export default function ChatPage() {
         {/* Dashboard Link */}
         <Link href="/dashboard">
           <Button
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg transition-all duration-300"
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg transition-all duration-300"
             title="Wellness Dashboard"
           >
-            <i className="fas fa-chart-line text-sm"></i>
+            <i className="fas fa-eye text-sm"></i>
           </Button>
         </Link>
 

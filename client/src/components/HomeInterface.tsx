@@ -27,12 +27,9 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
     <div className="space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 py-12">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
-          <i className="fas fa-eye text-white text-2xl"></i>
-        </div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex items-center justify-center">
-          <div className="w-12 h-12 mr-4 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
-            <i className="fas fa-eye text-white text-xl"></i>
+          <div className="w-16 h-16 mr-4 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+            <i className="fas fa-eye text-white text-2xl"></i>
           </div>
           LightPrompt
         </h1>
@@ -47,7 +44,7 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
               Start Your Journey
             </Button>
           </a>
-          <a href="/dashboard?view=community">
+          <a href="/dashboard?view=settings">
             <Button size="lg" variant="outline">
               <i className="fas fa-credit-card mr-2"></i>
               Plans & Features

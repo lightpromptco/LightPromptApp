@@ -376,7 +376,7 @@ export default function DashboardPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('community')}>
                   <i className="fas fa-comments mr-2"></i>
-                  Community & Plans
+                  Community
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('blog')}>
                   <i className="fas fa-book mr-2"></i>
@@ -388,7 +388,7 @@ export default function DashboardPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('settings')}>
                   <i className="fas fa-cog mr-2"></i>
-                  Settings
+                  Settings & Plans
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -738,27 +738,47 @@ export default function DashboardPage() {
           {activeView === 'settings' && (
             <div className="space-y-6">
               <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
-                💡 <strong>How it works:</strong> Customize your LightPrompt experience by adjusting privacy settings, notification preferences, and AI personality traits to match your unique wellness journey.
+                💡 <strong>How it works:</strong> Customize your LightPrompt experience and choose the plan that best fits your wellness journey. Each tier offers different levels of AI interaction and features.
               </div>
               <SettingsInterface userId={userId!} />
-            </div>
-          )}
-
-          {/* Community/Pricing Tab */}
-          {activeView === 'community' && (
-            <div className="space-y-6">
+              
+              {/* Plans & Features Section */}
               <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-lg p-8">
                   <h3 className="text-xl font-semibold mb-6 flex items-center">
                     <i className="fas fa-credit-card text-teal-600 mr-2"></i>
                     Plans & Features
                   </h3>
-                  <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
-                    💡 <strong>How it works:</strong> Choose the plan that best fits your wellness journey. Each tier offers different levels of AI interaction, features, and token allowances.
-                  </div>
                   {user && <PricingInterface user={user} />}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Community Tab */}
+          {activeView === 'community' && (
+            <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Connect with like-minded souls on your wellness journey through shared experiences, group challenges, and meaningful conversations.
+              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-users text-teal-600 mr-2"></i>
+                    Community Features
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Coming soon - Connect with your wellness tribe
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <i className="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                    <h3 className="text-lg font-medium text-gray-700 mb-2">Community features launching soon</h3>
+                    <p className="text-gray-600">Group challenges, shared reflections, and wellness circles</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
           
@@ -863,6 +883,70 @@ export default function DashboardPage() {
           {/* GeoPrompt Tab */}
           {activeView === 'geoprompt' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Check in at meaningful locations, get AI-guided reflections, and connect with others who resonate with these special places.
+              </div>
+              
+              {/* AI Monitored Check-in Section */}
+              <Card className="bg-gradient-to-br from-green-50 to-teal-50 border-green-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-map-pin text-green-600 mr-2"></i>
+                    AI Monitored Check-in
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Share your current location vibe and get personalized reflections
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="location-select">Choose Location</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a location..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="central-park">Central Park, NYC</SelectItem>
+                          <SelectItem value="golden-gate">Golden Gate Bridge, SF</SelectItem>
+                          <SelectItem value="sedona">Sedona Vortexes, AZ</SelectItem>
+                          <SelectItem value="mount-fuji">Mount Fuji, Japan</SelectItem>
+                          <SelectItem value="stonehenge">Stonehenge, UK</SelectItem>
+                          <SelectItem value="machu-picchu">Machu Picchu, Peru</SelectItem>
+                          <SelectItem value="custom">Custom Location</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="vibe-check">Current Vibe</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="How are you feeling?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="peaceful">🕊️ Peaceful & Centered</SelectItem>
+                          <SelectItem value="energized">⚡ Energized & Inspired</SelectItem>
+                          <SelectItem value="contemplative">🤔 Contemplative & Reflective</SelectItem>
+                          <SelectItem value="grateful">🙏 Grateful & Appreciative</SelectItem>
+                          <SelectItem value="curious">🔍 Curious & Open</SelectItem>
+                          <SelectItem value="emotional">💭 Processing Emotions</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <Button className="flex-1 bg-gradient-to-r from-green-600 to-teal-600">
+                      <i className="fas fa-map-pin mr-2"></i>
+                      Check In
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      <i className="fas fa-robot mr-2"></i>
+                      Chat with GeoPrompt Bot
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">

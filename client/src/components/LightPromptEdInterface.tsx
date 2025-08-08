@@ -166,13 +166,13 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg">
                   <i className="fas fa-list text-2xl text-cyan-600 mb-2"></i>
-                  <div className="text-lg font-semibold">5 modules</div>
+                  <div className="text-lg font-semibold">12 modules</div>
                   <div className="text-sm text-gray-600">structured learning</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg">
                   <i className="fas fa-video text-2xl text-purple-600 mb-2"></i>
                   <div className="text-lg font-semibold">Mixed format</div>
-                  <div className="text-sm text-gray-600">video, audio, exercises</div>
+                  <div className="text-sm text-gray-600">text, exercises, AI bot</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg">
                   <i className="fas fa-infinity text-2xl text-indigo-600 mb-2"></i>
@@ -196,7 +196,7 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
           
           <div className="mb-6">
             <div className="text-4xl font-bold text-gray-900 mb-2">
-              $197
+              $120
               <span className="text-lg font-normal text-gray-600 ml-2">one-time payment</span>
             </div>
             <p className="text-sm text-gray-600">30-day money-back guarantee</p>
@@ -221,8 +221,8 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
               Access anywhere
             </div>
             <div className="flex items-center">
-              <i className="fas fa-certificate text-purple-500 mr-2"></i>
-              Course certificate
+              <i className="fas fa-file-pdf text-purple-500 mr-2"></i>
+              Downloadable PDF
             </div>
           </div>
         </CardContent>
