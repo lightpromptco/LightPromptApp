@@ -103,11 +103,10 @@ export default function PlansPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-teal-600 bg-clip-text text-transparent">
-            LightPrompt Plans & Features
+            LightPrompt Pricing Plans
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Soul-tech wellness AI companions - completely free within your daily token allowance. 
-            No subscriptions, no paywalls, just mindful usage limits.
+            Choose the perfect plan for your wellness journey. From free exploration to enterprise-level customization.
           </p>
         </div>
 
@@ -209,246 +208,343 @@ export default function PlansPage() {
           </CardContent>
         </Card>
 
-        {/* Multiple Plan Tiers */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Basic/Free Tier */}
+        {/* Original Pricing Tiers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Explorer Tier - Free */}
           <Card className="relative bg-gradient-to-br from-gray-50 to-slate-50 border-slate-200">
             <CardHeader className="bg-gradient-to-r from-gray-600 to-slate-600 text-white rounded-t-lg">
               <div className="text-center">
-                <CardTitle className="text-xl">Basic</CardTitle>
-                <p className="text-gray-200 text-sm mt-1">Start your wellness journey</p>
+                <CardTitle className="text-xl">Explorer</CardTitle>
+                <p className="text-gray-200 text-sm mt-1">Perfect for discovering your wellness journey</p>
                 <div className="text-3xl font-bold mt-2">$0</div>
-                <div className="text-gray-300 text-xs">Forever Free</div>
+                <div className="text-gray-300 text-xs">/mo</div>
+                <div className="text-gray-300 text-xs">Forever free</div>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="bg-green-50 p-3 rounded border border-green-200">
-                  <div className="text-center text-green-800 font-medium mb-2">
-                    <i className="fas fa-coins mr-2"></i>10 Daily Tokens
-                  </div>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>All Bots: LightPrompt, BodyMirror, WooWoo, GeoPrompt, VisionQuest (within token limits)</span>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>All 5 AI wellness bots</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Basic wellness dashboard</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Join wellness challenges</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Voice features</span>
-                  </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>5 daily check-ins per month</span>
                 </div>
-
-                <Button className="w-full bg-gray-600 hover:bg-gray-700" onClick={() => window.location.href = '/'}>
-                  <i className="fas fa-rocket mr-2"></i>
-                  Start Free
-                </Button>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>3 custom habits tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Basic WooWoo (astrology, metaphysical wisdom)</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Community group access</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>2 wellness patterns per month</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Partner mode preview (1 connection)</span>
+                </div>
               </div>
+              
+              <div className="bg-gray-50 p-2 rounded text-xs text-center">
+                <div><strong>Monthly tokens:</strong> 50</div>
+                <div><strong>AI Bots:</strong> 2</div>
+                <div><strong>Daily check-ins:</strong> 5/month</div>
+                <div><strong>Habits tracking:</strong> 3</div>
+                <div><strong>WooWoo readings:</strong> 2/month</div>
+                <div><strong>GeoPrompts:</strong> 10/month</div>
+              </div>
+
+              <Button className="w-full bg-gray-600 hover:bg-gray-700" onClick={() => window.location.href = '/'}>
+                Current Plan
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Growth Tier */}
-          <Card className="relative bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 border-2 shadow-lg">
+          {/* Growth Tier - $29 */}
+          <Card className="relative bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200 border-2 shadow-lg">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <Badge className="bg-blue-500 text-white px-4 py-1">
-                <i className="fas fa-star mr-1"></i>Most Popular
+              <Badge className="bg-teal-500 text-white px-4 py-1">
+                Popular
               </Badge>
             </div>
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg pt-8">
+            <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-t-lg pt-8">
               <div className="text-center">
                 <CardTitle className="text-xl">Growth</CardTitle>
-                <p className="text-blue-200 text-sm mt-1">Accelerate your wellness</p>
-                <div className="text-3xl font-bold mt-2">$0</div>
-                <div className="text-blue-300 text-xs">Free via Challenges</div>
+                <p className="text-teal-200 text-sm mt-1">For those committed to personal transformation</p>
+                <div className="text-3xl font-bold mt-2">$29</div>
+                <div className="text-teal-300 text-xs">/mo</div>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                  <div className="text-center text-blue-800 font-medium mb-2">
-                    <i className="fas fa-coins mr-2"></i>25 Daily Tokens
-                  </div>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>All Explorer features</span>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Everything in Basic</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Advanced wellness insights</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Priority challenge access</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Habit tracking widgets</span>
-                  </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Access to all specialized bots</span>
                 </div>
-
-                <Button 
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  onClick={() => window.location.href = '/challenges'}
-                >
-                  <i className="fas fa-trophy mr-2"></i>
-                  Join Challenges
-                </Button>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Unlimited habit tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Advanced wellness patterns</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>VibeMatch community features</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Voice conversations</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Export wellness data</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Full WooWoo birth chart & resources</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Unlimited partner mode connections</span>
+                </div>
               </div>
+
+              <div className="bg-teal-50 p-2 rounded text-xs text-center">
+                <div><strong>Monthly tokens:</strong> 1,000</div>
+                <div><strong>AI Bots:</strong> All</div>
+                <div><strong>Daily check-ins:</strong> Unlimited/month</div>
+                <div><strong>Habits tracking:</strong> Unlimited</div>
+                <div><strong>WooWoo readings:</strong> Unlimited/month</div>
+                <div><strong>GeoPrompts:</strong> Unlimited/month</div>
+              </div>
+
+              <Button className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
+                Upgrade Now
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Premium Tier */}
+          {/* Resonance Tier - $49 */}
           <Card className="relative bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
             <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
               <div className="text-center">
-                <CardTitle className="text-xl">Premium</CardTitle>
-                <p className="text-purple-200 text-sm mt-1">Master your wellness</p>
-                <div className="text-3xl font-bold mt-2">$0</div>
-                <div className="text-purple-300 text-xs">Free via Courses</div>
+                <CardTitle className="text-xl">Resonance</CardTitle>
+                <p className="text-purple-200 text-sm mt-1">Deep connection and partnership features</p>
+                <div className="text-3xl font-bold mt-2">$49</div>
+                <div className="text-purple-300 text-xs">/mo</div>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="bg-purple-50 p-3 rounded border border-purple-200">
-                  <div className="text-center text-purple-800 font-medium mb-2">
-                    <i className="fas fa-coins mr-2"></i>50 Daily Tokens
-                  </div>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>All Growth features</span>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Everything in Growth</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>LightPrompt:Ed bot access</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Course materials & guides</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                    <span>Advanced customization</span>
-                  </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Partner Mode (share with loved ones)</span>
                 </div>
-
-                <Button 
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                  onClick={() => window.location.href = '/course-access'}
-                >
-                  <i className="fas fa-graduation-cap mr-2"></i>
-                  Access Courses
-                </Button>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Couples wellness tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Advanced AI personality customization</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Priority support</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Early access to new features</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Custom wellness goal setting</span>
+                </div>
               </div>
+
+              <div className="bg-purple-50 p-2 rounded text-xs text-center">
+                <div><strong>Monthly tokens:</strong> 2,500</div>
+                <div><strong>AI Bots:</strong> All</div>
+                <div><strong>Daily check-ins:</strong> 0/month</div>
+                <div><strong>Habits tracking:</strong> 0</div>
+                <div><strong>WooWoo readings:</strong> 0/month</div>
+                <div><strong>GeoPrompts:</strong> 0/month</div>
+              </div>
+
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                Upgrade Now
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Enterprise Tier - $199 */}
+          <Card className="relative bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200">
+            <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-t-lg">
+              <div className="text-center">
+                <CardTitle className="text-xl">Enterprise</CardTitle>
+                <p className="text-indigo-200 text-sm mt-1">For organizations and wellness professionals</p>
+                <div className="text-3xl font-bold mt-2">$199</div>
+                <div className="text-indigo-300 text-xs">/mo</div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>All Resonance features</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Team & organization management</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Custom AI training</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Advanced analytics dashboard</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>API access</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>White-label options</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-check text-green-500 mr-2 w-4"></i>
+                  <span>Dedicated account manager</span>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 p-2 rounded text-xs text-center">
+                <div><strong>Monthly tokens:</strong> 10,000</div>
+                <div><strong>AI Bots:</strong> All</div>
+                <div><strong>Daily check-ins:</strong> 0/month</div>
+                <div><strong>Habits tracking:</strong> 0</div>
+                <div><strong>WooWoo readings:</strong> 0/month</div>
+                <div><strong>GeoPrompts:</strong> 0/month</div>
+              </div>
+
+              <Button className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700">
+                Contact Sales
+              </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Features Comparison */}
+        {/* Feature Comparison Table */}
         <Card className="bg-gradient-to-br from-white to-gray-50">
           <CardHeader>
-            <CardTitle className="text-center text-2xl">All Features Included (Free!)</CardTitle>
-            <p className="text-center text-gray-600">Every feature available within your daily token allowance</p>
+            <CardTitle className="text-center text-2xl">Feature Comparison</CardTitle>
+            <p className="text-center text-gray-600">See what's included in each plan</p>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <span className="text-xl">{feature.icon}</span>
-                  <div>
-                    <div className="font-medium text-gray-900">{feature.title}</div>
-                    <div className="text-xs text-gray-600">{feature.description}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-200">
-              <div className="text-center space-y-3">
-                <div className="flex items-center justify-center mb-3">
-                  <i className="fas fa-coins text-yellow-600 text-2xl mr-3"></i>
-                  <h3 className="text-xl font-bold text-yellow-800">How Token Tiers Work</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-sm text-yellow-700">
-                    <p><strong>Basic (10 tokens):</strong> Perfect for daily check-ins and light wellness conversations</p>
-                  </div>
-                  <div className="text-sm text-yellow-700">
-                    <p><strong>Growth (25 tokens):</strong> Ideal for regular wellness exploration and habit building</p>
-                  </div>
-                  <div className="text-sm text-yellow-700">
-                    <p><strong>Premium (50 tokens):</strong> Comprehensive wellness journey with course access</p>
-                  </div>
-                </div>
-                <div className="text-center pt-4">
-                  <p className="text-sm text-yellow-600 italic">All tokens reset daily • No subscriptions • No paywalls • Just mindful usage</p>
-                </div>
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3">Feature</th>
+                    <th className="text-center p-3">Explorer</th>
+                    <th className="text-center p-3">Growth</th>
+                    <th className="text-center p-3">Resonance</th>
+                    <th className="text-center p-3">Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">Monthly Tokens</td>
+                    <td className="text-center p-3">50</td>
+                    <td className="text-center p-3">1,000</td>
+                    <td className="text-center p-3">2,500</td>
+                    <td className="text-center p-3">10,000</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">AI Wellness Bots</td>
+                    <td className="text-center p-3">2</td>
+                    <td className="text-center p-3">All</td>
+                    <td className="text-center p-3">All</td>
+                    <td className="text-center p-3">All</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">Daily Check-ins</td>
+                    <td className="text-center p-3">5/month</td>
+                    <td className="text-center p-3">Unlimited</td>
+                    <td className="text-center p-3">Unlimited</td>
+                    <td className="text-center p-3">Unlimited</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">Habit Tracking</td>
+                    <td className="text-center p-3">3</td>
+                    <td className="text-center p-3">Unlimited</td>
+                    <td className="text-center p-3">Unlimited</td>
+                    <td className="text-center p-3">Unlimited</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">Partner Mode</td>
+                    <td className="text-center p-3">Preview (1)</td>
+                    <td className="text-center p-3">Unlimited</td>
+                    <td className="text-center p-3">Advanced</td>
+                    <td className="text-center p-3">Enterprise</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-3 font-medium">Voice Features</td>
+                    <td className="text-center p-3">Basic</td>
+                    <td className="text-center p-3">Full</td>
+                    <td className="text-center p-3">Full</td>
+                    <td className="text-center p-3">Full</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
 
-        {/* How to Upgrade Your Token Limits */}
+        {/* Why Choose LightPrompt */}
         <Card className="bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200">
           <CardHeader>
             <CardTitle className="text-center text-2xl text-emerald-800">
-              <i className="fas fa-arrow-up mr-3"></i>
-              How to Get More Tokens (Still Free!)
+              Why Choose LightPrompt?
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center space-y-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="text-3xl">🎯</div>
-                <h3 className="font-semibold text-blue-800">Join Challenges</h3>
-                <p className="text-sm text-blue-700">Complete wellness challenges to unlock Growth tier (25 daily tokens)</p>
-                <Button 
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => window.location.href = '/challenges'}
-                >
-                  <i className="fas fa-trophy mr-2"></i>
-                  View Challenges
-                </Button>
+                <div className="text-3xl">🤖</div>
+                <h3 className="font-semibold text-blue-800">Multiple AI Companions</h3>
+                <p className="text-sm text-blue-700">Access specialized bots for different aspects of your wellness journey</p>
               </div>
               
               <div className="text-center space-y-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="text-3xl">📚</div>
-                <h3 className="font-semibold text-purple-800">Take Courses</h3>
-                <p className="text-sm text-purple-700">Join courses to unlock Premium tier (50 daily tokens)</p>
-                <Button 
-                  className="bg-purple-600 hover:bg-purple-700"
-                  onClick={() => window.location.href = '/course-access'}
-                >
-                  <i className="fas fa-graduation-cap mr-2"></i>
-                  Access Courses
-                </Button>
+                <div className="text-3xl">📊</div>
+                <h3 className="font-semibold text-purple-800">Advanced Analytics</h3>
+                <p className="text-sm text-purple-700">Track your wellness patterns and progress with detailed insights</p>
               </div>
               
               <div className="text-center space-y-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                <div className="text-3xl">💝</div>
-                <h3 className="font-semibold text-emerald-800">Support Us</h3>
-                <p className="text-sm text-emerald-700">Get the foundational book and help keep LightPrompt free</p>
-                <Button 
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  onClick={() => window.open('https://gumroad.com/l/lightprompted', '_blank')}
-                >
-                  <i className="fas fa-book mr-2"></i>
-                  Get Book
-                </Button>
+                <div className="text-3xl">🔮</div>
+                <h3 className="font-semibold text-emerald-800">Metaphysical Integration</h3>
+                <p className="text-sm text-emerald-700">Unique WooWoo features for astrology and spiritual wellness guidance</p>
               </div>
             </div>
           </CardContent>
