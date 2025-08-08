@@ -280,6 +280,19 @@ export default function ChatPage() {
       </div>
 
 
+      {/* LightPrompt Logo */}
+      <div className="fixed top-6 left-6 z-50">
+        <div className="flex items-center space-x-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-600">
+          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+            <i className="fas fa-eye text-white text-sm"></i>
+          </div>
+          <div className="text-sm">
+            <div className="font-bold text-gray-900 dark:text-gray-100">LightPrompt</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Soul-Tech Wellness</div>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation & Controls */}
       <div className="fixed top-6 right-6 z-50 flex items-center space-x-3">
         {/* Dashboard Link */}

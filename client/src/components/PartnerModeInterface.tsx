@@ -21,11 +21,81 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
   const [inviteEmail, setInviteEmail] = useState('');
   const [newGoal, setNewGoal] = useState('');
   const [selectedConnection, setSelectedConnection] = useState<string | null>(null);
+  const [testMode, setTestMode] = useState(true); // Enable test mode by default
 
-  // Get partner connections
+  // Test data for partner connections (matching actual schema)
+  const testConnections: (PartnerConnection & { testPartnerName?: string; testVibeMatch?: any })[] = [
+    {
+      id: 'test-connection-1',
+      userId1: userId,
+      userId2: 'test-partner-1',
+      relationshipType: 'romantic',
+      connectionLevel: 8,
+      dataSharing: {
+        mood: true,
+        energy: true,
+        stress: false,
+        habits: true,
+        sleep: true,
+        exercise: false
+      },
+      sharedGoals: [
+        'Practice morning meditation together',
+        'Complete 30-day gratitude challenge',
+        'Weekly mindful walks in nature'
+      ],
+      isActive: true,
+      establishedAt: new Date(),
+      createdAt: new Date(),
+      // Test-only data for display
+      testPartnerName: 'Alex Chen',
+      testVibeMatch: {
+        compatibility: 92,
+        lastSync: new Date().toISOString(),
+        sharedInterests: ['mindfulness', 'wellness', 'growth'],
+        energyAlignment: 'high'
+      }
+    },
+    {
+      id: 'test-connection-2', 
+      userId1: userId,
+      userId2: 'test-partner-2',
+      relationshipType: 'growth_partner',
+      connectionLevel: 6,
+      dataSharing: {
+        mood: true,
+        energy: false,
+        stress: true,
+        habits: true,
+        sleep: false,
+        exercise: true
+      },
+      sharedGoals: [
+        'Weekly check-ins on personal growth',
+        'Share book recommendations'
+      ],
+      isActive: true,
+      establishedAt: new Date(),
+      createdAt: new Date(),
+      // Test-only data for display
+      testPartnerName: 'Sam Rivera',
+      testVibeMatch: {
+        compatibility: 78,
+        lastSync: new Date().toISOString(),
+        sharedInterests: ['personal development', 'reading', 'fitness'],
+        energyAlignment: 'medium'
+      }
+    }
+  ];
+
+  // Get partner connections (use test data in test mode)
   const { data: connections, isLoading } = useQuery<PartnerConnection[]>({
     queryKey: ['/api/partner-connections', userId],
     queryFn: async () => {
+      if (testMode) {
+        // Return test data immediately
+        return testConnections;
+      }
       const response = await fetch(`/api/partner-connections/${userId}`);
       if (!response.ok) throw new Error('Failed to fetch connections');
       return response.json();
@@ -108,10 +178,33 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Partner Mode</h2>
+        <div className="flex items-center justify-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Partner Mode</h2>
+          {testMode && (
+            <div className="ml-4 flex items-center space-x-2">
+              <span className="text-sm text-orange-600 font-medium">TEST MODE</span>
+              <Button
+                onClick={() => setTestMode(!testMode)}
+                size="sm"
+                variant="outline"
+                className="border-orange-300 text-orange-600 hover:bg-orange-50"
+              >
+                <i className="fas fa-flask mr-1"></i>
+                {testMode ? 'Exit Test' : 'Test Mode'}
+              </Button>
+            </div>
+          )}
+        </div>
         <p className="text-gray-600">
           Share your wellness journey with trusted partners and grow together through meaningful connection.
         </p>
+        {testMode && (
+          <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm text-orange-700">
+            <i className="fas fa-info-circle mr-2"></i>
+            <strong>Test Mode Active:</strong> Showing demo data with fake partners Alex Chen (💕 romantic) and Sam Rivera (🌱 growth partner). 
+            VibeMatch compatibility scores are simulated.
+          </div>
+        )}
       </div>
 
       {/* Invite Partner */}
@@ -190,10 +283,16 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
                       <i className="fas fa-user text-white"></i>
                     </div>
                     <div>
-                      <h4 className="font-semibold">Your {connection.relationshipType.replace('_', ' ')} Partner</h4>
-                      <p className="text-sm text-gray-600">
-                        Connection Level: {connection.connectionLevel}/10
-                      </p>
+                      <h4 className="font-semibold">{(connection as any).testPartnerName || `Your ${connection.relationshipType.replace('_', ' ')} Partner`}</h4>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p>Connection Level: {connection.connectionLevel}/10</p>
+                        {(connection as any).testVibeMatch && (
+                          <p className="text-purple-600">
+                            <i className="fas fa-heart mr-1"></i>
+                            VibeMatch: {(connection as any).testVibeMatch.compatibility}% compatible
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   

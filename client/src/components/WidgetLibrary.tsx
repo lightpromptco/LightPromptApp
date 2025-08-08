@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 interface Widget {
   id: string;
   title: string;
-  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar';
+  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar' | 'book-store';
   content: any;
   size: 'small' | 'medium' | 'large';
   enabled: boolean;
@@ -91,6 +91,14 @@ const AVAILABLE_WIDGETS: Omit<Widget, 'enabled'>[] = [
     content: { type: 'calendar' },
     size: 'medium',
     description: 'Your wellness schedule and upcoming activities'
+  },
+  {
+    id: 'book-store',
+    title: 'LightPrompt:ed Book',
+    type: 'book-store',
+    content: { type: 'store' },
+    size: 'large',
+    description: 'Purchase the foundational LightPrompt:ed guide and other soul-tech resources'
   }
 ];
 
@@ -110,6 +118,7 @@ export function WidgetLibrary({ onAddWidget, currentWidgets }: WidgetLibraryProp
       case 'quotes': return <i className="fas fa-quote-left text-pink-500"></i>;
       case 'weather': return <i className="fas fa-cloud-sun text-cyan-500"></i>;
       case 'calendar': return <i className="fas fa-calendar text-indigo-500"></i>;
+      case 'book-store': return <i className="fas fa-book text-emerald-500"></i>;
       default: return <i className="fas fa-square text-gray-500"></i>;
     }
   };

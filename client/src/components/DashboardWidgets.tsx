@@ -9,7 +9,7 @@ import { WidgetLibrary } from '@/components/WidgetLibrary';
 interface Widget {
   id: string;
   title: string;
-  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar';
+  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar' | 'book-store';
   content: any;
   size: 'small' | 'medium' | 'large';
   enabled: boolean;
@@ -69,6 +69,14 @@ const DEFAULT_WIDGETS: Widget[] = [
     type: 'quick-action',
     content: { action: 'chat' },
     size: 'small',
+    enabled: true
+  },
+  {
+    id: 'book-store',
+    title: 'LightPrompt:ed Book',
+    type: 'book-store',
+    content: { type: 'store' },
+    size: 'large',
     enabled: true
   }
 ];
@@ -185,6 +193,7 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       case 'quotes': return <i className="fas fa-quote-left text-pink-500"></i>;
       case 'weather': return <i className="fas fa-cloud-sun text-cyan-500"></i>;
       case 'calendar': return <i className="fas fa-calendar text-indigo-500"></i>;
+      case 'book-store': return <i className="fas fa-book text-emerald-500"></i>;
       default: return <i className="fas fa-square text-gray-500"></i>;
     }
   };
@@ -207,6 +216,8 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
         return renderWeatherWidget(widget);
       case 'calendar':
         return renderCalendarWidget(widget);
+      case 'book-store':
+        return renderBookStoreWidget(widget);
       default:
         return <div className="text-gray-500">Widget content</div>;
     }
@@ -433,6 +444,55 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
               <div className="text-xs text-gray-500">6:00 PM</div>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderBookStoreWidget = (widget: Widget) => {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-center mb-4">
+          <div className="relative">
+            <div className="w-16 h-20 bg-gradient-to-br from-purple-600 to-indigo-600 rounded shadow-lg flex items-center justify-center">
+              <i className="fas fa-eye text-white text-xl"></i>
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+              <span className="text-xs text-white font-bold">✓</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center space-y-2">
+          <h3 className="font-bold text-lg text-gray-900">LightPrompt:ed</h3>
+          <p className="text-sm text-gray-600">The foundational guide to soul-tech wellness</p>
+          <div className="flex items-center justify-center space-x-2">
+            <span className="text-2xl font-bold text-emerald-600">$11</span>
+            <span className="text-sm text-gray-500 line-through">$19</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <Button 
+            size="sm" 
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+            onClick={() => window.open('https://gumroad.com/l/lightprompted', '_blank')}
+          >
+            <i className="fas fa-shopping-cart mr-1"></i>
+            Buy Now
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => window.location.href = '/dashboard?view=about'}
+          >
+            <i className="fas fa-info-circle mr-1"></i>
+            Learn More
+          </Button>
+        </div>
+
+        <div className="text-xs text-center text-gray-500 bg-emerald-50 p-2 rounded">
+          💫 <strong>Foundation first:</strong> Start with the book to understand LightPrompt, then explore the tools that call to you.
         </div>
       </div>
     );
