@@ -184,7 +184,6 @@ export function MainNavigation() {
       `}</style>
     </>
   );
-  );
 }
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
