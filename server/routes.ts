@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
+import { generateBirthChart } from "./astrology";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
@@ -285,6 +286,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("TTS error:", error);
       res.status(500).json({ error: "Failed to generate speech" });
+    }
+  });
+
+  // Birth Chart Generation
+  app.post("/api/birth-chart", async (req, res) => {
+    try {
+      const { day, month, year, hour, min, lat, lon, tzone } = req.body;
+      
+      // Validate required fields
+      if (!day || !month || !year || !hour || min === undefined || !lat || !lon) {
+        return res.status(400).json({ 
+          error: "Missing required fields: day, month, year, hour, min, lat, lon" 
+        });
+      }
+      
+      // Generate birth chart using astronomical calculations
+      const birthChart = await generateBirthChart({
+        day, month, year, hour, min, lat, lon, tzone: tzone || 0
+      });
+      
+      res.json(birthChart);
+    } catch (error) {
+      console.error("Birth chart generation error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate birth chart",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

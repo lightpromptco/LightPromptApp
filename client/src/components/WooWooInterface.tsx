@@ -5,32 +5,81 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GoogleMapsPicker } from '@/components/GoogleMapsPicker';
+import { useToast } from '@/hooks/use-toast';
 
 interface WooWooInterfaceProps {
   userId: string;
 }
 
 export function WooWooInterface({ userId }: WooWooInterfaceProps) {
+  const { toast } = useToast();
   const [birthData, setBirthData] = useState({
     date: '',
     time: '',
-    location: ''
+    location: '',
+    lat: 0,
+    lng: 0
   });
   const [showChart, setShowChart] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [chartData, setChartData] = useState<any>(null);
   const [cosmicClicks, setCosmicClicks] = useState(0);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   const handleGenerateChart = async () => {
-    if (birthData.date && birthData.time && birthData.location) {
+    if (birthData.date && birthData.time && birthData.location && birthData.lat && birthData.lng) {
       setIsGenerating(true);
       
-      // Simulate chart generation process
       try {
-        // Mock API call delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Use AstrologyAPI.com for real birth chart calculation
+        const [year, month, day] = birthData.date.split('-');
+        const [hours, minutes] = birthData.time.split(':');
         
-        // Generate personalized chart data based on birth info
+        const requestData = {
+          day: parseInt(day),
+          month: parseInt(month),
+          year: parseInt(year),
+          hour: parseInt(hours),
+          min: parseInt(minutes),
+          lat: birthData.lat,
+          lon: birthData.lng,
+          tzone: getTimezone(birthData.lat, birthData.lng)
+        };
+        
+        // Call our backend to generate the birth chart
+        const response = await fetch('/api/birth-chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to generate birth chart');
+        }
+        
+        const generatedChart = await response.json();
+        
+        setChartData({
+          ...generatedChart,
+          birthInfo: { ...birthData }
+        });
+        setShowChart(true);
+        
+        toast({
+          title: "Birth Chart Generated! ✨",
+          description: "Your cosmic blueprint is ready to explore."
+        });
+        
+      } catch (error: any) {
+        console.error('Chart generation error:', error);
+        toast({
+          title: "Chart Generation Failed",
+          description: error.message || "Unable to generate your birth chart. Please try again.",
+          variant: "destructive"
+        });
+        
+        // Fallback to mock data if API fails
         const generatedChart = {
           sunSign: getZodiacSign(new Date(birthData.date)),
           moonSign: getRandomZodiacSign(),
@@ -39,17 +88,38 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
           marsSign: getRandomZodiacSign(),
           birthInfo: { ...birthData },
           planets: generatePlanetPositions(),
-          houses: generateHousePositions()
+          houses: generateHousePositions(),
+          isDemo: true
         };
         
         setChartData(generatedChart);
         setShowChart(true);
-      } catch (error) {
-        console.error('Chart generation error:', error);
+        
       } finally {
         setIsGenerating(false);
       }
     }
+  };
+  
+  const getTimezone = (lat: number, lng: number): number => {
+    // Simple timezone approximation based on longitude
+    // In a real app, you'd use a proper timezone API
+    return Math.round(lng / 15);
+  };
+  
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number; placeId?: string }) => {
+    setBirthData(prev => ({
+      ...prev,
+      location: location.address,
+      lat: location.lat,
+      lng: location.lng
+    }));
+    setShowLocationPicker(false);
+    
+    toast({
+      title: "Location Set! 📍",
+      description: `Birth location: ${location.address}`
+    });
   };
 
   const getZodiacSign = (date: Date) => {
@@ -191,11 +261,56 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">Birth Location</label>
-                    <Input
-                      placeholder="City, Country"
-                      value={birthData.location}
-                      onChange={(e) => setBirthData({...birthData, location: e.target.value})}
-                    />
+                    <div className="space-y-2">
+                      {birthData.location ? (
+                        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-green-800">{birthData.location}</p>
+                              <p className="text-xs text-green-600">
+                                📍 {birthData.lat.toFixed(4)}, {birthData.lng.toFixed(4)}
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setShowLocationPicker(true)}
+                            >
+                              Change
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowLocationPicker(true)}
+                          className="w-full"
+                        >
+                          <i className="fas fa-map-marker-alt mr-2"></i>
+                          Select Birth Location
+                        </Button>
+                      )}
+                      
+                      {showLocationPicker && (
+                        <div className="border rounded-lg p-4 bg-white">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-medium">Choose Your Birth Location</h4>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setShowLocationPicker(false)}
+                            >
+                              <i className="fas fa-times"></i>
+                            </Button>
+                          </div>
+                          <GoogleMapsPicker
+                            onLocationSelect={handleLocationSelect}
+                            className="h-64"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <Button 
@@ -205,7 +320,7 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                     console.log('Generate button clicked', birthData);
                     handleGenerateChart();
                   }}
-                  disabled={!birthData.date || !birthData.time || !birthData.location || isGenerating}
+                  disabled={!birthData.date || !birthData.time || !birthData.location || !birthData.lat || !birthData.lng || isGenerating}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 >
                   {isGenerating ? (
@@ -229,9 +344,19 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>Your Birth Chart</CardTitle>
+                      <CardTitle className="flex items-center">
+                        Your Birth Chart
+                        {chartData?.isDemo && (
+                          <Badge variant="outline" className="ml-2 text-xs">
+                            Demo Data
+                          </Badge>
+                        )}
+                      </CardTitle>
                       <p className="text-sm text-gray-600">
-                        Born {new Date(birthData.date).toLocaleDateString()} at {birthData.time} in {birthData.location}
+                        Born {new Date(birthData.date).toLocaleDateString()} at {birthData.time}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        📍 {birthData.location}
                       </p>
                     </div>
                     <Button 
