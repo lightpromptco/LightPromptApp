@@ -28,10 +28,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create admin user on startup (only if doesn't exist)
   (async () => {
     try {
-      const existingAdmin = await storage.getUserByEmail('admin@lightprompt.com');
+      const existingAdmin = await storage.getUserByEmail('lightprompt.co@gmail.com');
       if (!existingAdmin) {
         const admin = await storage.createUser({
-          email: 'admin@lightprompt.com',
+          email: 'lightprompt.co@gmail.com',
           name: 'LightPrompt Admin'
         });
         

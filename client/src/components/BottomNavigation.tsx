@@ -31,9 +31,8 @@ export function BottomNavigation({
     
     // Course tier requires special access code
     if (bot.tier === 'Course') {
-      // Check if user has course access (you'll need to implement this check)
-      // For now, return false to require access code
-      return false;
+      // Check if user has course access or is admin
+      return user.courseAccess || user.tier === 'admin' || user.role === 'admin';
     }
     
     // All other bots are free within token limits

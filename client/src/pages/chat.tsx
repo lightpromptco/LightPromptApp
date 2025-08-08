@@ -81,7 +81,7 @@ export default function ChatPage() {
 
       if (isAdminMode) {
         // Use admin account
-        const response = await fetch('/api/users/admin@lightprompt.com');
+        const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
         if (response.ok) {
           user = await response.json();
           console.log('✅ Admin session loaded:', user?.name);
@@ -205,7 +205,7 @@ export default function ChatPage() {
   const validateSession = useCallback(async () => {
     const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
     const storedUserId = isAdminMode 
-      ? 'admin@lightprompt.com' 
+      ? 'email/lightprompt.co@gmail.com' 
       : sessionStorage.getItem('lightprompt_session_id');
       
     if (!storedUserId || !currentUser) return;
