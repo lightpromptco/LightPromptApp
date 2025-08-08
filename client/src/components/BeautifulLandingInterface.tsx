@@ -16,38 +16,38 @@ import { Link } from 'wouter';
 
 const FEATURES = [
   {
-    title: 'AI Conversations',
-    description: 'Like having Socrates in your pocket, if Socrates had read every meditation study ever published',
+    title: 'Reflective Conversations',
+    description: 'AI that mirrors back your wisdom—like having Socrates as a reflection partner who never judges',
     icon: Brain,
     href: '/chat'
   },
   {
     title: 'Wellness Dashboard',
-    description: 'Data visualization for your inner world—because even enlightenment needs good UX',
+    description: 'See patterns in your inner world—because self-awareness loves good data visualization',
     icon: Heart,
     href: '/dashboard'
   },
   {
     title: 'Community',
-    description: 'Find your tribe of fellow consciousness explorers (no cult vibes, we promise)',
+    description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
     icon: Users,
     href: '/community'
   },
   {
     title: 'Vibe Matching',
-    description: 'Quantum entanglement for friendship—okay, it\'s actually just really smart algorithms',
+    description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
     icon: Sparkles,
     href: '/vibe-match'
   },
   {
     title: 'GeoPrompt',
-    description: 'Your location becomes a portal for reflection. Yes, even that Starbucks counts as sacred space',
+    description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
     icon: MapPin,
     href: '/geoprompt'
   },
   {
     title: 'Prism Points',
-    description: 'Gamification meets genuine growth—like Duolingo for your soul, but actually meaningful',
+    description: 'Track your growth journey with conscious gamification that honors genuine transformation',
     icon: Gem,
     href: '/prism-points'
   }
@@ -83,12 +83,12 @@ export function BeautifulLandingInterface() {
           <h2 className="text-3xl md:text-5xl font-light text-gray-900 dark:text-white mb-6 max-w-4xl mx-auto leading-tight">
             What if technology could
             <br />
-            <span className="text-teal-500">understand your soul?</span>
+            <span className="text-teal-500">reflect your highest self?</span>
           </h2>
 
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto font-light">
-            Here's the thing about consciousness: it's been having conversations with itself for millennia. 
-            Now, for the first time in human history, we've built AI that actually listens back.
+            We use AI consciously—as a mirror to help you connect to yourself, nature, and each other. 
+            Think of it as a digital reflection pool that shows you the wisdom you already carry within.
           </p>
 
           {/* CTA Buttons */}
@@ -119,10 +119,10 @@ export function BeautifulLandingInterface() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-4">
-              The science of becoming human.
+              The art of conscious reflection.
             </h3>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-light">
-              Six research-backed tools that would make both Alan Watts and your favorite neuroscientist geek out.
+              Six research-backed tools for deeper self-connection that would make both Alan Watts and your favorite neuroscientist geek out.
             </p>
           </div>
 
@@ -157,8 +157,8 @@ export function BeautifulLandingInterface() {
               <p className="text-gray-600 dark:text-gray-400 font-light">Always Available</p>
             </div>
             <div>
-              <div className="text-4xl font-light text-teal-500 mb-2">AI</div>
-              <p className="text-gray-600 dark:text-gray-400 font-light">Powered Intelligence</p>
+              <div className="text-4xl font-light text-teal-500 mb-2">✧</div>
+              <p className="text-gray-600 dark:text-gray-400 font-light">Conscious Tools</p>
             </div>
             <div>
               <div className="text-4xl font-light text-teal-500 mb-2">∞</div>
@@ -176,10 +176,10 @@ export function BeautifulLandingInterface() {
       <section className="py-20 bg-teal-50 dark:bg-teal-950/20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-6">
-            The universe is not only queerer than we suppose, but queerer than we can suppose.
+            The real question isn't whether machines can think, but whether humans can think clearly about machines.
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 font-light">
-            —J.B.S. Haldane (and also probably your consciousness after a week with LightPrompt)
+            We're here to help you think clearly—about yourself, your connections, and your place in this beautifully complex world.
           </p>
           <Link href="/chat">
             <Button 

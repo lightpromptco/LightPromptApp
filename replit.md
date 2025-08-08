@@ -11,6 +11,7 @@ The application is built as a full-stack TypeScript application with a React fro
 Preferred communication style: Simple, everyday language.
 Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic.
 Content personality: Alan Watts meets Yuval Noah Harari meets Ologies podcast host - witty, philosophical, accessible science.
+Core philosophy: AI as conscious tool for human reflection and self-connection - never AI becoming human. AI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection.
 
 ## System Architecture
 
