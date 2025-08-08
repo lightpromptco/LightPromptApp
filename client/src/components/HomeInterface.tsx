@@ -27,10 +27,13 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
     <div className="space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 py-12">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full flex items-center justify-center">
-          <i className="fas fa-brain text-white text-2xl"></i>
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+          <i className="fas fa-eye text-white text-2xl"></i>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex items-center justify-center">
+          <div className="w-12 h-12 mr-4 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+            <i className="fas fa-eye text-white text-xl"></i>
+          </div>
           LightPrompt
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -38,14 +41,18 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
           your partner, and your community through meaningful conversations that evolve with your growth.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
-            <i className="fas fa-play mr-2"></i>
-            Start Your Journey
-          </Button>
-          <Button size="lg" variant="outline">
-            <i className="fas fa-video mr-2"></i>
-            Watch Demo
-          </Button>
+          <a href="/signup">
+            <Button size="lg" className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
+              <i className="fas fa-play mr-2"></i>
+              Start Your Journey
+            </Button>
+          </a>
+          <a href="/dashboard?view=community">
+            <Button size="lg" variant="outline">
+              <i className="fas fa-credit-card mr-2"></i>
+              Plans & Features
+            </Button>
+          </a>
         </div>
       </div>
 
@@ -322,7 +329,7 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
       {/* Newsletter Signup */}
       <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
         <CardContent className="text-center py-12">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full flex items-center justify-center mb-6">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center mb-6">
             <i className="fas fa-envelope-open-text text-white text-xl"></i>
           </div>
           <h3 className="text-2xl font-semibold mb-4">Stay Connected with LightPrompt</h3>

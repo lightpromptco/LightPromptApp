@@ -103,172 +103,21 @@ interface LightPromptEdInterfaceProps {
 
 export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) {
   const { toast } = useToast();
-  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
-  const getTotalProgress = () => {
-    const totalLessons = COURSE_MODULES.reduce((total, module) => total + module.lessons.length, 0);
-    const completedLessons = COURSE_MODULES.reduce((total, module) => 
-      total + module.lessons.filter(lesson => lesson.completed).length, 0
-    );
-    return (completedLessons / totalLessons) * 100;
+  const handlePurchase = () => {
+    // TODO: Integrate with Stripe for course purchase
+    toast({
+      title: "Redirecting to checkout...",
+      description: "You'll be taken to our secure payment portal.",
+    });
   };
-
-  const getModuleProgress = (module: Module) => {
-    const completedLessons = module.lessons.filter(lesson => lesson.completed).length;
-    return (completedLessons / module.lessons.length) * 100;
-  };
-
-  const getLessonIcon = (type: string) => {
-    switch (type) {
-      case 'video': return 'fas fa-play-circle';
-      case 'audio': return 'fas fa-headphones';
-      case 'text': return 'fas fa-book-open';
-      case 'exercise': return 'fas fa-dumbbell';
-      case 'reflection': return 'fas fa-pen-fancy';
-      default: return 'fas fa-circle';
-    }
-  };
-
-  if (selectedLesson && selectedModule) {
-    return (
-      <div className="space-y-6">
-        <Button 
-          onClick={() => setSelectedLesson(null)}
-          variant="ghost" 
-          className="mb-4"
-        >
-          <i className="fas fa-arrow-left mr-2"></i>
-          Back to {selectedModule.title}
-        </Button>
-        
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <Badge variant="outline" className="capitalize">
-                {selectedLesson.type}
-              </Badge>
-              <span className="text-sm text-gray-600">
-                <i className="fas fa-clock mr-1"></i>
-                {selectedLesson.duration} minutes
-              </span>
-            </div>
-            <CardTitle className="text-2xl">{selectedLesson.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-gray-100 rounded-lg p-8 text-center">
-              <i className={`${getLessonIcon(selectedLesson.type)} text-4xl text-teal-600 mb-4`}></i>
-              <h3 className="text-lg font-medium mb-2">Lesson Content</h3>
-              <p className="text-gray-600 mb-4">
-                This {selectedLesson.type} lesson would contain the actual course content.
-              </p>
-              <Button className="bg-gradient-to-r from-teal-600 to-cyan-600">
-                <i className="fas fa-play mr-2"></i>
-                Start Lesson
-              </Button>
-            </div>
-            
-            <div className="flex justify-between">
-              <Button variant="outline">
-                <i className="fas fa-chevron-left mr-2"></i>
-                Previous
-              </Button>
-              <Button 
-                onClick={() => {
-                  // Mark lesson as completed
-                  toast({
-                    title: "Lesson completed! ✨",
-                    description: "Great progress on your wellness journey.",
-                  });
-                }}
-                className="bg-gradient-to-r from-teal-600 to-cyan-600"
-              >
-                Complete Lesson
-                <i className="fas fa-chevron-right ml-2"></i>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (selectedModule) {
-    return (
-      <div className="space-y-6">
-        <Button 
-          onClick={() => setSelectedModule(null)}
-          variant="ghost" 
-          className="mb-4"
-        >
-          <i className="fas fa-arrow-left mr-2"></i>
-          Back to Course Overview
-        </Button>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">{selectedModule.title}</CardTitle>
-            <p className="text-gray-600">{selectedModule.description}</p>
-            <div className="flex items-center space-x-4 mt-4">
-              <Badge variant="outline">
-                <i className="fas fa-clock mr-1"></i>
-                {selectedModule.duration} minutes
-              </Badge>
-              <div className="flex-1">
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Progress</span>
-                  <span>{Math.round(getModuleProgress(selectedModule))}%</span>
-                </div>
-                <Progress value={getModuleProgress(selectedModule)} />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {selectedModule.lessons.map((lesson, index) => (
-                <div 
-                  key={lesson.id}
-                  className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors ${lesson.completed ? 'bg-teal-50 border-teal-200' : ''}`}
-                  onClick={() => setSelectedLesson(lesson)}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${lesson.completed ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                      {lesson.completed ? (
-                        <i className="fas fa-check text-sm"></i>
-                      ) : (
-                        <span className="text-sm">{index + 1}</span>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium">{lesson.title}</h4>
-                      <div className="flex items-center space-x-3 text-sm text-gray-600">
-                        <span className="capitalize">
-                          <i className={`${getLessonIcon(lesson.type)} mr-1`}></i>
-                          {lesson.type}
-                        </span>
-                        <span>
-                          <i className="fas fa-clock mr-1"></i>
-                          {lesson.duration} min
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <i className="fas fa-chevron-right text-gray-400"></i>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
       {/* Course Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full flex items-center justify-center mb-4">
-          <i className="fas fa-graduation-cap text-white text-2xl"></i>
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center mb-4">
+          <i className="fas fa-eye text-white text-2xl"></i>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">LightPrompt:ed</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
@@ -277,95 +126,107 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
         </p>
       </div>
 
-      {/* Course Progress */}
+      {/* Course Description */}
       <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Your Progress</h3>
-            <Badge className="bg-gradient-to-r from-teal-600 to-cyan-600">
-              {Math.round(getTotalProgress())}% Complete
-            </Badge>
+        <CardContent className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-gray-900">What You'll Learn</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start space-x-3">
+                  <i className="fas fa-check text-teal-600 mt-1"></i>
+                  <span>Foundations of soul-tech wellness and conscious technology use</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <i className="fas fa-check text-teal-600 mt-1"></i>
+                  <span>Emotional intelligence in the digital age with AI-enhanced introspection</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <i className="fas fa-check text-teal-600 mt-1"></i>
+                  <span>Building authentic connections and meaningful relationships</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <i className="fas fa-check text-teal-600 mt-1"></i>
+                  <span>Purpose discovery and life design with AI insights</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <i className="fas fa-check text-teal-600 mt-1"></i>
+                  <span>Integration practices for sustainable wellness transformation</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-gray-900">Course Features</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-white rounded-lg">
+                  <i className="fas fa-clock text-2xl text-teal-600 mb-2"></i>
+                  <div className="text-lg font-semibold">280+ minutes</div>
+                  <div className="text-sm text-gray-600">of content</div>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg">
+                  <i className="fas fa-list text-2xl text-cyan-600 mb-2"></i>
+                  <div className="text-lg font-semibold">5 modules</div>
+                  <div className="text-sm text-gray-600">structured learning</div>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg">
+                  <i className="fas fa-video text-2xl text-purple-600 mb-2"></i>
+                  <div className="text-lg font-semibold">Mixed format</div>
+                  <div className="text-sm text-gray-600">video, audio, exercises</div>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg">
+                  <i className="fas fa-infinity text-2xl text-indigo-600 mb-2"></i>
+                  <div className="text-lg font-semibold">Lifetime access</div>
+                  <div className="text-sm text-gray-600">learn at your pace</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <Progress value={getTotalProgress()} className="mb-2" />
-          <p className="text-sm text-gray-600">
-            Keep going! You're on track to complete your soul-tech transformation.
-          </p>
         </CardContent>
       </Card>
 
-      {/* Course Modules */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Course Modules</h3>
-        
-        {COURSE_MODULES.map((module, index) => (
-          <Card 
-            key={module.id}
-            className={`cursor-pointer hover:shadow-lg transition-all duration-300 ${
-              module.locked ? 'opacity-75' : 'hover:-translate-y-1'
-            } ${module.completed ? 'bg-green-50 border-green-200' : ''}`}
-            onClick={() => !module.locked && setSelectedModule(module)}
+      {/* Pricing and Purchase */}
+      <Card className="border-2 border-teal-500">
+        <CardContent className="p-8 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Transform Your Wellness Journey</h3>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            Join thousands of students who have discovered the power of soul-tech wellness. 
+            This comprehensive course will guide you through every step of your transformation.
+          </p>
+          
+          <div className="mb-6">
+            <div className="text-4xl font-bold text-gray-900 mb-2">
+              $197
+              <span className="text-lg font-normal text-gray-600 ml-2">one-time payment</span>
+            </div>
+            <p className="text-sm text-gray-600">30-day money-back guarantee</p>
+          </div>
+          
+          <Button 
+            onClick={handlePurchase}
+            size="lg" 
+            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-lg px-8 py-4"
           >
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    module.completed ? 'bg-green-500 text-white' : 
-                    module.locked ? 'bg-gray-300 text-gray-600' : 
-                    'bg-teal-500 text-white'
-                  }`}>
-                    {module.completed ? (
-                      <i className="fas fa-check"></i>
-                    ) : module.locked ? (
-                      <i className="fas fa-lock"></i>
-                    ) : (
-                      <span className="font-semibold">{index + 1}</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold mb-2">{module.title}</h4>
-                    <p className="text-gray-600 mb-3">{module.description}</p>
-                    
-                    <div className="flex items-center space-x-4 mb-3">
-                      <Badge variant="outline">
-                        <i className="fas fa-clock mr-1"></i>
-                        {module.duration} minutes
-                      </Badge>
-                      <Badge variant="outline">
-                        <i className="fas fa-list mr-1"></i>
-                        {module.lessons.length} lessons
-                      </Badge>
-                      {module.locked && (
-                        <Badge variant="secondary">
-                          <i className="fas fa-lock mr-1"></i>
-                          Locked
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {!module.locked && (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Progress</span>
-                          <span>{Math.round(getModuleProgress(module))}%</span>
-                        </div>
-                        <Progress value={getModuleProgress(module)} className="h-2" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {!module.locked && (
-                  <Button variant="outline" className="ml-4">
-                    <i className="fas fa-play mr-2"></i>
-                    {getModuleProgress(module) > 0 ? 'Continue' : 'Start'}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            <i className="fas fa-graduation-cap mr-2"></i>
+            Enroll in LightPrompt:ed
+          </Button>
+          
+          <div className="mt-6 flex items-center justify-center space-x-6 text-sm text-gray-600">
+            <div className="flex items-center">
+              <i className="fas fa-shield-alt text-green-500 mr-2"></i>
+              Secure checkout
+            </div>
+            <div className="flex items-center">
+              <i className="fas fa-mobile-alt text-blue-500 mr-2"></i>
+              Access anywhere
+            </div>
+            <div className="flex items-center">
+              <i className="fas fa-certificate text-purple-500 mr-2"></i>
+              Course certificate
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Coming Soon - VisionQuest */}
       <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
@@ -384,7 +245,6 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
           </Badge>
         </CardContent>
       </Card>
-
     </div>
   );
 }

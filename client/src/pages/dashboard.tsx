@@ -301,13 +301,22 @@ export default function DashboardPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">LightPrompt Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                <div className="w-8 h-8 mr-3 flex items-center justify-center bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full">
+                  <i className="fas fa-eye text-white text-sm"></i>
+                </div>
+                LightPrompt Dashboard
+              </h1>
               <p className="text-sm text-gray-600">Track your soul-tech wellness journey</p>
             </div>
           </div>
           
           {user && (
             <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" className="text-teal-600">
+                <i className="fas fa-question-circle mr-2"></i>
+                Help
+              </Button>
               <Badge variant="outline" className="capitalize">
                 {user.tier === 'tier_29' ? 'Growth' : user.tier === 'tier_49' ? 'Resonance' : user.tier}
               </Badge>
@@ -367,7 +376,7 @@ export default function DashboardPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('community')}>
                   <i className="fas fa-comments mr-2"></i>
-                  Community
+                  Community & Plans
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('blog')}>
                   <i className="fas fa-book mr-2"></i>
@@ -585,6 +594,9 @@ export default function DashboardPage() {
           {/* LightPrompt:ed Course Tab */}
           {activeView === 'lightprompted' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> LightPrompt:ed is our comprehensive soul-tech wellness course designed to guide you through personal transformation using AI-enhanced learning.
+              </div>
               <LightPromptEdInterface userId={userId!} />
             </div>
           )}
@@ -695,6 +707,9 @@ export default function DashboardPage() {
           {/* VibeMatch Tab */}
           {activeView === 'vibematch' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> VibeMatch uses AI to analyze your wellness patterns and values to connect you with like-minded souls who share similar growth journeys and authentic connection desires.
+              </div>
               <VibeMatchInterface userId={userId!} />
             </div>
           )}
@@ -702,6 +717,9 @@ export default function DashboardPage() {
           {/* Partner Mode Tab */}
           {activeView === 'partner' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Partner Mode allows you to securely share wellness insights with trusted individuals, set mutual growth goals, and support each other's journey while maintaining full privacy control.
+              </div>
               <PartnerModeInterface userId={userId!} />
             </div>
           )}
@@ -709,6 +727,9 @@ export default function DashboardPage() {
           {/* Blog Tab */}
           {activeView === 'blog' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Our blog features curated insights on AI wellness, soul-tech practices, and human connection. Articles are written by experts and informed by the latest research in technology and wellness.
+              </div>
               <BlogInterface userId={userId!} />
             </div>
           )}
@@ -716,6 +737,9 @@ export default function DashboardPage() {
           {/* Settings Tab */}
           {activeView === 'settings' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Customize your LightPrompt experience by adjusting privacy settings, notification preferences, and AI personality traits to match your unique wellness journey.
+              </div>
               <SettingsInterface userId={userId!} />
             </div>
           )}
@@ -729,6 +753,9 @@ export default function DashboardPage() {
                     <i className="fas fa-credit-card text-teal-600 mr-2"></i>
                     Plans & Features
                   </h3>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                    💡 <strong>How it works:</strong> Choose the plan that best fits your wellness journey. Each tier offers different levels of AI interaction, features, and token allowances.
+                  </div>
                   {user && <PricingInterface user={user} />}
                 </div>
               </div>
@@ -738,6 +765,9 @@ export default function DashboardPage() {
           {/* Astrology & Cosmos Tab */}
           {activeView === 'astrology' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Our astrology insights combine traditional wisdom with modern psychology to provide personalized cosmic guidance based on celestial patterns and your birth information.
+              </div>
               <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -844,16 +874,19 @@ export default function DashboardPage() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-center">
-                      <i className="fas fa-construction text-amber-600 mr-2"></i>
-                      <span className="text-amber-800 font-medium">Coming Soon!</span>
+                  <div className="mb-6">
+                    <h3 className="font-semibold mb-4">Global GeoPrompt Locations</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <iframe 
+                        src="https://www.google.com/maps/d/u/7/embed?mid=1Mgr3Aml4heEAZTt9C08wLXxNvkpgyhA&ehbc=2E312F&noprof=1" 
+                        width="100%" 
+                        height="480"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
                     </div>
-                    <p className="text-amber-700 text-sm mt-2">
-                      GeoPrompt will allow you to place QR codes at special locations, enabling 
-                      people to have reflective conversations with AI and connect through VibeMatch 
-                      based on location resonance.
-                    </p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -907,6 +940,9 @@ export default function DashboardPage() {
           {/* Device Integrations Tab */}
           {activeView === 'integrations' && (
             <div className="space-y-6">
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
+                💡 <strong>How it works:</strong> Device integrations sync your health data from wearables and apps to provide comprehensive wellness insights. All data is encrypted and you control what gets shared.
+              </div>
               <Card>
                 <CardHeader>
                   <CardTitle>Device Integrations</CardTitle>
