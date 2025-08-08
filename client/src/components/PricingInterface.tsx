@@ -268,6 +268,23 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                 </div>
                 
                 <Button 
+                  onClick={() => {
+                    if (tier.id === 'free') {
+                      // Handle free tier signup/downgrade
+                      window.location.href = '/#signup';
+                    } else if (tier.id === 'enterprise') {
+                      // Handle enterprise contact
+                      window.location.href = 'mailto:enterprise@lightprompt.com?subject=Enterprise Plan Inquiry';
+                    } else {
+                      // Handle Stripe payment for growth/resonance
+                      const priceId = isYearly 
+                        ? (tier.id === 'growth' ? 'price_yearly_growth' : 'price_yearly_resonance')
+                        : (tier.id === 'growth' ? 'price_monthly_growth' : 'price_monthly_resonance');
+                      // TODO: Integrate with Stripe Checkout
+                      console.log('Redirecting to Stripe for:', priceId);
+                      alert(`Stripe integration: ${tier.name} ${isYearly ? 'yearly' : 'monthly'} plan`);
+                    }
+                  }}
                   className={`w-full ${
                     tier.popular 
                       ? 'bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700' 
@@ -278,7 +295,8 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                 >
                   {isCurrentTier ? 'Current Plan' : 
                    user.tier === 'admin' ? 'Admin Access' :
-                   tier.id === 'free' ? 'Get Started' : 'Upgrade'}
+                   tier.id === 'free' ? 'Get Started' :
+                   tier.id === 'enterprise' ? 'Contact Sales' : 'Upgrade Now'}
                 </Button>
               </CardContent>
             </Card>
@@ -344,6 +362,40 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                 </tr>
               </tbody>
             </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Integration Info */}
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <i className="fas fa-credit-card text-blue-600 mr-2"></i>
+            Payment & Billing
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="space-y-2">
+              <i className="fas fa-shield-alt text-2xl text-blue-600"></i>
+              <h4 className="font-semibold">Secure Payments</h4>
+              <p className="text-sm text-gray-600">Powered by Stripe with bank-level security</p>
+            </div>
+            <div className="space-y-2">
+              <i className="fas fa-sync-alt text-2xl text-green-600"></i>
+              <h4 className="font-semibold">Flexible Billing</h4>
+              <p className="text-sm text-gray-600">Monthly or yearly, cancel anytime</p>
+            </div>
+            <div className="space-y-2">
+              <i className="fas fa-globe text-2xl text-purple-600"></i>
+              <h4 className="font-semibold">Global Support</h4>
+              <p className="text-sm text-gray-600">All major currencies and payment methods</p>
+            </div>
+          </div>
+          <div className="text-center pt-4">
+            <p className="text-sm text-gray-600">
+              All plans include a 14-day free trial. No commitment, no hidden fees.
+            </p>
           </div>
         </CardContent>
       </Card>

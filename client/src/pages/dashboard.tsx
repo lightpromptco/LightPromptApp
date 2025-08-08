@@ -19,6 +19,7 @@ import { SettingsInterface } from '@/components/SettingsInterface';
 import { PartnerModeInterface } from '@/components/PartnerModeInterface';
 import { BlogInterface } from '@/components/BlogInterface';
 import { PricingInterface } from '@/components/PricingInterface';
+import { HomeInterface } from '@/components/HomeInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -243,8 +244,9 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-11 gap-1">
+        <Tabs defaultValue="home" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-12 gap-1">
+            <TabsTrigger value="home" className="text-xs lg:text-sm">Home</TabsTrigger>
             <TabsTrigger value="overview" className="text-xs lg:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="checkin" className="text-xs lg:text-sm">Check-in</TabsTrigger>
             <TabsTrigger value="habits" className="text-xs lg:text-sm">Habits</TabsTrigger>
@@ -257,6 +259,11 @@ export default function DashboardPage() {
             <TabsTrigger value="horoscope" className="text-xs lg:text-sm">Astrology</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs lg:text-sm">Settings</TabsTrigger>
           </TabsList>
+
+          {/* Home Tab */}
+          <TabsContent value="home" className="space-y-6">
+            <HomeInterface userId={userId!} />
+          </TabsContent>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
