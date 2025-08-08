@@ -22,27 +22,75 @@ export async function createSupabaseUser(userData: {
   tier?: string;
   role?: string;
 }) {
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{
-      email: userData.email,
-      name: userData.name,
-      tier: userData.tier || 'free',
-      role: userData.role || 'user',
-      tokens_used: 0,
-      token_limit: 10,
-      reset_date: new Date().toISOString(),
-      course_access: false,
-      created_at: new Date().toISOString()
-    }])
-    .select()
-    .single();
+  // First, test what columns exist in the users table
+  try {
+    const { data: testData, error: testError } = await supabase
+      .from('users')
+      .select('*')
+      .limit(0); // Just get schema, no data
+    
+    if (testError) {
+      console.error('❌ Database connection test failed:', testError);
+      throw new Error(`Database not accessible: ${testError.message}`);
+    }
+    
+    console.log('✅ Database connection successful');
+  } catch (error: any) {
+    console.error('❌ Database connection error:', error);
+    throw error;
+  }
+
+  // Try creating user with minimal required fields first
+  const insertData: any = {
+    email: userData.email,
+    name: userData.name,
+    tier: userData.tier || 'free',
+    role: userData.role || 'user',
+    tokens_used: 0,
+    token_limit: userData.role === 'admin' ? 999999 : 10
+  };
+
+  // Only add optional fields if they exist in schema
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .insert([insertData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('First insert attempt failed:', error);
+      
+      // Try with course_access if the first attempt failed
+      insertData.course_access = userData.role === 'admin';
+      
+      const { data: retryData, error: retryError } = await supabase
+        .from('users')
+        .insert([insertData])
+        .select()
+        .single();
+        
+      if (retryError) {
+        throw retryError;
+      }
+      
+      console.log('✅ User created successfully on retry:', retryData.email);
+      return retryData;
+    }
+
+    console.log('✅ User created successfully:', data.email);
+    return data;
+  } catch (finalError: any) {
+    console.error('All insert attempts failed. Final error:', finalError);
+    throw finalError;
+  }
 
   if (error) {
     console.error('Supabase user creation error:', error);
     throw new Error(`Failed to create user: ${error.message}`);
   }
 
+  console.log('✅ User created successfully:', data.email);
   return data;
 }
 
@@ -62,18 +110,44 @@ export async function getSupabaseUser(userId: string) {
 }
 
 export async function updateSupabaseUser(userId: string, updates: any) {
-  const { data, error } = await supabase
+  // Filter out any potentially problematic columns
+  const safeUpdates = { ...updates };
+  
+  // Try update with all fields first
+  let { data, error } = await supabase
     .from('users')
-    .update(updates)
+    .update(safeUpdates)
     .eq('id', userId)
     .select()
     .single();
+
+  // If course_access field fails, try without it
+  if (error && error.message.includes('course_access')) {
+    console.log('⚠️ Retrying update without course_access field');
+    delete safeUpdates.course_access;
+    
+    const { data: retryData, error: retryError } = await supabase
+      .from('users')
+      .update(safeUpdates)
+      .eq('id', userId)
+      .select()
+      .single();
+      
+    if (retryError) {
+      console.error('Supabase user update error:', retryError);
+      throw new Error(`Failed to update user: ${retryError.message}`);
+    }
+    
+    console.log('✅ User updated successfully (without course_access)');
+    return retryData;
+  }
 
   if (error) {
     console.error('Supabase user update error:', error);
     throw new Error(`Failed to update user: ${error.message}`);
   }
 
+  console.log('✅ User updated successfully');
   return data;
 }
 
