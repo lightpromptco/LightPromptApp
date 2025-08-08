@@ -200,15 +200,15 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="checkin">Check-in & Health</TabsTrigger>
-            <TabsTrigger value="habits">Habits</TabsTrigger>
-            <TabsTrigger value="patterns">Patterns</TabsTrigger>
-            <TabsTrigger value="integrations">Devices</TabsTrigger>
-            <TabsTrigger value="horoscope">Astrology</TabsTrigger>
-            <TabsTrigger value="vibematch">VibeMatch</TabsTrigger>
-            <TabsTrigger value="community">Community</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1">
+            <TabsTrigger value="overview" className="text-xs lg:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="checkin" className="text-xs lg:text-sm">Check-in</TabsTrigger>
+            <TabsTrigger value="habits" className="text-xs lg:text-sm">Habits</TabsTrigger>
+            <TabsTrigger value="patterns" className="text-xs lg:text-sm">Patterns</TabsTrigger>
+            <TabsTrigger value="integrations" className="text-xs lg:text-sm">Devices</TabsTrigger>
+            <TabsTrigger value="horoscope" className="text-xs lg:text-sm">Astrology</TabsTrigger>
+            <TabsTrigger value="vibematch" className="text-xs lg:text-sm">VibeMatch</TabsTrigger>
+            <TabsTrigger value="community" className="text-xs lg:text-sm">Community</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
