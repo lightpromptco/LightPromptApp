@@ -13,7 +13,10 @@ import {
   MessageCircle,
   Menu,
   X,
-  Sparkles
+  Sparkles,
+  Settings,
+  UserPlus,
+  User
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -26,6 +29,12 @@ const NAV_ITEMS = [
   { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
   { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" },
   { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources" },
+];
+
+const ACCOUNT_ITEMS = [
+  { path: "/signup", label: "Sign Up", icon: UserPlus, description: "Create Account" },
+  { path: "/plans", label: "Plans", icon: Gem, description: "Upgrade Account" },
+  { path: "/privacy", label: "Privacy", icon: Settings, description: "Privacy Settings" },
 ];
 
 export function MainNavigation() {
@@ -66,26 +75,56 @@ export function MainNavigation() {
           </div>
         </div>
 
-        <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {NAV_ITEMS.map((item) => {
-            const active = isActive(item.path);
-            return (
-              <Link key={item.path} href={item.path}>
-                <Button
-                  variant={active ? "default" : "ghost"}
-                  className={`w-full justify-start h-auto p-3 ${
-                    active ? "bg-primary text-primary-foreground" : ""
-                  }`}
-                >
-                  <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
-                  <div className="flex-1 text-left">
-                    <div className="font-medium">{item.label}</div>
-                    <div className="text-xs opacity-70">{item.description}</div>
-                  </div>
-                </Button>
-              </Link>
-            );
-          })}
+        <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+          {/* Main Navigation */}
+          <div className="space-y-2">
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link key={item.path} href={item.path}>
+                  <Button
+                    variant={active ? "default" : "ghost"}
+                    className={`w-full justify-start h-auto p-3 ${
+                      active ? "bg-primary text-primary-foreground" : ""
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                    <div className="flex-1 text-left">
+                      <div className="font-medium">{item.label}</div>
+                      <div className="text-xs opacity-70">{item.description}</div>
+                    </div>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Account Section */}
+          <div className="space-y-2 border-t pt-4">
+            <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Account
+            </div>
+            {ACCOUNT_ITEMS.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link key={item.path} href={item.path}>
+                  <Button
+                    variant={active ? "default" : "ghost"}
+                    className="w-full justify-start text-sm"
+                    size="sm"
+                  >
+                    <item.icon className="h-4 w-4 mr-3" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.description}
+                      </span>
+                    </div>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         <div className="p-4 border-t">
@@ -144,6 +183,7 @@ export function MainNavigation() {
         }
       `}</style>
     </>
+  );
   );
 }
 

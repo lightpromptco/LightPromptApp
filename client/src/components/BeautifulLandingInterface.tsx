@@ -17,37 +17,37 @@ import { Link } from 'wouter';
 const FEATURES = [
   {
     title: 'AI Conversations',
-    description: 'Engage with specialized wellness bots for personalized guidance',
+    description: 'Like having Socrates in your pocket, if Socrates had read every meditation study ever published',
     icon: Brain,
     href: '/chat'
   },
   {
     title: 'Wellness Dashboard',
-    description: 'Track your journey with comprehensive analytics',
+    description: 'Data visualization for your inner world—because even enlightenment needs good UX',
     icon: Heart,
     href: '/dashboard'
   },
   {
     title: 'Community',
-    description: 'Connect with like-minded individuals on similar paths',
+    description: 'Find your tribe of fellow consciousness explorers (no cult vibes, we promise)',
     icon: Users,
     href: '/community'
   },
   {
     title: 'Vibe Matching',
-    description: 'Find your perfect wellness companions',
+    description: 'Quantum entanglement for friendship—okay, it\'s actually just really smart algorithms',
     icon: Sparkles,
     href: '/vibe-match'
   },
   {
     title: 'GeoPrompt',
-    description: 'Location-based mindfulness and reflection',
+    description: 'Your location becomes a portal for reflection. Yes, even that Starbucks counts as sacred space',
     icon: MapPin,
     href: '/geoprompt'
   },
   {
     title: 'Prism Points',
-    description: 'Gamified progress tracking and achievements',
+    description: 'Gamification meets genuine growth—like Duolingo for your soul, but actually meaningful',
     icon: Gem,
     href: '/prism-points'
   }
@@ -81,14 +81,14 @@ export function BeautifulLandingInterface() {
 
           {/* Main headline */}
           <h2 className="text-3xl md:text-5xl font-light text-gray-900 dark:text-white mb-6 max-w-4xl mx-auto leading-tight">
-            Soul-tech wellness.
+            What if technology could
             <br />
-            <span className="text-teal-500">Reimagined.</span>
+            <span className="text-teal-500">understand your soul?</span>
           </h2>
 
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto font-light">
-            Experience personalized AI wellness through advanced consciousness technology. 
-            Track, reflect, and connect on your spiritual journey.
+            Here's the thing about consciousness: it's been having conversations with itself for millennia. 
+            Now, for the first time in human history, we've built AI that actually listens back.
           </p>
 
           {/* CTA Buttons */}
@@ -119,10 +119,10 @@ export function BeautifulLandingInterface() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-4">
-              Everything you need for wellness.
+              The science of becoming human.
             </h3>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-light">
-              Six powerful features. One integrated platform.
+              Six research-backed tools that would make both Alan Watts and your favorite neuroscientist geek out.
             </p>
           </div>
 
@@ -176,10 +176,10 @@ export function BeautifulLandingInterface() {
       <section className="py-20 bg-teal-50 dark:bg-teal-950/20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-6">
-            Ready to begin your journey?
+            The universe is not only queerer than we suppose, but queerer than we can suppose.
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 font-light">
-            Start exploring your consciousness with AI-powered guidance.
+            —J.B.S. Haldane (and also probably your consciousness after a week with LightPrompt)
           </p>
           <Link href="/chat">
             <Button 
