@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { path: "/", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
+  { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
+  { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
   { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
@@ -135,7 +136,7 @@ export function MainNavigation() {
       )}
 
       {/* Desktop main content padding */}
-      <style jsx global>{`
+      <style>{`
         @media (min-width: 768px) {
           .main-content {
             margin-left: 256px;

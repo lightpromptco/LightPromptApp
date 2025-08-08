@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { MainLayout } from "@/components/MainNavigation";
+import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
 import PrivacyPage from "@/pages/privacy";
@@ -23,24 +24,75 @@ import { useEffect } from "react";
 
 function Router() {
   return (
-    <MainLayout>
-      <Switch>
-        <Route path="/" component={ChatPage} />
-        <Route path="/admin" component={AdminPage} />
-        <Route path="/privacy" component={PrivacyPage} />
-        <Route path="/course-access" component={CourseAccessPage} />
-        <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/challenges" component={ChallengesPage} />
-        <Route path="/signup" component={SignupPage} />
-        <Route path="/plans" component={PlansPage} />
-        <Route path="/community" component={CommunityPage} />
-        <Route path="/vibe-match" component={VibeMatchPage} />
-        <Route path="/geoprompt" component={GeoPromptPage} />
-        <Route path="/prism-points" component={PrismPointsPage} />
-        <Route path="/help" component={HelpPage} />
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayout>
+    <Switch>
+      <Route path="/" component={LandingPage} />
+      <Route path="/chat" component={() => (
+        <MainLayout>
+          <ChatPage />
+        </MainLayout>
+      )} />
+      <Route path="/admin" component={() => (
+        <MainLayout>
+          <AdminPage />
+        </MainLayout>
+      )} />
+      <Route path="/privacy" component={() => (
+        <MainLayout>
+          <PrivacyPage />
+        </MainLayout>
+      )} />
+      <Route path="/course-access" component={() => (
+        <MainLayout>
+          <CourseAccessPage />
+        </MainLayout>
+      )} />
+      <Route path="/dashboard" component={() => (
+        <MainLayout>
+          <DashboardPage />
+        </MainLayout>
+      )} />
+      <Route path="/challenges" component={() => (
+        <MainLayout>
+          <ChallengesPage />
+        </MainLayout>
+      )} />
+      <Route path="/signup" component={() => (
+        <MainLayout>
+          <SignupPage />
+        </MainLayout>
+      )} />
+      <Route path="/plans" component={() => (
+        <MainLayout>
+          <PlansPage />
+        </MainLayout>
+      )} />
+      <Route path="/community" component={() => (
+        <MainLayout>
+          <CommunityPage />
+        </MainLayout>
+      )} />
+      <Route path="/vibe-match" component={() => (
+        <MainLayout>
+          <VibeMatchPage />
+        </MainLayout>
+      )} />
+      <Route path="/geoprompt" component={() => (
+        <MainLayout>
+          <GeoPromptPage />
+        </MainLayout>
+      )} />
+      <Route path="/prism-points" component={() => (
+        <MainLayout>
+          <PrismPointsPage />
+        </MainLayout>
+      )} />
+      <Route path="/help" component={() => (
+        <MainLayout>
+          <HelpPage />
+        </MainLayout>
+      )} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
