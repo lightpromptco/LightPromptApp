@@ -32,6 +32,7 @@ import { CommunityInterface } from '@/components/CommunityInterface';
 import { AIHelpInterface } from '@/components/AIHelpInterface';
 import { AdminToggle } from '@/components/AdminToggle';
 import { ExternalLinksCodeSection } from '@/components/ExternalLinksCodeSection';
+import { DashboardWidgets } from '@/components/DashboardWidgets';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -450,7 +451,11 @@ export default function DashboardPage() {
           {/* Content Rendering */}
           {activeView === 'home' && (
             <div className="space-y-6">
-              <HomeInterface userId={userId!} />
+              <DashboardWidgets 
+                userId={userId!} 
+                dashboardData={dashboardData} 
+                user={user} 
+              />
             </div>
           )}
 
