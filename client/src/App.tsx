@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { MainLayout } from "@/components/MainNavigation";
 import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
 import PrivacyPage from "@/pages/privacy";
@@ -12,22 +13,34 @@ import DashboardPage from "@/pages/dashboard";
 import ChallengesPage from "@/pages/challenges";
 import SignupPage from "@/pages/signup";
 import PlansPage from "@/pages/plans";
+import CommunityPage from "@/pages/community";
+import VibeMatchPage from "@/pages/vibe-match";
+import GeoPromptPage from "@/pages/geoprompt";
+import PrismPointsPage from "@/pages/prism-points";
+import HelpPage from "@/pages/help";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={ChatPage} />
-      <Route path="/admin" component={AdminPage} />
-      <Route path="/privacy" component={PrivacyPage} />
-      <Route path="/course-access" component={CourseAccessPage} />
-      <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/challenges" component={ChallengesPage} />
-      <Route path="/signup" component={SignupPage} />
-      <Route path="/plans" component={PlansPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <MainLayout>
+      <Switch>
+        <Route path="/" component={ChatPage} />
+        <Route path="/admin" component={AdminPage} />
+        <Route path="/privacy" component={PrivacyPage} />
+        <Route path="/course-access" component={CourseAccessPage} />
+        <Route path="/dashboard" component={DashboardPage} />
+        <Route path="/challenges" component={ChallengesPage} />
+        <Route path="/signup" component={SignupPage} />
+        <Route path="/plans" component={PlansPage} />
+        <Route path="/community" component={CommunityPage} />
+        <Route path="/vibe-match" component={VibeMatchPage} />
+        <Route path="/geoprompt" component={GeoPromptPage} />
+        <Route path="/prism-points" component={PrismPointsPage} />
+        <Route path="/help" component={HelpPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </MainLayout>
   );
 }
 
