@@ -140,36 +140,65 @@ export function MainNavigation() {
           className="md:hidden fixed inset-0 bg-background/95 backdrop-blur z-40"
           onClick={() => setIsOpen(false)}
         >
-          <div className="pt-16 p-6 space-y-3">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center space-x-2 mb-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <h1 className="font-bold text-lg">LightPrompt</h1>
-                  <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
+          <div className="h-full overflow-y-auto">
+            <div className="pt-16 p-6 pb-20 space-y-4">
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center space-x-2 mb-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                    <Sparkles className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="font-bold text-lg">LightPrompt</h1>
+                    <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {NAV_ITEMS.map((item) => {
-              const active = isActive(item.path);
-              return (
-                <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
-                  <Button
-                    variant={active ? "default" : "outline"}
-                    className="w-full justify-start h-auto p-4"
-                  >
-                    <item.icon className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-medium">{item.label}</div>
-                      <div className="text-xs opacity-70">{item.description}</div>
-                    </div>
-                  </Button>
-                </Link>
-              );
-            })}
+              {/* Main Navigation */}
+              <div className="space-y-3">
+                {NAV_ITEMS.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
+                      <Button
+                        variant={active ? "default" : "outline"}
+                        className="w-full justify-start h-auto p-4"
+                      >
+                        <item.icon className="h-5 w-5 mr-3" />
+                        <div className="text-left">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-70">{item.description}</div>
+                        </div>
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Account Section */}
+              <div className="space-y-3 border-t pt-6">
+                <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Account
+                </div>
+                {ACCOUNT_ITEMS.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
+                      <Button
+                        variant={active ? "default" : "outline"}
+                        className="w-full justify-start h-auto p-4"
+                      >
+                        <item.icon className="h-5 w-5 mr-3" />
+                        <div className="text-left">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-70">{item.description}</div>
+                        </div>
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
