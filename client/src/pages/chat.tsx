@@ -17,6 +17,9 @@ export default function ChatPage() {
   const [isEmbedMode, setIsEmbedMode] = useState(false);
   const [sessionValidated, setSessionValidated] = useState(false);
   const [lastUsageCheck, setLastUsageCheck] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return localStorage.getItem('lightprompt-admin-mode') === 'true';
+  });
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -263,6 +266,7 @@ export default function ChatPage() {
           activeBot={activeBot}
           currentSession={currentSession}
           onSessionCreate={handleCreateSession}
+          isAdmin={isAdmin}
         />
         
         <BottomNavigation

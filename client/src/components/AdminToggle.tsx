@@ -26,6 +26,8 @@ export function AdminToggle({ isAdmin, onAdminChange }: AdminToggleProps) {
     if (level) {
       setAdminLevel(level as any);
       onAdminChange(true);
+      localStorage.setItem('lightprompt-admin-mode', 'true');
+      localStorage.setItem('lightprompt-admin-level', level);
       setIsOpen(false);
       setCode('');
       
@@ -49,6 +51,8 @@ export function AdminToggle({ isAdmin, onAdminChange }: AdminToggleProps) {
   const handleLogout = () => {
     setAdminLevel(null);
     onAdminChange(false);
+    localStorage.removeItem('lightprompt-admin-mode');
+    localStorage.removeItem('lightprompt-admin-level');
     console.log('Returning to mortal realm...');
   };
 

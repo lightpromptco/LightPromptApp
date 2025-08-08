@@ -45,6 +45,8 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
     customLocation: '',
     vibe: '',
     displayName: 'anonymous',
+    customName: '',
+    customInitials: '',
     reflection: '',
     sharePublicly: false
   });
@@ -67,6 +69,8 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
         customLocation: '',
         vibe: '',
         displayName: 'anonymous',
+        customName: '',
+        customInitials: '',
         reflection: '',
         sharePublicly: false
       });
@@ -82,6 +86,13 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
 
   const selectedLocation = LOCATION_OPTIONS.find(loc => loc.id === checkInData.location);
   const selectedVibe = VIBE_OPTIONS.find(vibe => vibe.id === checkInData.vibe);
+
+  const getDisplayNamePreview = () => {
+    if (checkInData.displayName === 'anonymous') return '👤 Anonymous';
+    if (checkInData.displayName === 'name') return `👤 ${checkInData.customName || 'Your Name'}`;
+    if (checkInData.displayName === 'initials') return `👤 ${checkInData.customInitials || 'Initials'}`;
+    return '👤 Anonymous';
+  };
 
   return (
     <div className="space-y-6">
@@ -203,6 +214,35 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
               </Select>
             </div>
 
+            {/* Custom Name Input */}
+            {checkInData.displayName === 'name' && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Enter your name
+                </label>
+                <Input
+                  value={checkInData.customName}
+                  onChange={(e) => setCheckInData({...checkInData, customName: e.target.value})}
+                  placeholder="Your name as you'd like it to appear"
+                />
+              </div>
+            )}
+
+            {/* Custom Initials Input */}
+            {checkInData.displayName === 'initials' && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Enter your initials
+                </label>
+                <Input
+                  value={checkInData.customInitials}
+                  onChange={(e) => setCheckInData({...checkInData, customInitials: e.target.value})}
+                  placeholder="e.g., J.D."
+                  maxLength={10}
+                />
+              </div>
+            )}
+
             {/* Quick Reflection */}
             <div>
               <label className="block text-sm font-medium mb-2">
@@ -232,8 +272,7 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
                     </Badge>
                   )}
                   <Badge variant="outline" className="text-gray-600">
-                    {checkInData.displayName === 'anonymous' ? '👤 Anonymous' : 
-                     checkInData.displayName === 'name' ? '👤 Your Name' : '👤 Initials'}
+                    {getDisplayNamePreview()}
                   </Badge>
                 </div>
               </div>

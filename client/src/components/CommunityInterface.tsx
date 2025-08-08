@@ -15,17 +15,79 @@ export function CommunityInterface({ userId }: CommunityInterfaceProps) {
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
-    category: 'general'
+    category: 'general',
+    photos: [] as File[],
+    photoPreviewUrls: [] as string[]
   });
+  const [photoApprovalStatus, setPhotoApprovalStatus] = useState<{
+    [key: string]: 'pending' | 'approved' | 'rejected'
+  }>({});
 
   const handleJoinCommunity = () => {
     setIsJoined(true);
   };
 
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length + newPost.photos.length > 3) {
+      alert('Maximum 3 photos allowed per post');
+      return;
+    }
+
+    // Create preview URLs
+    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+    
+    setNewPost({
+      ...newPost,
+      photos: [...newPost.photos, ...files],
+      photoPreviewUrls: [...newPost.photoPreviewUrls, ...newPreviewUrls]
+    });
+
+    // Simulate AI content approval (in real app, this would be an API call)
+    files.forEach((file, index) => {
+      const photoId = `${Date.now()}_${index}`;
+      setPhotoApprovalStatus(prev => ({ ...prev, [photoId]: 'pending' }));
+      
+      // Simulate AI approval after 2 seconds
+      setTimeout(() => {
+        const isApproved = Math.random() > 0.1; // 90% approval rate for demo
+        setPhotoApprovalStatus(prev => ({ 
+          ...prev, 
+          [photoId]: isApproved ? 'approved' : 'rejected'
+        }));
+      }, 2000);
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    const newPhotos = newPost.photos.filter((_, i) => i !== index);
+    const newPreviewUrls = newPost.photoPreviewUrls.filter((_, i) => i !== index);
+    
+    // Revoke the URL to prevent memory leaks
+    URL.revokeObjectURL(newPost.photoPreviewUrls[index]);
+    
+    setNewPost({
+      ...newPost,
+      photos: newPhotos,
+      photoPreviewUrls: newPreviewUrls
+    });
+  };
+
   const handleCreatePost = () => {
     // TODO: Implement post creation
     console.log('Creating post:', newPost);
-    setNewPost({ title: '', content: '', category: 'general' });
+    
+    // Clean up photo preview URLs
+    newPost.photoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+    
+    setNewPost({ 
+      title: '', 
+      content: '', 
+      category: 'general',
+      photos: [],
+      photoPreviewUrls: []
+    });
+    setPhotoApprovalStatus({});
   };
 
   if (!isJoined) {
@@ -438,6 +500,79 @@ export function CommunityInterface({ userId }: CommunityInterfaceProps) {
                   placeholder="Share what's on your heart..."
                   rows={5}
                 />
+              </div>
+
+              {/* Photo Upload */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Photos (optional)</label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="file"
+                      id="photo-upload"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="photo-upload"
+                      className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer border border-gray-300"
+                    >
+                      <i className="fas fa-camera mr-2 text-gray-600"></i>
+                      <span className="text-sm text-gray-700">Add Photos</span>
+                    </label>
+                    <span className="text-xs text-gray-500">Max 3 photos • AI content approval required</span>
+                  </div>
+
+                  {/* Photo Previews */}
+                  {newPost.photoPreviewUrls.length > 0 && (
+                    <div className="grid grid-cols-3 gap-3">
+                      {newPost.photoPreviewUrls.map((url, index) => {
+                        const photoId = `${Date.now()}_${index}`;
+                        const approvalStatus = photoApprovalStatus[photoId] || 'pending';
+                        
+                        return (
+                          <div key={index} className="relative group">
+                            <img
+                              src={url}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border"
+                            />
+                            <button
+                              onClick={() => removePhoto(index)}
+                              className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                            
+                            {/* AI Approval Status */}
+                            <div className="absolute bottom-1 left-1">
+                              {approvalStatus === 'pending' && (
+                                <Badge className="bg-yellow-500 text-xs px-1 py-0.5">
+                                  <i className="fas fa-clock mr-1"></i>
+                                  AI Review
+                                </Badge>
+                              )}
+                              {approvalStatus === 'approved' && (
+                                <Badge className="bg-green-500 text-xs px-1 py-0.5">
+                                  <i className="fas fa-check mr-1"></i>
+                                  Approved
+                                </Badge>
+                              )}
+                              {approvalStatus === 'rejected' && (
+                                <Badge className="bg-red-500 text-xs px-1 py-0.5">
+                                  <i className="fas fa-times mr-1"></i>
+                                  Rejected
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <Button 

@@ -13,13 +13,15 @@ interface ChatInterfaceProps {
   activeBot: Bot;
   currentSession: ChatSession | null;
   onSessionCreate: (botId: string) => Promise<ChatSession>;
+  isAdmin?: boolean;
 }
 
 export function ChatInterface({ 
   user, 
   activeBot, 
   currentSession,
-  onSessionCreate 
+  onSessionCreate,
+  isAdmin = false 
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -69,11 +71,11 @@ export function ChatInterface({
   const sendMessage = async (content: string) => {
     if (!user || !content.trim()) return;
 
-    // Check token limits
-    if (user.tokensUsed >= user.tokenLimit) {
+    // Check token limits (bypass for admin mode)
+    if (!isAdmin && user.tokensUsed >= user.tokenLimit) {
       toast({
         title: "Token limit reached",
-        description: "You've reached your daily message limit. Upgrade for more tokens.",
+        description: isAdmin ? "Admin mode: Unlimited tokens" : "You've reached your daily message limit. Upgrade for more tokens.",
         variant: "destructive",
       });
       return;

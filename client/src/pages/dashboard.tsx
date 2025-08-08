@@ -108,7 +108,9 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [activeView, setActiveView] = useState('home');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return localStorage.getItem('lightprompt-admin-mode') === 'true';
+  });
   const [newHabit, setNewHabit] = useState({
     name: '',
     description: '',
