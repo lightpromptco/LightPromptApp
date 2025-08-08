@@ -5,7 +5,10 @@ import {
   Habit, InsertHabit, HabitEntry, InsertHabitEntry,
   AppleHealthData, InsertAppleHealthData, HomeKitData, InsertHomeKitData,
   WellnessPattern, Recommendation, InsertRecommendation,
-  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration
+  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration,
+  VibeProfile, InsertVibeProfile, VibeMatch, InsertVibeMatch,
+  MatchChat, InsertMatchChat, ReflectionPrompt, InsertReflectionPrompt,
+  ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -87,6 +90,33 @@ export interface IStorage {
   createDeviceIntegration(integration: InsertDeviceIntegration): Promise<DeviceIntegration>;
   updateDeviceIntegration(userId: string, deviceType: string, updates: Partial<DeviceIntegration>): Promise<DeviceIntegration>;
   syncDeviceData(userId: string, deviceType: string): Promise<any>;
+
+  // VibeMatch System
+  // Vibe Profiles
+  getVibeProfile(userId: string): Promise<VibeProfile | undefined>;
+  createOrUpdateVibeProfile(profile: any): Promise<VibeProfile>;
+  
+  // Matching
+  getPotentialMatches(userId: string): Promise<any[]>;
+  getCurrentMatches(userId: string): Promise<VibeMatch[]>;
+  processMatchAction(userId: string, matchUserId: string, action: string): Promise<any>;
+  updateMatchResonance(matchId: string, resonanceContribution: number): Promise<void>;
+  
+  // Chat
+  getMatchChatMessages(matchId: string, userId: string): Promise<any[]>;
+  createMatchChatMessage(message: any): Promise<MatchChat>;
+  
+  // Safety
+  createChatSafetyLog(log: any): Promise<ChatSafetyLog>;
+  
+  // Prompts
+  getReflectionPrompts(): Promise<ReflectionPrompt[]>;
+  
+  // Prism Points
+  getPrismPoints(userId: string): Promise<PrismPoint[]>;
+  
+  // Test Data
+  setupVibeMatchTestData(userId: string): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -104,6 +134,18 @@ export class MemStorage implements IStorage {
   private recommendations: Map<string, Recommendation> = new Map();
   private fitnessData: Map<string, FitnessData> = new Map();
   private deviceIntegrations: Map<string, DeviceIntegration> = new Map();
+  
+  // VibeMatch data stores
+  private vibeProfiles: Map<string, VibeProfile> = new Map();
+  private vibeMatches: Map<string, VibeMatch> = new Map();
+  private matchChats: Map<string, MatchChat> = new Map();
+  private reflectionPrompts: Map<string, ReflectionPrompt> = new Map();
+  private chatSafetyLogs: Map<string, ChatSafetyLog> = new Map();
+  private prismPoints: Map<string, PrismPoint> = new Map();
+  
+  constructor() {
+    this.initializeReflectionPrompts();
+  }
 
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
@@ -760,6 +802,303 @@ export class MemStorage implements IStorage {
     await this.updateDeviceIntegration(userId, deviceType, { lastSync: new Date() });
     
     return { message: `Successfully synced ${deviceType} data`, timestamp: new Date() };
+  }
+
+  // VibeMatch System Implementations
+  
+  private initializeReflectionPrompts(): void {
+    const prompts = [
+      { category: 'self-discovery', difficulty: 'easy', prompt: 'What brings you the most joy in your daily life?', description: 'Share what genuinely lights you up' },
+      { category: 'growth', difficulty: 'medium', prompt: 'What challenge are you currently working through?', description: 'Explore a current area of personal development' },
+      { category: 'values', difficulty: 'easy', prompt: 'What does authentic living mean to you?', description: 'Express your core values and beliefs' },
+      { category: 'relationships', difficulty: 'medium', prompt: 'How do you prefer to connect with others?', description: 'Discuss your relationship and communication style' },
+      { category: 'spirituality', difficulty: 'hard', prompt: 'What practices help you feel most connected to yourself?', description: 'Share your spiritual or mindfulness practices' },
+      { category: 'purpose', difficulty: 'hard', prompt: 'What legacy do you want to leave in this world?', description: 'Reflect on your deeper purpose and impact' }
+    ];
+    
+    prompts.forEach((prompt, index) => {
+      const id = randomUUID();
+      const reflectionPrompt: ReflectionPrompt = {
+        id,
+        category: prompt.category,
+        difficulty: prompt.difficulty as 'easy' | 'medium' | 'hard',
+        prompt: prompt.prompt,
+        description: prompt.description,
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.reflectionPrompts.set(id, reflectionPrompt);
+    });
+  }
+
+  async getVibeProfile(userId: string): Promise<VibeProfile | undefined> {
+    return Array.from(this.vibeProfiles.values()).find(profile => profile.userId === userId);
+  }
+
+  async createOrUpdateVibeProfile(profileData: any): Promise<VibeProfile> {
+    const existing = await this.getVibeProfile(profileData.userId);
+    
+    if (existing) {
+      const updated: VibeProfile = { ...existing, ...profileData, updatedAt: new Date() };
+      this.vibeProfiles.set(existing.id, updated);
+      return updated;
+    } else {
+      const id = randomUUID();
+      const profile: VibeProfile = {
+        id,
+        userId: profileData.userId,
+        bio: profileData.bio || '',
+        location: profileData.location || '',
+        interests: profileData.interests || [],
+        vibeWords: profileData.vibeWords || [],
+        seekingConnection: profileData.seekingConnection || '',
+        ageRange: profileData.ageRange || '',
+        profileComplete: profileData.profileComplete || false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.vibeProfiles.set(id, profile);
+      return profile;
+    }
+  }
+
+  async getPotentialMatches(userId: string): Promise<any[]> {
+    const userProfile = await this.getVibeProfile(userId);
+    if (!userProfile) return [];
+    
+    // Get all other complete profiles
+    const otherProfiles = Array.from(this.vibeProfiles.values())
+      .filter(profile => profile.userId !== userId && profile.profileComplete);
+    
+    // Calculate match scores and create potential matches
+    return otherProfiles.map(profile => {
+      const userInterests = userProfile.interests || [];
+      const profileInterests = profile.interests || [];
+      const sharedInterests = userInterests.filter(interest => 
+        profileInterests.includes(interest)
+      );
+      const matchScore = Math.min(90, 60 + (sharedInterests.length * 10));
+      
+      return {
+        profile: {
+          userId: profile.userId,
+          bio: profile.bio,
+          interests: profile.interests,
+          vibeWords: profile.vibeWords,
+          location: profile.location
+        },
+        matchScore,
+        distance: '5-10 miles',
+        sharedInterests
+      };
+    }).sort((a, b) => b.matchScore - a.matchScore);
+  }
+
+  async getCurrentMatches(userId: string): Promise<VibeMatch[]> {
+    return Array.from(this.vibeMatches.values())
+      .filter(match => match.userId1 === userId || match.userId2 === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async processMatchAction(userId: string, matchUserId: string, action: string): Promise<any> {
+    // Check if there's already a match between these users
+    const existingMatch = Array.from(this.vibeMatches.values())
+      .find(match => 
+        (match.userId1 === userId && match.userId2 === matchUserId) ||
+        (match.userId1 === matchUserId && match.userId2 === userId)
+      );
+    
+    if (action === 'like') {
+      // Check if the other user already liked this user
+      const reverseMatch = Array.from(this.vibeMatches.values())
+        .find(match => match.userId1 === matchUserId && match.userId2 === userId);
+      
+      if (reverseMatch) {
+        // Mutual match! Update existing match to active
+        const updatedMatch: VibeMatch = {
+          ...reverseMatch,
+          status: 'active',
+          lastInteraction: new Date()
+        };
+        this.vibeMatches.set(reverseMatch.id, updatedMatch);
+        return { matched: true, matchId: reverseMatch.id };
+      } else {
+        // Create new match (pending)
+        const id = randomUUID();
+        const match: VibeMatch = {
+          id,
+          userId1: userId,
+          userId2: matchUserId,
+          matchScore: 75,
+          user1Action: 'like',
+          user2Action: null,
+          status: 'pending',
+          resonanceCount: 0,
+          lastInteraction: new Date(),
+          createdAt: new Date()
+        };
+        this.vibeMatches.set(id, match);
+        return { matched: false, matchId: id };
+      }
+    }
+    
+    return { matched: false };
+  }
+
+  async updateMatchResonance(matchId: string, resonanceContribution: number): Promise<void> {
+    const match = this.vibeMatches.get(matchId);
+    if (match) {
+      const updated: VibeMatch = {
+        ...match,
+        resonanceCount: (match.resonanceCount || 0) + resonanceContribution
+      };
+      this.vibeMatches.set(matchId, updated);
+    }
+  }
+
+  async getMatchChatMessages(matchId: string, userId: string): Promise<any[]> {
+    const messages = Array.from(this.matchChats.values())
+      .filter(chat => chat.matchId === matchId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    
+    // Add display information for the chat interface
+    return messages.map(msg => ({
+      ...msg,
+      isOwn: msg.senderId === userId,
+      partnerName: 'Anonymous Soul'
+    }));
+  }
+
+  async createMatchChatMessage(messageData: any): Promise<MatchChat> {
+    const id = randomUUID();
+    const message: MatchChat = {
+      id,
+      matchId: messageData.matchId,
+      senderId: messageData.senderId,
+      receiverId: messageData.receiverId,
+      message: messageData.message,
+      messageType: messageData.messageType || 'text',
+      isReflectionResponse: messageData.messageType === 'reflection_prompt',
+      reflectionPromptId: messageData.reflectionPromptId || null,
+      aiModerationScore: messageData.aiModerationScore || 100,
+      aiModerationFlags: [],
+      isHidden: false,
+      resonanceContribution: messageData.resonanceContribution || 0,
+      readAt: null,
+      createdAt: new Date()
+    };
+    this.matchChats.set(id, message);
+    return message;
+  }
+
+  async createChatSafetyLog(logData: any): Promise<ChatSafetyLog> {
+    const id = randomUUID();
+    const log: ChatSafetyLog = {
+      id,
+      chatId: logData.chatId,
+      userId: logData.userId,
+      actionType: logData.actionType,
+      reason: logData.reason,
+      aiAssistance: null,
+      resolved: false,
+      createdAt: new Date()
+    };
+    this.chatSafetyLogs.set(id, log);
+    return log;
+  }
+
+  async getReflectionPrompts(): Promise<ReflectionPrompt[]> {
+    return Array.from(this.reflectionPrompts.values())
+      .filter(prompt => prompt.isActive)
+      .sort(() => Math.random() - 0.5) // Randomize order
+      .slice(0, 8); // Return max 8 prompts
+  }
+
+  async getPrismPoints(userId: string): Promise<PrismPoint[]> {
+    return Array.from(this.prismPoints.values())
+      .filter(point => point.userId1 === userId || point.userId2 === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async setupVibeMatchTestData(userId: string): Promise<any> {
+    // Create test vibe profile if not exists
+    const existingProfile = await this.getVibeProfile(userId);
+    if (!existingProfile) {
+      await this.createOrUpdateVibeProfile({
+        userId,
+        bio: "I'm on a journey of self-discovery and love connecting with like-minded souls who value authenticity and growth.",
+        location: "San Francisco, CA",
+        interests: ["meditation", "yoga", "personal growth", "nature", "wellness"],
+        vibeWords: ["authentic", "empathetic", "curious", "grounded"],
+        seekingConnection: "spiritual_companion",
+        ageRange: "25-35",
+        profileComplete: true
+      });
+    }
+
+    // Create test match user
+    const testMatchUserId = randomUUID();
+    const testUser: User = {
+      id: testMatchUserId,
+      email: "testmatch@example.com",
+      name: "Test Soul",
+      avatarUrl: null,
+      tier: "free",
+      role: "user",
+      tokensUsed: 0,
+      tokenLimit: 10,
+      resetDate: new Date(),
+      courseAccess: false,
+      courseAccessDate: null,
+      createdAt: new Date()
+    };
+    this.users.set(testMatchUserId, testUser);
+
+    // Create test match profile
+    await this.createOrUpdateVibeProfile({
+      userId: testMatchUserId,
+      bio: "Soul seeking deeper connections through meaningful conversations and shared growth experiences.",
+      location: "San Francisco, CA", 
+      interests: ["meditation", "spirituality", "wellness", "mindfulness"],
+      vibeWords: ["mindful", "compassionate", "seeking", "open"],
+      seekingConnection: "growth_partner",
+      ageRange: "25-35",
+      profileComplete: true
+    });
+
+    // Create a mutual match
+    const matchId = randomUUID();
+    const match: VibeMatch = {
+      id: matchId,
+      userId1: userId,
+      userId2: testMatchUserId,
+      matchScore: 85,
+      user1Action: 'like',
+      user2Action: 'like',
+      status: 'active',
+      resonanceCount: 2, // Close to unlocking Prism Point
+      lastInteraction: new Date(),
+      createdAt: new Date()
+    };
+    this.vibeMatches.set(matchId, match);
+
+    // Add some test chat messages
+    await this.createMatchChatMessage({
+      matchId,
+      senderId: testMatchUserId,
+      receiverId: userId,
+      message: "Hi! I saw we both value meditation and personal growth. What drew you to mindfulness practices?",
+      messageType: "text",
+      aiModerationScore: 95,
+      resonanceContribution: 1
+    });
+
+    return {
+      testMatchUserId,
+      matchId,
+      message: "Test VibeMatch data created! You now have a mutual match ready to chat.",
+      instructions: "Go to the VibeMatch tab to see your connection and start chatting!"
+    };
   }
 }
 

@@ -100,6 +100,25 @@ export default function DashboardPage() {
     },
   });
 
+  // VibeMatch test setup mutation
+  const setupTestMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/vibe-match/test-setup/${userId}`, {
+        method: 'POST',
+      });
+      if (!response.ok) throw new Error('Failed to setup test data');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "🎉 VibeMatch Test Ready!",
+        description: data.message,
+      });
+      // Refresh all data
+      queryClient.invalidateQueries();
+    },
+  });
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
@@ -287,6 +306,43 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Test VibeMatch Setup */}
+            {userId && (
+              <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-flask text-pink-500 mr-2"></i>
+                    VibeMatch Test Setup
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Want to test the secure chat system? This will create a test match with sample data.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setupTestMutation.mutate()}
+                    disabled={setupTestMutation.isPending}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                  >
+                    {setupTestMutation.isPending ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i>
+                        Setting up test...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-magic mr-2"></i>
+                        Create Test VibeMatch Data
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-2">
+                    This creates a test match, profile, and chat history so you can test the secure messaging system.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* AI Recommendations */}
             {dashboardData?.recommendations && dashboardData.recommendations.length > 0 && (

@@ -484,6 +484,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // VibeMatch API Routes
+  
+  // Vibe Profile routes
+  app.get("/api/vibe-profile/:userId", async (req, res) => {
+    try {
+      const profile = await storage.getVibeProfile(req.params.userId);
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      res.json(profile);
+    } catch (error) {
+      console.error("Error getting vibe profile:", error);
+      res.status(500).json({ error: "Failed to get vibe profile" });
+    }
+  });
+
+  app.post("/api/vibe-profile", async (req, res) => {
+    try {
+      const profileData = req.body;
+      const profile = await storage.createOrUpdateVibeProfile(profileData);
+      res.json(profile);
+    } catch (error) {
+      console.error("Error creating/updating vibe profile:", error);
+      res.status(500).json({ error: "Failed to save vibe profile" });
+    }
+  });
+
+  // Match discovery routes
+  app.get("/api/vibe-matches/potential/:userId", async (req, res) => {
+    try {
+      const matches = await storage.getPotentialMatches(req.params.userId);
+      res.json(matches);
+    } catch (error) {
+      console.error("Error getting potential matches:", error);
+      res.status(500).json({ error: "Failed to get potential matches" });
+    }
+  });
+
+  app.get("/api/vibe-matches/current/:userId", async (req, res) => {
+    try {
+      const matches = await storage.getCurrentMatches(req.params.userId);
+      res.json(matches);
+    } catch (error) {
+      console.error("Error getting current matches:", error);
+      res.status(500).json({ error: "Failed to get current matches" });
+    }
+  });
+
+  app.post("/api/vibe-matches/action", async (req, res) => {
+    try {
+      const { userId, matchUserId, action } = req.body;
+      const result = await storage.processMatchAction(userId, matchUserId, action);
+      res.json(result);
+    } catch (error) {
+      console.error("Error processing match action:", error);
+      res.status(500).json({ error: "Failed to process match action" });
+    }
+  });
+
+  // Secure chat routes
+  app.get("/api/match-chat/:matchId", async (req, res) => {
+    try {
+      const { matchId } = req.params;
+      const { userId } = req.query;
+      const messages = await storage.getMatchChatMessages(matchId, userId as string);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error getting chat messages:", error);
+      res.status(500).json({ error: "Failed to get chat messages" });
+    }
+  });
+
+  app.post("/api/match-chat", async (req, res) => {
+    try {
+      const { matchId, senderId, receiverId, message, messageType, reflectionPromptId } = req.body;
+      
+      // AI moderation simulation (replace with actual Anthropic call)
+      const aiModerationScore = Math.floor(Math.random() * 20) + 80; // 80-100
+      const resonanceContribution = message.length > 50 && messageType === 'reflection_prompt' ? 1 : 0;
+      
+      const chatMessage = await storage.createMatchChatMessage({
+        matchId,
+        senderId,
+        receiverId,
+        message,
+        messageType: messageType || 'text',
+        reflectionPromptId,
+        aiModerationScore,
+        resonanceContribution
+      });
+      
+      // Update match resonance if contribution was made
+      if (resonanceContribution > 0) {
+        await storage.updateMatchResonance(matchId, resonanceContribution);
+      }
+      
+      res.json({ 
+        ...chatMessage, 
+        aiModerationScore, 
+        resonanceContribution 
+      });
+    } catch (error) {
+      console.error("Error sending chat message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  // Safety reporting
+  app.post("/api/chat-safety-report", async (req, res) => {
+    try {
+      const { chatId, userId, actionType, reason } = req.body;
+      const report = await storage.createChatSafetyLog({
+        chatId,
+        userId,
+        actionType,
+        reason
+      });
+      res.json(report);
+    } catch (error) {
+      console.error("Error creating safety report:", error);
+      res.status(500).json({ error: "Failed to create safety report" });
+    }
+  });
+
+  // Reflection prompts
+  app.get("/api/reflection-prompts", async (req, res) => {
+    try {
+      const prompts = await storage.getReflectionPrompts();
+      res.json(prompts);
+    } catch (error) {
+      console.error("Error getting reflection prompts:", error);
+      res.status(500).json({ error: "Failed to get reflection prompts" });
+    }
+  });
+
+  // Prism Points
+  app.get("/api/prism-points/:userId", async (req, res) => {
+    try {
+      const prismPoints = await storage.getPrismPoints(req.params.userId);
+      res.json(prismPoints);
+    } catch (error) {
+      console.error("Error getting prism points:", error);
+      res.status(500).json({ error: "Failed to get prism points" });
+    }
+  });
+
+  // TEST BYPASS ROUTES - For development/demo purposes
+  app.post("/api/vibe-match/test-setup/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const result = await storage.setupVibeMatchTestData(userId);
+      res.json({ message: "Test data created successfully", ...result });
+    } catch (error) {
+      console.error("Error setting up test data:", error);
+      res.status(500).json({ error: "Failed to setup test data" });
+    }
+  });
+
   // Wellness Dashboard API Routes
   
   // Get comprehensive dashboard data
