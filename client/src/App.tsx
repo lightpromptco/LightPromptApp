@@ -10,6 +10,7 @@ import CourseAccessPage from "@/pages/course-access";
 import DashboardPage from "@/pages/dashboard";
 import ChallengesPage from "@/pages/challenges";
 import SignupPage from "@/pages/signup";
+import PlansPage from "@/pages/plans";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/challenges" component={ChallengesPage} />
       <Route path="/signup" component={SignupPage} />
+      <Route path="/plans" component={PlansPage} />
       <Route component={NotFound} />
     </Switch>
   );
