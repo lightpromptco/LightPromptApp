@@ -193,9 +193,9 @@ export function EnhancedCheckInForm({ onSubmit, isLoading, existingData }: Enhan
       </div>
 
       {/* Reflection Section */}
-      <div className="bg-purple-50 p-4 rounded-lg">
-        <h4 className="font-semibold text-purple-900 mb-4 flex items-center">
-          <i className="fas fa-pen-nib text-purple-600 mr-2"></i>
+      <div className="bg-teal-50 p-4 rounded-lg">
+        <h4 className="font-semibold text-teal-900 mb-4 flex items-center">
+          <i className="fas fa-pen-nib text-teal-600 mr-2"></i>
           Daily Reflection
         </h4>
         <div className="space-y-4">
@@ -227,7 +227,7 @@ export function EnhancedCheckInForm({ onSubmit, isLoading, existingData }: Enhan
 
       <Button 
         type="submit" 
-        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+        className="w-full bg-gradient-to-r from-blue-500 to-teal-600 hover:from-blue-600 hover:to-teal-700"
         disabled={isLoading || !formData.mood}
       >
         {isLoading ? (

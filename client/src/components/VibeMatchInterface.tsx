@@ -125,7 +125,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600">Loading your vibe profile...</p>
         </div>
       </div>
@@ -153,8 +153,8 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
             onClick={() => setCurrentView(tab.id as any)}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
               currentView === tab.id
-                ? 'text-pink-600 border-b-2 border-pink-600'
-                : 'text-gray-600 hover:text-pink-500'
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'text-gray-600 hover:text-teal-500'
             }`}
           >
             <i className={`${tab.icon} mr-2`}></i>
@@ -193,7 +193,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                 <h4 className="font-semibold mb-2">Vibe Words</h4>
                 <div className="flex flex-wrap gap-1">
                   {vibeProfile.vibeWords?.map((word, i) => (
-                    <Badge key={i} className="text-xs bg-pink-100 text-pink-700">
+                    <Badge key={i} className="text-xs bg-teal-100 text-teal-700">
                       {word}
                     </Badge>
                   ))}
@@ -220,22 +220,22 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
           {matchesLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <p className="text-gray-600">Finding your soul connections...</p>
               </div>
             </div>
           ) : currentMatch ? (
             <div className="max-w-md mx-auto">
-              <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200 overflow-hidden">
+              <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200 overflow-hidden">
                 {/* Match Card */}
                 <div className="relative">
-                  <div className="h-48 bg-gradient-to-br from-pink-300 to-purple-400 flex items-center justify-center">
+                  <div className="h-48 bg-gradient-to-br from-teal-300 to-cyan-400 flex items-center justify-center">
                     <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
                       <i className="fas fa-user text-4xl text-gray-400"></i>
                     </div>
                   </div>
                   <div className="absolute top-4 right-4 bg-white/90 rounded-full px-3 py-1">
-                    <span className="text-sm font-semibold text-pink-600">
+                    <span className="text-sm font-semibold text-teal-600">
                       {currentMatch.matchScore}% match
                     </span>
                   </div>
@@ -256,7 +256,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                       <h4 className="font-semibold mb-2">Shared Vibes</h4>
                       <div className="flex flex-wrap gap-1">
                         {currentMatch.sharedInterests.map((interest, i) => (
-                          <Badge key={i} className="text-xs bg-purple-100 text-purple-700">
+                          <Badge key={i} className="text-xs bg-cyan-100 text-cyan-700">
                             {interest}
                           </Badge>
                         ))}
@@ -292,7 +292,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                   </Button>
                   <Button
                     size="lg"
-                    className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                    className="w-16 h-16 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700"
                     onClick={() => matchActionMutation.mutate({
                       matchUserId: currentMatch.profile.userId,
                       action: 'like'
@@ -344,7 +344,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-300 to-purple-400 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-teal-300 to-cyan-400 rounded-full flex items-center justify-center">
                           <i className="fas fa-user text-white"></i>
                         </div>
                         <div>
@@ -359,13 +359,13 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                     
                     {(match.resonanceCount || 0) >= 3 ? (
                       <div className="text-center">
-                        <div className="w-full bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-3 mb-3">
-                          <i className="fas fa-gem text-purple-600 text-lg mb-1"></i>
-                          <p className="text-sm font-semibold text-purple-700">
+                        <div className="w-full bg-gradient-to-r from-cyan-100 to-teal-100 rounded-lg p-3 mb-3">
+                          <i className="fas fa-gem text-cyan-600 text-lg mb-1"></i>
+                          <p className="text-sm font-semibold text-cyan-700">
                             Prism Point Ready!
                           </p>
                         </div>
-                        <Button size="sm" className="bg-gradient-to-r from-purple-500 to-pink-600">
+                        <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-teal-600">
                           <i className="fas fa-unlock mr-2"></i>
                           Unlock Connection
                         </Button>
@@ -400,7 +400,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
       {currentView === 'prism' && (
         <div className="space-y-4">
           <div className="text-center">
-            <i className="fas fa-gem text-4xl text-purple-500 mb-4"></i>
+            <i className="fas fa-gem text-4xl text-cyan-500 mb-4"></i>
             <h3 className="text-xl font-semibold mb-2">Prism Points</h3>
             <p className="text-gray-600 max-w-md mx-auto">
               After 3 resonance matches, you and your soul connection can choose to unlock deeper connection 
@@ -411,10 +411,10 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
           {prismPoints?.length ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {prismPoints.map((point) => (
-                <Card key={point.id} className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+                <Card key={point.id} className="bg-gradient-to-br from-cyan-50 to-teal-50 border-cyan-200">
                   <CardContent className="p-6">
                     <div className="text-center space-y-4">
-                      <i className="fas fa-gem text-3xl text-purple-600"></i>
+                      <i className="fas fa-gem text-3xl text-cyan-600"></i>
                       <h4 className="font-semibold">Soul Connection Unlocked</h4>
                       {point.unlocked ? (
                         <div className="space-y-2">
@@ -435,7 +435,7 @@ export function VibeMatchInterface({ userId }: VibeMatchInterfaceProps) {
                           </p>
                           <Button 
                             size="sm" 
-                            className="bg-gradient-to-r from-purple-500 to-pink-600"
+                            className="bg-gradient-to-r from-cyan-500 to-teal-600"
                           >
                             <i className="fas fa-key mr-2"></i>
                             Give Consent to Unlock
@@ -616,7 +616,7 @@ function VibeProfileSetup({ onSave, isLoading }: { onSave: (data: any) => void; 
               {formData.vibeWords.map((word, i) => (
                 <Badge
                   key={i}
-                  className="bg-pink-100 text-pink-700 cursor-pointer"
+                  className="bg-teal-100 text-teal-700 cursor-pointer"
                   onClick={() => setFormData(prev => ({
                     ...prev,
                     vibeWords: prev.vibeWords.filter((_, index) => index !== i)
@@ -630,7 +630,7 @@ function VibeProfileSetup({ onSave, isLoading }: { onSave: (data: any) => void; 
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700"
             disabled={isLoading || !formData.bio || !formData.location || !formData.seekingConnection || !formData.ageRange}
           >
             {isLoading ? (

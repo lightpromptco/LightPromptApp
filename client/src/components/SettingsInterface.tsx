@@ -138,7 +138,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
           <div>
             <Label className="text-base font-medium">Profile Visibility</Label>
             <Select 
-              value={preferences.visibility} 
+              value={preferences.visibility || 'private'} 
               onValueChange={(value) => updateSetting('visibility', value)}
             >
               <SelectTrigger className="mt-2">
@@ -184,7 +184,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <i className="fas fa-brain text-purple-500 mr-2"></i>
+            <i className="fas fa-brain text-teal-500 mr-2"></i>
             AI Interaction Settings
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -195,7 +195,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
           <div>
             <Label className="text-base font-medium">AI Personality</Label>
             <Select 
-              value={preferences.aiPersonality} 
+              value={preferences.aiPersonality || 'balanced'} 
               onValueChange={(value) => updateSetting('aiPersonality', value)}
             >
               <SelectTrigger className="mt-2">
@@ -221,7 +221,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
                 type="range"
                 min="1"
                 max="10"
-                value={preferences.aiIntensity}
+                value={preferences.aiIntensity || 5}
                 onChange={(e) => updateSetting('aiIntensity', parseInt(e.target.value))}
                 className="w-full"
               />
@@ -235,7 +235,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
           <div>
             <Label className="text-base font-medium">Guidance Style</Label>
             <Select 
-              value={preferences.aiGuidanceStyle} 
+              value={preferences.aiGuidanceStyle || 'supportive'} 
               onValueChange={(value) => updateSetting('aiGuidanceStyle', value)}
             >
               <SelectTrigger className="mt-2">
@@ -278,7 +278,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <i className="fas fa-heart text-pink-500 mr-2"></i>
+            <i className="fas fa-heart text-teal-500 mr-2"></i>
             Partner Mode Settings
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -309,10 +309,10 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
       </Card>
 
       {/* Easter Egg Unlocks Section */}
-      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+      <Card className="bg-gradient-to-br from-teal-50 to-teal-50 border-teal-200">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <i className="fas fa-gem text-purple-500 mr-2"></i>
+            <i className="fas fa-gem text-teal-500 mr-2"></i>
             Unlocked Features
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -321,7 +321,7 @@ export function SettingsInterface({ userId }: SettingsInterfaceProps) {
         </CardHeader>
         <CardContent>
           <div className="text-center py-6">
-            <i className="fas fa-magic text-4xl text-purple-300 mb-4"></i>
+            <i className="fas fa-magic text-4xl text-teal-300 mb-4"></i>
             <h4 className="font-medium text-gray-700 mb-2">No special features unlocked yet</h4>
             <p className="text-sm text-gray-600">
               Keep growing, connecting, and exploring to unlock hidden features!

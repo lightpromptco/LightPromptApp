@@ -141,24 +141,6 @@ export default function DashboardPage() {
     },
   });
 
-  // VibeMatch test setup mutation
-  const setupTestMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/vibe-match/test-setup/${userId}`, {
-        method: 'POST',
-      });
-      if (!response.ok) throw new Error('Failed to setup test data');
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "🎉 VibeMatch Test Ready!",
-        description: data.message,
-      });
-      // Refresh all data
-      queryClient.invalidateQueries();
-    },
-  });
 
   if (!userId) {
     return (
@@ -249,7 +231,7 @@ export default function DashboardPage() {
               <Badge variant="outline" className="capitalize">
                 {user.tier === 'tier_29' ? 'Growth' : user.tier === 'tier_49' ? 'Resonance' : user.tier}
               </Badge>
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-600 rounded-full flex items-center justify-center text-white font-medium">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -350,42 +332,6 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            {/* Test VibeMatch Setup */}
-            {userId && (
-              <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-flask text-pink-500 mr-2"></i>
-                    VibeMatch Test Setup
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Want to test the secure chat system? This will create a test match with sample data.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <Button 
-                    onClick={() => setupTestMutation.mutate()}
-                    disabled={setupTestMutation.isPending}
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                  >
-                    {setupTestMutation.isPending ? (
-                      <>
-                        <i className="fas fa-spinner fa-spin mr-2"></i>
-                        Setting up test...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-magic mr-2"></i>
-                        Create Test VibeMatch Data
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-xs text-gray-500 mt-2">
-                    This creates a test match, profile, and chat history so you can test the secure messaging system.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
 
             {/* AI Recommendations */}
             {dashboardData?.recommendations && dashboardData.recommendations.length > 0 && (
@@ -408,7 +354,7 @@ export default function DashboardPage() {
                             rec.type === 'breathwork' ? 'fa-wind text-blue-500' :
                             rec.type === 'workout' ? 'fa-dumbbell text-green-500' :
                             rec.type === 'nutrition' ? 'fa-apple-alt text-red-500' :
-                            'fa-heart text-purple-500'
+                            'fa-heart text-teal-500'
                           }`}></i>
                           <h4 className="font-semibold text-gray-900">{rec.title}</h4>
                         </div>
@@ -442,7 +388,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <i className="fas fa-chart-line text-purple-500 mr-2"></i>
+                    <i className="fas fa-chart-line text-teal-500 mr-2"></i>
                     Recent Insights
                   </CardTitle>
                   <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded mt-2">
@@ -451,8 +397,8 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {dashboardData.patterns.slice(0, 3).map((pattern) => (
-                    <div key={pattern.id} className="flex items-start space-x-3 p-3 bg-purple-50 rounded-lg">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div key={pattern.id} className="flex items-start space-x-3 p-3 bg-teal-50 rounded-lg">
+                      <div className="w-2 h-2 bg-teal-500 rounded-full mt-2 flex-shrink-0"></div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">{pattern.description}</p>
                         <div className="flex items-center space-x-2 mt-1">
@@ -796,7 +742,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center text-base">
-                    <i className="fas fa-ring text-purple-500 mr-2"></i>
+                    <i className="fas fa-ring text-teal-500 mr-2"></i>
                     Oura Ring
                   </CardTitle>
                 </CardHeader>
@@ -947,10 +893,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Future integrations preview */}
-            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+            <Card className="bg-gradient-to-br from-teal-50 to-indigo-50 border-teal-200">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <i className="fas fa-rocket text-purple-500 mr-2"></i>
+                  <i className="fas fa-rocket text-teal-500 mr-2"></i>
                   Coming Soon
                 </CardTitle>
                 <div className="text-xs text-gray-500 bg-white/50 p-2 rounded mt-2">
@@ -980,7 +926,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-2 bg-white/30 rounded">
-                  <i className="fas fa-rainbow text-purple-500"></i>
+                  <i className="fas fa-rainbow text-teal-500"></i>
                   <div>
                     <span className="font-medium">Siri Rainbow Screen</span>
                     <p className="text-xs text-gray-600">Native iOS app needed for full Siri visual integration</p>
@@ -999,10 +945,10 @@ export default function DashboardPage() {
 
           {/* Horoscope/Astrology Tab */}
           <TabsContent value="horoscope" className="space-y-6">
-            <Card className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200">
+            <Card className="bg-gradient-to-br from-violet-50 to-teal-50 border-violet-200">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <i className="fas fa-moon text-purple-500 mr-2"></i>
+                  <i className="fas fa-moon text-teal-500 mr-2"></i>
                   SoulMap Astrology Insights
                 </CardTitle>
                 <p className="text-sm text-gray-600">
@@ -1046,7 +992,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="text-center pt-4">
-                        <Button className="bg-gradient-to-r from-purple-500 to-violet-600">
+                        <Button className="bg-gradient-to-r from-teal-500 to-violet-600">
                           <i className="fas fa-crystal-ball mr-2"></i>
                           Get Full Reading
                         </Button>
@@ -1058,13 +1004,13 @@ export default function DashboardPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
-                        <i className="fas fa-chart-pie text-purple-500 mr-2"></i>
+                        <i className="fas fa-chart-pie text-teal-500 mr-2"></i>
                         Your Birth Chart
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="text-center py-6">
-                        <i className="fas fa-user-astronaut text-4xl text-purple-300 mb-4"></i>
+                        <i className="fas fa-user-astronaut text-4xl text-teal-300 mb-4"></i>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">Create Your Cosmic Profile</h3>
                         <p className="text-gray-600 mb-4">Enter your birth details for personalized astrological insights</p>
                         
@@ -1074,7 +1020,7 @@ export default function DashboardPage() {
                           <Input placeholder="Birth location (City, State)" />
                         </div>
                         
-                        <Button className="mt-4 bg-gradient-to-r from-purple-500 to-violet-600">
+                        <Button className="mt-4 bg-gradient-to-r from-teal-500 to-violet-600">
                           <i className="fas fa-star mr-2"></i>
                           Generate Birth Chart
                         </Button>
@@ -1084,7 +1030,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Daily Affirmation */}
-                <Card className="mt-6 bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200">
+                <Card className="mt-6 bg-gradient-to-br from-rose-50 to-cyan-50 border-rose-200">
                   <CardContent className="p-6 text-center">
                     <i className="fas fa-heart text-rose-500 text-2xl mb-3"></i>
                     <h3 className="text-lg font-semibold text-rose-900 mb-2">Today's Soul Affirmation</h3>
@@ -1149,7 +1095,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg opacity-60">
                     <h4 className="font-semibold mb-2 flex items-center">
-                      <i className="fas fa-hands-helping text-purple-500 mr-2"></i>
+                      <i className="fas fa-hands-helping text-teal-500 mr-2"></i>
                       Support Others
                     </h4>
                     <p className="text-xs text-gray-600">Offer encouragement and learn from the experiences of kindred spirits</p>
@@ -1168,10 +1114,10 @@ export default function DashboardPage() {
 
           {/* VibeMatch Tab */}
           <TabsContent value="vibematch" className="space-y-6">
-            <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
+            <Card className="bg-gradient-to-br from-cyan-50 to-teal-50 border-cyan-200">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <i className="fas fa-heart text-pink-500 mr-2"></i>
+                  <i className="fas fa-heart text-cyan-500 mr-2"></i>
                   VibeMatch - Soul Connection Discovery
                 </CardTitle>
                 <p className="text-sm text-gray-600">

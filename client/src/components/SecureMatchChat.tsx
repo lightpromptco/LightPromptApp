@@ -158,7 +158,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600">Loading your soul connection...</p>
         </div>
       </div>
@@ -168,14 +168,14 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
   return (
     <div className="h-full flex flex-col">
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-b border-pink-200 p-4">
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Button onClick={onBack} variant="ghost" size="sm">
               <i className="fas fa-arrow-left mr-2"></i>
               Back
             </Button>
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-purple-400 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-300 to-cyan-400 rounded-full flex items-center justify-center">
               <i className="fas fa-user text-white"></i>
             </div>
             <div>
@@ -192,7 +192,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
               AI Protected
             </Badge>
             {(match.resonanceCount || 0) >= 3 && (
-              <Badge className="bg-purple-100 text-purple-700">
+              <Badge className="bg-teal-100 text-teal-700">
                 <i className="fas fa-gem mr-1"></i>
                 Prism Ready
               </Badge>
@@ -221,7 +221,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                   msg.isOwn
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
@@ -266,7 +266,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
             </p>
             <Button
               onClick={() => setShowReflectionPrompts(true)}
-              className="bg-gradient-to-r from-pink-500 to-purple-600"
+              className="bg-gradient-to-r from-teal-600 to-cyan-600"
             >
               <i className="fas fa-lightbulb mr-2"></i>
               Start with a Reflection Prompt
@@ -297,7 +297,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
                 <div
                   key={prompt.id}
                   onClick={() => handleSendReflectionPrompt(prompt)}
-                  className="p-3 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg cursor-pointer hover:from-purple-100 hover:to-pink-100 transition-colors"
+                  className="p-3 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-lg cursor-pointer hover:from-teal-100 hover:to-cyan-100 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant="outline" className="text-xs capitalize">
@@ -344,7 +344,7 @@ export function SecureMatchChat({ match, currentUserId, onBack }: SecureMatchCha
             <Button
               type="submit"
               disabled={!message.trim() || sendMessageMutation.isPending}
-              className="bg-gradient-to-r from-pink-500 to-purple-600"
+              className="bg-gradient-to-r from-teal-600 to-cyan-600"
             >
               {sendMessageMutation.isPending ? (
                 <i className="fas fa-spinner fa-spin"></i>

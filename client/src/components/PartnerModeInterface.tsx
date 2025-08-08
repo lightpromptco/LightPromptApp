@@ -97,7 +97,7 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600">Loading your connections...</p>
         </div>
       </div>
@@ -115,10 +115,10 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
       </div>
 
       {/* Invite Partner */}
-      <Card className="bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
+      <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <i className="fas fa-heart text-pink-500 mr-2"></i>
+            <i className="fas fa-heart text-teal-600 mr-2"></i>
             Invite a Partner
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -158,7 +158,7 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
             <Button 
               type="submit" 
               disabled={!inviteEmail.trim() || invitePartnerMutation.isPending}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600"
+              className="w-full bg-gradient-to-r from-teal-600 to-cyan-600"
             >
               {invitePartnerMutation.isPending ? (
                 <>
@@ -182,11 +182,11 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
           <h3 className="text-lg font-semibold text-gray-900">Your Wellness Partners</h3>
           
           {connections.map((connection) => (
-            <Card key={connection.id} className="border-l-4 border-l-purple-500">
+            <Card key={connection.id} className="border-l-4 border-l-teal-500">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-300 to-pink-400 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-teal-300 to-pink-400 rounded-full flex items-center justify-center">
                       <i className="fas fa-user text-white"></i>
                     </div>
                     <div>
@@ -224,8 +224,8 @@ export function PartnerModeInterface({ userId }: PartnerModeInterfaceProps) {
                   <h5 className="font-medium mb-3">Shared Growth Goals</h5>
                   <div className="space-y-2 mb-3">
                     {(connection.sharedGoals as string[] || []).map((goal, index) => (
-                      <div key={index} className="flex items-center space-x-2 bg-purple-50 p-2 rounded">
-                        <i className="fas fa-target text-purple-500"></i>
+                      <div key={index} className="flex items-center space-x-2 bg-teal-50 p-2 rounded">
+                        <i className="fas fa-target text-teal-500"></i>
                         <span className="text-sm">{goal}</span>
                       </div>
                     ))}
