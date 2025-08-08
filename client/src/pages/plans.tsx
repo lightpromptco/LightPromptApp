@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { StripeCheckout } from '@/components/StripeCheckout';
 
 interface User {
   id: string;
@@ -17,7 +18,14 @@ interface User {
 
 export default function PlansPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [checkoutState, setCheckoutState] = useState<{
+    isOpen: boolean;
+    planId: string;
+    planName: string;
+    price: string;
+  }>({ isOpen: false, planId: '', planName: '', price: '' });
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Get user from localStorage
   useEffect(() => {
@@ -94,6 +102,48 @@ export default function PlansPage() {
       title: "More Tokens Available",
       description: "Join a wellness challenge or course to increase your daily token limit!",
     });
+  };
+
+  const handleUpgrade = (planId: string, planName: string, price: string) => {
+    if (!currentUser?.id) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in to upgrade your plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setCheckoutState({ 
+      isOpen: true, 
+      planId, 
+      planName, 
+      price 
+    });
+  };
+
+  const handleCheckoutClose = () => {
+    setCheckoutState({ 
+      isOpen: false, 
+      planId: '', 
+      planName: '', 
+      price: '' 
+    });
+  };
+
+  const handleUpgradeSuccess = (updatedUser: any) => {
+    setUser(updatedUser);
+    queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+    
+    toast({
+      title: "🎉 Welcome to your new plan!",
+      description: `You now have ${updatedUser.tokenLimit} daily tokens and access to all premium features.`,
+    });
+  };
+
+  const isCurrentPlan = (planTier: string) => {
+    if (!currentUser) return false;
+    return currentUser.tier === planTier;
   };
 
   return (
@@ -332,8 +382,22 @@ export default function PlansPage() {
                 <div><strong>GeoPrompts:</strong> Unlimited/month</div>
               </div>
 
-              <Button className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
-                Upgrade Now
+              <Button 
+                className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+                onClick={() => handleUpgrade('growth', 'Growth', '29')}
+                disabled={isCurrentPlan('growth')}
+              >
+                {isCurrentPlan('growth') ? (
+                  <>
+                    <i className="fas fa-check mr-2"></i>
+                    Current Plan
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-crown mr-2"></i>
+                    Upgrade Now
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -389,8 +453,22 @@ export default function PlansPage() {
                 <div><strong>GeoPrompts:</strong> 0/month</div>
               </div>
 
-              <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                Upgrade Now
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                onClick={() => handleUpgrade('resonance', 'Resonance', '49')}
+                disabled={isCurrentPlan('resonance')}
+              >
+                {isCurrentPlan('resonance') ? (
+                  <>
+                    <i className="fas fa-check mr-2"></i>
+                    Current Plan
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-crown mr-2"></i>
+                    Upgrade Now
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -446,8 +524,22 @@ export default function PlansPage() {
                 <div><strong>GeoPrompts:</strong> 0/month</div>
               </div>
 
-              <Button className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700">
-                Contact Sales
+              <Button 
+                className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+                onClick={() => handleUpgrade('enterprise', 'Enterprise', '199')}
+                disabled={isCurrentPlan('enterprise')}
+              >
+                {isCurrentPlan('enterprise') ? (
+                  <>
+                    <i className="fas fa-check mr-2"></i>
+                    Current Plan
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-crown mr-2"></i>
+                    Upgrade Now
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -662,6 +754,19 @@ export default function PlansPage() {
         </div>
 
       </div>
+      
+      {/* Stripe Checkout Modal */}
+      {checkoutState.isOpen && currentUser && (
+        <StripeCheckout
+          planId={checkoutState.planId}
+          planName={checkoutState.planName}
+          price={checkoutState.price}
+          userId={currentUser.id}
+          isOpen={checkoutState.isOpen}
+          onClose={handleCheckoutClose}
+          onSuccess={handleUpgradeSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -11,8 +11,17 @@ import {
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
+import Stripe from "stripe";
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -469,6 +478,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error redeeming access code:", error);
       res.status(400).json({ error: error?.message || 'Failed to redeem access code' });
+    }
+  });
+
+  // Stripe payment routes
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { planId, userId } = req.body;
+      
+      if (!planId || !userId) {
+        return res.status(400).json({ error: "Missing planId or userId" });
+      }
+
+      // Plan pricing mapping
+      const plans = {
+        "growth": { amount: 2900, name: "Growth Plan" }, // $29.00
+        "resonance": { amount: 4900, name: "Resonance Plan" }, // $49.00
+        "enterprise": { amount: 19900, name: "Enterprise Plan" } // $199.00
+      };
+
+      const plan = plans[planId as keyof typeof plans];
+      if (!plan) {
+        return res.status(400).json({ error: "Invalid plan ID" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Create payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: plan.amount,
+        currency: "usd",
+        metadata: {
+          userId,
+          planId,
+          planName: plan.name,
+          userEmail: user.email
+        },
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error("Stripe payment intent error:", error);
+      res.status(500).json({ 
+        error: "Failed to create payment intent", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Confirm payment and upgrade user tier
+  app.post("/api/confirm-payment", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      
+      if (!paymentIntentId) {
+        return res.status(400).json({ error: "Missing paymentIntentId" });
+      }
+
+      // Retrieve payment intent from Stripe
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === "succeeded") {
+        const { userId, planId } = paymentIntent.metadata;
+        
+        if (!userId || !planId) {
+          return res.status(400).json({ error: "Missing user or plan data in payment" });
+        }
+
+        // Upgrade user tier
+        const upgradedUser = await storage.upgradeTier(userId, planId);
+        
+        res.json({ 
+          success: true, 
+          user: upgradedUser,
+          message: "Payment successful and tier upgraded!" 
+        });
+      } else {
+        res.status(400).json({ 
+          error: "Payment not completed", 
+          status: paymentIntent.status 
+        });
+      }
+    } catch (error: any) {
+      console.error("Payment confirmation error:", error);
+      res.status(500).json({ 
+        error: "Failed to confirm payment", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Stripe webhook for payment confirmations
+  app.post("/api/stripe-webhook", async (req, res) => {
+    try {
+      const event = req.body;
+      
+      // Handle the event
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          const { userId, planId } = paymentIntent.metadata;
+          
+          if (userId && planId) {
+            // Upgrade user tier
+            await storage.upgradeTier(userId, planId);
+            console.log(`✅ User ${userId} upgraded to ${planId} tier`);
+          }
+          break;
+        
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error("Stripe webhook error:", error);
+      res.status(500).json({ error: "Webhook failed" });
     }
   });
 

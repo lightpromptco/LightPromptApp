@@ -53,6 +53,9 @@ export interface IStorage {
   incrementTokenUsage(userId: string): Promise<void>;
   resetTokenUsage(userId: string): Promise<void>;
   
+  // Tier management
+  upgradeTier(userId: string, planId: string): Promise<User>;
+  
   // Wellness Dashboard
   // Wellness Metrics
   getWellnessMetrics(userId: string, days?: number): Promise<WellnessMetric[]>;
@@ -397,6 +400,34 @@ export class MemStorage implements IStorage {
     
     const updatedUser = { ...user, tokensUsed: 0, resetDate: new Date() };
     this.users.set(userId, updatedUser);
+  }
+
+  async upgradeTier(userId: string, planId: string): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    // Plan configuration
+    const planConfig = {
+      "growth": { tier: "growth", tokenLimit: 1000 },
+      "resonance": { tier: "resonance", tokenLimit: 2500 },
+      "enterprise": { tier: "enterprise", tokenLimit: 10000 }
+    };
+    
+    const config = planConfig[planId as keyof typeof planConfig];
+    if (!config) {
+      throw new Error("Invalid plan ID");
+    }
+    
+    const updatedUser = {
+      ...user,
+      tier: config.tier,
+      tokenLimit: config.tokenLimit,
+      tokensUsed: 0, // Reset tokens when upgrading
+      resetDate: new Date()
+    };
+    
+    this.users.set(userId, updatedUser);
+    return updatedUser;
   }
 
   async getAccessCode(code: string): Promise<AccessCode | undefined> {
