@@ -74,9 +74,14 @@ export function ChatInterface({
     // Check token limits (bypass for admin mode)
     if (!isAdmin && user.tokensUsed >= user.tokenLimit) {
       toast({
-        title: "Token limit reached",
-        description: isAdmin ? "Admin mode: Unlimited tokens" : "You've reached your daily message limit. Upgrade for more tokens.",
+        title: "Daily limit reached",
+        description: isAdmin ? "Admin mode: Unlimited tokens" : "Upgrade to Growth ($29/mo) for 1,000 daily tokens and unlimited bot access!",
         variant: "destructive",
+        action: !isAdmin ? {
+          altText: "View Plans",
+          onClick: () => window.location.href = '/plans',
+          children: "Upgrade"
+        } : undefined,
       });
       return;
     }

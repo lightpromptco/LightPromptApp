@@ -40,7 +40,7 @@ export function UsageWarning({ user, onDismiss }: UsageWarningProps) {
       return {
         level: 'high',
         title: 'Almost at Daily Limit',
-        message: `Only ${remainingTokens} tokens remaining today. Consider upgrading for more daily usage.`,
+        message: `Only ${remainingTokens} tokens remaining today. Upgrade to Growth plan for 1,000 daily tokens!`,
         color: 'bg-orange-50 border-orange-200 text-orange-800',
         icon: 'fas fa-exclamation-circle text-orange-500'
       };
@@ -112,8 +112,7 @@ export function UsageWarning({ user, onDismiss }: UsageWarningProps) {
                   size="sm"
                   className="text-xs h-7 px-3 bg-white/20 hover:bg-white/30 border border-current/30"
                   onClick={() => {
-                    // Could link to upgrade page in the future
-                    window.open('mailto:lightprompt.co@gmail.com?subject=Upgrade%20Request', '_blank');
+                    window.location.href = '/plans';
                   }}
                 >
                   <i className="fas fa-crown mr-1"></i>
