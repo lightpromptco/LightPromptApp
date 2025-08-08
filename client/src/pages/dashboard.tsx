@@ -22,6 +22,10 @@ import { BlogInterface } from '@/components/BlogInterface';
 import { PricingInterface } from '@/components/PricingInterface';
 import { HomeInterface } from '@/components/HomeInterface';
 import { LightPromptEdInterface } from '@/components/LightPromptEdInterface';
+import { AboutInterface } from '@/components/AboutInterface';
+import { ContactInterface } from '@/components/ContactInterface';
+import { PrivacyInterface } from '@/components/PrivacyInterface';
+import { LegalInterface } from '@/components/LegalInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -282,6 +286,10 @@ export default function DashboardPage() {
       case 'partner': return 'Partner Mode';
       case 'community': return 'Community';
       case 'blog': return 'Blog & Insights';
+      case 'about': return 'About';
+      case 'contact': return 'Contact';
+      case 'privacy': return 'Privacy';
+      case 'legal': return 'Legal';
       case 'integrations': return 'Device Integrations';
       case 'settings': return 'Settings';
       default: return 'Home';
@@ -381,6 +389,22 @@ export default function DashboardPage() {
                 <DropdownMenuItem onClick={() => setActiveView('blog')}>
                   <i className="fas fa-book mr-2"></i>
                   Blog & Insights
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('about')}>
+                  <i className="fas fa-info-circle mr-2"></i>
+                  About
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('contact')}>
+                  <i className="fas fa-envelope mr-2"></i>
+                  Contact
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('privacy')}>
+                  <i className="fas fa-shield-alt mr-2"></i>
+                  Privacy
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('legal')}>
+                  <i className="fas fa-gavel mr-2"></i>
+                  Legal
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('integrations')}>
                   <i className="fas fa-mobile-alt mr-2"></i>
@@ -1191,6 +1215,22 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+          )}
+          
+          {activeView === 'about' && user && (
+            <AboutInterface userId={user.id} />
+          )}
+          
+          {activeView === 'contact' && user && (
+            <ContactInterface userId={user.id} />
+          )}
+          
+          {activeView === 'privacy' && user && (
+            <PrivacyInterface userId={user.id} />
+          )}
+          
+          {activeView === 'legal' && user && (
+            <LegalInterface userId={user.id} />
           )}
         </div>
       </div>

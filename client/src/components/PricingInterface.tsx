@@ -277,12 +277,15 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                       window.location.href = 'mailto:enterprise@lightprompt.com?subject=Enterprise Plan Inquiry';
                     } else {
                       // Handle Stripe payment for growth/resonance
-                      const priceId = isYearly 
-                        ? (tier.id === 'growth' ? 'price_yearly_growth' : 'price_yearly_resonance')
-                        : (tier.id === 'growth' ? 'price_monthly_growth' : 'price_monthly_resonance');
-                      // TODO: Integrate with Stripe Checkout
-                      console.log('Redirecting to Stripe for:', priceId);
-                      alert(`Stripe integration: ${tier.name} ${isYearly ? 'yearly' : 'monthly'} plan`);
+                      const price = isYearly ? tier.price.yearly : tier.price.monthly;
+                      const queryParams = new URLSearchParams({
+                        plan: tier.id,
+                        planName: tier.name,
+                        price: price.toString(),
+                        isYearly: isYearly.toString(),
+                        userId: user.id
+                      });
+                      window.location.href = `/checkout?${queryParams}`;
                     }
                   }}
                   className={`w-full ${

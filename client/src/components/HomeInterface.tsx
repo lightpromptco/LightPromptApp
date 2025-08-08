@@ -101,11 +101,16 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
             </div>
             
             <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center p-8">
-              <img 
-                src="/attached_assets/LightPromptEd (2)_1754618061966.png" 
-                alt="LightPrompt:ed Book Cover" 
-                className="max-w-full h-auto max-h-80 rounded-lg shadow-2xl"
-              />
+              <div className="flex items-center justify-center">
+                <div className="w-64 h-80 bg-gradient-to-br from-purple-300 to-indigo-300 rounded-lg shadow-2xl flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <i className="fas fa-book text-6xl mb-4"></i>
+                    <h3 className="text-2xl font-bold">LightPrompt:ed</h3>
+                    <p className="text-lg">The Human Guide</p>
+                    <p className="text-sm">Available Now</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
