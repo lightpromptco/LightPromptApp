@@ -71,6 +71,20 @@ export function ChatInterface({
   const sendMessage = async (content: string) => {
     if (!user || !content.trim()) return;
 
+    // Easter Egg: Secret chat command
+    const secretPhrases = [
+      'tell me the ancient secret',
+      'reveal the hidden wisdom',
+      'show me the cosmic truth',
+      'unlock the mysteries'
+    ];
+    
+    if (secretPhrases.includes(content.toLowerCase())) {
+      if ((window as any).discoverEasterEgg) {
+        (window as any).discoverEasterEgg('chat-oracle', 'Oracle Whisperer', 'You found the secret phrase.', 35);
+      }
+    }
+
     // Check token limits (bypass for admin mode)
     if (!isAdmin && user.tokensUsed >= user.tokenLimit) {
       toast({

@@ -25,6 +25,7 @@ export function BottomNavigation({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState<Bot | null>(null);
+  const [logoSpinCount, setLogoSpinCount] = useState(0);
 
   const canAccessBot = (bot: Bot) => {
     if (!user) return false;

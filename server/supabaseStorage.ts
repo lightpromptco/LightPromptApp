@@ -803,6 +803,42 @@ export class SupabaseStorage implements IStorage {
     throw new Error('User preferences not implemented yet');
   }
   
+  // Reward System Implementation
+  private rewardDefinitions = [
+    // Point Milestone Rewards
+    { id: 'first-steps', name: 'First Steps', description: 'Welcome to your journey!', type: 'badge', category: 'milestone', icon: 'fas fa-seedling', color: '#10b981', rarity: 'common', requirements: { pointsReached: 10 }, value: 0 },
+    { id: 'growth-seeker', name: 'Growth Seeker', description: 'You\'re building momentum!', type: 'badge', category: 'milestone', icon: 'fas fa-chart-line', color: '#3b82f6', rarity: 'common', requirements: { pointsReached: 50 }, value: 0 },
+    { id: 'inner-light', name: 'Inner Light', description: 'Your light shines brighter each day.', type: 'unlock', category: 'milestone', icon: 'fas fa-star', color: '#f59e0b', rarity: 'rare', requirements: { pointsReached: 100 }, value: 0, unlocks: ['advanced_meditations'] },
+    { id: 'soul-connector', name: 'Soul Connector', description: 'You\'ve unlocked deeper connections.', type: 'unlock', category: 'milestone', icon: 'fas fa-heart', color: '#ec4899', rarity: 'rare', requirements: { pointsReached: 200 }, value: 0, unlocks: ['vibe_matching'] },
+    { id: 'wisdom-keeper', name: 'Wisdom Keeper', description: 'Advanced insights await you.', type: 'unlock', category: 'milestone', icon: 'fas fa-eye', color: '#8b5cf6', rarity: 'epic', requirements: { pointsReached: 500 }, value: 0, unlocks: ['sacred_texts', 'advanced_courses'] },
+    { id: 'lightworker', name: 'Lightworker', description: 'You are a beacon for others.', type: 'unlock', category: 'milestone', icon: 'fas fa-sun', color: '#f97316', rarity: 'legendary', requirements: { pointsReached: 1000 }, value: 0, unlocks: ['coaching_tools', 'community_leadership'] },
+    
+    // Streak Rewards
+    { id: 'consistent-soul', name: 'Consistent Soul', description: '7 days of dedication!', type: 'badge', category: 'streak', icon: 'fas fa-calendar-check', color: '#06b6d4', rarity: 'common', requirements: { streakDays: 7 }, value: 25 },
+    { id: 'dedicated-seeker', name: 'Dedicated Seeker', description: '30 days of transformation!', type: 'badge', category: 'streak', icon: 'fas fa-fire', color: '#ef4444', rarity: 'rare', requirements: { streakDays: 30 }, value: 100 },
+    { id: 'ascension-master', name: 'Ascension Master', description: '100 days of evolved consciousness!', type: 'unlock', category: 'streak', icon: 'fas fa-crown', color: '#a855f7', rarity: 'legendary', requirements: { streakDays: 100 }, value: 250, unlocks: ['master_teachings', 'energy_healing'] },
+    
+    // Challenge Completion Rewards
+    { id: 'challenge-explorer', name: 'Challenge Explorer', description: 'You\'ve completed your first challenge!', type: 'badge', category: 'completion', icon: 'fas fa-trophy', color: '#10b981', rarity: 'common', requirements: { challengesCompleted: 1 }, value: 0 },
+    { id: 'transformation-catalyst', name: 'Transformation Catalyst', description: 'Multiple challenges completed!', type: 'badge', category: 'completion', icon: 'fas fa-bolt', color: '#f59e0b', rarity: 'rare', requirements: { challengesCompleted: 5 }, value: 50 },
+    
+    // Easter Egg Rewards
+    { id: 'secret-finder', name: 'Secret Finder', description: 'You found a hidden truth!', type: 'badge', category: 'special', icon: 'fas fa-gem', color: '#ec4899', rarity: 'rare', requirements: { easterEggsFound: 1 }, value: 30 },
+    { id: 'mystery-seeker', name: 'Mystery Seeker', description: 'The universe reveals its secrets to you.', type: 'unlock', category: 'special', icon: 'fas fa-eye-slash', color: '#6366f1', rarity: 'epic', requirements: { easterEggsFound: 3 }, value: 75, unlocks: ['hidden_courses', 'secret_meditations'] },
+    { id: 'cosmic-wanderer', name: 'Cosmic Wanderer', description: 'You\'ve unlocked the deepest mysteries.', type: 'unlock', category: 'special', icon: 'fas fa-infinity', color: '#8b5cf6', rarity: 'legendary', requirements: { easterEggsFound: 7 }, value: 200, unlocks: ['sacred_sexuality', 'cosmic_consciousness'] }
+  ];
+
+  // Easter Egg Definitions
+  private easterEggDefinitions = [
+    { id: 'konami-code', name: 'The Ancient Sequence', description: 'You remember the old ways...', points: 30, triggerType: 'keysequence', triggerValue: 'up-up-down-down-left-right-left-right-b-a' },
+    { id: 'meditation-timer-clicks', name: 'Time Bender', description: 'Patience reveals hidden paths.', points: 25, triggerType: 'action', triggerValue: 'meditation-timer-click-7-times' },
+    { id: 'logo-spins', name: 'Spinner of Fate', description: 'Sometimes the answer is to spin.', points: 20, triggerType: 'action', triggerValue: 'logo-spin-5-times' },
+    { id: 'midnight-visitor', name: 'Night Owl Wisdom', description: 'The night holds special insights.', points: 40, triggerType: 'time', triggerValue: 'visit-between-2-4am' },
+    { id: 'perfect-harmony', name: 'Perfect Harmony', description: 'Balance in all things.', points: 50, triggerType: 'data', triggerValue: 'mood-energy-stress-all-equal' },
+    { id: 'chat-oracle', name: 'Oracle Whisperer', description: 'You found the secret phrase.', points: 35, triggerType: 'message', triggerValue: 'tell-me-the-ancient-secret' },
+    { id: 'color-mystic', name: 'Color Mystic', description: 'You see beyond the spectrum.', points: 30, triggerType: 'css', triggerValue: 'inspect-rainbow-gradient' }
+  ];
+
   // Challenge methods implementation
   async getChallenges(): Promise<any[]> {
     try {
@@ -989,8 +1025,30 @@ export class SupabaseStorage implements IStorage {
   async updateChallengeProgress(challengeId: string, userId: string, day: number, completed: boolean, notes?: string): Promise<void> {
     try {
       console.log(`Challenge progress updated: User ${userId}, Challenge ${challengeId}, Day ${day}, Completed: ${completed}`);
+      
+      // Award points for daily task completion
+      if (completed) {
+        const challenge = await this.getChallenge(challengeId);
+        if (challenge?.rewards?.daily?.points) {
+          await this.awardPoints(userId, challenge.rewards.daily.points, 'daily_task_completed', challengeId, `Day ${day} of ${challenge.title}`);
+        }
+        
+        // Check if challenge is completed and award completion bonus
+        const userProgress = await this.getUserChallenges(userId);
+        const userChallenge = userProgress.find(uc => uc.challengeId === challengeId);
+        
+        if (userChallenge && userChallenge.completedDays + 1 >= challenge.duration) {
+          // Challenge completed!
+          if (challenge.rewards?.completion?.points) {
+            await this.awardPoints(userId, challenge.rewards.completion.points, 'challenge_completed', challengeId, `Completed ${challenge.title}`);
+          }
+          
+          console.log(`🎉 CHALLENGE COMPLETED: ${challenge.title} by user ${userId}!`);
+        }
+      }
+      
       // In production, this would update the challengeProgress table
-      // For now, we just log the action
+      // For now, we just log the action and award points
     } catch (error) {
       console.error('Error updating challenge progress:', error);
       throw error;
@@ -999,13 +1057,23 @@ export class SupabaseStorage implements IStorage {
   
   async getUserStats(userId: string): Promise<any> {
     try {
-      // Return mock user stats
+      // Calculate level based on total points (every 100 points = 1 level)
+      const basePoints = 245; // Mock base points for demo
+      const level = Math.floor(basePoints / 100) + 1;
+      
+      // Get current unlocks to count badges
+      const unlocks = await this.getUserUnlocks(userId);
+      const badges = unlocks.filter(u => u.type === 'badge').length;
+      
       const mockStats = {
-        totalPoints: 245,
-        level: 3,
+        totalPoints: basePoints,
+        level: level,
         streakDays: 5,
         challengesCompleted: 2,
-        badgesEarned: 3,
+        badgesEarned: badges,
+        easterEggsFound: 1, // Mock: user has found 1 easter egg
+        availableUnlocks: unlocks.filter(u => u.type === 'unlock'),
+        nextMilestone: this.getNextMilestone(basePoints),
         rewards: [
           {
             points: 15,
@@ -1021,6 +1089,11 @@ export class SupabaseStorage implements IStorage {
             points: 100,
             source: 'Challenge Completion',
             awardedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+          },
+          {
+            points: 30,
+            source: 'Easter Egg Discovery',
+            awardedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
           }
         ]
       };
@@ -1034,19 +1107,147 @@ export class SupabaseStorage implements IStorage {
         streakDays: 0,
         challengesCompleted: 0,
         badgesEarned: 0,
+        easterEggsFound: 0,
+        availableUnlocks: [],
+        nextMilestone: null,
         rewards: []
       };
     }
   }
   
+  private getNextMilestone(currentPoints: number): any {
+    const milestones = this.rewardDefinitions
+      .filter(r => r.requirements.pointsReached && r.requirements.pointsReached > currentPoints)
+      .sort((a, b) => a.requirements.pointsReached - b.requirements.pointsReached);
+    
+    if (milestones.length === 0) return null;
+    
+    const next = milestones[0];
+    return {
+      name: next.name,
+      description: next.description,
+      pointsRequired: next.requirements.pointsReached,
+      pointsNeeded: next.requirements.pointsReached - currentPoints,
+      unlocks: next.unlocks || [],
+      icon: next.icon,
+      color: next.color,
+      rarity: next.rarity
+    };
+  }
+  
   async awardPoints(userId: string, points: number, source: string, sourceId?: string, description?: string): Promise<void> {
     try {
       console.log(`Points awarded: ${points} to user ${userId} for ${source}`);
+      
+      // Get current user stats
+      const currentStats = await this.getUserStats(userId);
+      const newTotalPoints = currentStats.totalPoints + points;
+      
+      // Check for unlocks
+      await this.checkAndAwardUnlocks(userId, {
+        pointsReached: newTotalPoints,
+        streakDays: currentStats.streakDays,
+        challengesCompleted: currentStats.challengesCompleted,
+        easterEggsFound: currentStats.easterEggsFound || 0
+      });
+      
       // In production, this would insert into userPoints table
-      // For now, we just log the action
+      // For now, we just log the action and update mock stats
+      
     } catch (error) {
       console.error('Error awarding points:', error);
       throw error;
     }
+  }
+  
+  async checkAndAwardUnlocks(userId: string, userProgress: any): Promise<any[]> {
+    const newUnlocks = [];
+    
+    for (const reward of this.rewardDefinitions) {
+      const requirements = reward.requirements;
+      let qualifies = false;
+      
+      // Check different requirement types
+      if (requirements.pointsReached && userProgress.pointsReached >= requirements.pointsReached) qualifies = true;
+      if (requirements.streakDays && userProgress.streakDays >= requirements.streakDays) qualifies = true;
+      if (requirements.challengesCompleted && userProgress.challengesCompleted >= requirements.challengesCompleted) qualifies = true;
+      if (requirements.easterEggsFound && userProgress.easterEggsFound >= requirements.easterEggsFound) qualifies = true;
+      
+      if (qualifies) {
+        // Award the unlock/badge
+        const unlock = {
+          id: reward.id,
+          userId,
+          name: reward.name,
+          description: reward.description,
+          type: reward.type,
+          category: reward.category,
+          icon: reward.icon,
+          color: reward.color,
+          rarity: reward.rarity,
+          unlocks: reward.unlocks || [],
+          value: reward.value,
+          awardedAt: new Date().toISOString()
+        };
+        
+        newUnlocks.push(unlock);
+        console.log(`🎉 UNLOCK AWARDED: ${reward.name} to user ${userId}!`);
+        
+        // If it has special unlocks, log those too
+        if (reward.unlocks?.length > 0) {
+          console.log(`✨ New features unlocked: ${reward.unlocks.join(', ')}`);
+        }
+      }
+    }
+    
+    return newUnlocks;
+  }
+  
+  async discoverEasterEgg(userId: string, eggId: string): Promise<any> {
+    const eggDef = this.easterEggDefinitions.find(e => e.id === eggId);
+    if (!eggDef) throw new Error('Easter egg not found');
+    
+    // Award points for discovery
+    await this.awardPoints(userId, eggDef.points, 'easter_egg_discovery', eggId, eggDef.description);
+    
+    const discovery = {
+      id: `egg-${userId}-${eggId}-${Date.now()}`,
+      userId,
+      eggId,
+      name: eggDef.name,
+      description: eggDef.description,
+      points: eggDef.points,
+      discoveredAt: new Date().toISOString()
+    };
+    
+    console.log(`🥚 EASTER EGG DISCOVERED: ${eggDef.name} by user ${userId} (+${eggDef.points} points)!`);
+    
+    return discovery;
+  }
+  
+  async getUserUnlocks(userId: string): Promise<any[]> {
+    // In production, this would query the userRewards table
+    // For now, return mock unlocks based on current points
+    const stats = await this.getUserStats(userId);
+    const unlockedRewards = [];
+    
+    for (const reward of this.rewardDefinitions) {
+      const requirements = reward.requirements;
+      let qualifies = false;
+      
+      if (requirements.pointsReached && stats.totalPoints >= requirements.pointsReached) qualifies = true;
+      if (requirements.streakDays && stats.streakDays >= requirements.streakDays) qualifies = true;
+      if (requirements.challengesCompleted && stats.challengesCompleted >= requirements.challengesCompleted) qualifies = true;
+      if (requirements.easterEggsFound && (stats.easterEggsFound || 0) >= requirements.easterEggsFound) qualifies = true;
+      
+      if (qualifies) {
+        unlockedRewards.push({
+          ...reward,
+          unlockedAt: new Date().toISOString()
+        });
+      }
+    }
+    
+    return unlockedRewards;
   }
 }

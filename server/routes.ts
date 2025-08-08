@@ -1428,6 +1428,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user unlocks
+  app.get('/api/users/:userId/unlocks', async (req, res) => {
+    try {
+      const unlocks = await storage.getUserUnlocks(req.params.userId);
+      res.json(unlocks);
+    } catch (error) {
+      console.error('Error fetching user unlocks:', error);
+      res.status(500).json({ error: 'Failed to fetch user unlocks' });
+    }
+  });
+
+  // Discover easter egg
+  app.post('/api/easter-eggs/discover', async (req, res) => {
+    try {
+      const { userId, eggId, trigger } = req.body;
+      if (!userId || !eggId) {
+        return res.status(400).json({ error: 'userId and eggId are required' });
+      }
+      
+      const discovery = await storage.discoverEasterEgg(userId, eggId);
+      res.status(201).json(discovery);
+    } catch (error) {
+      console.error('Error discovering easter egg:', error);
+      res.status(500).json({ error: error.message || 'Failed to discover easter egg' });
+    }
+  });
+
+  // Get user's discovered easter eggs
+  app.get('/api/users/:userId/easter-eggs', async (req, res) => {
+    try {
+      // For now, return mock discovered eggs
+      const discoveredEggs = [
+        {
+          id: 'secret-finder-discovery',
+          userId: req.params.userId,
+          eggId: 'meditation-timer-clicks',
+          name: 'Time Bender',
+          description: 'Patience reveals hidden paths.',
+          points: 25,
+          discoveredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+      res.json(discoveredEggs);
+    } catch (error) {
+      console.error('Error fetching discovered easter eggs:', error);
+      res.status(500).json({ error: 'Failed to fetch easter eggs' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

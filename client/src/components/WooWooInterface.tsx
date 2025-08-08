@@ -19,6 +19,7 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
   const [showChart, setShowChart] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [chartData, setChartData] = useState<any>(null);
+  const [cosmicClicks, setCosmicClicks] = useState(0);
 
   const handleGenerateChart = async () => {
     if (birthData.date && birthData.time && birthData.location) {
@@ -132,7 +133,18 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4">
+        <div 
+          className={`w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4 cursor-pointer transition-transform ${cosmicClicks > 0 ? 'logo-spin-easter-egg' : ''}`}
+          onClick={() => {
+            setCosmicClicks(prev => prev + 1);
+            if (cosmicClicks + 1 === 5) {
+              if ((window as any).discoverEasterEgg) {
+                (window as any).discoverEasterEgg('logo-spins', 'Spinner of Fate', 'Sometimes the answer is to spin.', 20);
+              }
+            }
+          }}
+          title={cosmicClicks > 0 ? `✨ Cosmic spins: ${cosmicClicks}/5` : 'Click me'}
+        >
           <i className="fas fa-star text-white text-xl"></i>
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">WooWoo & Cosmos</h2>
@@ -503,7 +515,16 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                 <CardTitle className="text-sm">Breathwork Tools</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start meditation-timer-pulse" 
+                  onClick={() => {
+                    if ((window as any).discoverEasterEgg) {
+                      (window as any).discoverEasterEgg('meditation-timer-clicks', 'Time Bender', 'Patience reveals hidden paths.', 25);
+                    }
+                  }}
+                >
                   <i className="fas fa-circle-notch mr-2"></i>
                   4-7-8 Timer
                 </Button>
