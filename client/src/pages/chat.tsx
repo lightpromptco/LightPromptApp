@@ -24,6 +24,16 @@ export default function ChatPage() {
   // Initialize circadian theming
   useCircadian();
 
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('lightprompt-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   // Create or get user on mount and validate session
   useEffect(() => {
     initializeUser();
@@ -265,19 +275,6 @@ export default function ChatPage() {
         />
       </div>
 
-      {/* LightPrompt Logo */}
-      <div className="fixed top-6 left-6 z-50">
-        <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg border border-white/20">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-            <img 
-              src="/attached_assets/LightPrompt Logo with Electric Neon Colors (5)_1754613275736.png" 
-              alt="LightPrompt"
-              className="w-6 h-6 object-contain filter invert"
-            />
-          </div>
-          <span className="text-sm font-semibold text-gray-800">LightPrompt</span>
-        </div>
-      </div>
 
       {/* Navigation & Controls */}
       <div className="fixed top-6 right-6 z-50 flex items-center space-x-3">
@@ -292,40 +289,24 @@ export default function ChatPage() {
         </Link>
 
         {/* Test Dashboard Data Button (for development) */}
-        {currentUser && (
-          <Button
-            onClick={async () => {
-              try {
-                const response = await fetch(`/api/test/populate-dashboard/${currentUser.id}`, {
-                  method: 'POST'
-                });
-                const result = await response.json();
-                toast({
-                  title: "Dashboard populated!",
-                  description: `Added ${result.metrics} metrics, ${result.habits} habits, and ${result.habitEntries} entries.`,
-                });
-              } catch (error) {
-                toast({
-                  title: "Error",
-                  description: "Failed to populate dashboard data",
-                  variant: "destructive"
-                });
-              }
-            }}
-            className="w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all duration-300"
-            title="Add sample wellness data"
-          >
-            <i className="fas fa-plus text-sm"></i>
-          </Button>
-        )}
 
-        {/* Embed Mode Toggle */}
+        {/* Dark Mode Toggle */}
         <Button
-          onClick={toggleEmbedMode}
-          className="w-10 h-10 rounded-xl bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 border border-gray-200 shadow-sm transition-all duration-300"
-          title="Toggle embed mode"
+          onClick={() => {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+              document.documentElement.classList.remove('dark');
+              localStorage.setItem('lightprompt-theme', 'light');
+            } else {
+              document.documentElement.classList.add('dark');
+              localStorage.setItem('lightprompt-theme', 'dark');
+            }
+          }}
+          className="w-10 h-10 rounded-xl bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm transition-all duration-300"
+          title="Toggle dark mode"
         >
-          <i className={`fas ${isEmbedMode ? 'fa-expand-arrows-alt' : 'fa-compress-arrows-alt'} text-sm`}></i>
+          <i className="fas fa-moon dark:hidden text-sm"></i>
+          <i className="fas fa-sun hidden dark:block text-sm"></i>
         </Button>
       </div>
     </>
