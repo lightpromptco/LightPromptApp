@@ -20,6 +20,7 @@ import { PartnerModeInterface } from '@/components/PartnerModeInterface';
 import { BlogInterface } from '@/components/BlogInterface';
 import { PricingInterface } from '@/components/PricingInterface';
 import { HomeInterface } from '@/components/HomeInterface';
+import { LightPromptEdInterface } from '@/components/LightPromptEdInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -31,6 +32,63 @@ interface DashboardData {
   deviceIntegrations?: DeviceIntegration[];
   appleHealth?: any;
   homeKit?: any;
+}
+
+interface HabitCardProps {
+  habit: Habit;
+  streak: number;
+  onToggle: (completed: boolean) => void;
+  isLoading: boolean;
+}
+
+function HabitCard({ habit, streak, onToggle, isLoading }: HabitCardProps) {
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  const handleToggle = () => {
+    const newCompleted = !isCompleted;
+    setIsCompleted(newCompleted);
+    onToggle(newCompleted);
+  };
+
+  return (
+    <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+      <div className="flex items-center space-x-3">
+        <Button
+          onClick={handleToggle}
+          disabled={isLoading}
+          variant={isCompleted ? "default" : "outline"}
+          size="sm"
+          className={isCompleted ? "bg-green-500 hover:bg-green-600" : ""}
+        >
+          {isCompleted ? (
+            <i className="fas fa-check text-white"></i>
+          ) : (
+            <i className="fas fa-circle text-gray-400"></i>
+          )}
+        </Button>
+        <div>
+          <h4 className="font-medium">{habit.name}</h4>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <span className="capitalize">{habit.category}</span>
+            <span>•</span>
+            <span>{habit.frequency}</span>
+            {streak > 0 && (
+              <>
+                <span>•</span>
+                <span className="text-orange-600">
+                  <i className="fas fa-fire mr-1"></i>
+                  {streak} day streak
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <Badge variant="outline" className="text-xs">
+        Target: {habit.target}
+      </Badge>
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -245,18 +303,17 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="home" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-12 gap-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-11 gap-1">
             <TabsTrigger value="home" className="text-xs lg:text-sm">Home</TabsTrigger>
             <TabsTrigger value="overview" className="text-xs lg:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="checkin" className="text-xs lg:text-sm">Check-in</TabsTrigger>
-            <TabsTrigger value="habits" className="text-xs lg:text-sm">Habits</TabsTrigger>
-            <TabsTrigger value="patterns" className="text-xs lg:text-sm">Patterns</TabsTrigger>
+            <TabsTrigger value="growth" className="text-xs lg:text-sm">Growth</TabsTrigger>
+            <TabsTrigger value="lightprompted" className="text-xs lg:text-sm">LightPrompt:ed</TabsTrigger>
             <TabsTrigger value="vibematch" className="text-xs lg:text-sm">VibeMatch</TabsTrigger>
             <TabsTrigger value="partner" className="text-xs lg:text-sm">Partner</TabsTrigger>
             <TabsTrigger value="community" className="text-xs lg:text-sm">Community</TabsTrigger>
             <TabsTrigger value="blog" className="text-xs lg:text-sm">Blog</TabsTrigger>
             <TabsTrigger value="integrations" className="text-xs lg:text-sm">Devices</TabsTrigger>
-            <TabsTrigger value="horoscope" className="text-xs lg:text-sm">Astrology</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs lg:text-sm">Settings</TabsTrigger>
           </TabsList>
 
@@ -427,6 +484,11 @@ export default function DashboardPage() {
             )}
           </TabsContent>
 
+          {/* LightPrompt:ed Course Tab */}
+          <TabsContent value="lightprompted" className="space-y-6">
+            <LightPromptEdInterface userId={userId!} />
+          </TabsContent>
+
           {/* Daily Check-in & Health Tab */}
           <TabsContent value="checkin" className="space-y-6">
             <Card>
@@ -449,8 +511,21 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
 
-          {/* Habits Tab */}
-          <TabsContent value="habits" className="space-y-6">
+          {/* Growth Tracking Tab (Combined Habits & Patterns) */}
+          <TabsContent value="growth" className="space-y-6">
+            <Tabs defaultValue="habits" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="habits">
+                  <i className="fas fa-star mr-2"></i>
+                  Habits
+                </TabsTrigger>
+                <TabsTrigger value="patterns">
+                  <i className="fas fa-chart-line mr-2"></i>
+                  Patterns
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="habits">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -618,11 +693,9 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
-          </TabsContent>
-
-
-          {/* Patterns Tab */}
-          <TabsContent value="patterns" className="space-y-6">
+              </TabsContent>
+              
+              <TabsContent value="patterns">
             <Card>
               <CardHeader>
                 <CardTitle>Wellness Patterns & Insights</CardTitle>
@@ -668,6 +741,8 @@ export default function DashboardPage() {
                 )}
               </CardContent>
             </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Integrations Tab */}
@@ -1301,60 +1376,6 @@ function DailyCheckInForm({
   );
 }
 
-// Habit Card Component
-function HabitCard({ 
-  habit, 
-  streak, 
-  onToggle, 
-  isLoading 
-}: { 
-  habit: Habit; 
-  streak: number; 
-  onToggle: (completed: boolean) => void; 
-  isLoading: boolean; 
-}) {
-  const [isCompleted, setIsCompleted] = useState(false);
-
-  const handleToggle = () => {
-    const newCompleted = !isCompleted;
-    setIsCompleted(newCompleted);
-    onToggle(newCompleted);
-  };
-
-  return (
-    <div className="flex items-center space-x-4 p-4 border rounded-lg">
-      <button
-        onClick={handleToggle}
-        disabled={isLoading}
-        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-          isCompleted 
-            ? 'bg-green-500 border-green-500 text-white' 
-            : 'border-gray-300 hover:border-green-400'
-        }`}
-      >
-        {isCompleted && <i className="fas fa-check text-xs"></i>}
-      </button>
-      
-      <div className="flex-1">
-        <div className="flex items-center space-x-2">
-          <i className={`${habit.icon} text-sm`} style={{ color: habit.color || '#10b981' }}></i>
-          <h4 className="font-medium">{habit.name}</h4>
-          {streak > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {streak} day{streak !== 1 ? 's' : ''} 🔥
-            </Badge>
-          )}
-        </div>
-        {habit.description && (
-          <p className="text-sm text-gray-600 mt-1">{habit.description}</p>
-        )}
-        <div className="text-xs text-gray-500 mt-1">
-          {habit.frequency} • Target: {habit.target}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Fitness Input Form Component
 function FitnessInputForm({ userId }: { userId: string }) {
