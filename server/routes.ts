@@ -20,7 +20,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-07-30.basil",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -32,7 +32,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!existingAdmin) {
         const admin = await storage.createUser({
           email: 'admin@lightprompt.com',
-          name: 'LightPrompt Admin',
+          name: 'LightPrompt Admin'
+        });
+        
+        // Update admin with special privileges
+        await storage.updateUser(admin.id, {
           tier: 'admin',
           role: 'admin',
           tokensUsed: 0,

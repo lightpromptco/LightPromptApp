@@ -748,4 +748,83 @@ export class SupabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Vibe Profile methods (stub implementations for now)
+  async getVibeProfile(userId: string): Promise<VibeProfile | undefined> {
+    return undefined; // TODO: Implement when needed
+  }
+  
+  async createOrUpdateVibeProfile(data: any): Promise<VibeProfile> {
+    throw new Error('Vibe profiles not implemented yet');
+  }
+  
+  // Vibe Match methods (stub implementations)
+  async getPotentialMatches(userId: string): Promise<any[]> {
+    return []; // TODO: Implement when needed
+  }
+  
+  async getCurrentMatches(userId: string): Promise<any[]> {
+    return []; // TODO: Implement when needed
+  }
+  
+  async processMatchAction(data: any): Promise<any> {
+    throw new Error('Match actions not implemented yet');
+  }
+  
+  async getMatchChatMessages(matchId: string): Promise<any[]> {
+    return []; // TODO: Implement when needed
+  }
+  
+  async createMatchChatMessage(data: any): Promise<any> {
+    throw new Error('Match chat not implemented yet');
+  }
+  
+  async updateMatchResonance(data: any): Promise<any> {
+    throw new Error('Match resonance not implemented yet');
+  }
+  
+  // Safety methods (stub implementations)
+  async createChatSafetyLog(data: any): Promise<any> {
+    return {}; // TODO: Implement safety logging
+  }
+  
+  async setupVibeMatchTestData(): Promise<void> {
+    // TODO: Implement test data setup when needed
+  }
+  
+  // Partner methods (stub implementations)
+  async invitePartner(data: any): Promise<any> {
+    throw new Error('Partner invites not implemented yet');
+  }
+  
+  async updatePartnerConnection(data: any): Promise<any> {
+    throw new Error('Partner connections not implemented yet');
+  }
+  
+  // User Preferences (stub implementation)
+  async createOrUpdateUserPreferences(data: any): Promise<any> {
+    throw new Error('User preferences not implemented yet');
+  }
+  
+  // Challenge methods (stub implementations)
+  async getActiveChallenges(): Promise<Challenge[]> {
+    return []; // TODO: Implement when challenges are ready
+  }
+  
+  async createChallenge(data: InsertChallenge): Promise<Challenge> {
+    throw new Error('Challenge creation not implemented yet');
+  }
+  
+  async getChallengeById(id: string): Promise<Challenge | undefined> {
+    return undefined; // TODO: Implement when challenges are ready
+  }
+  
+  // Reward methods (stub implementations)
+  async awardReward(data: any): Promise<any> {
+    throw new Error('Rewards not implemented yet');
+  }
+  
+  async getRewardDefinitions(): Promise<RewardDefinition[]> {
+    return []; // TODO: Implement when rewards are ready
+  }
 }
