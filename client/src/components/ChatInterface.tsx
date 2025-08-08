@@ -334,26 +334,45 @@ export function ChatInterface({
             {/* Quick Actions and Usage */}
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-teal-50 text-gray-600 hover:text-teal-700 transition-all duration-300 text-sm border border-gray-200 hover:border-teal-200"
-                  onClick={() => sendMessage("Let's do a daily check-in")}
-                  disabled={isLoading || !user}
-                >
-                  <i className="fas fa-lightbulb mr-2"></i>
-                  Daily Check-in
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-teal-50 text-gray-600 hover:text-teal-700 transition-all duration-300 text-sm border border-gray-200 hover:border-teal-200"
-                  onClick={() => sendMessage("Help me reflect on my current mood")}
-                  disabled={isLoading || !user}
-                >
-                  <i className="fas fa-heart mr-2"></i>
-                  Mood Reflection
-                </Button>
+                {/* GeoPrompt-specific actions */}
+                {activeBot.id === 'geoprompt' ? (
+                  <>
+                    <span className="text-gray-400 text-sm italic">check in</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-green-50 text-gray-600 hover:text-green-700 transition-all duration-300 text-sm border border-gray-200 hover:border-green-200"
+                      onClick={() => sendMessage("I want to do a location-based reflection check-in")}
+                      disabled={isLoading || !user}
+                    >
+                      <i className="fas fa-map-marker-alt mr-2"></i>
+                      Start GeoPrompt
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-teal-50 text-gray-600 hover:text-teal-700 transition-all duration-300 text-sm border border-gray-200 hover:border-teal-200"
+                      onClick={() => sendMessage("Let's do a daily check-in")}
+                      disabled={isLoading || !user}
+                    >
+                      <i className="fas fa-lightbulb mr-2"></i>
+                      Daily Check-in
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-teal-50 text-gray-600 hover:text-teal-700 transition-all duration-300 text-sm border border-gray-200 hover:border-teal-200"
+                      onClick={() => sendMessage("Help me reflect on my current mood")}
+                      disabled={isLoading || !user}
+                    >
+                      <i className="fas fa-heart mr-2"></i>
+                      Mood Reflection
+                    </Button>
+                  </>
+                )}
               </div>
               
               {user && (

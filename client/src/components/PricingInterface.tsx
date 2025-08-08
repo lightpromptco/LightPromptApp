@@ -36,13 +36,13 @@ const PRICING_TIERS: PricingTier[] = [
     description: 'Perfect for discovering your wellness journey',
     price: { monthly: 0, yearly: 0 },
     features: [
-      'LightPromptBot & GeoPrompt access',
-      '5 daily check-ins per month',
-      '3 custom habits tracking',
-      'Basic WooWoo (astrology) readings',
-      'Community group access',
-      '2 wellness patterns per month',
-      'Partner mode preview (1 connection)'
+      '🤖 All Bots: LightPrompt, BodyMirror, WooWoo, GeoPrompt, VisionQuest (within token limits)',
+      '📊 5 daily check-ins per month',
+      '🎯 3 custom habits tracking', 
+      '🌟 Basic WooWoo (astrology, metaphysical wisdom)',
+      '👥 Community group access',
+      '📈 2 wellness patterns per month',
+      '💑 Partner mode preview (1 connection)'
     ],
     limits: {
       tokens: 50,

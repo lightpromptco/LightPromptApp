@@ -30,6 +30,8 @@ import { GeoPromptCheckInInterface } from '@/components/GeoPromptCheckInInterfac
 import { WooWooInterface } from '@/components/WooWooInterface';
 import { CommunityInterface } from '@/components/CommunityInterface';
 import { AIHelpInterface } from '@/components/AIHelpInterface';
+import { AdminToggle } from '@/components/AdminToggle';
+import { ExternalLinksCodeSection } from '@/components/ExternalLinksCodeSection';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -106,6 +108,7 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [activeView, setActiveView] = useState('home');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [newHabit, setNewHabit] = useState({
     name: '',
     description: '',
@@ -326,6 +329,7 @@ export default function DashboardPage() {
           
           {user && (
             <div className="flex items-center space-x-3">
+              <AdminToggle isAdmin={isAdmin} onAdminChange={setIsAdmin} />
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -783,6 +787,11 @@ export default function DashboardPage() {
                 💡 <strong>How it works:</strong> Customize your LightPrompt experience and choose the plan that best fits your wellness journey. Each tier offers different levels of AI interaction and features.
               </div>
               <SettingsInterface userId={userId!} />
+              
+              {/* Admin External Links Section */}
+              {isAdmin && (
+                <ExternalLinksCodeSection isAdmin={isAdmin} />
+              )}
               
               {/* Manage Subscriptions Section */}
               <Card>
