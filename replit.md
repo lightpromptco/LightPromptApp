@@ -9,6 +9,7 @@ The application is built as a full-stack TypeScript application with a React fro
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic.
 
 ## System Architecture
 

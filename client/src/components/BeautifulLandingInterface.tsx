@@ -1,89 +1,60 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { 
   Sparkles, 
   Brain, 
   Heart, 
-  Zap, 
   Users, 
   MapPin, 
   Target, 
   Gem,
   ArrowRight,
   Play,
-  Star,
-  Moon,
-  Sun,
-  Waves,
-  TreePine
+  ChevronRight
 } from 'lucide-react';
 import { Link } from 'wouter';
 
-const FEATURE_CARDS = [
+const FEATURES = [
   {
     title: 'AI Conversations',
-    description: 'Deep reflections with specialized soul-tech bots',
+    description: 'Engage with specialized wellness bots for personalized guidance',
     icon: Brain,
-    gradient: 'from-purple-500 to-pink-500',
-    href: '/chat',
-    features: ['LightPromptBot', 'BodyBot', 'SpiritBot', 'WooWoo']
+    href: '/chat'
   },
   {
     title: 'Wellness Dashboard',
-    description: 'Track your spiritual journey and growth patterns',
+    description: 'Track your journey with comprehensive analytics',
     icon: Heart,
-    gradient: 'from-pink-500 to-rose-500',
-    href: '/dashboard',
-    features: ['Mood Tracking', 'Habit Building', 'Progress Insights']
+    href: '/dashboard'
+  },
+  {
+    title: 'Community',
+    description: 'Connect with like-minded individuals on similar paths',
+    icon: Users,
+    href: '/community'
   },
   {
     title: 'Vibe Matching',
-    description: 'Connect with kindred spirits and soul family',
-    icon: Users,
-    gradient: 'from-blue-500 to-cyan-500',
-    href: '/vibe-match',
-    features: ['Energy Matching', 'Soul Connections', 'Private Messaging']
+    description: 'Find your perfect wellness companions',
+    icon: Sparkles,
+    href: '/vibe-match'
   },
   {
     title: 'GeoPrompt',
-    description: 'Location-based reflections and check-ins',
+    description: 'Location-based mindfulness and reflection',
     icon: MapPin,
-    gradient: 'from-green-500 to-emerald-500',
-    href: '/geoprompt',
-    features: ['Sacred Spaces', 'Travel Reflections', 'Energy Mapping']
+    href: '/geoprompt'
   },
   {
     title: 'Prism Points',
-    description: 'Gamified wellness with achievements and rewards',
+    description: 'Gamified progress tracking and achievements',
     icon: Gem,
-    gradient: 'from-yellow-500 to-orange-500',
-    href: '/prism-points',
-    features: ['Point System', 'Achievements', 'Leaderboards']
-  },
-  {
-    title: 'Wellness Challenges',
-    description: 'Structured programs for spiritual growth',
-    icon: Target,
-    gradient: 'from-indigo-500 to-purple-500',
-    href: '/challenges',
-    features: ['21-Day Programs', 'Community Goals', 'Progress Tracking']
+    href: '/prism-points'
   }
-];
-
-const FLOATING_ELEMENTS = [
-  { icon: Sparkles, top: '10%', left: '15%', delay: 0 },
-  { icon: Heart, top: '25%', right: '20%', delay: 1000 },
-  { icon: Star, top: '60%', left: '10%', delay: 2000 },
-  { icon: Moon, top: '45%', right: '15%', delay: 1500 },
-  { icon: Waves, top: '75%', left: '25%', delay: 3000 },
-  { icon: TreePine, top: '15%', right: '35%', delay: 2500 }
 ];
 
 export function BeautifulLandingInterface() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeCard, setActiveCard] = useState<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -91,170 +62,135 @@ export function BeautifulLandingInterface() {
   }, []);
 
   const hour = currentTime.getHours();
-  const isEvening = hour >= 18 || hour < 6;
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-violet-900/20 dark:to-purple-900/20 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {FLOATING_ELEMENTS.map((element, index) => (
-          <div
-            key={index}
-            className="absolute opacity-10 animate-float"
-            style={{
-              top: element.top,
-              left: element.left,
-              right: element.right,
-              animationDelay: `${element.delay}ms`,
-              animationDuration: '6s'
-            }}
-          >
-            <element.icon className="h-12 w-12 text-purple-500" />
-          </div>
-        ))}
-      </div>
-
-      {/* Hero Section */}
-      <div className="relative z-10 container mx-auto px-6 py-12">
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center mb-8">
-            <div className="relative">
-              <div className="w-24 h-24 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl">
-                <Sparkles className="h-12 w-12 text-white" />
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-br from-violet-400 to-pink-400 rounded-3xl opacity-30 animate-pulse"></div>
+    <div className="min-h-screen bg-white dark:bg-black">
+      {/* Hero Section - Apple Style */}
+      <section className="relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+          {/* Logo */}
+          <div className="mb-8">
+            <div className="w-16 h-16 mx-auto bg-teal-500 rounded-2xl flex items-center justify-center mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
-          </div>
-
-          <h1 className="text-6xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-light text-gray-900 dark:text-white tracking-tight">
               LightPrompt
-            </span>
-          </h1>
-          
-          <p className="text-2xl text-gray-600 dark:text-gray-300 mb-2">
-            Soul-Tech Wellness Platform
-          </p>
-          
-          <p className="text-lg text-gray-500 dark:text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
-            {greeting}! Welcome to your personal AI wellness companion. Experience deep reflection, 
-            track your spiritual journey, and connect with like-minded souls through 
-            cutting-edge consciousness technology.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <Badge variant="secondary" className="px-4 py-2 text-sm bg-violet-100 text-violet-700">
-              <Brain className="h-4 w-4 mr-2" />
-              AI-Powered Reflection
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 text-sm bg-purple-100 text-purple-700">
-              <Heart className="h-4 w-4 mr-2" />
-              Emotional Intelligence
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 text-sm bg-pink-100 text-pink-700">
-              <Zap className="h-4 w-4 mr-2" />
-              Real-time Insights
-            </Badge>
+            </h1>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* Main headline */}
+          <h2 className="text-3xl md:text-5xl font-light text-gray-900 dark:text-white mb-6 max-w-4xl mx-auto leading-tight">
+            Soul-tech wellness.
+            <br />
+            <span className="text-teal-500">Reimagined.</span>
+          </h2>
+
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto font-light">
+            Experience personalized AI wellness through advanced consciousness technology. 
+            Track, reflect, and connect on your spiritual journey.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Link href="/chat">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
-                <Play className="h-5 w-5 mr-2" />
-                Start Your Journey
+              <Button 
+                size="lg" 
+                className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200"
+              >
+                Get started
               </Button>
             </Link>
             <Link href="/help">
-              <Button variant="outline" size="lg" className="px-8 py-3 rounded-full border-2 border-purple-200 hover:border-purple-300 transition-all duration-300">
-                Learn More
-                <ArrowRight className="h-5 w-5 ml-2" />
+              <Button 
+                variant="ghost" 
+                size="lg" 
+                className="text-teal-500 hover:text-teal-600 px-8 py-4 text-lg font-medium"
+              >
+                Learn more <ChevronRight className="ml-1 h-5 w-5" />
               </Button>
             </Link>
           </div>
         </div>
+      </section>
 
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {FEATURE_CARDS.map((feature, index) => (
-            <Card 
-              key={index}
-              className="group relative overflow-hidden bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
-              onMouseEnter={() => setActiveCard(index)}
-              onMouseLeave={() => setActiveCard(null)}
-            >
-              <Link href={feature.href}>
-                <CardContent className="p-8">
-                  <div className="relative z-10">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="h-8 w-8 text-white" />
-                    </div>
-                    
-                    <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100">
-                      {feature.title}
-                    </h3>
-                    
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                      {feature.description}
-                    </p>
-                    
-                    <div className="space-y-2">
-                      {feature.features.map((feat, featIndex) => (
-                        <div key={featIndex} className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                          <div className="w-1 h-1 bg-purple-400 rounded-full mr-2"></div>
-                          {feat}
-                        </div>
-                      ))}
-                    </div>
+      {/* Features Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-950">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-4">
+              Everything you need for wellness.
+            </h3>
+            <p className="text-xl text-gray-600 dark:text-gray-400 font-light">
+              Six powerful features. One integrated platform.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {FEATURES.map((feature, index) => (
+              <Link key={index} href={feature.href}>
+                <div className="group bg-white dark:bg-gray-900 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 dark:border-gray-800">
+                  <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-teal-500 transition-colors duration-300">
+                    <feature.icon className="h-6 w-6 text-teal-500 group-hover:text-white transition-colors duration-300" />
                   </div>
                   
-                  {/* Animated Background */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    {feature.title}
+                  </h4>
                   
-                  {/* Hover Glow Effect */}
-                  {activeCard === index && (
-                    <div className={`absolute -inset-1 bg-gradient-to-r ${feature.gradient} opacity-20 blur animate-pulse`}></div>
-                  )}
-                </CardContent>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed font-light">
+                    {feature.description}
+                  </p>
+                </div>
               </Link>
-            </Card>
-          ))}
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Stats Section */}
-        <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-3xl p-8 border border-purple-100 dark:border-purple-800">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      {/* Stats Section */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">∞</div>
-              <p className="text-gray-600 dark:text-gray-300">Infinite Possibilities</p>
+              <div className="text-4xl font-light text-teal-500 mb-2">24/7</div>
+              <p className="text-gray-600 dark:text-gray-400 font-light">Always Available</p>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
-              <p className="text-gray-600 dark:text-gray-300">Always Available</p>
+              <div className="text-4xl font-light text-teal-500 mb-2">AI</div>
+              <p className="text-gray-600 dark:text-gray-400 font-light">Powered Intelligence</p>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">🔒</div>
-              <p className="text-gray-600 dark:text-gray-300">Privacy First</p>
+              <div className="text-4xl font-light text-teal-500 mb-2">∞</div>
+              <p className="text-gray-600 dark:text-gray-400 font-light">Infinite Growth</p>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">✨</div>
-              <p className="text-gray-600 dark:text-gray-300">Soul-Tech Magic</p>
+              <div className="text-4xl font-light text-teal-500 mb-2">🔒</div>
+              <p className="text-gray-600 dark:text-gray-400 font-light">Privacy First</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-20px) rotate(2deg); }
-          66% { transform: translateY(-10px) rotate(-1deg); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
+      {/* Final CTA */}
+      <section className="py-20 bg-teal-50 dark:bg-teal-950/20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h3 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-white mb-6">
+            Ready to begin your journey?
+          </h3>
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 font-light">
+            Start exploring your consciousness with AI-powered guidance.
+          </p>
+          <Link href="/chat">
+            <Button 
+              size="lg" 
+              className="bg-teal-500 hover:bg-teal-600 text-white px-12 py-4 rounded-full text-lg font-medium"
+            >
+              Start now
+            </Button>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
