@@ -219,18 +219,18 @@ export async function createSupabaseMessage(messageData: {
   audioUrl?: string;
   metadata?: any;
 }) {
+  // Start with minimal required fields only
+  const insertData: any = {
+    session_id: messageData.sessionId,
+    role: messageData.role,
+    content: messageData.content
+  };
+
+  console.log('Creating message with data:', insertData);
+
   const { data, error } = await supabase
     .from('messages')
-    .insert([{
-      session_id: messageData.sessionId,
-      role: messageData.role,
-      content: messageData.content,
-      sentiment: messageData.sentiment,
-      sentiment_score: messageData.sentimentScore,
-      audio_url: messageData.audioUrl,
-      metadata: messageData.metadata,
-      created_at: new Date().toISOString()
-    }])
+    .insert([insertData])
     .select()
     .single();
 
@@ -239,6 +239,7 @@ export async function createSupabaseMessage(messageData: {
     throw new Error(`Failed to create message: ${error.message}`);
   }
 
+  console.log('Message created successfully:', data.id);
   return data;
 }
 
@@ -247,7 +248,7 @@ export async function getSupabaseSessionMessages(sessionId: string) {
     .from('messages')
     .select('*')
     .eq('session_id', sessionId)
-    .order('created_at', { ascending: true });
+    .order('id', { ascending: true }); // Use id instead of created_at for ordering
 
   if (error) {
     console.error('Supabase messages fetch error:', error);

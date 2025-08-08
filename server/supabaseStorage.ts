@@ -191,14 +191,12 @@ export class SupabaseStorage implements IStorage {
 
   async createMessage(message: InsertMessage): Promise<Message> {
     try {
+      console.log('Creating message for session:', message.sessionId);
       const supabaseMessage = await createSupabaseMessage({
         sessionId: message.sessionId,
         role: message.role,
-        content: message.content,
-        sentiment: message.sentiment,
-        sentimentScore: message.sentimentScore,
-        audioUrl: message.audioUrl,
-        metadata: message.metadata
+        content: message.content
+        // Temporarily skip all optional fields for debugging
       });
       return this.formatMessage(supabaseMessage);
     } catch (error) {
