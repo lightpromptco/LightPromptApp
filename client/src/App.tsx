@@ -19,6 +19,10 @@ import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import PrismPointsPage from "@/pages/prism-points";
 import HelpPage from "@/pages/help";
+import BookPage from "@/pages/book";
+import CoursePage from "@/pages/course";
+import B2BPage from "@/pages/b2b";
+import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -89,6 +93,26 @@ function Router() {
       <Route path="/help" component={() => (
         <MainLayout>
           <HelpPage />
+        </MainLayout>
+      )} />
+      <Route path="/book" component={() => (
+        <MainLayout>
+          <BookPage />
+        </MainLayout>
+      )} />
+      <Route path="/course" component={() => (
+        <MainLayout>
+          <CoursePage />
+        </MainLayout>
+      )} />
+      <Route path="/b2b" component={() => (
+        <MainLayout>
+          <B2BPage />
+        </MainLayout>
+      )} />
+      <Route path="/settings" component={() => (
+        <MainLayout>
+          <SettingsPage />
         </MainLayout>
       )} />
       <Route component={NotFound} />

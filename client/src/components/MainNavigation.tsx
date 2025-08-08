@@ -34,7 +34,14 @@ const NAV_ITEMS = [
 const ACCOUNT_ITEMS = [
   { path: "/signup", label: "Sign Up", icon: UserPlus, description: "Create Account" },
   { path: "/plans", label: "Plans", icon: Gem, description: "Upgrade Account" },
-  { path: "/privacy", label: "Privacy", icon: Settings, description: "Privacy Settings" },
+  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings" },
+  { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy" },
+];
+
+const PRODUCT_ITEMS = [
+  { path: "/book", label: "The Book", icon: HelpCircle, description: "LightPrompted Guide" },
+  { path: "/course", label: "LightPrompt:ed", icon: Target, description: "Online Course" },
+  { path: "/b2b", label: "For Business", icon: Users, description: "Enterprise Solutions" },
 ];
 
 export function MainNavigation() {
@@ -92,6 +99,33 @@ export function MainNavigation() {
                     <div className="flex-1 text-left">
                       <div className="font-medium">{item.label}</div>
                       <div className="text-xs opacity-70">{item.description}</div>
+                    </div>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Products Section */}
+          <div className="space-y-2 border-t pt-4">
+            <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Products
+            </div>
+            {PRODUCT_ITEMS.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link key={item.path} href={item.path}>
+                  <Button
+                    variant={active ? "default" : "ghost"}
+                    className="w-full justify-start text-sm"
+                    size="sm"
+                  >
+                    <item.icon className="h-4 w-4 mr-3" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.description}
+                      </span>
                     </div>
                   </Button>
                 </Link>
@@ -157,6 +191,30 @@ export function MainNavigation() {
               {/* Main Navigation */}
               <div className="space-y-3">
                 {NAV_ITEMS.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
+                      <Button
+                        variant={active ? "default" : "outline"}
+                        className="w-full justify-start h-auto p-4"
+                      >
+                        <item.icon className="h-5 w-5 mr-3" />
+                        <div className="text-left">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-70">{item.description}</div>
+                        </div>
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Products Section */}
+              <div className="space-y-3 border-t pt-6">
+                <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Products
+                </div>
+                {PRODUCT_ITEMS.map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
