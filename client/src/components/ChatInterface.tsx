@@ -137,8 +137,30 @@ export function ChatInterface({
 
       const data = await response.json();
       
-      // Reload messages to get the updated conversation
-      await loadMessages(session.id);
+      // Add the user message and bot response directly to the local state
+      const userMessage = {
+        id: 'user-' + Date.now(),
+        sessionId: session.id,
+        role: 'user' as const,
+        content,
+        sentiment: data.userSentiment?.sentiment || 'neutral',
+        sentimentScore: data.userSentiment?.score || 0,
+        createdAt: new Date().toISOString()
+      };
+      
+      const botMessage = data.message;
+      
+      // Update messages immediately for better UX
+      setMessages(prev => [...prev, userMessage, botMessage]);
+      
+      // Try to reload from database in background (non-blocking)
+      setTimeout(async () => {
+        try {
+          await loadMessages(session.id);
+        } catch (error) {
+          console.log('Background message reload failed, continuing with local state');
+        }
+      }, 1000);
       
     } catch (error) {
       console.error('Chat error:', error);
