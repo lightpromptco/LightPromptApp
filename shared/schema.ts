@@ -661,6 +661,82 @@ export const chatSafetyLogs = pgTable("chat_safety_logs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Partner Mode - Deep relationship sharing
+export const partnerConnections = pgTable("partner_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  relationshipType: text("relationship_type").notNull(), // romantic, friendship, family, growth_partner
+  connectionLevel: integer("connection_level").default(1), // 1-10 depth level
+  dataSharing: jsonb("data_sharing").default({}), // what wellness data they share
+  sharedGoals: jsonb("shared_goals").default([]), // mutual growth goals
+  isActive: boolean("is_active").default(true),
+  establishedAt: timestamp("established_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Easter Egg unlock system
+export const easterEggUnlocks = pgTable("easter_egg_unlocks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  eggType: text("egg_type").notNull(), // sacred_sexuality, advanced_growth, master_level, etc
+  triggerType: text("trigger_type").notNull(), // connection_level, resonance_count, usage_days, etc
+  triggerValue: integer("trigger_value").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  content: jsonb("content").default({}), // unlocked content/features
+  unlockedAt: timestamp("unlocked_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// User Preferences/Settings
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  // Privacy & Data Sharing
+  dataSharing: jsonb("data_sharing").default({
+    wellness_metrics: 'private',
+    habits: 'private', 
+    mood_patterns: 'private',
+    growth_insights: 'private'
+  }),
+  visibility: text("visibility").default("private"), // private, connections, public
+  // Notification preferences
+  notifications: jsonb("notifications").default({
+    daily_checkin_reminder: true,
+    vibe_match_notifications: true,
+    partner_updates: true,
+    community_mentions: true,
+    easter_egg_unlocks: true
+  }),
+  // Wellness tracking preferences
+  trackingPreferences: jsonb("tracking_preferences").default({
+    mood_tracking: true,
+    energy_tracking: true,
+    habit_reminders: true,
+    pattern_insights: true
+  }),
+  // AI interaction settings
+  aiPersonality: text("ai_personality").default("balanced"), // nurturing, direct, playful, wise, mystical
+  aiIntensity: integer("ai_intensity").default(5), // 1-10 how deep AI conversations go
+  aiGuidanceStyle: text("ai_guidance_style").default("supportive"), // supportive, challenging, exploratory
+  // Community settings
+  communitySettings: jsonb("community_settings").default({
+    default_anonymous: true,
+    auto_moderate: true,
+    notification_level: 'mentions_only'
+  }),
+  // Partner mode settings
+  partnerSettings: jsonb("partner_settings").default({
+    auto_share_mood: false,
+    auto_share_habits: false,
+    share_insights: true,
+    relationship_goals_visible: false
+  }),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert schemas
 export const insertVibeProfileSchema = createInsertSchema(vibeProfiles);
 export const insertVibeMatchSchema = createInsertSchema(vibeMatches);
@@ -669,6 +745,9 @@ export const insertResonanceInteractionSchema = createInsertSchema(resonanceInte
 export const insertMatchChatSchema = createInsertSchema(matchChats);
 export const insertReflectionPromptSchema = createInsertSchema(reflectionPrompts);
 export const insertChatSafetyLogSchema = createInsertSchema(chatSafetyLogs);
+export const insertPartnerConnectionSchema = createInsertSchema(partnerConnections);
+export const insertEasterEggUnlockSchema = createInsertSchema(easterEggUnlocks);
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences);
 
 // Type exports
 export type Organization = typeof organizations.$inferSelect;
@@ -692,3 +771,9 @@ export type ReflectionPrompt = typeof reflectionPrompts.$inferSelect;
 export type InsertReflectionPrompt = z.infer<typeof insertReflectionPromptSchema>;
 export type ChatSafetyLog = typeof chatSafetyLogs.$inferSelect;
 export type InsertChatSafetyLog = z.infer<typeof insertChatSafetyLogSchema>;
+export type PartnerConnection = typeof partnerConnections.$inferSelect;
+export type InsertPartnerConnection = z.infer<typeof insertPartnerConnectionSchema>;
+export type EasterEggUnlock = typeof easterEggUnlocks.$inferSelect;
+export type InsertEasterEggUnlock = z.infer<typeof insertEasterEggUnlockSchema>;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;

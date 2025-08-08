@@ -15,6 +15,7 @@ import { Link } from 'wouter';
 import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern, Recommendation, FitnessData, DeviceIntegration } from '@shared/schema';
 import { VibeMatchInterface } from '@/components/VibeMatchInterface';
 import { EnhancedCheckInForm } from '@/components/EnhancedCheckInForm';
+import { SettingsInterface } from '@/components/SettingsInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -219,15 +220,17 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1">
             <TabsTrigger value="overview" className="text-xs lg:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="checkin" className="text-xs lg:text-sm">Check-in</TabsTrigger>
             <TabsTrigger value="habits" className="text-xs lg:text-sm">Habits</TabsTrigger>
             <TabsTrigger value="patterns" className="text-xs lg:text-sm">Patterns</TabsTrigger>
+            <TabsTrigger value="vibematch" className="text-xs lg:text-sm">VibeMatch</TabsTrigger>
+            <TabsTrigger value="partner" className="text-xs lg:text-sm">Partner</TabsTrigger>
+            <TabsTrigger value="community" className="text-xs lg:text-sm">Community</TabsTrigger>
             <TabsTrigger value="integrations" className="text-xs lg:text-sm">Devices</TabsTrigger>
             <TabsTrigger value="horoscope" className="text-xs lg:text-sm">Astrology</TabsTrigger>
-            <TabsTrigger value="vibematch" className="text-xs lg:text-sm">VibeMatch</TabsTrigger>
-            <TabsTrigger value="community" className="text-xs lg:text-sm">Community</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs lg:text-sm">Settings</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
