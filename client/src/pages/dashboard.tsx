@@ -107,7 +107,12 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showHabitForm, setShowHabitForm] = useState(false);
-  const [activeView, setActiveView] = useState('home');
+  const [activeView, setActiveView] = useState(() => {
+    // Parse URL parameters to set initial view
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewParam = urlParams.get('view');
+    return viewParam || 'home';
+  });
   const [isAdmin, setIsAdmin] = useState(() => {
     return localStorage.getItem('lightprompt-admin-mode') === 'true';
   });
@@ -290,7 +295,7 @@ export default function DashboardPage() {
       case 'growth': return 'Growth Tracking';
       case 'lightprompted': return 'LightPrompt:ed Course';
       case 'astrology': return 'WooWoo & Cosmos';
-      case 'geoprompt': return 'GeoPrompt';
+      case 'geoprompt': return 'GeoPrompt Check-In';
       case 'vibematch': return 'VibeMatch';
       case 'partner': return 'Partner Mode';
       case 'community': return 'Community';

@@ -339,7 +339,7 @@ export function ChatInterface({
                 {/* GeoPrompt-specific actions */}
                 {activeBot.id === 'geoprompt' ? (
                   <>
-                    <span className="text-gray-400 text-sm italic">check in</span>
+                    <span className="px-3 py-2 rounded-xl bg-gray-100 text-gray-600 text-sm border border-gray-200 italic">check in</span>
                     <Button
                       variant="ghost"
                       size="sm"

@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
+import { GoogleMapsPicker } from '@/components/GoogleMapsPicker';
 
 interface GeoPromptCheckInInterfaceProps {
   userId: string;
@@ -43,14 +44,21 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
   const [checkInData, setCheckInData] = useState({
     location: '',
     customLocation: '',
+    mapLocation: null as { address: string; lat: number; lng: number; placeId?: string } | null,
     vibe: '',
     displayName: 'anonymous',
     customName: '',
     customInitials: '',
     reflection: '',
-    sharePublicly: false
+    sharePublicly: false,
+    logoPhotos: [] as File[],
+    logoPhotoPreviewUrls: [] as string[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photoApprovalStatus, setPhotoApprovalStatus] = useState<{
+    [key: string]: 'pending' | 'approved' | 'rejected'
+  }>({});
+  const [useMapSelection, setUseMapSelection] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,16 +72,21 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Reset form
+      checkInData.logoPhotoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
       setCheckInData({
         location: '',
         customLocation: '',
+        mapLocation: null,
         vibe: '',
         displayName: 'anonymous',
         customName: '',
         customInitials: '',
         reflection: '',
-        sharePublicly: false
+        sharePublicly: false,
+        logoPhotos: [],
+        logoPhotoPreviewUrls: []
       });
+      setPhotoApprovalStatus({});
       
       alert('GeoPrompt check-in saved! Ready for location-based reflection.');
     } catch (error) {
@@ -86,6 +99,56 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
 
   const selectedLocation = LOCATION_OPTIONS.find(loc => loc.id === checkInData.location);
   const selectedVibe = VIBE_OPTIONS.find(vibe => vibe.id === checkInData.vibe);
+
+  const handleLogoPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length + checkInData.logoPhotos.length > 2) {
+      alert('Maximum 2 LightPrompt logo photos allowed per check-in');
+      return;
+    }
+
+    // Create preview URLs
+    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+    
+    setCheckInData({
+      ...checkInData,
+      logoPhotos: [...checkInData.logoPhotos, ...files],
+      logoPhotoPreviewUrls: [...checkInData.logoPhotoPreviewUrls, ...newPreviewUrls]
+    });
+
+    // Simulate AI content approval
+    files.forEach((file, index) => {
+      const photoId = `${Date.now()}_${index}`;
+      setPhotoApprovalStatus(prev => ({ ...prev, [photoId]: 'pending' }));
+      
+      // Simulate AI approval after 1.5 seconds
+      setTimeout(() => {
+        const isApproved = Math.random() > 0.05; // 95% approval rate for logo photos
+        setPhotoApprovalStatus(prev => ({ 
+          ...prev, 
+          [photoId]: isApproved ? 'approved' : 'rejected'
+        }));
+      }, 1500);
+    });
+  };
+
+  const removeLogoPhoto = (index: number) => {
+    const newPhotos = checkInData.logoPhotos.filter((_, i) => i !== index);
+    const newPreviewUrls = checkInData.logoPhotoPreviewUrls.filter((_, i) => i !== index);
+    
+    // Revoke the URL to prevent memory leaks
+    URL.revokeObjectURL(checkInData.logoPhotoPreviewUrls[index]);
+    
+    setCheckInData({
+      ...checkInData,
+      logoPhotos: newPhotos,
+      logoPhotoPreviewUrls: newPreviewUrls
+    });
+  };
+
+  const handleMapLocationSelect = (location: { address: string; lat: number; lng: number; placeId?: string }) => {
+    setCheckInData({ ...checkInData, mapLocation: location });
+  };
 
   const getDisplayNamePreview = () => {
     if (checkInData.displayName === 'anonymous') return '👤 Anonymous';
@@ -109,7 +172,7 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
       </div>
 
       {/* Check-in Form */}
-      <Card className="max-w-2xl mx-auto">
+      <Card className="max-w-2xl mx-auto bg-gradient-to-br from-teal-50 to-green-50 border-teal-200">
         <CardHeader>
           <CardTitle>Where are you and how are you feeling?</CardTitle>
           <p className="text-sm text-gray-600">
@@ -120,30 +183,62 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Location Selection */}
             <div>
-              <label className="block text-sm font-medium mb-2">
-                📍 Where are you right now?
-              </label>
-              <Select value={checkInData.location} onValueChange={(value) => 
-                setCheckInData({...checkInData, location: value})
-              }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your location type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LOCATION_OPTIONS.map(location => (
-                    <SelectItem key={location.id} value={location.id}>
-                      <span className="flex items-center">
-                        <span className="mr-2">{location.emoji}</span>
-                        {location.name}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium">
+                  📍 Where are you right now?
+                </label>
+                <div className="flex items-center space-x-2 text-sm">
+                  <Button
+                    type="button"
+                    variant={!useMapSelection ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUseMapSelection(false)}
+                    className="text-xs"
+                  >
+                    <i className="fas fa-list mr-1"></i>
+                    Preset Locations
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={useMapSelection ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUseMapSelection(true)}
+                    className="text-xs"
+                  >
+                    <i className="fas fa-map mr-1"></i>
+                    Map Selection
+                  </Button>
+                </div>
+              </div>
+
+              {!useMapSelection ? (
+                <Select value={checkInData.location} onValueChange={(value) => 
+                  setCheckInData({...checkInData, location: value, mapLocation: null})
+                }>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your location type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LOCATION_OPTIONS.map(location => (
+                      <SelectItem key={location.id} value={location.id}>
+                        <span className="flex items-center">
+                          <span className="mr-2">{location.emoji}</span>
+                          {location.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <GoogleMapsPicker
+                  onLocationSelect={handleMapLocationSelect}
+                  className="mt-2"
+                />
+              )}
             </div>
 
             {/* Custom Location */}
-            {checkInData.location === 'other' && (
+            {checkInData.location === 'other' && !useMapSelection && (
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Describe your location
@@ -256,12 +351,95 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
               />
             </div>
 
+            {/* LightPrompt Logo Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                📸 LightPrompt Logo Photos (optional)
+              </label>
+              <p className="text-xs text-gray-600 mb-3">
+                Spotted a LightPrompt logo in the wild? Share it with the community!
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="file"
+                    id="logo-photo-upload"
+                    accept="image/*"
+                    multiple
+                    onChange={handleLogoPhotoUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="logo-photo-upload"
+                    className="flex items-center px-4 py-2 bg-white hover:bg-gray-50 rounded-lg cursor-pointer border border-gray-300 shadow-sm"
+                  >
+                    <i className="fas fa-camera mr-2 text-teal-600"></i>
+                    <span className="text-sm text-gray-700">Add Logo Photos</span>
+                  </label>
+                  <span className="text-xs text-gray-500">Max 2 photos • AI content approval required</span>
+                </div>
+
+                {/* Logo Photo Previews */}
+                {checkInData.logoPhotoPreviewUrls.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {checkInData.logoPhotoPreviewUrls.map((url, index) => {
+                      const photoId = `${Date.now()}_${index}`;
+                      const approvalStatus = photoApprovalStatus[photoId] || 'pending';
+                      
+                      return (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Logo photo ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg border-2 border-teal-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeLogoPhoto(index)}
+                            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <i className="fas fa-times text-xs"></i>
+                          </button>
+                          
+                          {/* Approval Status Badge */}
+                          <div className="absolute bottom-2 left-2">
+                            {approvalStatus === 'pending' && (
+                              <Badge className="bg-yellow-500 text-white text-xs">
+                                <i className="fas fa-clock mr-1"></i>
+                                Reviewing...
+                              </Badge>
+                            )}
+                            {approvalStatus === 'approved' && (
+                              <Badge className="bg-green-500 text-white text-xs">
+                                <i className="fas fa-check mr-1"></i>
+                                Approved
+                              </Badge>
+                            )}
+                            {approvalStatus === 'rejected' && (
+                              <Badge className="bg-red-500 text-white text-xs">
+                                <i className="fas fa-times mr-1"></i>
+                                Rejected
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Preview */}
-            {(checkInData.location || checkInData.vibe) && (
-              <div className="bg-gradient-to-br from-teal-50 to-green-50 p-4 rounded-lg border border-teal-200">
+            {(checkInData.location || checkInData.mapLocation || checkInData.vibe) && (
+              <div className="bg-white p-4 rounded-lg border border-teal-300">
                 <h4 className="font-medium mb-2 text-teal-800">Your Check-in Preview:</h4>
                 <div className="flex items-center space-x-4 text-sm">
-                  {selectedLocation && (
+                  {useMapSelection && checkInData.mapLocation ? (
+                    <Badge variant="outline" className="text-green-700 border-green-300">
+                      📍 {checkInData.mapLocation.address}
+                    </Badge>
+                  ) : selectedLocation && (
                     <Badge variant="outline" className="text-green-700 border-green-300">
                       {selectedLocation.emoji} {selectedLocation.name}
                     </Badge>
@@ -281,7 +459,7 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
             {/* Submit Button */}
             <Button 
               type="submit" 
-              disabled={!checkInData.location || !checkInData.vibe || isSubmitting}
+              disabled={(!checkInData.location && !checkInData.mapLocation) || !checkInData.vibe || isSubmitting}
               className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
             >
               {isSubmitting ? (
