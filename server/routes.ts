@@ -25,6 +25,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Create admin user on startup (only if doesn't exist)
+  (async () => {
+    try {
+      const existingAdmin = await storage.getUserByEmail('admin@lightprompt.com');
+      if (!existingAdmin) {
+        const admin = await storage.createUser({
+          email: 'admin@lightprompt.com',
+          name: 'LightPrompt Admin',
+          tier: 'admin',
+          role: 'admin',
+          tokensUsed: 0,
+          tokenLimit: 999999,
+          courseAccess: true
+        });
+        console.log('✅ Admin user created:', admin.email);
+      } else {
+        console.log('✅ Admin user already exists:', existingAdmin.email);
+      }
+    } catch (error) {
+      console.error('❌ Failed to create admin user:', error);
+    }
+  })();
+  
   // User routes
   app.post("/api/users", async (req, res) => {
     try {

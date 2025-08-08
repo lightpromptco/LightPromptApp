@@ -75,23 +75,35 @@ export default function ChatPage() {
 
   const initializeUser = async () => {
     try {
-      // Try to get user from localStorage first
-      const storedUserId = localStorage.getItem('lightprompt_user_id');
+      // Check if admin mode is enabled
+      const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
       let user: User | null = null;
 
-      if (storedUserId) {
-        const response = await fetch(`/api/users/${storedUserId}`);
+      if (isAdminMode) {
+        // Use admin account
+        const response = await fetch('/api/users/admin@lightprompt.com');
         if (response.ok) {
           user = await response.json();
-          console.log('✅ Session restored for user:', user?.name);
-        } else {
-          console.log('❌ Stored user session invalid, clearing...');
-          localStorage.removeItem('lightprompt_user_id');
+          console.log('✅ Admin session loaded:', user?.name);
+        }
+      } else {
+        // Try to get user from session storage (temporary session)
+        const storedUserId = sessionStorage.getItem('lightprompt_session_id');
+        
+        if (storedUserId) {
+          const response = await fetch(`/api/users/${storedUserId}`);
+          if (response.ok) {
+            user = await response.json();
+            console.log('✅ Session restored for user:', user?.name);
+          } else {
+            console.log('❌ Stored user session invalid, clearing...');
+            sessionStorage.removeItem('lightprompt_session_id');
+          }
         }
       }
 
-      // Create new user if none exists
-      if (!user) {
+      // Create new user if none exists (and not admin mode)
+      if (!user && !isAdminMode) {
         const response = await fetch('/api/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -104,11 +116,12 @@ export default function ChatPage() {
         if (response.ok) {
           user = await response.json();
           if (user) {
-            localStorage.setItem('lightprompt_user_id', user.id);
+            // Store in session storage (temporary session)
+            sessionStorage.setItem('lightprompt_session_id', user.id);
             console.log('✅ New user session created:', user?.name);
             toast({
               title: "Welcome to LightPrompt!",
-              description: "Your session has been created. Chat data will persist across visits.",
+              description: "Your data will be stored securely in the cloud. Session is temporary unless you create an account.",
             });
           }
         }
@@ -190,7 +203,11 @@ export default function ChatPage() {
 
   // Session validation to ensure user data is fresh
   const validateSession = useCallback(async () => {
-    const storedUserId = localStorage.getItem('lightprompt_user_id');
+    const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
+    const storedUserId = isAdminMode 
+      ? 'admin@lightprompt.com' 
+      : sessionStorage.getItem('lightprompt_session_id');
+      
     if (!storedUserId || !currentUser) return;
 
     try {
@@ -205,7 +222,9 @@ export default function ChatPage() {
         setSessionValidated(true);
       } else {
         console.log('❌ Session validation failed, re-initializing...');
-        localStorage.removeItem('lightprompt_user_id');
+        if (!isAdminMode) {
+          sessionStorage.removeItem('lightprompt_session_id');
+        }
         setCurrentUser(null);
         initializeUser();
       }
@@ -226,15 +245,17 @@ export default function ChatPage() {
   }, [currentUser, lastUsageCheck, validateSession]);
 
   const handleLogout = () => {
-    console.log('👋 User logging out, but will auto-create new session');
+    console.log('👋 User logging out');
     setCurrentUser(null);
     setCurrentSession(null);
     setSessionValidated(false);
-    localStorage.removeItem('lightprompt_user_id');
+    
+    // Clear session storage but keep admin mode setting
+    sessionStorage.removeItem('lightprompt_session_id');
     
     toast({
       title: "Logged out",
-      description: "A new anonymous session will be created automatically.",
+      description: "Your session data has been cleared. A new session will be created automatically.",
     });
 
     // The app will reinitialize a new user automatically

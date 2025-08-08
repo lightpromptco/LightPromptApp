@@ -83,15 +83,15 @@ const DEFAULT_WIDGETS: Widget[] = [
 
 export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidgetsProps) {
   const [widgets, setWidgets] = useState<Widget[]>(() => {
-    // Load saved layout from localStorage
-    const saved = localStorage.getItem(`dashboard-layout-${userId}`);
+    // Load saved layout from sessionStorage (temporary session)
+    const saved = sessionStorage.getItem(`dashboard-layout-${userId}`);
     return saved ? JSON.parse(saved) : DEFAULT_WIDGETS;
   });
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Save layout to localStorage whenever widgets change
+  // Save layout to sessionStorage whenever widgets change
   useEffect(() => {
-    localStorage.setItem(`dashboard-layout-${userId}`, JSON.stringify(widgets));
+    sessionStorage.setItem(`dashboard-layout-${userId}`, JSON.stringify(widgets));
   }, [widgets, userId]);
 
   const handleDragEnd = (result: DropResult) => {

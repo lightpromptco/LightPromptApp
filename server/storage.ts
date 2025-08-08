@@ -19,6 +19,17 @@ import {
   AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { 
+  createSupabaseUser, 
+  getSupabaseUser, 
+  updateSupabaseUser, 
+  validateUserTier,
+  createSupabaseSession,
+  getSupabaseUserSessions,
+  createSupabaseMessage,
+  getSupabaseSessionMessages,
+  createAdminUser
+} from "./supabase";
 
 export interface IStorage {
   // Users
@@ -2370,4 +2381,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { SupabaseStorage } from "./supabaseStorage";
+
+export const storage = new SupabaseStorage();

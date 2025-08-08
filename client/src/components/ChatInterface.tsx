@@ -77,11 +77,6 @@ export function ChatInterface({
         title: "Daily limit reached",
         description: isAdmin ? "Admin mode: Unlimited tokens" : "Upgrade to Growth ($29/mo) for 1,000 daily tokens and unlimited bot access!",
         variant: "destructive",
-        action: !isAdmin ? {
-          altText: "View Plans",
-          onClick: () => window.location.href = '/plans',
-          children: "Upgrade"
-        } : undefined,
       });
       return;
     }
@@ -252,7 +247,16 @@ export function ChatInterface({
                       <i className={`${activeBot.icon} text-white text-sm`}></i>
                     </div>
                     <div className="chat-bubble bg-gray-50 border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-bl-md">
-                      <p>{message.content}</p>
+                      <div className="prose prose-sm max-w-none text-gray-800" dangerouslySetInnerHTML={{ 
+                        __html: message.content
+                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                          .replace(/\n\n/g, '</p><p>')
+                          .replace(/\n/g, '<br/>')
+                          .replace(/^(.*)$/gm, '<p>$1</p>')
+                          .replace(/<p><\/p>/g, '')
+                          .replace(/<p>(<br\/>)+<\/p>/g, '<br/>')
+                      }} />
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center space-x-2 text-xs text-gray-500">
                           <span>{formatTime(message.createdAt)}</span>
