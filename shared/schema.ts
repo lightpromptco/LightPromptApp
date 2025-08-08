@@ -775,6 +775,130 @@ export const easterEggUnlocks = pgTable("easter_egg_unlocks", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Wellness Circles Tables
+export const wellnessCircles = pgTable("wellness_circles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // anxiety, sleep, fitness, mindfulness, etc.
+  facilitatorId: varchar("facilitator_id").references(() => users.id),
+  facilitatorName: text("facilitator_name"),
+  maxMembers: integer("max_members").default(12),
+  currentMembers: integer("current_members").default(0),
+  meetingFrequency: text("meeting_frequency").default("weekly"), // weekly, bi-weekly, monthly
+  meetingDay: text("meeting_day"), // monday, tuesday, etc.
+  meetingTime: text("meeting_time"), // "18:00" format
+  timezone: text("timezone").default("UTC"),
+  status: text("status").default("active"), // active, paused, completed
+  isPublic: boolean("is_public").default(true),
+  guidelines: text("guidelines"),
+  topics: jsonb("topics").default([]), // focus areas/topics
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const circleMembers = pgTable("circle_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  circleId: varchar("circle_id").notNull().references(() => wellnessCircles.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: text("role").default("member"), // member, moderator, facilitator
+  status: text("status").default("pending"), // pending, active, inactive
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  lastActiveAt: timestamp("last_active_at").defaultNow(),
+});
+
+export const circleActivities = pgTable("circle_activities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  circleId: varchar("circle_id").notNull().references(() => wellnessCircles.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // check-in, goal-share, insight, celebration
+  title: text("title"),
+  content: text("content").notNull(),
+  isPrivate: boolean("is_private").default(false),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// 30-Day Habit Builder Tables
+export const habitPrograms = pgTable("habit_programs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // mindfulness, fitness, nutrition, sleep, productivity
+  duration: integer("duration").default(30), // days
+  difficulty: text("difficulty").default("beginner"), // beginner, intermediate, advanced
+  dailyTasks: jsonb("daily_tasks").default([]), // structured daily activities
+  rewards: jsonb("rewards").default({}), // milestone rewards
+  icon: text("icon").default("fas fa-star"),
+  color: text("color").default("#10b981"),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  participantCount: integer("participant_count").default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const habitEnrollments = pgTable("habit_enrollments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  programId: varchar("program_id").notNull().references(() => habitPrograms.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  status: text("status").default("active"), // active, paused, completed, dropped
+  currentDay: integer("current_day").default(1),
+  completedDays: integer("completed_days").default(0),
+  streakDays: integer("streak_days").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  progress: integer("progress").default(0), // percentage
+  dailyGoals: jsonb("daily_goals").default([]),
+  completedGoals: jsonb("completed_goals").default([]),
+  notes: text("notes"),
+  startedAt: timestamp("started_at").notNull().defaultNow(),
+  completedAt: timestamp("completed_at"),
+  lastCheckIn: timestamp("last_check_in"),
+});
+
+export const habitCheckIns = pgTable("habit_check_ins", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  enrollmentId: varchar("enrollment_id").notNull().references(() => habitEnrollments.id, { onDelete: "cascade" }),
+  day: integer("day").notNull(),
+  date: timestamp("date").notNull().defaultNow(),
+  tasksCompleted: jsonb("tasks_completed").default([]),
+  mood: text("mood"),
+  energy: integer("energy"), // 1-10
+  motivation: integer("motivation"), // 1-10
+  notes: text("notes"),
+  challenges: text("challenges"),
+  wins: text("wins"),
+  isCompleted: boolean("is_completed").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Admin & Content Management Tables
+export const adminSettings = pgTable("admin_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: text("key").notNull().unique(),
+  value: jsonb("value").notNull(),
+  description: text("description"),
+  category: text("category").default("general"), // general, ui, features, pricing
+  isPublic: boolean("is_public").default(false), // if users can see this setting
+  updatedBy: varchar("updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const contentBlocks = pgTable("content_blocks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(), // faq-general, plans-basic, etc.
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").default("markdown"), // markdown, html, json
+  category: text("category").notNull(), // faq, plans, features, about
+  isPublished: boolean("is_published").default(false),
+  sortOrder: integer("sort_order").default(0),
+  metadata: jsonb("metadata").default({}),
+  createdBy: varchar("created_by").references(() => users.id),
+  updatedBy: varchar("updated_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // User Preferences/Settings
 export const userPreferences = pgTable("user_preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -841,6 +965,20 @@ export const insertUserStatsSchema = createInsertSchema(userStats);
 export const insertEasterEggUnlockSchema = createInsertSchema(easterEggUnlocks);
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences);
 
+// Wellness Circles Schemas
+export const insertWellnessCircleSchema = createInsertSchema(wellnessCircles);
+export const insertCircleMemberSchema = createInsertSchema(circleMembers);
+export const insertCircleActivitySchema = createInsertSchema(circleActivities);
+
+// 30-Day Habit Builder Schemas
+export const insertHabitProgramSchema = createInsertSchema(habitPrograms);
+export const insertHabitEnrollmentSchema = createInsertSchema(habitEnrollments);
+export const insertHabitCheckInSchema = createInsertSchema(habitCheckIns);
+
+// Admin & Content Schemas
+export const insertAdminSettingSchema = createInsertSchema(adminSettings);
+export const insertContentBlockSchema = createInsertSchema(contentBlocks);
+
 // Type exports
 export type Organization = typeof organizations.$inferSelect;
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
@@ -881,3 +1019,30 @@ export type EasterEggUnlock = typeof easterEggUnlocks.$inferSelect;
 export type InsertEasterEggUnlock = z.infer<typeof insertEasterEggUnlockSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+
+// Wellness Circles Types
+export type WellnessCircle = typeof wellnessCircles.$inferSelect;
+export type InsertWellnessCircle = z.infer<typeof insertWellnessCircleSchema>;
+
+export type CircleMember = typeof circleMembers.$inferSelect;
+export type InsertCircleMember = z.infer<typeof insertCircleMemberSchema>;
+
+export type CircleActivity = typeof circleActivities.$inferSelect;
+export type InsertCircleActivity = z.infer<typeof insertCircleActivitySchema>;
+
+// 30-Day Habit Builder Types
+export type HabitProgram = typeof habitPrograms.$inferSelect;
+export type InsertHabitProgram = z.infer<typeof insertHabitProgramSchema>;
+
+export type HabitEnrollment = typeof habitEnrollments.$inferSelect;
+export type InsertHabitEnrollment = z.infer<typeof insertHabitEnrollmentSchema>;
+
+export type HabitCheckIn = typeof habitCheckIns.$inferSelect;
+export type InsertHabitCheckIn = z.infer<typeof insertHabitCheckInSchema>;
+
+// Admin & Content Types
+export type AdminSetting = typeof adminSettings.$inferSelect;
+export type InsertAdminSetting = z.infer<typeof insertAdminSettingSchema>;
+
+export type ContentBlock = typeof contentBlocks.$inferSelect;
+export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;

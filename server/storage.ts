@@ -12,7 +12,11 @@ import {
   PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences,
   Challenge, InsertChallenge, ChallengeParticipant, InsertChallengeParticipant,
   ChallengeProgress, InsertChallengeProgress, RewardDefinition, InsertRewardDefinition,
-  UserReward, InsertUserReward, UserStats, InsertUserStats
+  UserReward, InsertUserReward, UserStats, InsertUserStats,
+  WellnessCircle, InsertWellnessCircle, CircleMember, InsertCircleMember,
+  CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
+  HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
+  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -150,6 +154,41 @@ export interface IStorage {
   // User Preferences
   getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
   createOrUpdateUserPreferences(preferences: Partial<UserPreferences & { userId: string }>): Promise<UserPreferences>;
+  
+  // Wellness Circles
+  getWellnessCircles(): Promise<WellnessCircle[]>;
+  getWellnessCircle(id: string): Promise<WellnessCircle | undefined>;
+  createWellnessCircle(circle: InsertWellnessCircle): Promise<WellnessCircle>;
+  updateWellnessCircle(id: string, updates: Partial<WellnessCircle>): Promise<WellnessCircle>;
+  joinWellnessCircle(circleId: string, userId: string): Promise<CircleMember>;
+  leaveWellnessCircle(circleId: string, userId: string): Promise<void>;
+  getUserCircles(userId: string): Promise<(CircleMember & { circle: WellnessCircle })[]>;
+  getCircleMembers(circleId: string): Promise<(CircleMember & { user: User })[]>;
+  createCircleActivity(activity: InsertCircleActivity): Promise<CircleActivity>;
+  getCircleActivities(circleId: string, limit?: number): Promise<(CircleActivity & { user: User })[]>;
+  
+  // 30-Day Habit Builder
+  getHabitPrograms(): Promise<HabitProgram[]>;
+  getHabitProgram(id: string): Promise<HabitProgram | undefined>;
+  createHabitProgram(program: InsertHabitProgram): Promise<HabitProgram>;
+  updateHabitProgram(id: string, updates: Partial<HabitProgram>): Promise<HabitProgram>;
+  enrollInHabitProgram(programId: string, userId: string): Promise<HabitEnrollment>;
+  getUserHabitEnrollments(userId: string): Promise<(HabitEnrollment & { program: HabitProgram })[]>;
+  getHabitEnrollment(enrollmentId: string): Promise<HabitEnrollment | undefined>;
+  updateHabitEnrollment(id: string, updates: Partial<HabitEnrollment>): Promise<HabitEnrollment>;
+  createHabitCheckIn(checkIn: InsertHabitCheckIn): Promise<HabitCheckIn>;
+  getHabitCheckIns(enrollmentId: string): Promise<HabitCheckIn[]>;
+  getHabitCheckIn(enrollmentId: string, day: number): Promise<HabitCheckIn | undefined>;
+  
+  // Admin & Content Management
+  getAdminSettings(category?: string): Promise<AdminSetting[]>;
+  getAdminSetting(key: string): Promise<AdminSetting | undefined>;
+  setAdminSetting(setting: InsertAdminSetting): Promise<AdminSetting>;
+  getContentBlocks(category?: string, published?: boolean): Promise<ContentBlock[]>;
+  getContentBlock(slug: string): Promise<ContentBlock | undefined>;
+  createContentBlock(block: InsertContentBlock): Promise<ContentBlock>;
+  updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock>;
+  deleteContentBlock(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -184,9 +223,23 @@ export class MemStorage implements IStorage {
   private partnerConnections: Map<string, PartnerConnection> = new Map();
   private userPreferences: Map<string, UserPreferences> = new Map();
   
+  // New data stores for wellness circles, habit builder, and admin
+  private wellnessCircles: Map<string, WellnessCircle> = new Map();
+  private circleMembers: Map<string, CircleMember> = new Map();
+  private circleActivities: Map<string, CircleActivity> = new Map();
+  private habitPrograms: Map<string, HabitProgram> = new Map();
+  private habitEnrollments: Map<string, HabitEnrollment> = new Map();
+  private habitCheckIns: Map<string, HabitCheckIn> = new Map();
+  private adminSettings: Map<string, AdminSetting> = new Map();
+  private contentBlocks: Map<string, ContentBlock> = new Map();
+  
   constructor() {
     this.initializeReflectionPrompts();
     this.initializeChallengesAndRewards();
+    this.initializeWellnessCircles();
+    this.initializeHabitPrograms();
+    this.initializeAdminSettings();
+    this.initializeContentBlocks();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -1575,6 +1628,714 @@ export class MemStorage implements IStorage {
     };
     this.userStats.set(userId, updatedStats);
     return updatedStats;
+  }
+
+  // ========================================
+  // WELLNESS CIRCLES IMPLEMENTATION
+  // ========================================
+  async getWellnessCircles(): Promise<WellnessCircle[]> {
+    return Array.from(this.wellnessCircles.values()).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async getWellnessCircle(id: string): Promise<WellnessCircle | undefined> {
+    return this.wellnessCircles.get(id);
+  }
+
+  async createWellnessCircle(circle: InsertWellnessCircle): Promise<WellnessCircle> {
+    const id = randomUUID();
+    const now = new Date();
+    const newCircle: WellnessCircle = {
+      id,
+      name: circle.name,
+      description: circle.description,
+      category: circle.category,
+      facilitatorId: circle.facilitatorId || null,
+      facilitatorName: circle.facilitatorName || null,
+      maxMembers: circle.maxMembers || 12,
+      currentMembers: 0,
+      meetingFrequency: circle.meetingFrequency || 'weekly',
+      meetingDay: circle.meetingDay || null,
+      meetingTime: circle.meetingTime || null,
+      timezone: circle.timezone || 'UTC',
+      status: circle.status || 'active',
+      isPublic: circle.isPublic !== false,
+      guidelines: circle.guidelines || null,
+      topics: circle.topics || [],
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.wellnessCircles.set(id, newCircle);
+    return newCircle;
+  }
+
+  async updateWellnessCircle(id: string, updates: Partial<WellnessCircle>): Promise<WellnessCircle> {
+    const circle = this.wellnessCircles.get(id);
+    if (!circle) throw new Error('Circle not found');
+    
+    const updated = { ...circle, ...updates, updatedAt: new Date() };
+    this.wellnessCircles.set(id, updated);
+    return updated;
+  }
+
+  async joinWellnessCircle(circleId: string, userId: string): Promise<CircleMember> {
+    const circle = this.wellnessCircles.get(circleId);
+    if (!circle) throw new Error('Circle not found');
+    
+    // Check if already a member
+    const existingMember = Array.from(this.circleMembers.values())
+      .find(m => m.circleId === circleId && m.userId === userId);
+    if (existingMember) return existingMember;
+    
+    const id = randomUUID();
+    const now = new Date();
+    const member: CircleMember = {
+      id,
+      circleId,
+      userId,
+      role: 'member',
+      status: 'pending',
+      joinedAt: now,
+      lastActiveAt: now
+    };
+    
+    this.circleMembers.set(id, member);
+    
+    // Update circle member count
+    circle.currentMembers = (circle.currentMembers || 0) + 1;
+    this.wellnessCircles.set(circleId, { ...circle, updatedAt: new Date() });
+    
+    return member;
+  }
+
+  async leaveWellnessCircle(circleId: string, userId: string): Promise<void> {
+    const member = Array.from(this.circleMembers.values())
+      .find(m => m.circleId === circleId && m.userId === userId);
+    
+    if (member) {
+      this.circleMembers.delete(member.id);
+      
+      // Update circle member count
+      const circle = this.wellnessCircles.get(circleId);
+      if (circle && circle.currentMembers > 0) {
+        circle.currentMembers--;
+        this.wellnessCircles.set(circleId, { ...circle, updatedAt: new Date() });
+      }
+    }
+  }
+
+  async getUserCircles(userId: string): Promise<(CircleMember & { circle: WellnessCircle })[]> {
+    const memberships = Array.from(this.circleMembers.values())
+      .filter(m => m.userId === userId);
+    
+    return memberships.map(member => {
+      const circle = this.wellnessCircles.get(member.circleId);
+      return { ...member, circle: circle! };
+    }).filter(item => item.circle);
+  }
+
+  async getCircleMembers(circleId: string): Promise<(CircleMember & { user: User })[]> {
+    const members = Array.from(this.circleMembers.values())
+      .filter(m => m.circleId === circleId);
+    
+    return members.map(member => {
+      const user = this.users.get(member.userId);
+      return { ...member, user: user! };
+    }).filter(item => item.user);
+  }
+
+  async createCircleActivity(activity: InsertCircleActivity): Promise<CircleActivity> {
+    const id = randomUUID();
+    const newActivity: CircleActivity = {
+      id,
+      circleId: activity.circleId,
+      userId: activity.userId,
+      type: activity.type,
+      title: activity.title || null,
+      content: activity.content,
+      isPrivate: activity.isPrivate || false,
+      metadata: activity.metadata || {},
+      createdAt: new Date()
+    };
+    
+    this.circleActivities.set(id, newActivity);
+    return newActivity;
+  }
+
+  async getCircleActivities(circleId: string, limit?: number): Promise<(CircleActivity & { user: User })[]> {
+    let activities = Array.from(this.circleActivities.values())
+      .filter(a => a.circleId === circleId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    if (limit) {
+      activities = activities.slice(0, limit);
+    }
+    
+    return activities.map(activity => {
+      const user = this.users.get(activity.userId);
+      return { ...activity, user: user! };
+    }).filter(item => item.user);
+  }
+
+  // ========================================
+  // 30-DAY HABIT BUILDER IMPLEMENTATION
+  // ========================================
+  async getHabitPrograms(): Promise<HabitProgram[]> {
+    return Array.from(this.habitPrograms.values())
+      .filter(p => p.isActive)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getHabitProgram(id: string): Promise<HabitProgram | undefined> {
+    return this.habitPrograms.get(id);
+  }
+
+  async createHabitProgram(program: InsertHabitProgram): Promise<HabitProgram> {
+    const id = randomUUID();
+    const newProgram: HabitProgram = {
+      id,
+      name: program.name,
+      description: program.description,
+      category: program.category,
+      duration: program.duration || 30,
+      difficulty: program.difficulty || 'beginner',
+      dailyTasks: program.dailyTasks || [],
+      rewards: program.rewards || {},
+      icon: program.icon || 'fas fa-star',
+      color: program.color || '#10b981',
+      isActive: program.isActive !== false,
+      createdBy: program.createdBy || null,
+      participantCount: 0,
+      createdAt: new Date()
+    };
+    
+    this.habitPrograms.set(id, newProgram);
+    return newProgram;
+  }
+
+  async updateHabitProgram(id: string, updates: Partial<HabitProgram>): Promise<HabitProgram> {
+    const program = this.habitPrograms.get(id);
+    if (!program) throw new Error('Habit program not found');
+    
+    const updated = { ...program, ...updates };
+    this.habitPrograms.set(id, updated);
+    return updated;
+  }
+
+  async enrollInHabitProgram(programId: string, userId: string): Promise<HabitEnrollment> {
+    const program = this.habitPrograms.get(programId);
+    if (!program) throw new Error('Habit program not found');
+    
+    // Check if already enrolled
+    const existing = Array.from(this.habitEnrollments.values())
+      .find(e => e.programId === programId && e.userId === userId);
+    if (existing) return existing;
+    
+    const id = randomUUID();
+    const now = new Date();
+    const enrollment: HabitEnrollment = {
+      id,
+      programId,
+      userId,
+      status: 'active',
+      currentDay: 1,
+      completedDays: 0,
+      streakDays: 0,
+      longestStreak: 0,
+      progress: 0,
+      dailyGoals: program.dailyTasks || [],
+      completedGoals: [],
+      notes: null,
+      startedAt: now,
+      completedAt: null,
+      lastCheckIn: null
+    };
+    
+    this.habitEnrollments.set(id, enrollment);
+    
+    // Update program participant count
+    program.participantCount++;
+    this.habitPrograms.set(programId, program);
+    
+    return enrollment;
+  }
+
+  async getUserHabitEnrollments(userId: string): Promise<(HabitEnrollment & { program: HabitProgram })[]> {
+    const enrollments = Array.from(this.habitEnrollments.values())
+      .filter(e => e.userId === userId);
+    
+    return enrollments.map(enrollment => {
+      const program = this.habitPrograms.get(enrollment.programId);
+      return { ...enrollment, program: program! };
+    }).filter(item => item.program);
+  }
+
+  async getHabitEnrollment(enrollmentId: string): Promise<HabitEnrollment | undefined> {
+    return this.habitEnrollments.get(enrollmentId);
+  }
+
+  async updateHabitEnrollment(id: string, updates: Partial<HabitEnrollment>): Promise<HabitEnrollment> {
+    const enrollment = this.habitEnrollments.get(id);
+    if (!enrollment) throw new Error('Habit enrollment not found');
+    
+    const updated = { ...enrollment, ...updates };
+    this.habitEnrollments.set(id, updated);
+    return updated;
+  }
+
+  async createHabitCheckIn(checkIn: InsertHabitCheckIn): Promise<HabitCheckIn> {
+    const id = randomUUID();
+    const now = new Date();
+    const newCheckIn: HabitCheckIn = {
+      id,
+      enrollmentId: checkIn.enrollmentId,
+      day: checkIn.day,
+      date: now,
+      tasksCompleted: checkIn.tasksCompleted || [],
+      mood: checkIn.mood || null,
+      energy: checkIn.energy || null,
+      motivation: checkIn.motivation || null,
+      notes: checkIn.notes || null,
+      challenges: checkIn.challenges || null,
+      wins: checkIn.wins || null,
+      isCompleted: checkIn.isCompleted || false,
+      createdAt: now
+    };
+    
+    this.habitCheckIns.set(id, newCheckIn);
+    
+    // Update enrollment progress
+    const enrollment = this.habitEnrollments.get(checkIn.enrollmentId);
+    if (enrollment && checkIn.isCompleted) {
+      enrollment.completedDays++;
+      enrollment.currentDay = Math.min(enrollment.currentDay + 1, 30);
+      enrollment.progress = Math.round((enrollment.completedDays / 30) * 100);
+      enrollment.lastCheckIn = now;
+      
+      // Update streak
+      if (checkIn.isCompleted) {
+        enrollment.streakDays++;
+        enrollment.longestStreak = Math.max(enrollment.longestStreak, enrollment.streakDays);
+      } else {
+        enrollment.streakDays = 0;
+      }
+      
+      this.habitEnrollments.set(checkIn.enrollmentId, enrollment);
+    }
+    
+    return newCheckIn;
+  }
+
+  async getHabitCheckIns(enrollmentId: string): Promise<HabitCheckIn[]> {
+    return Array.from(this.habitCheckIns.values())
+      .filter(c => c.enrollmentId === enrollmentId)
+      .sort((a, b) => a.day - b.day);
+  }
+
+  async getHabitCheckIn(enrollmentId: string, day: number): Promise<HabitCheckIn | undefined> {
+    return Array.from(this.habitCheckIns.values())
+      .find(c => c.enrollmentId === enrollmentId && c.day === day);
+  }
+
+  // ========================================
+  // ADMIN & CONTENT MANAGEMENT IMPLEMENTATION
+  // ========================================
+  async getAdminSettings(category?: string): Promise<AdminSetting[]> {
+    let settings = Array.from(this.adminSettings.values());
+    if (category) {
+      settings = settings.filter(s => s.category === category);
+    }
+    return settings.sort((a, b) => a.key.localeCompare(b.key));
+  }
+
+  async getAdminSetting(key: string): Promise<AdminSetting | undefined> {
+    return Array.from(this.adminSettings.values()).find(s => s.key === key);
+  }
+
+  async setAdminSetting(setting: InsertAdminSetting): Promise<AdminSetting> {
+    // Check if setting exists
+    const existing = await this.getAdminSetting(setting.key);
+    
+    if (existing) {
+      const updated = { ...existing, ...setting, updatedAt: new Date() };
+      this.adminSettings.set(existing.id, updated);
+      return updated;
+    } else {
+      const id = randomUUID();
+      const newSetting: AdminSetting = {
+        id,
+        key: setting.key,
+        value: setting.value,
+        description: setting.description || null,
+        category: setting.category || 'general',
+        isPublic: setting.isPublic || false,
+        updatedBy: setting.updatedBy || null,
+        updatedAt: new Date()
+      };
+      
+      this.adminSettings.set(id, newSetting);
+      return newSetting;
+    }
+  }
+
+  async getContentBlocks(category?: string, published?: boolean): Promise<ContentBlock[]> {
+    let blocks = Array.from(this.contentBlocks.values());
+    
+    if (category) {
+      blocks = blocks.filter(b => b.category === category);
+    }
+    
+    if (published !== undefined) {
+      blocks = blocks.filter(b => b.isPublished === published);
+    }
+    
+    return blocks.sort((a, b) => {
+      if (a.sortOrder !== b.sortOrder) {
+        return a.sortOrder - b.sortOrder;
+      }
+      return a.title.localeCompare(b.title);
+    });
+  }
+
+  async getContentBlock(slug: string): Promise<ContentBlock | undefined> {
+    return Array.from(this.contentBlocks.values()).find(b => b.slug === slug);
+  }
+
+  async createContentBlock(block: InsertContentBlock): Promise<ContentBlock> {
+    const id = randomUUID();
+    const now = new Date();
+    const newBlock: ContentBlock = {
+      id,
+      slug: block.slug,
+      title: block.title,
+      content: block.content,
+      type: block.type || 'markdown',
+      category: block.category,
+      isPublished: block.isPublished || false,
+      sortOrder: block.sortOrder || 0,
+      metadata: block.metadata || {},
+      createdBy: block.createdBy || null,
+      updatedBy: block.updatedBy || null,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.contentBlocks.set(id, newBlock);
+    return newBlock;
+  }
+
+  async updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock> {
+    const block = this.contentBlocks.get(id);
+    if (!block) throw new Error('Content block not found');
+    
+    const updated = { ...block, ...updates, updatedAt: new Date() };
+    this.contentBlocks.set(id, updated);
+    return updated;
+  }
+
+  async deleteContentBlock(id: string): Promise<void> {
+    this.contentBlocks.delete(id);
+  }
+
+  // ========================================
+  // INITIALIZATION METHODS FOR NEW SYSTEMS
+  // ========================================
+  private initializeWellnessCircles() {
+    // Create sample wellness circles
+    const circles = [
+      {
+        id: 'wc-anxiety-mindfulness',
+        name: 'Anxiety & Mindfulness Circle',
+        description: 'A supportive space for those working with anxiety through mindfulness practices.',
+        category: 'anxiety',
+        facilitatorId: null,
+        facilitatorName: 'Sarah T.',
+        maxMembers: 12,
+        currentMembers: 8,
+        meetingFrequency: 'weekly',
+        meetingDay: 'wednesday',
+        meetingTime: '19:00',
+        timezone: 'UTC',
+        status: 'active',
+        isPublic: true,
+        guidelines: 'This is a safe, supportive space. Share authentically and listen with compassion.',
+        topics: ['breathing techniques', 'mindful awareness', 'anxiety management', 'group support']
+      },
+      {
+        id: 'wc-sleep-recovery',
+        name: 'Sleep & Recovery Circle',
+        description: 'Focus on optimizing sleep patterns and recovery for better wellness.',
+        category: 'sleep',
+        facilitatorId: null,
+        facilitatorName: 'Dr. Marcus L.',
+        maxMembers: 15,
+        currentMembers: 12,
+        meetingFrequency: 'bi-weekly',
+        meetingDay: 'tuesday',
+        meetingTime: '20:00',
+        timezone: 'UTC',
+        status: 'active',
+        isPublic: true,
+        guidelines: 'Evidence-based approaches to sleep wellness. Share experiences and insights.',
+        topics: ['sleep hygiene', 'recovery techniques', 'circadian rhythms', 'rest optimization']
+      }
+    ];
+
+    circles.forEach(circle => {
+      const wellnessCircle: WellnessCircle = {
+        ...circle,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.wellnessCircles.set(circle.id, wellnessCircle);
+    });
+  }
+
+  private initializeHabitPrograms() {
+    // Create sample 30-day habit programs
+    const programs = [
+      {
+        id: 'hp-mindful-mornings',
+        name: '30-Day Mindful Morning Routine',
+        description: 'Start each day with intention through mindful morning practices.',
+        category: 'mindfulness',
+        duration: 30,
+        difficulty: 'beginner',
+        dailyTasks: [
+          '5-minute morning meditation',
+          'Set 3 daily intentions',
+          'Mindful first cup of coffee/tea',
+          'Write one gratitude note'
+        ],
+        rewards: {
+          weekly: { points: 100, badge: 'Morning Warrior' },
+          completion: { points: 500, badge: 'Mindful Master' }
+        },
+        icon: 'fas fa-sun',
+        color: '#f59e0b',
+        isActive: true,
+        createdBy: null,
+        participantCount: 43
+      },
+      {
+        id: 'hp-evening-reflection',
+        name: '30-Day Evening Reflection Practice',
+        description: 'End each day with gratitude and reflection for deeper self-awareness.',
+        category: 'reflection',
+        duration: 30,
+        difficulty: 'intermediate',
+        dailyTasks: [
+          'Journal 3 things learned today',
+          '10-minute reflection meditation',
+          'Plan tomorrow with intention',
+          'Practice loving-kindness'
+        ],
+        rewards: {
+          weekly: { points: 120, badge: 'Reflection Champion' },
+          completion: { points: 600, badge: 'Wisdom Keeper' }
+        },
+        icon: 'fas fa-moon',
+        color: '#6366f1',
+        isActive: true,
+        createdBy: null,
+        participantCount: 28
+      },
+      {
+        id: 'hp-body-awareness',
+        name: '30-Day Body Awareness Journey',
+        description: 'Develop deeper connection with your body through mindful movement.',
+        category: 'fitness',
+        duration: 30,
+        difficulty: 'beginner',
+        dailyTasks: [
+          '15-minute gentle movement',
+          'Body scan meditation',
+          'Mindful eating practice',
+          'Notice physical sensations'
+        ],
+        rewards: {
+          weekly: { points: 110, badge: 'Body Wise' },
+          completion: { points: 550, badge: 'Embodied Soul' }
+        },
+        icon: 'fas fa-heart',
+        color: '#ef4444',
+        isActive: true,
+        createdBy: null,
+        participantCount: 35
+      }
+    ];
+
+    programs.forEach(program => {
+      const habitProgram: HabitProgram = {
+        ...program,
+        createdAt: new Date()
+      };
+      this.habitPrograms.set(program.id, habitProgram);
+    });
+  }
+
+  private initializeAdminSettings() {
+    const settings = [
+      {
+        key: 'app.name',
+        value: 'LightPrompt',
+        description: 'Application name displayed throughout the UI',
+        category: 'ui',
+        isPublic: true
+      },
+      {
+        key: 'app.tagline',
+        value: 'Soul-Tech Wellness',
+        description: 'Main tagline for the application',
+        category: 'ui',
+        isPublic: true
+      },
+      {
+        key: 'features.wellness_circles.enabled',
+        value: true,
+        description: 'Enable/disable wellness circles feature',
+        category: 'features',
+        isPublic: false
+      },
+      {
+        key: 'features.habit_builder.enabled',
+        value: true,
+        description: 'Enable/disable 30-day habit builder feature',
+        category: 'features',
+        isPublic: false
+      },
+      {
+        key: 'pricing.premium_bots.enabled',
+        value: true,
+        description: 'Require premium tier for advanced bots',
+        category: 'pricing',
+        isPublic: false
+      },
+      {
+        key: 'mobile.optimization.enabled',
+        value: true,
+        description: 'Enable mobile optimization features',
+        category: 'ui',
+        isPublic: false
+      }
+    ];
+
+    settings.forEach((setting, index) => {
+      const adminSetting: AdminSetting = {
+        id: `setting-${index + 1}`,
+        key: setting.key,
+        value: setting.value,
+        description: setting.description,
+        category: setting.category,
+        isPublic: setting.isPublic,
+        updatedBy: null,
+        updatedAt: new Date()
+      };
+      this.adminSettings.set(adminSetting.id, adminSetting);
+    });
+  }
+
+  private initializeContentBlocks() {
+    const contentBlocks = [
+      // FAQ Content
+      {
+        slug: 'faq-what-is-lightprompt',
+        title: 'What is LightPrompt?',
+        content: 'LightPrompt is a privacy-first, soul-tech wellness platform that combines AI-powered conversations with holistic wellness tracking. Our platform helps you develop deeper self-awareness through guided reflection, habit building, and community connection.',
+        category: 'faq',
+        sortOrder: 1,
+        isPublished: true
+      },
+      {
+        slug: 'faq-how-does-ai-work',
+        title: 'How do the AI companions work?',
+        content: 'Our AI companions are designed with different personalities and specialties to support various aspects of your wellness journey. Each bot uses advanced language models to provide personalized, empathetic responses while maintaining strict privacy standards.',
+        category: 'faq',
+        sortOrder: 2,
+        isPublished: true
+      },
+      {
+        slug: 'faq-data-privacy',
+        title: 'How is my data protected?',
+        content: 'We prioritize your privacy above all else. Your conversations and wellness data are encrypted, never sold to third parties, and you maintain complete control over what you share and with whom.',
+        category: 'faq',
+        sortOrder: 3,
+        isPublished: true
+      },
+      
+      // Plans & Features Content
+      {
+        slug: 'plan-free-tier',
+        title: 'Free Tier',
+        content: '**$0/month**\n\n- Access to LightPromptBot\n- Basic wellness tracking\n- 10 conversations per day\n- Community access\n- Mobile app access\n\n*Perfect for exploring soul-tech wellness*',
+        category: 'plans',
+        sortOrder: 1,
+        isPublished: true
+      },
+      {
+        slug: 'plan-premium-tier',
+        title: 'Premium Tier',
+        content: '**$29/month**\n\n- All Free features\n- Access to specialized bots (VisionQuest, WooWoo, BodyMirror)\n- Unlimited conversations\n- Advanced analytics\n- Wellness circles access\n- 30-day habit builder\n- Priority support\n\n*For dedicated wellness practitioners*',
+        category: 'plans',
+        sortOrder: 2,
+        isPublished: true
+      },
+      {
+        slug: 'plan-pro-tier',
+        title: 'Pro Tier',
+        content: '**$49/month**\n\n- All Premium features\n- Partner mode & relationship tools\n- Advanced AI personality customization\n- Export & backup options\n- Integration with health apps\n- Custom wellness programs\n\n*For wellness professionals & couples*',
+        category: 'plans',
+        sortOrder: 3,
+        isPublished: true
+      },
+      
+      // Feature descriptions
+      {
+        slug: 'feature-ai-companions',
+        title: 'AI Wellness Companions',
+        content: 'Our specialized AI bots each bring unique perspectives to your wellness journey:\n\n**LightPromptBot** - Your primary wellness guide\n**VisionQuest** - Deep spiritual exploration\n**WooWoo** - Mystical and intuitive insights\n**BodyMirror** - Somatic awareness and body wisdom',
+        category: 'features',
+        sortOrder: 1,
+        isPublished: true
+      },
+      {
+        slug: 'feature-wellness-circles',
+        title: 'Wellness Circles',
+        content: 'Join small, supportive groups focused on specific wellness topics. Share experiences, learn from others, and grow together in a safe, moderated environment.',
+        category: 'features',
+        sortOrder: 2,
+        isPublished: true
+      },
+      {
+        slug: 'feature-habit-builder',
+        title: '30-Day Habit Builder',
+        content: 'Structured programs to help you build lasting wellness habits. Each program includes daily tasks, progress tracking, community support, and rewards for consistency.',
+        category: 'features',
+        sortOrder: 3,
+        isPublished: true
+      }
+    ];
+
+    contentBlocks.forEach((block, index) => {
+      const contentBlock: ContentBlock = {
+        id: `content-${index + 1}`,
+        slug: block.slug,
+        title: block.title,
+        content: block.content,
+        type: 'markdown',
+        category: block.category,
+        isPublished: block.isPublished,
+        sortOrder: block.sortOrder,
+        metadata: {},
+        createdBy: null,
+        updatedBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.contentBlocks.set(contentBlock.id, contentBlock);
+    });
   }
 }
 
