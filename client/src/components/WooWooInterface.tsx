@@ -187,9 +187,14 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                   </div>
                 </div>
                 <Button 
-                  onClick={handleGenerateChart}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log('Generate button clicked', birthData);
+                    handleGenerateChart();
+                  }}
                   disabled={!birthData.date || !birthData.time || !birthData.location || isGenerating}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 >
                   {isGenerating ? (
                     <>

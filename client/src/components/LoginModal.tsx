@@ -181,15 +181,16 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
             </Button>
           </div>
 
-          <div className="text-center">
-            <Button
-              variant="link"
-              onClick={() => window.location.href = '/admin'}
-              className="text-sm text-gray-600"
-            >
-              <i className="fas fa-cog mr-1"></i>
-              Admin Portal
-            </Button>
+          {/* Discreet admin access - small gray dot that appears on hover */}
+          <div className="text-center relative">
+            <div 
+              className="inline-block w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-400 cursor-pointer opacity-30 hover:opacity-60 transition-opacity"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/admin';
+              }}
+              title=""
+            ></div>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
