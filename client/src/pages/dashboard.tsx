@@ -34,6 +34,14 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showHabitForm, setShowHabitForm] = useState(false);
+  const [newHabit, setNewHabit] = useState({
+    name: '',
+    description: '',
+    category: 'mindfulness',
+    frequency: 'daily',
+    target: 1
+  });
   const userId = localStorage.getItem('lightprompt_user_id');
 
   // Get user data
@@ -99,6 +107,37 @@ export default function DashboardPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+    },
+  });
+
+  // Create habit mutation
+  const createHabitMutation = useMutation({
+    mutationFn: async (habitData: typeof newHabit) => {
+      const response = await fetch('/api/habits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          ...habitData,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to create habit');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      setShowHabitForm(false);
+      setNewHabit({
+        name: '',
+        description: '',
+        category: 'mindfulness',
+        frequency: 'daily',
+        target: 1
+      });
+      toast({
+        title: "Habit created! 🌟",
+        description: "Your new wellness habit is ready to track.",
+      });
     },
   });
 
@@ -199,18 +238,9 @@ export default function DashboardPage() {
                 Back to Chat
               </Button>
             </Link>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                <img 
-                  src="/attached_assets/LightPrompt Logo with Electric Neon Colors (5)_1754613275736.png" 
-                  alt="LightPrompt"
-                  className="w-8 h-8 object-contain filter invert"
-                />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">LightPrompt Dashboard</h1>
-                <p className="text-sm text-gray-600">Track your soul-tech wellness journey</p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">LightPrompt Dashboard</h1>
+              <p className="text-sm text-gray-600">Track your soul-tech wellness journey</p>
             </div>
           </div>
           
@@ -469,7 +499,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Habit Tracker
-                  <Button size="sm">
+                  <Button size="sm" onClick={() => setShowHabitForm(true)}>
                     <i className="fas fa-plus mr-2"></i>
                     Add Habit
                   </Button>
@@ -495,11 +525,143 @@ export default function DashboardPage() {
                     <i className="fas fa-star text-4xl text-gray-300 mb-4"></i>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No habits yet</h3>
                     <p className="text-gray-600 mb-4">Start building positive habits to track your progress</p>
-                    <Button>Create Your First Habit</Button>
+                    <Button onClick={() => setShowHabitForm(true)}>Create Your First Habit</Button>
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {/* Add Habit Modal */}
+            {showHabitForm && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Create New Habit</h3>
+                    <Button 
+                      onClick={() => setShowHabitForm(false)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      <i className="fas fa-times"></i>
+                    </Button>
+                  </div>
+                  
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (newHabit.name.trim()) {
+                        createHabitMutation.mutate(newHabit);
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div>
+                      <Label htmlFor="habit-name">Habit Name *</Label>
+                      <Input
+                        id="habit-name"
+                        placeholder="e.g., Morning Meditation"
+                        value={newHabit.name}
+                        onChange={(e) => setNewHabit(prev => ({ ...prev, name: e.target.value }))}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="habit-description">Description</Label>
+                      <Input
+                        id="habit-description"
+                        placeholder="Brief description of your habit"
+                        value={newHabit.description}
+                        onChange={(e) => setNewHabit(prev => ({ ...prev, description: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="habit-category">Category</Label>
+                      <Select 
+                        value={newHabit.category} 
+                        onValueChange={(value) => setNewHabit(prev => ({ ...prev, category: value }))}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mindfulness">🧘 Mindfulness</SelectItem>
+                          <SelectItem value="fitness">💪 Fitness</SelectItem>
+                          <SelectItem value="nutrition">🥗 Nutrition</SelectItem>
+                          <SelectItem value="sleep">😴 Sleep</SelectItem>
+                          <SelectItem value="social">👥 Social</SelectItem>
+                          <SelectItem value="learning">📚 Learning</SelectItem>
+                          <SelectItem value="creativity">🎨 Creativity</SelectItem>
+                          <SelectItem value="productivity">⚡ Productivity</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="habit-frequency">Frequency</Label>
+                        <Select 
+                          value={newHabit.frequency} 
+                          onValueChange={(value) => setNewHabit(prev => ({ ...prev, frequency: value }))}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="weekly">Weekly</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="habit-target">Target Count</Label>
+                        <Input
+                          id="habit-target"
+                          type="number"
+                          min="1"
+                          value={newHabit.target}
+                          onChange={(e) => setNewHabit(prev => ({ ...prev, target: parseInt(e.target.value) || 1 }))}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-3 pt-4">
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        onClick={() => setShowHabitForm(false)}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        disabled={!newHabit.name.trim() || createHabitMutation.isPending}
+                        className="flex-1"
+                      >
+                        {createHabitMutation.isPending ? (
+                          <>
+                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-plus mr-2"></i>
+                            Create Habit
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
 

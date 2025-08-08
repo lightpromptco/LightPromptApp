@@ -787,9 +787,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to get wellness metrics" });
     }
   });
-  
+
   // Habits
   app.post("/api/habits", async (req, res) => {
+    try {
+      const habitData = insertHabitSchema.parse(req.body);
+      const habit = await storage.createHabit(habitData);
+      res.json(habit);
+    } catch (error: any) {
+      console.error("Error creating habit:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create habit' });
+    }
+  });
+
+  app.get("/api/habits/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const habits = await storage.getUserHabits(userId);
+      res.json(habits);
+    } catch (error) {
+      console.error("Error getting habits:", error);
+      res.status(500).json({ error: "Failed to get habits" });
+    }
+  });
+
+  // Habit Entries
+  app.post("/api/habit-entries", async (req, res) => {
+    try {
+      const entryData = insertHabitEntrySchema.parse(req.body);
+      const entry = await storage.createHabitEntry(entryData);
+      res.json(entry);
+    } catch (error: any) {
+      console.error("Error creating habit entry:", error);
+      res.status(400).json({ error: error?.message || 'Failed to create habit entry' });
+    }
+  });
+  
+  // Apple Health Data
+  app.post("/api/apple-health", async (req, res) => {
     try {
       const habitData = insertHabitSchema.parse(req.body);
       const habit = await storage.createHabit(habitData);
