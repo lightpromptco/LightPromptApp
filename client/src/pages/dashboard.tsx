@@ -390,6 +390,10 @@ export default function DashboardPage() {
                   <i className="fas fa-cog mr-2"></i>
                   Settings & Plans
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/signup'}>
+                  <i className="fas fa-user-plus mr-2"></i>
+                  Sign Up
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
