@@ -344,7 +344,6 @@ export function ChatInterface({
                 {/* GeoPrompt-specific actions */}
                 {activeBot.id === 'geoprompt' ? (
                   <>
-                    <span className="px-3 py-2 rounded-xl bg-gray-100 text-gray-600 text-sm border border-gray-200 italic">check in</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -354,6 +353,16 @@ export function ChatInterface({
                     >
                       <i className="fas fa-map-marker-alt mr-2"></i>
                       Start GeoPrompt
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-teal-50 text-gray-600 hover:text-teal-700 transition-all duration-300 text-sm border border-gray-200 hover:border-teal-200"
+                      onClick={() => sendMessage("Let's do a daily check-in")}
+                      disabled={isLoading || !user}
+                    >
+                      <i className="fas fa-lightbulb mr-2"></i>
+                      Daily Check-in
                     </Button>
                   </>
                 ) : (

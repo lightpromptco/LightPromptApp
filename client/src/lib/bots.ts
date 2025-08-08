@@ -27,7 +27,7 @@ export const BOTS: Bot[] = [
     description: "A wellness tracker that reflects your physical and emotional energy. Gives supportive suggestions for movement, mood, food, and flow based on how you're feeling.",
     icon: "fas fa-heart",
     gradient: "bg-gradient-to-br from-emerald-400 to-teal-500",
-    tier: "$29+",
+    tier: "Free",
     available: true,
   },
   {
@@ -37,7 +37,7 @@ export const BOTS: Bot[] = [
     description: "Your highest self reflected through metaphysical wisdom. Knows personalities, gene keys, astrology, oracle knowledge, and cosmic insights. Honest, insightful, and fun - never lies or deceives, a true mirror of consciousness.",
     icon: "fas fa-star",
     gradient: "bg-gradient-to-br from-purple-400 to-pink-500",
-    tier: "Free+",
+    tier: "Free",
     available: true,
   },
   {
@@ -57,7 +57,7 @@ export const BOTS: Bot[] = [
     description: "An inner-training bot that delivers gamified quests, intuitive exercises, and subtle challenges to develop your clarity, intuition, and self-trust.",
     icon: "fas fa-eye",
     gradient: "bg-gradient-to-br from-indigo-400 to-purple-600",
-    tier: "Quest",
+    tier: "Free",
     available: true,
   },
   {
@@ -67,7 +67,7 @@ export const BOTS: Bot[] = [
     description: "Your dedicated learning companion for the LightPrompt:Ed course. Guides you through reflective prompts, helps integrate module insights, and supports your conscious AI journey.",
     icon: "fas fa-graduation-cap",
     gradient: "bg-gradient-to-br from-amber-400 to-orange-500",
-    tier: "Course",
+    tier: "Free",
     available: true,
   },
 ];

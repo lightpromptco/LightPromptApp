@@ -27,13 +27,9 @@ export function BottomNavigation({
   const [showUpgradeModal, setShowUpgradeModal] = useState<Bot | null>(null);
 
   const canAccessBot = (bot: Bot) => {
+    // All bots are now free within token limits
     if (!user) return false;
-    if (bot.tier === 'Free') return true;
-    if (bot.tier === '$29+' && ['tier_29', 'tier_49', 'admin'].includes(user.tier)) return true;
-    if (bot.tier === '$49+' && ['tier_49', 'admin'].includes(user.tier)) return true;
-    if (bot.tier === 'Quest' && ['admin'].includes(user.tier)) return true;
-    if (bot.tier === 'Course' && (user.courseAccess || ['admin'].includes(user.tier))) return true;
-    return false;
+    return true; // All bots accessible within token limits
   };
 
   const handleBotSelect = (bot: Bot) => {

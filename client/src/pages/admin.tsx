@@ -13,17 +13,20 @@ export default function AdminPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Check if current user is admin
+  // Check if current user is admin (database role OR localStorage admin mode)
   const currentUserId = localStorage.getItem('lightprompt_user_id');
+  const isLocalAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
+  
   const { data: currentUser } = useQuery<User>({
     queryKey: ['/api/users', currentUserId],
     enabled: !!currentUserId,
   });
 
   // Get all users (admin only)
+  const isAdmin = currentUser?.role === 'admin' || isLocalAdminMode;
   const { data: users = [], isLoading } = useQuery<User[]>({
     queryKey: ['/api/admin/users'],
-    enabled: currentUser?.role === 'admin',
+    enabled: isAdmin,
   });
 
   // Update user mutation
@@ -63,13 +66,20 @@ export default function AdminPage() {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (currentUser?.role !== 'admin') {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600 mb-4">You need admin privileges to access this page.</p>
+            <p className="text-gray-600 mb-4">
+              You need admin privileges to access this page.
+              {!isLocalAdminMode && (
+                <span className="block text-sm mt-2 text-gray-500">
+                  To enable admin mode, add "lightprompt-admin-mode" = "true" to localStorage
+                </span>
+              )}
+            </p>
             <Link href="/">
               <Button>Return to Chat</Button>
             </Link>
@@ -223,7 +233,7 @@ export default function AdminPage() {
                           <option value="free">Free</option>
                           <option value="tier_29">$29+ Tier</option>
                           <option value="tier_49">$49+ Tier</option>
-                          {currentUser?.role === 'admin' && (
+                          {isAdmin && (
                             <option value="admin">Admin</option>
                           )}
                         </select>
