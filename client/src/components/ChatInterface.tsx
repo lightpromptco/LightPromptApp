@@ -3,6 +3,8 @@ import { User, Message, ChatSession } from '@shared/schema';
 import { Bot } from '@/lib/bots';
 import { VoiceRecorder } from './VoiceRecorder';
 import { ParticleSystem } from './ParticleSystem';
+import { WooWooInterface } from './WooWooInterface';
+import { GeoPromptCheckInInterface } from './GeoPromptCheckInInterface';
 import { useSentiment } from '@/hooks/useSentiment';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -265,7 +267,18 @@ export function ChatInterface({
           </div>
         </div>
 
-        {/* Messages */}
+        {/* Conditional Content Based on Bot Type */}
+        {activeBot.id === 'woowoo' ? (
+          <div className="flex-1 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+            <WooWooInterface userId={user?.id || ''} />
+          </div>
+        ) : activeBot.id === 'geoprompt' ? (
+          <div className="flex-1 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+            <GeoPromptCheckInInterface userId={user?.id || ''} />
+          </div>
+        ) : (
+        <div className="flex-1 flex flex-col">
+        {/* Regular Chat Messages */}
         <div className="flex-1 p-6 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
           <div className="max-w-4xl mx-auto space-y-6">
             
@@ -362,7 +375,7 @@ export function ChatInterface({
           </div>
         </div>
 
-        {/* Input Area */}
+        {/* Input Area for Regular Chat */}
         <div className="p-6 bg-white/95 backdrop-blur-lg border-t border-gray-200">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit}>
@@ -453,6 +466,8 @@ export function ChatInterface({
             </div>
           </div>
         </div>
+        </div>
+        )}
       </div>
     </>
   );
