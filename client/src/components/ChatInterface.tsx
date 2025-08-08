@@ -61,7 +61,10 @@ export function ChatInterface({
       const response = await fetch(`/api/sessions/${sessionId}/messages`);
       if (response.ok) {
         const sessionMessages = await response.json();
-        setMessages(sessionMessages);
+        // Only update messages if we have data, don't clear existing messages with empty array
+        if (sessionMessages && sessionMessages.length > 0) {
+          setMessages(sessionMessages);
+        }
       }
     } catch (error) {
       console.error('Failed to load messages:', error);
@@ -154,9 +157,17 @@ export function ChatInterface({
       setMessages(prev => [...prev, userMessage, botMessage]);
       
       // Try to reload from database in background (non-blocking)
+      // Only sync if we successfully get messages from the database
       setTimeout(async () => {
         try {
-          await loadMessages(session.id);
+          const response = await fetch(`/api/sessions/${session.id}/messages`);
+          if (response.ok) {
+            const sessionMessages = await response.json();
+            // Only update if we actually got messages from the database
+            if (sessionMessages && sessionMessages.length > 0) {
+              setMessages(sessionMessages);
+            }
+          }
         } catch (error) {
           console.log('Background message reload failed, continuing with local state');
         }
