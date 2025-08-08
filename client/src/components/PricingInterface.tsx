@@ -20,6 +20,12 @@ interface PricingTier {
     tokens: number;
     bots: number;
     sessions: number;
+    checkIns?: number;
+    habits?: number;
+    patterns?: number;
+    partnerConnections?: number;
+    astrology?: number;
+    geoPrompts?: number;
   };
 }
 
@@ -30,16 +36,24 @@ const PRICING_TIERS: PricingTier[] = [
     description: 'Perfect for discovering your wellness journey',
     price: { monthly: 0, yearly: 0 },
     features: [
-      'Basic LightPromptBot conversations',
-      'Daily mood & energy tracking',
-      '3 custom habits',
-      'Basic wellness insights',
-      'Community access'
+      'LightPromptBot & GeoPrompt access',
+      '5 daily check-ins per month',
+      '3 custom habits tracking',
+      'Basic WooWoo (astrology) readings',
+      'Community group access',
+      '2 wellness patterns per month',
+      'Partner mode preview (1 connection)'
     ],
     limits: {
       tokens: 50,
-      bots: 1,
-      sessions: 5
+      bots: 2,
+      sessions: 5,
+      checkIns: 5,
+      habits: 3,
+      patterns: 2,
+      partnerConnections: 1,
+      astrology: 2,
+      geoPrompts: 10
     }
   },
   {
@@ -55,12 +69,20 @@ const PRICING_TIERS: PricingTier[] = [
       'Advanced wellness patterns',
       'VibeMatch community features',
       'Voice conversations',
-      'Export wellness data'
+      'Export wellness data',
+      'Full WooWoo birth chart & resources',
+      'Unlimited partner mode connections'
     ],
     limits: {
       tokens: 1000,
       bots: 99,
-      sessions: 99
+      sessions: 99,
+      checkIns: 999,
+      habits: 999,
+      patterns: 999,
+      partnerConnections: 10,
+      astrology: 999,
+      geoPrompts: 999
     }
   },
   {
@@ -262,8 +284,20 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                     <span>{tier.limits.bots === 99 ? 'All' : tier.limits.bots}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Chat sessions:</span>
-                    <span>{tier.limits.sessions === 999 ? 'Unlimited' : tier.limits.sessions}</span>
+                    <span>Daily check-ins:</span>
+                    <span>{tier.limits.checkIns === 999 ? 'Unlimited' : tier.limits.checkIns || 0}/month</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Habits tracking:</span>
+                    <span>{tier.limits.habits === 999 ? 'Unlimited' : tier.limits.habits || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>WooWoo readings:</span>
+                    <span>{tier.limits.astrology === 999 ? 'Unlimited' : tier.limits.astrology || 0}/month</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>GeoPrompts:</span>
+                    <span>{tier.limits.geoPrompts === 999 ? 'Unlimited' : tier.limits.geoPrompts || 0}/month</span>
                   </div>
                 </div>
                 

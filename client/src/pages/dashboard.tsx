@@ -26,6 +26,10 @@ import { AboutInterface } from '@/components/AboutInterface';
 import { ContactInterface } from '@/components/ContactInterface';
 import { PrivacyInterface } from '@/components/PrivacyInterface';
 import { LegalInterface } from '@/components/LegalInterface';
+import { GeoPromptCheckInInterface } from '@/components/GeoPromptCheckInInterface';
+import { WooWooInterface } from '@/components/WooWooInterface';
+import { CommunityInterface } from '@/components/CommunityInterface';
+import { AIHelpInterface } from '@/components/AIHelpInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -280,7 +284,7 @@ export default function DashboardPage() {
       case 'checkin': return 'Check-in & Overview';
       case 'growth': return 'Growth Tracking';
       case 'lightprompted': return 'LightPrompt:ed Course';
-      case 'astrology': return 'Astrology & Cosmos';
+      case 'astrology': return 'WooWoo & Cosmos';
       case 'geoprompt': return 'GeoPrompt';
       case 'vibematch': return 'VibeMatch';
       case 'partner': return 'Partner Mode';
@@ -290,6 +294,7 @@ export default function DashboardPage() {
       case 'contact': return 'Contact';
       case 'privacy': return 'Privacy';
       case 'legal': return 'Legal';
+      case 'help': return 'AI Help & Support';
       case 'integrations': return 'Device Integrations';
       case 'settings': return 'Settings';
       default: return 'Home';
@@ -321,7 +326,12 @@ export default function DashboardPage() {
           
           {user && (
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" className="text-teal-600">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-teal-600"
+                onClick={() => setActiveView('help')}
+              >
                 <i className="fas fa-question-circle mr-2"></i>
                 Help
               </Button>
@@ -368,7 +378,7 @@ export default function DashboardPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('astrology')}>
                   <i className="fas fa-star mr-2"></i>
-                  Astrology & Cosmos
+                  WooWoo & Cosmos
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('geoprompt')}>
                   <i className="fas fa-map-marker-alt mr-2"></i>
@@ -405,6 +415,10 @@ export default function DashboardPage() {
                 <DropdownMenuItem onClick={() => setActiveView('legal')}>
                   <i className="fas fa-gavel mr-2"></i>
                   Legal
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('help')}>
+                  <i className="fas fa-question-circle mr-2"></i>
+                  AI Help & Support
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('integrations')}>
                   <i className="fas fa-mobile-alt mr-2"></i>
@@ -810,293 +824,21 @@ export default function DashboardPage() {
           {/* Community Tab */}
           {activeView === 'community' && (
             <div className="space-y-6">
-              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
-                💡 <strong>How it works:</strong> Connect with like-minded souls on your wellness journey through shared experiences, group challenges, and meaningful conversations.
-              </div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-users text-teal-600 mr-2"></i>
-                    Community Features
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Coming soon - Connect with your wellness tribe
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <i className="fas fa-users text-4xl text-gray-300 mb-4"></i>
-                    <h3 className="text-lg font-medium text-gray-700 mb-2">Community features launching soon</h3>
-                    <p className="text-gray-600">Group challenges, shared reflections, and wellness circles</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <CommunityInterface userId={userId!} />
             </div>
           )}
           
-          {/* Astrology & Cosmos Tab */}
+          {/* WooWoo & Cosmos Tab */}
           {activeView === 'astrology' && (
             <div className="space-y-6">
-              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
-                💡 <strong>How it works:</strong> Our astrology insights combine traditional wisdom with modern psychology to provide personalized cosmic guidance based on celestial patterns and your birth information.
-              </div>
-              <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-star text-purple-600 mr-2"></i>
-                    Astrology & Cosmic Insights
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Explore your cosmic patterns and celestial guidance
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="bg-white">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg flex items-center">
-                          <i className="fas fa-sun text-yellow-500 mr-2"></i>
-                          Today's Cosmic Weather
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Moon Phase:</span>
-                            <span className="text-sm">🌓 First Quarter</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Planetary Ruler:</span>
-                            <span className="text-sm">♃ Jupiter</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Element:</span>
-                            <span className="text-sm">🔥 Fire</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="bg-white">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg flex items-center">
-                          <i className="fas fa-chart-pie text-indigo-500 mr-2"></i>
-                          Your Birth Chart
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-center py-4">
-                          <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center">
-                            <i className="fas fa-user-astronaut text-white text-2xl"></i>
-                          </div>
-                          <p className="text-sm text-gray-600">Connect your birth details for personalized cosmic insights</p>
-                          <Button size="sm" className="mt-3 bg-gradient-to-r from-purple-600 to-indigo-600">
-                            Set Birth Info
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  
-                  <Card className="bg-white">
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <i className="fas fa-crystal-ball text-purple-500 mr-2"></i>
-                        Daily Cosmic Guidance
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-700 mb-4">
-                        Today's energy invites deep reflection and spiritual growth. The cosmic currents 
-                        support inner work and connecting with your soul's wisdom. Trust your intuition 
-                        as it guides you toward authentic expression.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="bg-purple-50">
-                          <i className="fas fa-heart text-red-500 mr-1"></i>
-                          Love: Open your heart
-                        </Badge>
-                        <Badge variant="outline" className="bg-indigo-50">
-                          <i className="fas fa-briefcase text-blue-500 mr-1"></i>
-                          Career: Trust your vision
-                        </Badge>
-                        <Badge variant="outline" className="bg-green-50">
-                          <i className="fas fa-leaf text-green-500 mr-1"></i>
-                          Wellness: Ground yourself
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CardContent>
-              </Card>
+              <WooWooInterface userId={userId!} />
             </div>
           )}
           
           {/* GeoPrompt Tab */}
           {activeView === 'geoprompt' && (
             <div className="space-y-6">
-              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6">
-                💡 <strong>How it works:</strong> Check in at meaningful locations, get AI-guided reflections, and connect with others who resonate with these special places.
-              </div>
-              
-              {/* AI Monitored Check-in Section */}
-              <Card className="bg-gradient-to-br from-green-50 to-teal-50 border-green-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-map-pin text-green-600 mr-2"></i>
-                    AI Monitored Check-in
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Share your current location vibe and get personalized reflections
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="location-select">Choose Location</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a location..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="central-park">Central Park, NYC</SelectItem>
-                          <SelectItem value="golden-gate">Golden Gate Bridge, SF</SelectItem>
-                          <SelectItem value="sedona">Sedona Vortexes, AZ</SelectItem>
-                          <SelectItem value="mount-fuji">Mount Fuji, Japan</SelectItem>
-                          <SelectItem value="stonehenge">Stonehenge, UK</SelectItem>
-                          <SelectItem value="machu-picchu">Machu Picchu, Peru</SelectItem>
-                          <SelectItem value="big-sur">Big Sur Cliffs, CA</SelectItem>
-                          <SelectItem value="antelope-canyon">Antelope Canyon, AZ</SelectItem>
-                          <SelectItem value="joshua-tree">Joshua Tree, CA</SelectItem>
-                          <SelectItem value="custom">Custom Location</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="vibe-check">Current Vibe</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="How are you feeling?" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="peaceful">🕊️ Peaceful & Centered</SelectItem>
-                          <SelectItem value="energized">⚡ Energized & Inspired</SelectItem>
-                          <SelectItem value="contemplative">🤔 Contemplative & Reflective</SelectItem>
-                          <SelectItem value="grateful">🙏 Grateful & Appreciative</SelectItem>
-                          <SelectItem value="curious">🔍 Curious & Open</SelectItem>
-                          <SelectItem value="emotional">💭 Processing Emotions</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="display-name">Display As</Label>
-                      <Select defaultValue="anon">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="anon">🎭 Anonymous</SelectItem>
-                          <SelectItem value="name">👤 Your Name</SelectItem>
-                          <SelectItem value="initials">🏷️ Initials Only</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="check-in-message">Share Your Experience (Optional)</Label>
-                    <Textarea
-                      id="check-in-message"
-                      placeholder="What brought you here? How does this place make you feel? Share your thoughts..."
-                      className="mt-2"
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="flex space-x-3">
-                    <Button className="flex-1 bg-gradient-to-r from-green-600 to-teal-600">
-                      <i className="fas fa-map-pin mr-2"></i>
-                      Check In
-                    </Button>
-                    <Button variant="outline" className="flex-1">
-                      <i className="fas fa-robot mr-2"></i>
-                      Chat with GeoPrompt Bot
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <i className="fas fa-map-marker-alt text-green-600 mr-2"></i>
-                    GeoPrompt - Location-Based Wellness
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Create QR codes for reflective dialogues at meaningful locations
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-4">Global GeoPrompt Locations</h3>
-                    <div className="border rounded-lg overflow-hidden">
-                      <iframe 
-                        src="https://www.google.com/maps/d/u/7/embed?mid=1Mgr3Aml4heEAZTt9C08wLXxNvkpgyhA&ehbc=2E312F&noprof=1" 
-                        width="100%" 
-                        height="480"
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      ></iframe>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center">
-                        <i className="fas fa-qrcode text-blue-500 mr-2"></i>
-                        Create Location Prompts
-                      </h3>
-                      <ul className="text-sm text-gray-600 space-y-2">
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          Generate unique QR codes for locations
-                        </li>
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          AI-guided reflection experiences
-                        </li>
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          Anonymous or authenticated check-ins
-                        </li>
-                      </ul>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center">
-                        <i className="fas fa-users text-purple-500 mr-2"></i>
-                        Location-Based Matching
-                      </h3>
-                      <ul className="text-sm text-gray-600 space-y-2">
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          Connect with others who resonate with locations
-                        </li>
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          VibeMatch integration for meaningful connections
-                        </li>
-                        <li className="flex items-start">
-                          <i className="fas fa-check text-green-500 mr-2 mt-0.5"></i>
-                          Privacy-first location sharing
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <GeoPromptCheckInInterface userId={userId!} />
             </div>
           )}
           
@@ -1231,6 +973,10 @@ export default function DashboardPage() {
           
           {activeView === 'legal' && user && (
             <LegalInterface userId={user.id} />
+          )}
+          
+          {activeView === 'help' && user && (
+            <AIHelpInterface userId={user.id} />
           )}
         </div>
       </div>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface HomeInterfaceProps {
   userId: string;
@@ -16,11 +16,29 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
     company: '',
     message: ''
   });
+  const [bookCoverImage, setBookCoverImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement contact form submission
-    console.log('Contact form submitted:', contactForm);
+    const subject = encodeURIComponent(contactForm.company ? 'Business Inquiry' : 'General Inquiry');
+    const body = encodeURIComponent(`Name: ${contactForm.name}\nEmail: ${contactForm.email}\nCompany: ${contactForm.company || 'N/A'}\n\nMessage:\n${contactForm.message}`);
+    window.location.href = `mailto:lightprompt.co@gmail.com?subject=${subject}&body=${body}`;
+  };
+
+  const handleBookCoverUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setBookCoverImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -64,6 +82,10 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
                 <p className="text-gray-600 mb-4">
                   By Ashley Coston - A transformative guide to navigating the intersection of technology, consciousness, and personal growth in our rapidly evolving world.
                 </p>
+                <p className="text-xs text-purple-600 mb-4 flex items-center">
+                  <i className="fas fa-info-circle mr-2"></i>
+                  Click the book cover to upload your own image
+                </p>
               </div>
               
               <div className="space-y-3">
@@ -102,12 +124,51 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
             
             <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center p-8">
               <div className="flex items-center justify-center">
-                <div className="w-64 h-80 bg-gradient-to-br from-purple-300 to-indigo-300 rounded-lg shadow-2xl flex items-center justify-center">
+                <div className="relative w-64 h-80 bg-gradient-to-br from-purple-300 to-indigo-300 rounded-lg shadow-2xl flex items-center justify-center group cursor-pointer">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const container = e.target.closest('.group');
+                          if (container && event.target?.result) {
+                            const imgElement = document.createElement('img');
+                            imgElement.src = event.target.result as string;
+                            imgElement.className = 'w-full h-full object-cover rounded-lg';
+                            imgElement.alt = 'LightPrompt:ed Book Cover';
+                            container.innerHTML = '';
+                            container.appendChild(imgElement);
+                            
+                            // Add upload overlay
+                            const overlay = document.createElement('div');
+                            overlay.className = 'absolute inset-0 bg-black/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center';
+                            overlay.innerHTML = '<i class="fas fa-upload text-white text-lg"></i>';
+                            container.appendChild(overlay);
+                            
+                            // Re-add file input
+                            const newInput = e.target.cloneNode(true);
+                            container.appendChild(newInput);
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
                   <div className="text-center text-white">
                     <i className="fas fa-book text-6xl mb-4"></i>
                     <h3 className="text-2xl font-bold">LightPrompt:ed</h3>
                     <p className="text-lg">The Human Guide</p>
                     <p className="text-sm">Available Now</p>
+                  </div>
+                  <div className="absolute inset-0 bg-black/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="text-center">
+                      <i className="fas fa-upload text-white text-2xl mb-2"></i>
+                      <p className="text-white text-sm">Click to upload cover</p>
+                    </div>
                   </div>
                 </div>
               </div>
