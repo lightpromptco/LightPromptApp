@@ -825,7 +825,10 @@ export default function DashboardPage() {
                     <i className="fas fa-receipt text-4xl text-gray-300 mb-4"></i>
                     <h3 className="text-lg font-medium text-gray-700 mb-2">No active subscriptions</h3>
                     <p className="text-gray-600 mb-4">You're currently on the free Explorer plan</p>
-                    <Button variant="outline">
+                    <Button 
+                      variant="outline"
+                      onClick={() => window.location.href = '/plans'}
+                    >
                       <i className="fas fa-arrow-down mr-2"></i>
                       View Plans Below
                     </Button>
