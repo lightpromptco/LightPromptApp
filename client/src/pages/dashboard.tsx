@@ -742,11 +742,35 @@ export default function DashboardPage() {
               </div>
               <SettingsInterface userId={userId!} />
               
+              {/* Manage Subscriptions Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-credit-card text-blue-600 mr-2"></i>
+                    Manage Subscriptions
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    View and manage your active subscriptions and billing
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <i className="fas fa-receipt text-4xl text-gray-300 mb-4"></i>
+                    <h3 className="text-lg font-medium text-gray-700 mb-2">No active subscriptions</h3>
+                    <p className="text-gray-600 mb-4">You're currently on the free Explorer plan</p>
+                    <Button variant="outline">
+                      <i className="fas fa-arrow-down mr-2"></i>
+                      View Plans Below
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
               {/* Plans & Features Section */}
               <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-lg p-8">
                   <h3 className="text-xl font-semibold mb-6 flex items-center">
-                    <i className="fas fa-credit-card text-teal-600 mr-2"></i>
+                    <i className="fas fa-star text-teal-600 mr-2"></i>
                     Plans & Features
                   </h3>
                   {user && <PricingInterface user={user} />}
@@ -899,7 +923,7 @@ export default function DashboardPage() {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="location-select">Choose Location</Label>
                       <Select>
@@ -913,6 +937,9 @@ export default function DashboardPage() {
                           <SelectItem value="mount-fuji">Mount Fuji, Japan</SelectItem>
                           <SelectItem value="stonehenge">Stonehenge, UK</SelectItem>
                           <SelectItem value="machu-picchu">Machu Picchu, Peru</SelectItem>
+                          <SelectItem value="big-sur">Big Sur Cliffs, CA</SelectItem>
+                          <SelectItem value="antelope-canyon">Antelope Canyon, AZ</SelectItem>
+                          <SelectItem value="joshua-tree">Joshua Tree, CA</SelectItem>
                           <SelectItem value="custom">Custom Location</SelectItem>
                         </SelectContent>
                       </Select>
@@ -933,7 +960,31 @@ export default function DashboardPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div>
+                      <Label htmlFor="display-name">Display As</Label>
+                      <Select defaultValue="anon">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="anon">🎭 Anonymous</SelectItem>
+                          <SelectItem value="name">👤 Your Name</SelectItem>
+                          <SelectItem value="initials">🏷️ Initials Only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+                  
+                  <div>
+                    <Label htmlFor="check-in-message">Share Your Experience (Optional)</Label>
+                    <Textarea
+                      id="check-in-message"
+                      placeholder="What brought you here? How does this place make you feel? Share your thoughts..."
+                      className="mt-2"
+                      rows={3}
+                    />
+                  </div>
+                  
                   <div className="flex space-x-3">
                     <Button className="flex-1 bg-gradient-to-r from-green-600 to-teal-600">
                       <i className="fas fa-map-pin mr-2"></i>

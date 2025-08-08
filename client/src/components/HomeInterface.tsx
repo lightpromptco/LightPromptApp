@@ -53,6 +53,64 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
         </div>
       </div>
 
+      {/* LightPrompt:ed Book Promotion */}
+      <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200 overflow-hidden">
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 items-center">
+            <div className="p-8 space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">LightPrompt:ed</h2>
+                <p className="text-lg text-purple-600 font-medium mb-4">The Human Guide to AI, Soul, and The Future</p>
+                <p className="text-gray-600 mb-4">
+                  By Ashley Coston - A transformative guide to navigating the intersection of technology, consciousness, and personal growth in our rapidly evolving world.
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 text-sm">
+                  <i className="fas fa-check text-purple-600"></i>
+                  <span>Downloadable PDF format</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm">
+                  <i className="fas fa-robot text-purple-600"></i>
+                  <span>Includes free access to LightPrompt bot</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm">
+                  <i className="fas fa-star text-purple-600"></i>
+                  <span>Essential reading for conscious AI users</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">$11</div>
+                  <div className="text-sm text-gray-600">Instant download</div>
+                </div>
+                <a 
+                  href="https://gumroad.com/l/lightprompted" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg px-6 py-3">
+                    <i className="fas fa-book mr-2"></i>
+                    Get Your Copy
+                  </Button>
+                </a>
+              </div>
+            </div>
+            
+            <div className="h-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center p-8">
+              <img 
+                src="/attached_assets/LightPromptEd (2)_1754618061966.png" 
+                alt="LightPrompt:ed Book Cover" 
+                className="max-w-full h-auto max-h-80 rounded-lg shadow-2xl"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* What is LightPrompt */}
       <Card>
         <CardHeader>
