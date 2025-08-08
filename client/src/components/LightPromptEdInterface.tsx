@@ -385,34 +385,6 @@ export function LightPromptEdInterface({ userId }: LightPromptEdInterfaceProps) 
         </CardContent>
       </Card>
 
-      {/* Community & Support */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <i className="fas fa-users text-teal-600 mr-2"></i>
-            Learning Community
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-gray-600">
-            Connect with fellow learners, share insights, and get support on your soul-tech journey.
-          </p>
-          <div className="flex space-x-3">
-            <Button variant="outline" className="flex-1">
-              <i className="fas fa-comments mr-2"></i>
-              Join Discussions
-            </Button>
-            <Button variant="outline" className="flex-1">
-              <i className="fas fa-calendar-alt mr-2"></i>
-              Live Q&A Sessions
-            </Button>
-            <Button variant="outline" className="flex-1">
-              <i className="fas fa-book mr-2"></i>
-              Resources
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
