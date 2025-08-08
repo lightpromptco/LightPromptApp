@@ -17,6 +17,8 @@ import { VibeMatchInterface } from '@/components/VibeMatchInterface';
 import { EnhancedCheckInForm } from '@/components/EnhancedCheckInForm';
 import { SettingsInterface } from '@/components/SettingsInterface';
 import { PartnerModeInterface } from '@/components/PartnerModeInterface';
+import { BlogInterface } from '@/components/BlogInterface';
+import { PricingInterface } from '@/components/PricingInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -242,7 +244,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-11 gap-1">
             <TabsTrigger value="overview" className="text-xs lg:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="checkin" className="text-xs lg:text-sm">Check-in</TabsTrigger>
             <TabsTrigger value="habits" className="text-xs lg:text-sm">Habits</TabsTrigger>
@@ -250,6 +252,7 @@ export default function DashboardPage() {
             <TabsTrigger value="vibematch" className="text-xs lg:text-sm">VibeMatch</TabsTrigger>
             <TabsTrigger value="partner" className="text-xs lg:text-sm">Partner</TabsTrigger>
             <TabsTrigger value="community" className="text-xs lg:text-sm">Community</TabsTrigger>
+            <TabsTrigger value="blog" className="text-xs lg:text-sm">Blog</TabsTrigger>
             <TabsTrigger value="integrations" className="text-xs lg:text-sm">Devices</TabsTrigger>
             <TabsTrigger value="horoscope" className="text-xs lg:text-sm">Astrology</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs lg:text-sm">Settings</TabsTrigger>
@@ -1138,9 +1141,25 @@ export default function DashboardPage() {
             <PartnerModeInterface userId={userId!} />
           </TabsContent>
 
+          {/* Blog Tab */}
+          <TabsContent value="blog" className="space-y-6">
+            <BlogInterface userId={userId!} />
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
-            <SettingsInterface userId={userId!} />
+            <div className="space-y-8">
+              <SettingsInterface userId={userId!} />
+              
+              {/* Pricing Section */}
+              <div className="border-t pt-8">
+                <h3 className="text-xl font-semibold mb-6 flex items-center">
+                  <i className="fas fa-credit-card text-teal-600 mr-2"></i>
+                  Plans & Features
+                </h3>
+                {user && <PricingInterface user={user} />}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
