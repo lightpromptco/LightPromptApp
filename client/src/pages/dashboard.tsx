@@ -124,11 +124,17 @@ export default function DashboardPage() {
     frequency: 'daily',
     target: 1
   });
-  const userId = localStorage.getItem('lightprompt_user_id');
+  // Get userId from sessionStorage (for regular users) or admin mode
+  const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
+  const regularUserId = sessionStorage.getItem('lightprompt_session_id');
+  const userId = isAdminMode ? '4208c9e4-2a5d-451b-9a54-44f0ab6d7313' : regularUserId;
 
-  // Get user data
+  // Get user data - use email endpoint for admin
   const { data: user } = useQuery<User>({
-    queryKey: ['/api/users', userId],
+    queryKey: isAdminMode ? ['/api/users/email', 'lightprompt.co@gmail.com'] : ['/api/users', userId],
+    queryFn: isAdminMode ? 
+      () => fetch('/api/users/email/lightprompt.co@gmail.com').then(res => res.json()) :
+      undefined,
     enabled: !!userId,
   });
 

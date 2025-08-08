@@ -53,9 +53,19 @@ export default function ChallengesPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Get user from localStorage (you might want to get this from context)
-  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const userId = user.id;
+  // Get userId from sessionStorage (for regular users) or admin mode
+  const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
+  const regularUserId = sessionStorage.getItem('lightprompt_session_id');
+  const userId = isAdminMode ? '4208c9e4-2a5d-451b-9a54-44f0ab6d7313' : regularUserId;
+  
+  // Get user data
+  const { data: user } = useQuery<any>({
+    queryKey: isAdminMode ? ['/api/users/email', 'lightprompt.co@gmail.com'] : ['/api/users', userId],
+    queryFn: isAdminMode ? 
+      () => fetch('/api/users/email/lightprompt.co@gmail.com').then(res => res.json()) :
+      () => fetch(`/api/users/${userId}`).then(res => res.json()),
+    enabled: !!userId,
+  });
 
   // Fetch available challenges
   const { data: challenges = [], isLoading: challengesLoading } = useQuery<Challenge[]>({

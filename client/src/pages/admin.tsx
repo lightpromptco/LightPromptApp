@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [adminData, setAdminData] = useState<any>(null);
   const { toast } = useToast();
 
@@ -32,7 +33,7 @@ export default function AdminPage() {
   };
 
   const handleLogin = async () => {
-    if (email === 'lightprompt.co@gmail.com') {
+    if (email === 'lightprompt.co@gmail.com' && password === 'lightprompt2025') {
       try {
         const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
         if (response.ok) {
@@ -60,7 +61,7 @@ export default function AdminPage() {
     } else {
       toast({
         title: "Access Denied",
-        description: "Only the admin email can access this portal.",
+        description: "Invalid email or password.",
         variant: "destructive",
       });
     }
@@ -71,6 +72,7 @@ export default function AdminPage() {
     setIsLoggedIn(false);
     setAdminData(null);
     setEmail('');
+    setPassword('');
     toast({
       title: "Logged Out",
       description: "Admin session ended.",
@@ -101,6 +103,19 @@ export default function AdminPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter admin email..."
                 className="w-full"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Admin Password
+              </label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter admin password..."
+                className="w-full"
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               />
             </div>
@@ -114,7 +129,8 @@ export default function AdminPage() {
             </Button>
 
             <div className="text-center text-sm text-gray-600">
-              <p>Use: <code className="bg-gray-100 px-2 py-1 rounded text-xs">lightprompt.co@gmail.com</code></p>
+              <p>Email: <code className="bg-gray-100 px-2 py-1 rounded text-xs">lightprompt.co@gmail.com</code></p>
+              <p>Password: <code className="bg-gray-100 px-2 py-1 rounded text-xs">lightprompt2025</code></p>
             </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800">
