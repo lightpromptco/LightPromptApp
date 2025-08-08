@@ -675,6 +675,92 @@ export const partnerConnections = pgTable("partner_connections", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Challenge System
+export const challenges = pgTable("challenges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // daily, weekly, monthly, custom
+  category: text("category").notNull(), // mindfulness, fitness, nutrition, growth, etc
+  duration: integer("duration").notNull(), // days
+  difficulty: text("difficulty").notNull().default("beginner"), // beginner, intermediate, advanced
+  requirements: jsonb("requirements").default({}), // what needs to be done
+  rewards: jsonb("rewards").default({}), // points, badges, unlocks
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  maxParticipants: integer("max_participants"), // null = unlimited
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const challengeParticipants = pgTable("challenge_participants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  challengeId: varchar("challenge_id").notNull().references(() => challenges.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  status: text("status").notNull().default("active"), // active, completed, dropped, failed
+  progress: integer("progress").default(0), // percentage completed
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  completedDays: integer("completed_days").default(0),
+  totalDays: integer("total_days").notNull(),
+  lastActivityAt: timestamp("last_activity_at"),
+  completedAt: timestamp("completed_at"),
+});
+
+export const challengeProgress = pgTable("challenge_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  participantId: varchar("participant_id").notNull().references(() => challengeParticipants.id, { onDelete: "cascade" }),
+  day: integer("day").notNull(), // day number in challenge
+  date: timestamp("date").notNull(),
+  completed: boolean("completed").default(false),
+  notes: text("notes"),
+  metadata: jsonb("metadata").default({}), // extra data like mood, energy, etc
+  submittedAt: timestamp("submitted_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Reward System
+export const rewardDefinitions = pgTable("reward_definitions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // badge, points, unlock, achievement
+  category: text("category").notNull(), // streak, completion, milestone, special
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
+  rarity: text("rarity").notNull().default("common"), // common, rare, epic, legendary
+  requirements: jsonb("requirements").notNull(), // what triggers this reward
+  value: integer("value").default(0), // point value
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const userRewards = pgTable("user_rewards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  rewardId: varchar("reward_id").notNull().references(() => rewardDefinitions.id),
+  source: text("source").notNull(), // challenge, streak, milestone, manual
+  sourceId: varchar("source_id"), // challenge_id, etc
+  earnedAt: timestamp("earned_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const userStats = pgTable("user_stats", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  totalPoints: integer("total_points").default(0),
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  challengesCompleted: integer("challenges_completed").default(0),
+  challengesJoined: integer("challenges_joined").default(0),
+  badgesEarned: integer("badges_earned").default(0),
+  level: integer("level").default(1),
+  experience: integer("experience").default(0),
+  lastActivityAt: timestamp("last_activity_at"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Easter Egg unlock system
 export const easterEggUnlocks = pgTable("easter_egg_unlocks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -746,6 +832,12 @@ export const insertMatchChatSchema = createInsertSchema(matchChats);
 export const insertReflectionPromptSchema = createInsertSchema(reflectionPrompts);
 export const insertChatSafetyLogSchema = createInsertSchema(chatSafetyLogs);
 export const insertPartnerConnectionSchema = createInsertSchema(partnerConnections);
+export const insertChallengeSchema = createInsertSchema(challenges);
+export const insertChallengeParticipantSchema = createInsertSchema(challengeParticipants);
+export const insertChallengeProgressSchema = createInsertSchema(challengeProgress);
+export const insertRewardDefinitionSchema = createInsertSchema(rewardDefinitions);
+export const insertUserRewardSchema = createInsertSchema(userRewards);
+export const insertUserStatsSchema = createInsertSchema(userStats);
 export const insertEasterEggUnlockSchema = createInsertSchema(easterEggUnlocks);
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences);
 
@@ -773,6 +865,18 @@ export type ChatSafetyLog = typeof chatSafetyLogs.$inferSelect;
 export type InsertChatSafetyLog = z.infer<typeof insertChatSafetyLogSchema>;
 export type PartnerConnection = typeof partnerConnections.$inferSelect;
 export type InsertPartnerConnection = z.infer<typeof insertPartnerConnectionSchema>;
+export type Challenge = typeof challenges.$inferSelect;
+export type InsertChallenge = z.infer<typeof insertChallengeSchema>;
+export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
+export type InsertChallengeParticipant = z.infer<typeof insertChallengeParticipantSchema>;
+export type ChallengeProgress = typeof challengeProgress.$inferSelect;
+export type InsertChallengeProgress = z.infer<typeof insertChallengeProgressSchema>;
+export type RewardDefinition = typeof rewardDefinitions.$inferSelect;
+export type InsertRewardDefinition = z.infer<typeof insertRewardDefinitionSchema>;
+export type UserReward = typeof userRewards.$inferSelect;
+export type InsertUserReward = z.infer<typeof insertUserRewardSchema>;
+export type UserStats = typeof userStats.$inferSelect;
+export type InsertUserStats = z.infer<typeof insertUserStatsSchema>;
 export type EasterEggUnlock = typeof easterEggUnlocks.$inferSelect;
 export type InsertEasterEggUnlock = z.infer<typeof insertEasterEggUnlockSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;

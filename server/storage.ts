@@ -9,7 +9,10 @@ import {
   VibeProfile, InsertVibeProfile, VibeMatch, InsertVibeMatch,
   MatchChat, InsertMatchChat, ReflectionPrompt, InsertReflectionPrompt,
   ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint,
-  PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences
+  PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences,
+  Challenge, InsertChallenge, ChallengeParticipant, InsertChallengeParticipant,
+  ChallengeProgress, InsertChallengeProgress, RewardDefinition, InsertRewardDefinition,
+  UserReward, InsertUserReward, UserStats, InsertUserStats
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -125,6 +128,25 @@ export interface IStorage {
   updatePartnerConnection(id: string, updates: Partial<PartnerConnection>): Promise<PartnerConnection>;
   invitePartner(userId: string, email: string, relationshipType: string): Promise<any>;
   
+  // Challenge System
+  getActiveChallenges(): Promise<Challenge[]>;
+  createChallenge(data: InsertChallenge): Promise<Challenge>;
+  getChallengeById(id: string): Promise<Challenge | null>;
+  joinChallenge(challengeId: string, userId: string): Promise<ChallengeParticipant>;
+  updateChallengeProgress(challengeId: string, userId: string, progressData: {
+    day: number;
+    completed: boolean;
+    notes?: string;
+    metadata?: any;
+  }): Promise<ChallengeProgress>;
+  getUserChallenges(userId: string): Promise<(ChallengeParticipant & { challenge: Challenge })[]>;
+  
+  // Reward System
+  getUserStats(userId: string): Promise<UserStats & { rewards: UserReward[] }>;
+  awardReward(userId: string, rewardId: string, source: string, sourceId?: string): Promise<UserReward>;
+  getRewardDefinitions(): Promise<RewardDefinition[]>;
+  updateUserStats(userId: string, updates: Partial<UserStats>): Promise<UserStats>;
+
   // User Preferences
   getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
   createOrUpdateUserPreferences(preferences: Partial<UserPreferences & { userId: string }>): Promise<UserPreferences>;
@@ -137,6 +159,12 @@ export class MemStorage implements IStorage {
   private userProfiles: Map<string, UserProfile> = new Map();
   private accessCodes: Map<string, AccessCode> = new Map();
   private wellnessMetrics: Map<string, WellnessMetric> = new Map();
+  private challenges: Map<string, Challenge> = new Map();
+  private challengeParticipants: Map<string, ChallengeParticipant> = new Map();
+  private challengeProgress: Map<string, ChallengeProgress> = new Map();
+  private rewardDefinitions: Map<string, RewardDefinition> = new Map();
+  private userRewards: Map<string, UserReward> = new Map();
+  private userStats: Map<string, UserStats> = new Map();
   private habits: Map<string, Habit> = new Map();
   private habitEntries: Map<string, HabitEntry> = new Map();
   private appleHealthData: Map<string, AppleHealthData> = new Map();
@@ -158,6 +186,7 @@ export class MemStorage implements IStorage {
   
   constructor() {
     this.initializeReflectionPrompts();
+    this.initializeChallengesAndRewards();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -1218,6 +1247,334 @@ export class MemStorage implements IStorage {
       this.userPreferences.set(id, userPrefs);
       return userPrefs;
     }
+  }
+
+  // Initialize default challenges and rewards
+  private initializeChallengesAndRewards() {
+    // Initialize some default reward definitions
+    const defaultRewards: RewardDefinition[] = [
+      {
+        id: 'streak-7',
+        title: 'Week Warrior',
+        description: 'Complete daily check-ins for 7 days in a row',
+        type: 'badge',
+        criteria: { streakDays: 7 },
+        points: 100,
+        icon: '🔥',
+        rarity: 'common',
+        createdAt: new Date()
+      },
+      {
+        id: 'habits-complete',
+        title: 'Habit Master',
+        description: 'Complete all daily habits',
+        type: 'badge',
+        criteria: { habitsComplete: true },
+        points: 50,
+        icon: '⭐',
+        rarity: 'common',
+        createdAt: new Date()
+      },
+      {
+        id: 'challenge-complete',
+        title: 'Challenge Champion',
+        description: 'Complete your first wellness challenge',
+        type: 'badge',
+        criteria: { challengeComplete: true },
+        points: 200,
+        icon: '🏆',
+        rarity: 'rare',
+        createdAt: new Date()
+      }
+    ];
+
+    defaultRewards.forEach(reward => {
+      this.rewardDefinitions.set(reward.id, reward);
+    });
+
+    // Initialize some default challenges
+    const defaultChallenges: Challenge[] = [
+      {
+        id: 'mindful-week',
+        title: '7 Days of Mindfulness',
+        description: 'Practice mindfulness for 7 consecutive days with daily check-ins and meditation',
+        type: 'daily',
+        category: 'mindfulness',
+        duration: 7,
+        difficulty: 'beginner',
+        isActive: true,
+        participantCount: 42,
+        dailyTasks: [
+          'Complete morning meditation (5+ minutes)',
+          'Log your mood and energy levels',
+          'Practice one mindful moment during the day',
+          'Reflect on your gratitude'
+        ],
+        rewards: {
+          completion: { points: 200, badge: 'challenge-complete' },
+          daily: { points: 20 }
+        },
+        createdAt: new Date(),
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+      },
+      {
+        id: 'energy-boost',
+        title: 'Energy & Vitality Challenge',
+        description: 'Boost your natural energy through movement, nutrition, and sleep optimization',
+        type: 'daily',
+        category: 'fitness',
+        duration: 14,
+        difficulty: 'intermediate',
+        isActive: true,
+        participantCount: 28,
+        dailyTasks: [
+          'Get 20+ minutes of movement',
+          'Drink 8 glasses of water',
+          'Complete sleep tracking',
+          'Eat 2+ servings of vegetables'
+        ],
+        rewards: {
+          completion: { points: 400, badge: 'challenge-complete' },
+          daily: { points: 30 }
+        },
+        createdAt: new Date(),
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      },
+      {
+        id: 'soul-growth',
+        title: 'Soul Growth Journey',
+        description: 'A 21-day transformative journey combining reflection, intention-setting, and spiritual practices',
+        type: 'daily',
+        category: 'growth',
+        duration: 21,
+        difficulty: 'advanced',
+        isActive: true,
+        participantCount: 15,
+        dailyTasks: [
+          'Complete guided soul reflection',
+          'Journal your insights and patterns',
+          'Set daily intention',
+          'Practice gratitude or appreciation'
+        ],
+        rewards: {
+          completion: { points: 600, badge: 'challenge-complete' },
+          daily: { points: 40 }
+        },
+        createdAt: new Date(),
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      }
+    ];
+
+    defaultChallenges.forEach(challenge => {
+      this.challenges.set(challenge.id, challenge);
+    });
+  }
+
+  // Challenge System Implementation
+  async getActiveChallenges(): Promise<Challenge[]> {
+    const now = new Date();
+    return Array.from(this.challenges.values())
+      .filter(challenge => challenge.isActive && (!challenge.endDate || challenge.endDate > now))
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
+  async createChallenge(data: InsertChallenge): Promise<Challenge> {
+    const id = randomUUID();
+    const challenge: Challenge = {
+      ...data,
+      id,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      participantCount: 0,
+      createdAt: new Date()
+    };
+    this.challenges.set(id, challenge);
+    return challenge;
+  }
+
+  async getChallengeById(id: string): Promise<Challenge | null> {
+    return this.challenges.get(id) || null;
+  }
+
+  async joinChallenge(challengeId: string, userId: string): Promise<ChallengeParticipant> {
+    const challenge = this.challenges.get(challengeId);
+    if (!challenge) {
+      throw new Error('Challenge not found');
+    }
+
+    // Check if user already joined
+    const existingParticipant = Array.from(this.challengeParticipants.values())
+      .find(p => p.challengeId === challengeId && p.userId === userId);
+    
+    if (existingParticipant) {
+      return existingParticipant;
+    }
+
+    const id = randomUUID();
+    const participant: ChallengeParticipant = {
+      id,
+      challengeId,
+      userId,
+      status: 'active',
+      progress: 0,
+      completedDays: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastActivity: null,
+      joinedAt: new Date()
+    };
+
+    this.challengeParticipants.set(id, participant);
+    
+    // Increment participant count
+    const updatedChallenge = { ...challenge, participantCount: challenge.participantCount + 1 };
+    this.challenges.set(challengeId, updatedChallenge);
+
+    return participant;
+  }
+
+  async updateChallengeProgress(challengeId: string, userId: string, progressData: {
+    day: number;
+    completed: boolean;
+    notes?: string;
+    metadata?: any;
+  }): Promise<ChallengeProgress> {
+    const participant = Array.from(this.challengeParticipants.values())
+      .find(p => p.challengeId === challengeId && p.userId === userId);
+    
+    if (!participant) {
+      throw new Error('User not participating in this challenge');
+    }
+
+    const id = randomUUID();
+    const progress: ChallengeProgress = {
+      id,
+      challengeId,
+      userId,
+      day: progressData.day,
+      completed: progressData.completed,
+      notes: progressData.notes || null,
+      metadata: progressData.metadata || {},
+      completedAt: progressData.completed ? new Date() : null,
+      createdAt: new Date()
+    };
+
+    this.challengeProgress.set(id, progress);
+
+    // Update participant stats
+    if (progressData.completed) {
+      const updatedParticipant = {
+        ...participant,
+        completedDays: participant.completedDays + 1,
+        progress: Math.min(100, ((participant.completedDays + 1) / 21) * 100), // Assuming 21-day challenges
+        currentStreak: participant.currentStreak + 1,
+        longestStreak: Math.max(participant.longestStreak, participant.currentStreak + 1),
+        lastActivity: new Date()
+      };
+      this.challengeParticipants.set(participant.id, updatedParticipant);
+
+      // Award daily points
+      await this.awardReward(userId, 'daily-progress', 'challenge', challengeId);
+    }
+
+    return progress;
+  }
+
+  async getUserChallenges(userId: string): Promise<(ChallengeParticipant & { challenge: Challenge })[]> {
+    const participants = Array.from(this.challengeParticipants.values())
+      .filter(p => p.userId === userId);
+    
+    const result = [];
+    for (const participant of participants) {
+      const challenge = this.challenges.get(participant.challengeId);
+      if (challenge) {
+        result.push({ ...participant, challenge });
+      }
+    }
+    
+    return result.sort((a, b) => b.joinedAt.getTime() - a.joinedAt.getTime());
+  }
+
+  // Reward System Implementation
+  async getUserStats(userId: string): Promise<UserStats & { rewards: UserReward[] }> {
+    let stats = this.userStats.get(userId);
+    if (!stats) {
+      // Create default stats for new user
+      stats = {
+        id: randomUUID(),
+        userId,
+        totalPoints: 0,
+        level: 1,
+        streakDays: 0,
+        longestStreak: 0,
+        challengesCompleted: 0,
+        habitsCompleted: 0,
+        reflectionsCount: 0,
+        badgesEarned: 0,
+        achievements: [],
+        lastActivity: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.userStats.set(userId, stats);
+    }
+
+    const rewards = Array.from(this.userRewards.values())
+      .filter(r => r.userId === userId);
+    
+    return { ...stats, rewards };
+  }
+
+  async awardReward(userId: string, rewardId: string, source: string, sourceId?: string): Promise<UserReward> {
+    const id = randomUUID();
+    const reward: UserReward = {
+      id,
+      userId,
+      rewardId,
+      source,
+      sourceId: sourceId || null,
+      points: 20, // Default points
+      awardedAt: new Date()
+    };
+
+    // Check if it's a defined reward
+    const rewardDef = this.rewardDefinitions.get(rewardId);
+    if (rewardDef) {
+      reward.points = rewardDef.points;
+    }
+
+    this.userRewards.set(id, reward);
+
+    // Update user stats
+    const stats = await this.getUserStats(userId);
+    const updatedStats = {
+      ...stats,
+      totalPoints: stats.totalPoints + reward.points,
+      level: Math.floor((stats.totalPoints + reward.points) / 1000) + 1, // Level up every 1000 points
+      lastActivity: new Date(),
+      updatedAt: new Date()
+    };
+    this.userStats.set(userId, updatedStats);
+
+    return reward;
+  }
+
+  async getRewardDefinitions(): Promise<RewardDefinition[]> {
+    return Array.from(this.rewardDefinitions.values())
+      .sort((a, b) => a.points - b.points);
+  }
+
+  async updateUserStats(userId: string, updates: Partial<UserStats>): Promise<UserStats> {
+    const stats = await this.getUserStats(userId);
+    const updatedStats = {
+      ...stats,
+      ...updates,
+      updatedAt: new Date()
+    };
+    this.userStats.set(userId, updatedStats);
+    return updatedStats;
   }
 }
 

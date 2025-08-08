@@ -384,6 +384,10 @@ export default function DashboardPage() {
                   <i className="fas fa-chart-line mr-2"></i>
                   Growth Tracking
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/challenges'}>
+                  <i className="fas fa-trophy mr-2"></i>
+                  Challenges & Rewards
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('lightprompted')}>
                   <i className="fas fa-graduation-cap mr-2"></i>
                   LightPrompt:ed Course

@@ -1081,6 +1081,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== CHALLENGE SYSTEM ENDPOINTS =====
+
+  // Get all active challenges
+  app.get('/api/challenges', async (req, res) => {
+    try {
+      const challenges = await storage.getActiveChallenges();
+      res.json(challenges);
+    } catch (error) {
+      console.error('Error fetching challenges:', error);
+      res.status(500).json({ error: 'Failed to fetch challenges' });
+    }
+  });
+
+  // Create new challenge (admin only)
+  app.post('/api/challenges', async (req, res) => {
+    try {
+      const challenge = await storage.createChallenge(req.body);
+      res.status(201).json(challenge);
+    } catch (error) {
+      console.error('Error creating challenge:', error);
+      res.status(500).json({ error: 'Failed to create challenge' });
+    }
+  });
+
+  // Get specific challenge details
+  app.get('/api/challenges/:id', async (req, res) => {
+    try {
+      const challenge = await storage.getChallengeById(req.params.id);
+      if (!challenge) {
+        return res.status(404).json({ error: 'Challenge not found' });
+      }
+      res.json(challenge);
+    } catch (error) {
+      console.error('Error fetching challenge:', error);
+      res.status(500).json({ error: 'Failed to fetch challenge' });
+    }
+  });
+
+  // Join a challenge
+  app.post('/api/challenges/:id/join', async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const participant = await storage.joinChallenge(req.params.id, userId);
+      res.status(201).json(participant);
+    } catch (error) {
+      console.error('Error joining challenge:', error);
+      res.status(500).json({ error: 'Failed to join challenge' });
+    }
+  });
+
+  // Update daily progress
+  app.post('/api/challenges/:id/progress', async (req, res) => {
+    try {
+      const { userId, day, completed, notes, metadata } = req.body;
+      const progress = await storage.updateChallengeProgress(req.params.id, userId, {
+        day,
+        completed,
+        notes,
+        metadata
+      });
+      res.json(progress);
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      res.status(500).json({ error: 'Failed to update progress' });
+    }
+  });
+
+  // Get user's challenges
+  app.get('/api/users/:userId/challenges', async (req, res) => {
+    try {
+      const challenges = await storage.getUserChallenges(req.params.userId);
+      res.json(challenges);
+    } catch (error) {
+      console.error('Error fetching user challenges:', error);
+      res.status(500).json({ error: 'Failed to fetch user challenges' });
+    }
+  });
+
+  // Get user stats and rewards
+  app.get('/api/users/:userId/stats', async (req, res) => {
+    try {
+      const stats = await storage.getUserStats(req.params.userId);
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+      res.status(500).json({ error: 'Failed to fetch user stats' });
+    }
+  });
+
+  // Award manual reward (admin only)
+  app.post('/api/rewards', async (req, res) => {
+    try {
+      const { userId, rewardId, source, sourceId } = req.body;
+      const reward = await storage.awardReward(userId, rewardId, source, sourceId);
+      res.status(201).json(reward);
+    } catch (error) {
+      console.error('Error awarding reward:', error);
+      res.status(500).json({ error: 'Failed to award reward' });
+    }
+  });
+
+  // Get available reward definitions
+  app.get('/api/rewards/definitions', async (req, res) => {
+    try {
+      const rewards = await storage.getRewardDefinitions();
+      res.json(rewards);
+    } catch (error) {
+      console.error('Error fetching reward definitions:', error);
+      res.status(500).json({ error: 'Failed to fetch reward definitions' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
