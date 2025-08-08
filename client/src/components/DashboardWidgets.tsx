@@ -144,12 +144,20 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
               hover:shadow-lg transition-all duration-200
             `}>
               {isEditMode && (
-                <div className="absolute top-2 right-2 z-10">
+                <div className="absolute top-2 right-2 z-50">
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => toggleWidget(widget.id)}
-                    className="h-6 w-6 p-0 bg-white/80 hover:bg-red-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      toggleWidget(widget.id);
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    className="h-6 w-6 p-0 bg-white/90 hover:bg-red-100 shadow-sm border border-gray-200"
                   >
                     <i className="fas fa-times text-red-500 text-xs"></i>
                   </Button>
@@ -509,7 +517,7 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
           </Badge>
         </div>
         <div className="flex items-center space-x-2">
-          <WidgetLibrary onAddWidget={addWidget} currentWidgets={widgets} />
+          {/* <WidgetLibrary onAddWidget={addWidget} currentWidgets={widgets} /> */}
           <Button
             size="sm"
             variant={isEditMode ? "default" : "outline"}

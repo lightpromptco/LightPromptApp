@@ -17,11 +17,115 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
     location: ''
   });
   const [showChart, setShowChart] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [chartData, setChartData] = useState<any>(null);
 
-  const handleGenerateChart = () => {
+  const handleGenerateChart = async () => {
     if (birthData.date && birthData.time && birthData.location) {
-      setShowChart(true);
+      setIsGenerating(true);
+      
+      // Simulate chart generation process
+      try {
+        // Mock API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate personalized chart data based on birth info
+        const generatedChart = {
+          sunSign: getZodiacSign(new Date(birthData.date)),
+          moonSign: getRandomZodiacSign(),
+          risingSign: getRandomZodiacSign(),
+          venusSign: getRandomZodiacSign(),
+          marsSign: getRandomZodiacSign(),
+          birthInfo: { ...birthData },
+          planets: generatePlanetPositions(),
+          houses: generateHousePositions()
+        };
+        
+        setChartData(generatedChart);
+        setShowChart(true);
+      } catch (error) {
+        console.error('Chart generation error:', error);
+      } finally {
+        setIsGenerating(false);
+      }
     }
+  };
+
+  const getZodiacSign = (date: Date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+    if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+    if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+    if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+    if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+    if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+    if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+    if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+    if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+    if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
+    if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+    return 'Pisces';
+  };
+
+  const getRandomZodiacSign = () => {
+    const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 
+                   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    return signs[Math.floor(Math.random() * signs.length)];
+  };
+
+  const generatePlanetPositions = () => {
+    const planets = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+    return planets.map(planet => ({
+      name: planet,
+      sign: getRandomZodiacSign(),
+      degree: Math.floor(Math.random() * 30) + 1
+    }));
+  };
+
+  const generateHousePositions = () => {
+    return Array.from({length: 12}, (_, i) => ({
+      house: i + 1,
+      sign: getRandomZodiacSign(),
+      planets: []
+    }));
+  };
+
+  const getSunSignWellnessTip = (sign: string) => {
+    const tips: Record<string, string> = {
+      'Aries': 'thrive on high-energy workouts and competitive activities. Your wellness routine benefits from dynamic movement and challenges.',
+      'Taurus': 'appreciate steady, grounding practices. Yoga, massage, and nature walks help you feel centered and strong.',
+      'Gemini': 'enjoy variety in your wellness routine. Mix up your activities to keep your curious mind engaged.',
+      'Cancer': 'benefit from nurturing, water-based activities. Swimming, gentle yoga, and cozy self-care rituals soothe your soul.',
+      'Leo': 'thrive on creative expression and recognition. Your wellness routine benefits from playful, heart-centered activities that make you feel radiant.',
+      'Virgo': 'excel with structured, detail-oriented wellness plans. Precision in diet and exercise helps you feel your best.',
+      'Libra': 'flourish with beautiful, harmonious wellness practices. Partner workouts and aesthetic environments inspire you.',
+      'Scorpio': 'need intense, transformative practices. Deep yoga, martial arts, and meditation help you channel your powerful energy.',
+      'Sagittarius': 'love adventurous, exploratory wellness activities. Hiking, travel fitness, and outdoor sports feed your spirit.',
+      'Capricorn': 'prefer traditional, goal-oriented wellness routines. Structured programs and measurable results motivate you.',
+      'Aquarius': 'enjoy innovative, unique wellness approaches. Technology-assisted fitness and group activities energize you.',
+      'Pisces': 'benefit from intuitive, flowing practices. Water activities, meditation, and artistic expression heal your sensitive nature.'
+    };
+    return tips[sign] || 'have unique wellness needs that benefit from mindful, personalized approaches.';
+  };
+
+  const getMoonSignWellnessTip = (sign: string) => {
+    const tips: Record<string, string> = {
+      'Aries': 'quick, energetic emotional releases. Short bursts of intense activity help you process feelings.',
+      'Taurus': 'slow, steady emotional grounding. Consistent routines and sensory pleasures soothe your feelings.',
+      'Gemini': 'varied emotional outlets. Journaling, talking, and changing activities help you process emotions.',
+      'Cancer': 'deep emotional nurturing. Water, comfort foods, and family time help you feel emotionally secure.',
+      'Leo': 'dramatic, creative emotional expression. Performance, art, and recognition help you process feelings.',
+      'Virgo': 'organized emotional processing. Lists, analysis, and practical solutions help you work through feelings.',
+      'Libra': 'balanced, harmonious emotional states. Beauty, partnership, and peaceful environments soothe you.',
+      'Scorpio': 'intense, transformative emotional work. Deep therapy, meditation, and shadow work help you heal.',
+      'Sagittarius': 'expansive emotional exploration. Travel, learning, and philosophical discussions lift your spirits.',
+      'Capricorn': 'structured emotional discipline. Goals, achievements, and traditional approaches help you feel stable.',
+      'Aquarius': 'innovative emotional detachment. Unique perspectives and group activities help you process feelings.',
+      'Pisces': 'deep emotional sensitivity. Water-based activities, meditation, and artistic expression help you process feelings and find inner peace.'
+    };
+    return tips[sign] || 'unique emotional needs that benefit from personalized, intuitive approaches.';
   };
 
   return (
@@ -84,11 +188,20 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                 </div>
                 <Button 
                   onClick={handleGenerateChart}
-                  disabled={!birthData.date || !birthData.time || !birthData.location}
+                  disabled={!birthData.date || !birthData.time || !birthData.location || isGenerating}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
                 >
-                  <i className="fas fa-star mr-2"></i>
-                  Generate Birth Chart
+                  {isGenerating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                      Generating Chart...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-star mr-2"></i>
+                      Generate Birth Chart
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -97,10 +210,25 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
               {/* Birth Chart Visualization */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Your Birth Chart</CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Born {birthData.date} at {birthData.time} in {birthData.location}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Your Birth Chart</CardTitle>
+                      <p className="text-sm text-gray-600">
+                        Born {new Date(birthData.date).toLocaleDateString()} at {birthData.time} in {birthData.location}
+                      </p>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => {
+                        setShowChart(false);
+                        setChartData(null);
+                      }}
+                    >
+                      <i className="fas fa-edit mr-2"></i>
+                      New Chart
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="relative w-80 h-80 mx-auto bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 rounded-full flex items-center justify-center">
@@ -143,22 +271,22 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                   <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div className="space-y-1">
                       <div className="text-2xl">☉</div>
-                      <div className="text-sm font-medium">Sun in Leo</div>
+                      <div className="text-sm font-medium">Sun in {chartData?.sunSign || 'Leo'}</div>
                       <div className="text-xs text-gray-600">Core Self</div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-2xl">☽</div>
-                      <div className="text-sm font-medium">Moon in Pisces</div>
+                      <div className="text-sm font-medium">Moon in {chartData?.moonSign || 'Pisces'}</div>
                       <div className="text-xs text-gray-600">Emotions</div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-2xl">↗</div>
-                      <div className="text-sm font-medium">Rising Gemini</div>
+                      <div className="text-sm font-medium">Rising {chartData?.risingSign || 'Gemini'}</div>
                       <div className="text-xs text-gray-600">First Impression</div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-2xl">♀</div>
-                      <div className="text-sm font-medium">Venus in Cancer</div>
+                      <div className="text-sm font-medium">Venus in {chartData?.venusSign || 'Cancer'}</div>
                       <div className="text-xs text-gray-600">Love Style</div>
                     </div>
                   </div>
@@ -181,8 +309,7 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                         Solar Wellness Path
                       </h4>
                       <p className="text-sm text-gray-700">
-                        With your Sun in Leo, you thrive on creative expression and recognition. 
-                        Your wellness routine benefits from playful, heart-centered activities that make you feel radiant.
+                        With your Sun in {chartData?.sunSign || 'Leo'}, you {getSunSignWellnessTip(chartData?.sunSign || 'Leo')}
                       </p>
                     </div>
                     
@@ -192,8 +319,7 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
                         Emotional Wellness Style
                       </h4>
                       <p className="text-sm text-gray-700">
-                        Your Pisces Moon suggests deep emotional sensitivity. Water-based activities, 
-                        meditation, and artistic expression help you process feelings and find inner peace.
+                        Your {chartData?.moonSign || 'Pisces'} Moon suggests {getMoonSignWellnessTip(chartData?.moonSign || 'Pisces')}
                       </p>
                     </div>
                   </div>
