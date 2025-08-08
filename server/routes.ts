@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
-import { generateBirthChart } from "./astrology";
+import { generateBirthChart } from "./astrology.js";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
@@ -292,18 +292,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Birth Chart Generation
   app.post("/api/birth-chart", async (req, res) => {
     try {
-      const { day, month, year, hour, min, lat, lon, tzone } = req.body;
+      console.log('🔮 Birth chart request received:', req.body);
+      const { day, month, year, hour, min, lat, lng, lon, tzone } = req.body;
+      
+      // Accept both lng and lon for longitude
+      const longitude = lng || lon;
       
       // Validate required fields
-      if (!day || !month || !year || !hour || min === undefined || !lat || !lon) {
+      if (!day || !month || !year || !hour || min === undefined || !lat || !longitude) {
+        console.log('❌ Validation failed - missing fields:', { day, month, year, hour, min, lat, longitude });
         return res.status(400).json({ 
-          error: "Missing required fields: day, month, year, hour, min, lat, lon" 
+          error: "Missing required fields: day, month, year, hour, min, lat, lon/lng" 
         });
       }
       
       // Generate birth chart using astronomical calculations
       const birthChart = await generateBirthChart({
-        day, month, year, hour, min, lat, lon, tzone: tzone || 0
+        day, month, year, hour, min, lat, lon: longitude, tzone: tzone || 0
       });
       
       res.json(birthChart);

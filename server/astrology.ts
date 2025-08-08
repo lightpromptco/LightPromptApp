@@ -285,8 +285,8 @@ export async function generateBirthChart(birthData: BirthData): Promise<BirthCha
   
   // Calculate Moon sign (approximate based on lunar cycle)
   const lunarMonth = ((jd - 2451550.1) / 29.53) % 12; // Approximate lunar cycles since new moon
-  const moonSignIndex = Math.floor(lunarMonth);
-  const moonSign = zodiacSigns[moonSignIndex % 12].name;
+  const moonSignIndex = Math.abs(Math.floor(lunarMonth)) % 12;
+  const moonSign = zodiacSigns[moonSignIndex].name;
   
   // Calculate Rising sign (Ascendant)
   const risingSign = calculateAscendant(jd, birthData.lat, birthData.lon);
