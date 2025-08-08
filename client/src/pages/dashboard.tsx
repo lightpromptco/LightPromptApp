@@ -141,6 +141,7 @@ export default function DashboardPage() {
       return response.json();
     },
     enabled: !!userId,
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
   });
 
   // Daily check-in mutation

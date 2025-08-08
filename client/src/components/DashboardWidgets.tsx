@@ -476,7 +476,7 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
           <Button 
             size="sm" 
             className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-            onClick={() => window.open('https://gumroad.com/l/lightprompted', '_blank')}
+            onClick={() => window.open('https://lightprompt.gumroad.com/l/xrpvr', '_blank')}
           >
             <i className="fas fa-shopping-cart mr-1"></i>
             Buy Now
