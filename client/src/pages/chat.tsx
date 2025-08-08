@@ -8,6 +8,7 @@ import { UsageWarning } from '@/components/UsageWarning';
 import { useCircadian } from '@/hooks/useCircadian';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { LoginModal } from '@/components/LoginModal';
 import { Link } from 'wouter';
 
 export default function ChatPage() {
@@ -20,6 +21,7 @@ export default function ChatPage() {
   const [isAdmin, setIsAdmin] = useState(() => {
     return localStorage.getItem('lightprompt-admin-mode') === 'true';
   });
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -102,29 +104,10 @@ export default function ChatPage() {
         }
       }
 
-      // Create new user if none exists (and not admin mode)
+      // Show login modal if no user exists (and not admin mode)
       if (!user && !isAdminMode) {
-        const response = await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: `user_${Date.now()}@lightprompt.com`,
-            name: `User ${Math.floor(Math.random() * 1000)}`,
-          }),
-        });
-
-        if (response.ok) {
-          user = await response.json();
-          if (user) {
-            // Store in session storage (temporary session)
-            sessionStorage.setItem('lightprompt_session_id', user.id);
-            console.log('✅ New user session created:', user?.name);
-            toast({
-              title: "Welcome to LightPrompt!",
-              description: "Your data will be stored securely in the cloud. Session is temporary unless you create an account.",
-            });
-          }
-        }
+        setShowLoginModal(true);
+        return; // Don't set user yet, wait for login
       }
 
       setCurrentUser(user);
@@ -244,24 +227,63 @@ export default function ChatPage() {
     }
   }, [currentUser, lastUsageCheck, validateSession]);
 
+  const handleLogin = (user: User) => {
+    setCurrentUser(user);
+    sessionStorage.setItem('lightprompt_session_id', user.id);
+    setShowLoginModal(false);
+    toast({
+      title: "Welcome!",
+      description: `Signed in as ${user.name}`,
+    });
+  };
+
+  const handleGuestMode = async () => {
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: `guest_${Date.now()}@lightprompt.com`,
+          name: `Guest ${Math.floor(Math.random() * 1000)}`,
+        }),
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        if (user) {
+          sessionStorage.setItem('lightprompt_session_id', user.id);
+          setCurrentUser(user);
+          setShowLoginModal(false);
+          toast({
+            title: "Guest Mode Activated",
+            description: "Your session is temporary. Create an account to save your progress.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create guest user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start guest session. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleLogout = () => {
     console.log('👋 User logging out');
     setCurrentUser(null);
     setCurrentSession(null);
     setSessionValidated(false);
+    setShowLoginModal(true);
     
     // Clear session storage but keep admin mode setting
     sessionStorage.removeItem('lightprompt_session_id');
     
     toast({
       title: "Logged out",
-      description: "Your session data has been cleared. A new session will be created automatically.",
+      description: "Sign in again to continue your wellness journey.",
     });
-
-    // The app will reinitialize a new user automatically
-    setTimeout(() => {
-      initializeUser();
-    }, 100);
   };
 
   const handleCreateSession = async (botId: string): Promise<ChatSession> => {
@@ -335,6 +357,26 @@ export default function ChatPage() {
           <i className="fas fa-sun hidden dark:block text-sm"></i>
         </Button>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+      />
+
+      {/* Guest Mode Button - Show when no user and not in admin mode */}
+      {!currentUser && !isAdmin && !showLoginModal && (
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+          <Button
+            onClick={handleGuestMode}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
+          >
+            <i className="fas fa-user-friends mr-2"></i>
+            Continue as Guest
+          </Button>
+        </div>
+      )}
     </>
   );
 }
