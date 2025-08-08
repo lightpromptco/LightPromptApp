@@ -13,7 +13,8 @@ import {
   WellnessCircle, InsertWellnessCircle, CircleMember, InsertCircleMember,
   CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
   HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
-  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock
+  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock,
+  GeoPromptCheckIn, InsertGeoPromptCheckIn
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { 
@@ -210,6 +211,10 @@ export interface IStorage {
   createContentBlock(block: InsertContentBlock): Promise<ContentBlock>;
   updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock>;
   deleteContentBlock(id: string): Promise<void>;
+
+  // GeoPrompt Check-ins
+  createGeoPromptCheckIn(checkIn: InsertGeoPromptCheckIn): Promise<GeoPromptCheckIn>;
+  getGeoPromptCheckInsByUser(userId: string): Promise<GeoPromptCheckIn[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -253,6 +258,7 @@ export class MemStorage implements IStorage {
   private habitCheckIns: Map<string, HabitCheckIn> = new Map();
   private adminSettings: Map<string, AdminSetting> = new Map();
   private contentBlocks: Map<string, ContentBlock> = new Map();
+  private geoPromptCheckIns: Map<string, GeoPromptCheckIn> = new Map();
   
   constructor() {
     this.initializeReflectionPrompts();

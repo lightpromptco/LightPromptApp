@@ -943,6 +943,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GeoPrompt Check-ins API endpoints
+  app.post('/api/geoprompt-checkins', async (req, res) => {
+    try {
+      const checkInData = req.body;
+      
+      // Validate required fields
+      if (!checkInData.userId || !checkInData.location || !checkInData.vibe || !checkInData.reflection) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: userId, location, vibe, reflection' 
+        });
+      }
+
+      const checkIn = await storage.createGeoPromptCheckIn(checkInData);
+      
+      res.status(201).json({ 
+        success: true, 
+        checkIn,
+        message: 'Check-in saved successfully!' 
+      });
+    } catch (error) {
+      console.error('GeoPrompt check-in error:', error);
+      res.status(500).json({ error: 'Failed to save check-in' });
+    }
+  });
+
+  app.get('/api/geoprompt-checkins/user/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const checkIns = await storage.getGeoPromptCheckInsByUser(userId);
+      
+      res.json({ checkIns });
+    } catch (error) {
+      console.error('Get GeoPrompt check-ins error:', error);
+      res.status(500).json({ error: 'Failed to get check-ins' });
+    }
+  });
+
   // Partner Connection routes
   app.get("/api/partner-connections/:userId", async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, jsonb, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, jsonb, boolean, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -871,6 +871,26 @@ export const habitCheckIns = pgTable("habit_check_ins", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// GeoPrompt Check-ins Table
+export const geoPromptCheckIns = pgTable("geoprompt_check_ins", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  location: text("location").notNull(),
+  customLocation: text("custom_location"),
+  mapAddress: text("map_address"),
+  mapLat: real("map_lat"),
+  mapLng: real("map_lng"),
+  mapPlaceId: text("map_place_id"),
+  vibe: text("vibe").notNull(),
+  displayName: text("display_name").default('anonymous'),
+  customName: text("custom_name"),
+  customInitials: text("custom_initials"),
+  reflection: text("reflection").notNull(),
+  sharePublicly: boolean("share_publicly").default(false),
+  logoPhotos: jsonb("logo_photos").default([]),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Admin & Content Management Tables
 export const adminSettings = pgTable("admin_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -974,6 +994,9 @@ export const insertCircleActivitySchema = createInsertSchema(circleActivities);
 export const insertHabitProgramSchema = createInsertSchema(habitPrograms);
 export const insertHabitEnrollmentSchema = createInsertSchema(habitEnrollments);
 export const insertHabitCheckInSchema = createInsertSchema(habitCheckIns);
+
+// GeoPrompt Check-ins Schema
+export const insertGeoPromptCheckInSchema = createInsertSchema(geoPromptCheckIns);
 
 // Admin & Content Schemas
 export const insertAdminSettingSchema = createInsertSchema(adminSettings);

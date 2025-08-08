@@ -65,11 +65,39 @@ export function GeoPromptCheckInInterface({ userId }: GeoPromptCheckInInterfaceP
     setIsSubmitting(true);
     
     try {
-      // TODO: Implement API call to save GeoPrompt check-in
-      console.log('GeoPrompt Check-in Data:', checkInData);
+      // Prepare check-in data for API
+      const checkInPayload = {
+        userId: checkInData.userId || userId,
+        location: checkInData.location,
+        customLocation: checkInData.customLocation,
+        mapAddress: checkInData.mapLocation?.address,
+        mapLat: checkInData.mapLocation?.lat,
+        mapLng: checkInData.mapLocation?.lng,
+        mapPlaceId: checkInData.mapLocation?.placeId,
+        vibe: checkInData.vibe,
+        displayName: checkInData.displayName,
+        customName: checkInData.customName,
+        customInitials: checkInData.customInitials,
+        reflection: checkInData.reflection,
+        sharePublicly: checkInData.sharePublicly,
+        logoPhotos: [] // Will be implemented later for file uploads
+      };
+
+      const response = await fetch('/api/geoprompt-checkins', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(checkInPayload),
+      });
+
+      const result = await response.json();
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save check-in');
+      }
+
+      console.log('✅ Check-in saved successfully:', result);
       
       // Reset form
       checkInData.logoPhotoPreviewUrls.forEach(url => URL.revokeObjectURL(url));

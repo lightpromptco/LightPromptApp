@@ -13,7 +13,8 @@ import {
   WellnessCircle, InsertWellnessCircle, CircleMember, InsertCircleMember,
   CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
   HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
-  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock
+  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock,
+  GeoPromptCheckIn, InsertGeoPromptCheckIn
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import {
@@ -1247,5 +1248,28 @@ export class SupabaseStorage implements IStorage {
     }
     
     return unlockedRewards;
+  }
+
+  // GeoPrompt Check-ins
+  async createGeoPromptCheckIn(checkIn: InsertGeoPromptCheckIn): Promise<GeoPromptCheckIn> {
+    const { data, error } = await supabase
+      .from('geoprompt_check_ins')
+      .insert(checkIn)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async getGeoPromptCheckInsByUser(userId: string): Promise<GeoPromptCheckIn[]> {
+    const { data, error } = await supabase
+      .from('geoprompt_check_ins')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
   }
 }
