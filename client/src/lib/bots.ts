@@ -67,7 +67,7 @@ export const BOTS: Bot[] = [
     description: "Your dedicated learning companion for the LightPrompt:Ed course. Guides you through reflective prompts, helps integrate module insights, and supports your conscious AI journey.",
     icon: "fas fa-graduation-cap",
     gradient: "bg-gradient-to-br from-amber-400 to-orange-500",
-    tier: "Free",
+    tier: "Course",
     available: true,
   },
 ];

@@ -27,9 +27,17 @@ export function BottomNavigation({
   const [showUpgradeModal, setShowUpgradeModal] = useState<Bot | null>(null);
 
   const canAccessBot = (bot: Bot) => {
-    // All bots are now free within token limits
     if (!user) return false;
-    return true; // All bots accessible within token limits
+    
+    // Course tier requires special access code
+    if (bot.tier === 'Course') {
+      // Check if user has course access (you'll need to implement this check)
+      // For now, return false to require access code
+      return false;
+    }
+    
+    // All other bots are free within token limits
+    return true;
   };
 
   const handleBotSelect = (bot: Bot) => {

@@ -303,8 +303,6 @@ export default function DashboardPage() {
       case 'blog': return 'Blog & Insights';
       case 'about': return 'About';
       case 'contact': return 'Contact';
-      case 'privacy': return 'Privacy';
-      case 'legal': return 'Legal';
       case 'help': return 'AI Help & Support';
       case 'integrations': return 'Device Integrations';
       case 'settings': return 'Settings';
@@ -423,14 +421,6 @@ export default function DashboardPage() {
                 <DropdownMenuItem onClick={() => setActiveView('contact')}>
                   <i className="fas fa-envelope mr-2"></i>
                   Contact
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('privacy')}>
-                  <i className="fas fa-shield-alt mr-2"></i>
-                  Privacy
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('legal')}>
-                  <i className="fas fa-gavel mr-2"></i>
-                  Legal
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setActiveView('help')}>
                   <i className="fas fa-question-circle mr-2"></i>
@@ -995,13 +985,6 @@ export default function DashboardPage() {
             <ContactInterface userId={user.id} />
           )}
           
-          {activeView === 'privacy' && user && (
-            <PrivacyInterface userId={user.id} />
-          )}
-          
-          {activeView === 'legal' && user && (
-            <LegalInterface userId={user.id} />
-          )}
           
           {activeView === 'help' && user && (
             <AIHelpInterface userId={user.id} />

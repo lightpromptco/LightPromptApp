@@ -62,11 +62,13 @@ export function AIHelpInterface({ userId }: AIHelpInterfaceProps) {
       </div>
 
       <Tabs defaultValue="quick-help" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="quick-help">Quick Help</TabsTrigger>
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="ai-chat">AI Assistant</TabsTrigger>
-          <TabsTrigger value="contact">Contact Support</TabsTrigger>
+          <TabsTrigger value="contact">Support</TabsTrigger>
+          <TabsTrigger value="privacy">Privacy</TabsTrigger>
+          <TabsTrigger value="legal">Legal</TabsTrigger>
         </TabsList>
 
         {/* Quick Help Tab */}
@@ -502,6 +504,168 @@ export function AIHelpInterface({ userId }: AIHelpInterfaceProps) {
                       <Badge variant="outline">&lt; 48 hours</Badge>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Privacy Tab */}
+        <TabsContent value="privacy" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <i className="fas fa-shield-alt text-blue-500 mr-2"></i>
+                Privacy Policy
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Last updated: January 2025
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="prose prose-sm max-w-none">
+                <h3 className="text-lg font-semibold mb-3">Our Commitment to Your Privacy</h3>
+                <p className="mb-4 text-gray-700">
+                  At LightPrompt, we believe that privacy is fundamental to authentic self-reflection and growth. 
+                  Your wellness journey is deeply personal, and we are committed to protecting your data with the highest standards of care and security.
+                </p>
+
+                <h3 className="text-lg font-semibold mb-3">What Information We Collect</h3>
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-medium mb-1">Account Information</h4>
+                    <p className="text-gray-600 text-sm">Email address, name, and account preferences you provide when creating your account.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Wellness Data</h4>
+                    <p className="text-gray-600 text-sm">Mood tracking, habit entries, check-ins, and AI conversation data you choose to share with our platform.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Usage Information</h4>
+                    <p className="text-gray-600 text-sm">How you interact with our platform to improve your experience and our services.</p>
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-semibold mb-3 mt-6">How We Use Your Information</h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li>• Provide personalized AI responses and wellness insights</li>
+                  <li>• Track your progress and patterns over time</li>
+                  <li>• Improve our AI models and platform features</li>
+                  <li>• Send you important updates about your account</li>
+                  <li>• Provide customer support when you need it</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold mb-3 mt-6">What We DON'T Do</h3>
+                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                  <ul className="space-y-1 text-gray-700 text-sm">
+                    <li>• <strong>We never sell your personal data</strong></li>
+                    <li>• <strong>We don't share your wellness data with third parties</strong></li>
+                    <li>• <strong>We don't use your data for advertising</strong></li>
+                    <li>• <strong>We don't track you across other websites</strong></li>
+                  </ul>
+                </div>
+
+                <h3 className="text-lg font-semibold mb-3 mt-6">Your Rights</h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li>• <strong>Access:</strong> Request a copy of your data at any time</li>
+                  <li>• <strong>Deletion:</strong> Delete your account and all associated data</li>
+                  <li>• <strong>Portability:</strong> Export your wellness data in a readable format</li>
+                  <li>• <strong>Correction:</strong> Update or correct any inaccurate information</li>
+                </ul>
+
+                <div className="bg-teal-50 p-3 rounded-lg border border-teal-200 mt-6">
+                  <p className="text-sm text-gray-700">
+                    <strong>Philosophy:</strong> We believe that true wellness requires trust. That's why we're committed to transparency 
+                    about how we collect, use, and protect your data. Your growth journey is yours alone.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Legal Tab */}
+        <TabsContent value="legal" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <i className="fas fa-gavel text-purple-500 mr-2"></i>
+                  Terms of Service
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2">1. Acceptance of Terms</h4>
+                  <p className="text-gray-600 text-sm">
+                    By using LightPrompt, you agree to these terms. If you don't agree, please don't use our service.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">2. Description of Service</h4>
+                  <p className="text-gray-600 text-sm">
+                    LightPrompt provides AI-powered wellness tools for personal reflection, growth tracking, and authentic connection.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">3. User Responsibilities</h4>
+                  <ul className="text-gray-600 text-sm space-y-1">
+                    <li>• Use the service for personal growth and wellness</li>
+                    <li>• Don't share harmful, illegal, or inappropriate content</li>
+                    <li>• Respect other users in community features</li>
+                    <li>• Keep your account information secure</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">4. Limitation of Liability</h4>
+                  <p className="text-gray-600 text-sm">
+                    LightPrompt is a wellness tool, not medical advice. For serious mental health concerns, 
+                    please consult qualified professionals.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <i className="fas fa-copyright text-indigo-500 mr-2"></i>
+                  Copyright & Licensing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2">Platform Copyright</h4>
+                  <p className="text-gray-600 text-sm">
+                    © 2025 LightPrompt. All rights reserved. The LightPrompt platform, AI models, and user interface 
+                    are proprietary technology protected by copyright law.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Your Content</h4>
+                  <p className="text-gray-600 text-sm">
+                    You retain ownership of your wellness data, conversations, and personal content. 
+                    We only use it to provide our services to you.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">AI Training</h4>
+                  <p className="text-gray-600 text-sm">
+                    Our AI models are trained on publicly available text and proprietary datasets. 
+                    Individual user data is not used for training without explicit consent.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Contact for Legal Issues</h4>
+                  <p className="text-gray-600 text-sm">
+                    Email: <a href="mailto:lightprompt.co@gmail.com" className="text-teal-600 hover:underline">lightprompt.co@gmail.com</a>
+                  </p>
                 </div>
               </CardContent>
             </Card>
