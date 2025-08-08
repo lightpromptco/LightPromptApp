@@ -199,9 +199,18 @@ export default function DashboardPage() {
                 Back to Chat
               </Button>
             </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Wellness Dashboard</h1>
-              <p className="text-sm text-gray-600">Track your patterns, habits, and wellness journey</p>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                <img 
+                  src="/attached_assets/LightPrompt Logo with Electric Neon Colors (5)_1754613275736.png" 
+                  alt="LightPrompt"
+                  className="w-8 h-8 object-contain filter invert"
+                />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">LightPrompt Dashboard</h1>
+                <p className="text-sm text-gray-600">Track your soul-tech wellness journey</p>
+              </div>
             </div>
           </div>
           

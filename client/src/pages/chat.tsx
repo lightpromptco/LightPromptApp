@@ -265,6 +265,20 @@ export default function ChatPage() {
         />
       </div>
 
+      {/* LightPrompt Logo */}
+      <div className="fixed top-6 left-6 z-50">
+        <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg border border-white/20">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+            <img 
+              src="/attached_assets/LightPrompt Logo with Electric Neon Colors (5)_1754613275736.png" 
+              alt="LightPrompt"
+              className="w-6 h-6 object-contain filter invert"
+            />
+          </div>
+          <span className="text-sm font-semibold text-gray-800">LightPrompt</span>
+        </div>
+      </div>
+
       {/* Navigation & Controls */}
       <div className="fixed top-6 right-6 z-50 flex items-center space-x-3">
         {/* Dashboard Link */}
