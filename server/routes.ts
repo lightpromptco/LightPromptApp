@@ -630,6 +630,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Challenge API endpoints
+  
+  // Get all available challenges
+  app.get("/api/challenges", async (req, res) => {
+    try {
+      const challenges = await storage.getChallenges();
+      res.json(challenges);
+    } catch (error) {
+      console.error("Error getting challenges:", error);
+      res.status(500).json({ error: "Failed to get challenges" });
+    }
+  });
+  
+  // Join a challenge
+  app.post("/api/challenges/:challengeId/join", async (req, res) => {
+    try {
+      const { challengeId } = req.params;
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+      
+      const userChallenge = await storage.joinChallenge(userId, challengeId);
+      res.json(userChallenge);
+    } catch (error: any) {
+      console.error("Error joining challenge:", error);
+      res.status(500).json({ error: error.message || "Failed to join challenge" });
+    }
+  });
+  
+  // Update challenge progress
+  app.post("/api/challenges/:challengeId/progress", async (req, res) => {
+    try {
+      const { challengeId } = req.params;
+      const { userId, day, completed, notes } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+      
+      await storage.updateChallengeProgress(challengeId, userId, day, completed, notes);
+      
+      // Award points for completing daily tasks
+      if (completed) {
+        await storage.awardPoints(userId, 10, "daily_task", challengeId, `Completed day ${day}`);
+      }
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error updating challenge progress:", error);
+      res.status(500).json({ error: error.message || "Failed to update progress" });
+    }
+  });
+  
+  // Get user's challenges
+  app.get("/api/users/:userId/challenges", async (req, res) => {
+    try {
+      const userChallenges = await storage.getUserChallenges(req.params.userId);
+      res.json(userChallenges);
+    } catch (error) {
+      console.error("Error getting user challenges:", error);
+      res.status(500).json({ error: "Failed to get user challenges" });
+    }
+  });
+  
+  // Get user stats (points, level, streaks)
+  app.get("/api/users/:userId/stats", async (req, res) => {
+    try {
+      const stats = await storage.getUserStats(req.params.userId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting user stats:", error);
+      res.status(500).json({ error: "Failed to get user stats" });
+    }
+  });
+
   // Serve private objects
   app.get("/objects/:objectPath(*)", async (req, res) => {
     const objectStorageService = new ObjectStorageService();

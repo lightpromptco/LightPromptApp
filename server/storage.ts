@@ -10,9 +10,6 @@ import {
   MatchChat, InsertMatchChat, ReflectionPrompt, InsertReflectionPrompt,
   ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint,
   PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences,
-  Challenge, InsertChallenge, ChallengeParticipant, InsertChallengeParticipant,
-  ChallengeProgress, InsertChallengeProgress, RewardDefinition, InsertRewardDefinition,
-  UserReward, InsertUserReward, UserStats, InsertUserStats,
   WellnessCircle, InsertWellnessCircle, CircleMember, InsertCircleMember,
   CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
   HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
@@ -98,6 +95,16 @@ export interface IStorage {
 
   // Recommendations
   getRecommendations(userId: string, limit?: number): Promise<Recommendation[]>;
+  
+  // Challenges
+  getChallenges(): Promise<Challenge[]>;
+  getChallenge(id: string): Promise<Challenge | undefined>;
+  createChallenge(challenge: InsertChallenge): Promise<Challenge>;
+  joinChallenge(userId: string, challengeId: string): Promise<any>;
+  getUserChallenges(userId: string): Promise<any[]>;
+  updateChallengeProgress(challengeId: string, userId: string, day: number, completed: boolean, notes?: string): Promise<void>;
+  getUserStats(userId: string): Promise<any>;
+  awardPoints(userId: string, points: number, source: string, sourceId?: string, description?: string): Promise<void>;
   createRecommendation(recommendation: InsertRecommendation): Promise<Recommendation>;
   updateRecommendation(id: string, updates: Partial<Recommendation>): Promise<Recommendation>;
   generateRecommendations(userId: string): Promise<Recommendation[]>;
