@@ -16,6 +16,7 @@ import type { User, WellnessMetric, Habit, HabitEntry, WellnessPattern, Recommen
 import { VibeMatchInterface } from '@/components/VibeMatchInterface';
 import { EnhancedCheckInForm } from '@/components/EnhancedCheckInForm';
 import { SettingsInterface } from '@/components/SettingsInterface';
+import { PartnerModeInterface } from '@/components/PartnerModeInterface';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -1013,6 +1014,16 @@ export default function DashboardPage() {
                 <VibeMatchInterface userId={userId!} />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Partner Mode Tab */}
+          <TabsContent value="partner" className="space-y-6">
+            <PartnerModeInterface userId={userId!} />
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <SettingsInterface userId={userId!} />
           </TabsContent>
         </Tabs>
       </div>

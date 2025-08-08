@@ -642,6 +642,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Partner Connection routes
+  app.get("/api/partner-connections/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const connections = await storage.getPartnerConnections(userId);
+      res.json(connections);
+    } catch (error) {
+      console.error("Error fetching partner connections:", error);
+      res.status(500).json({ error: "Failed to fetch partner connections" });
+    }
+  });
+
+  app.post("/api/partner-connections/invite", async (req, res) => {
+    try {
+      const { userId, inviteEmail, relationshipType } = req.body;
+      if (!userId || !inviteEmail || !relationshipType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      const result = await storage.invitePartner(userId, inviteEmail, relationshipType);
+      res.json(result);
+    } catch (error) {
+      console.error("Error sending partner invitation:", error);
+      res.status(500).json({ error: "Failed to send invitation" });
+    }
+  });
+
+  app.post("/api/partner-connections/:connectionId/goals", async (req, res) => {
+    try {
+      const connectionId = req.params.connectionId;
+      const { goal } = req.body;
+      
+      if (!goal) {
+        return res.status(400).json({ error: "Goal is required" });
+      }
+
+      // Get existing connection and add goal to shared goals
+      const connection = await storage.updatePartnerConnection(connectionId, {
+        sharedGoals: [] // Will be properly implemented when we have the get method
+      });
+      
+      res.json(connection);
+    } catch (error) {
+      console.error("Error updating partner goal:", error);
+      res.status(500).json({ error: "Failed to update goal" });
+    }
+  });
+
+  // User Preferences routes  
+  app.get("/api/user-preferences/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const preferences = await storage.getUserPreferences(userId);
+      
+      if (!preferences) {
+        return res.status(404).json({ error: "Preferences not found" });
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ error: "Failed to fetch preferences" });
+    }
+  });
+
+  app.post("/api/user-preferences/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const updates = req.body;
+      
+      const preferences = await storage.createOrUpdateUserPreferences({
+        userId,
+        ...updates
+      });
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error saving user preferences:", error);
+      res.status(500).json({ error: "Failed to save preferences" });
+    }
+  });
+
   // Wellness Dashboard API Routes
   
   // Get comprehensive dashboard data

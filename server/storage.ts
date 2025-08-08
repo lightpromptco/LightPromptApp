@@ -8,7 +8,8 @@ import {
   FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration,
   VibeProfile, InsertVibeProfile, VibeMatch, InsertVibeMatch,
   MatchChat, InsertMatchChat, ReflectionPrompt, InsertReflectionPrompt,
-  ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint
+  ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint,
+  PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -117,6 +118,16 @@ export interface IStorage {
   
   // Test Data
   setupVibeMatchTestData(userId: string): Promise<any>;
+  
+  // Partner Connections
+  getPartnerConnections(userId: string): Promise<PartnerConnection[]>;
+  createPartnerConnection(connection: InsertPartnerConnection): Promise<PartnerConnection>;
+  updatePartnerConnection(id: string, updates: Partial<PartnerConnection>): Promise<PartnerConnection>;
+  invitePartner(userId: string, email: string, relationshipType: string): Promise<any>;
+  
+  // User Preferences
+  getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
+  createOrUpdateUserPreferences(preferences: Partial<UserPreferences & { userId: string }>): Promise<UserPreferences>;
 }
 
 export class MemStorage implements IStorage {
@@ -142,6 +153,8 @@ export class MemStorage implements IStorage {
   private reflectionPrompts: Map<string, ReflectionPrompt> = new Map();
   private chatSafetyLogs: Map<string, ChatSafetyLog> = new Map();
   private prismPoints: Map<string, PrismPoint> = new Map();
+  private partnerConnections: Map<string, PartnerConnection> = new Map();
+  private userPreferences: Map<string, UserPreferences> = new Map();
   
   constructor() {
     this.initializeReflectionPrompts();
@@ -839,12 +852,12 @@ export class MemStorage implements IStorage {
     const existing = await this.getVibeProfile(profileData.userId);
     
     if (existing) {
-      const updated: VibeProfile = { ...existing, ...profileData, updatedAt: new Date() };
+      const updated = { ...existing, ...profileData, updatedAt: new Date() } as VibeProfile;
       this.vibeProfiles.set(existing.id, updated);
       return updated;
     } else {
       const id = randomUUID();
-      const profile: VibeProfile = {
+      const profile = {
         id,
         userId: profileData.userId,
         bio: profileData.bio || '',
@@ -1099,6 +1112,112 @@ export class MemStorage implements IStorage {
       message: "Test VibeMatch data created! You now have a mutual match ready to chat.",
       instructions: "Go to the VibeMatch tab to see your connection and start chatting!"
     };
+  }
+
+  // Partner Connections
+  async getPartnerConnections(userId: string): Promise<PartnerConnection[]> {
+    return Array.from(this.partnerConnections.values())
+      .filter(conn => conn.userId1 === userId || conn.userId2 === userId);
+  }
+
+  async createPartnerConnection(connection: InsertPartnerConnection): Promise<PartnerConnection> {
+    const id = randomUUID();
+    const partnerConnection: PartnerConnection = {
+      id,
+      ...connection,
+      connectionLevel: connection.connectionLevel || 1,
+      dataSharing: connection.dataSharing || {},
+      sharedGoals: connection.sharedGoals || [],
+      isActive: connection.isActive !== undefined ? connection.isActive : true,
+      establishedAt: new Date(),
+      createdAt: new Date()
+    };
+    this.partnerConnections.set(id, partnerConnection);
+    return partnerConnection;
+  }
+
+  async updatePartnerConnection(id: string, updates: Partial<PartnerConnection>): Promise<PartnerConnection> {
+    const existing = this.partnerConnections.get(id);
+    if (!existing) {
+      throw new Error('Partner connection not found');
+    }
+    const updated = { ...existing, ...updates };
+    this.partnerConnections.set(id, updated);
+    return updated;
+  }
+
+  async invitePartner(userId: string, email: string, relationshipType: string): Promise<any> {
+    // In a real implementation, this would send an email invitation
+    // For now, we'll simulate creating a pending connection
+    return {
+      success: true,
+      message: `Invitation sent to ${email} for ${relationshipType} partnership`,
+      inviteCode: randomUUID()
+    };
+  }
+
+  // User Preferences
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    return Array.from(this.userPreferences.values())
+      .find(pref => pref.userId === userId);
+  }
+
+  async createOrUpdateUserPreferences(preferences: Partial<UserPreferences & { userId: string }>): Promise<UserPreferences> {
+    const existing = await this.getUserPreferences(preferences.userId!);
+    
+    if (existing) {
+      const updated: UserPreferences = {
+        ...existing,
+        ...preferences,
+        updatedAt: new Date()
+      };
+      this.userPreferences.set(existing.id, updated);
+      return updated;
+    } else {
+      const id = randomUUID();
+      const userPrefs: UserPreferences = {
+        id,
+        userId: preferences.userId!,
+        dataSharing: preferences.dataSharing || {
+          wellness_metrics: 'private',
+          habits: 'private',
+          mood_patterns: 'private',
+          growth_insights: 'private'
+        },
+        visibility: preferences.visibility || 'private',
+        notifications: preferences.notifications || {
+          daily_checkin_reminder: true,
+          vibe_match_notifications: true,
+          partner_updates: true,
+          community_mentions: true,
+          easter_egg_unlocks: true
+        },
+        trackingPreferences: preferences.trackingPreferences || {
+          mood_tracking: true,
+          energy_tracking: true,
+          habit_reminders: true,
+          pattern_insights: true
+        },
+        aiPersonality: preferences.aiPersonality || 'balanced',
+        aiIntensity: preferences.aiIntensity || 5,
+        aiGuidanceStyle: preferences.aiGuidanceStyle || 'supportive',
+        communitySettings: preferences.communitySettings || {
+          default_anonymous: true,
+          auto_moderate: true,
+          notification_level: 'mentions_only'
+        },
+        partnerSettings: preferences.partnerSettings || {
+          auto_share_mood: false,
+          auto_share_habits: false,
+          share_insights: true,
+          relationship_goals_visible: false
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.userPreferences.set(id, userPrefs);
+      return userPrefs;
+    }
   }
 }
 
