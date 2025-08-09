@@ -1007,6 +1007,8 @@ export type Organization = typeof organizations.$inferSelect;
 export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
 export type OrganizationMember = typeof organizationMembers.$inferSelect;
 export type InsertOrganizationMember = z.infer<typeof insertOrganizationMemberSchema>;
+
+
 export type OrganizationInsight = typeof organizationInsights.$inferSelect;
 export type UserAuth = typeof userAuth.$inferSelect;
 export type VerificationCode = typeof verificationCodes.$inferSelect;

@@ -26,6 +26,7 @@ import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
 import WooWooPage from "@/pages/woo-woo";
 import VisionQuestPage from "@/pages/vision-quest";
+import ContentManagement from "@/pages/admin/content";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -131,6 +132,11 @@ function Router() {
       <Route path="/vision-quest" component={() => (
         <MainLayout>
           <VisionQuestPage />
+        </MainLayout>
+      )} />
+      <Route path="/admin/content" component={() => (
+        <MainLayout>
+          <ContentManagement />
         </MainLayout>
       )} />
       <Route component={NotFound} />

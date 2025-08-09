@@ -2,16 +2,19 @@
 
 ## Overview
 
-LightPrompt is a privacy-first, multi-bot AI platform for soul-tech wellness. The application provides users with AI companions for emotional reflection, body awareness, and spiritual growth through conversational interfaces. The core platform features a main reflection bot (LightPromptBot) with additional specialized bots for wellness tracking, progress visualization, and inner training exercises.
+LightPrompt is a privacy-first, soul-tech wellness platform that has evolved into a streamlined digital product business. Originally designed as a multi-bot AI platform for emotional reflection and spiritual growth, it now focuses on selling the LightPrompt:ed course and ebook through a clean, professional e-commerce interface.
 
-The application is built as a full-stack TypeScript application with a React frontend and Express backend, designed to provide real-time emotional tone analysis, voice interactions, and personalized AI responses based on user sentiment and conversation patterns.
+The application is built as a full-stack TypeScript application with a React frontend and Express backend, featuring Stripe integration for secure payments, content management capabilities, and Google Maps integration for location-based mindfulness features (GeoPrompt).
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
-Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic.
+Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic, Stripe-style navigation.
 Content personality: Alan Watts meets Yuval Noah Harari meets Ologies podcast host - witty, philosophical, accessible science.
 Core philosophy: AI as conscious tool for human reflection and self-connection - never AI becoming human. AI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection.
+Navigation: Clean "Store" section only, hates "Products" terminology, prefers professional simplicity.
+Pricing: Course $120, Ebook $11, Bundle $125 (saves $99) - no "WooWoo" terminology, now called "CosmosBot" and "Soul Map & Cosmos".
+Domain transition: Moving to lightprompt.co as main landing page.
 
 ## System Architecture
 
@@ -48,11 +51,22 @@ Core philosophy: AI as conscious tool for human reflection and self-connection -
 
 ### External Dependencies
 
-- **Database**: Neon Database (PostgreSQL) via `@neondatabase/serverless` for production data storage
+- **Database**: Supabase (PostgreSQL) for production data storage (currently experiencing connection timeouts)
+- **Payments**: Stripe integration for secure course and ebook sales
 - **AI Services**: OpenAI API for language model completions, audio transcription, and speech synthesis
+- **Maps**: Google Maps API for GeoPrompt location-based features
 - **Cloud Storage**: Google Cloud Storage for file uploads and object management with ACL policies
 - **File Upload**: Uppy.js for drag-and-drop file upload interfaces with progress tracking
 - **UI Framework**: Radix UI component library for accessible, unstyled UI primitives
 - **Development Tools**: Replit-specific plugins for development environment integration and error handling
 
-The architecture emphasizes modularity and type safety throughout the stack, with shared TypeScript schemas ensuring consistency between frontend and backend. The design supports real-time interactions while maintaining clean separation between data persistence, business logic, and presentation layers.
+## Recent Changes (August 2025)
+
+- **Product-Centered Approach**: Simplified navigation to focus on selling LightPrompt:ed course and ebook
+- **Content Management System**: Added admin panel at `/admin/content` for editing pages, images, and fonts
+- **Google Maps Integration**: Created new GoogleMap component for GeoPrompt functionality
+- **Database Issues**: Experiencing ETIMEDOUT errors preventing schema migrations (using in-memory storage as fallback)
+- **Clean Navigation**: Removed confusing terminology, implemented Stripe-style professional design
+- **Pricing Structure**: Finalized Course $120, Ebook $11, Bundle $125 pricing
+
+The architecture emphasizes e-commerce functionality and content management while maintaining the original wellness-focused features. Database connection issues are being worked around with in-memory storage solutions.

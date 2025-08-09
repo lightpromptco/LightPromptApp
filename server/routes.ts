@@ -13,6 +13,7 @@ import {
 import multer from "multer";
 import { z } from "zod";
 import Stripe from "stripe";
+import { registerContentRoutes } from "./routes/content";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -52,6 +53,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('❌ Failed to create admin user:', error);
     }
   })();
+  
+  // Register content management routes
+  registerContentRoutes(app);
   
   // Soul Map routes
   app.get("/api/soul-map/:userId", async (req, res) => {
