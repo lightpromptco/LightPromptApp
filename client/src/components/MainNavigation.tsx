@@ -16,13 +16,18 @@ import {
   Sparkles,
   Settings,
   UserPlus,
-  User
+  User,
+  Moon,
+  Stars,
+  Compass
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
   { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview" },
+  { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
+  { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
   { path: "/geoprompt", label: "GeoPrompt", icon: MapPin, description: "Location-based Reflections" },

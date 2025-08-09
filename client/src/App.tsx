@@ -23,6 +23,8 @@ import BookPage from "@/pages/book";
 import CoursePage from "@/pages/course";
 import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
+import WooWooPage from "@/pages/woo-woo";
+import VisionQuestPage from "@/pages/vision-quest";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -113,6 +115,16 @@ function Router() {
       <Route path="/settings" component={() => (
         <MainLayout>
           <SettingsPage />
+        </MainLayout>
+      )} />
+      <Route path="/woo-woo" component={() => (
+        <MainLayout>
+          <WooWooPage />
+        </MainLayout>
+      )} />
+      <Route path="/vision-quest" component={() => (
+        <MainLayout>
+          <VisionQuestPage />
         </MainLayout>
       )} />
       <Route component={NotFound} />

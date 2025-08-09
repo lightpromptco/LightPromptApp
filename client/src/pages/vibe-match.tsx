@@ -76,28 +76,31 @@ export default function VibeMatchPage() {
     queryKey: ['/api/users/email/lightprompt.co@gmail.com'],
   });
 
+  // Mock user for development if none found
+  const currentUser = user || { id: 'mock-user-id', email: 'lightprompt.co@gmail.com', tier: 'premium' };
+
   // Get user's vibe profile
   const { data: userVibeProfile } = useQuery({
-    queryKey: ['/api/vibe-profile', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['/api/vibe-profile', currentUser?.id],
+    enabled: !!currentUser?.id,
   });
 
   // Get potential matches
   const { data: potentialMatches = [] } = useQuery({
-    queryKey: ['/api/vibe-matches/potential', user?.id],
-    enabled: !!user?.id && !!userVibeProfile?.profileComplete,
+    queryKey: ['/api/vibe-matches/potential', currentUser?.id],
+    enabled: !!currentUser?.id && !!userVibeProfile?.profileComplete,
   });
 
   // Get current matches
   const { data: currentMatches = [] } = useQuery({
-    queryKey: ['/api/vibe-matches/current', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['/api/vibe-matches/current', currentUser?.id],
+    enabled: !!currentUser?.id,
   });
 
   // Get prism points
   const { data: prismPoints = [] } = useQuery({
-    queryKey: ['/api/prism-points', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['/api/prism-points', currentUser?.id],
+    enabled: !!currentUser?.id,
   });
 
   // Create/update vibe profile mutation
@@ -105,7 +108,7 @@ export default function VibeMatchPage() {
     mutationFn: async (profileData: any) => {
       return apiRequest("POST", "/api/vibe-profile", {
         ...profileData,
-        userId: user?.id
+        userId: currentUser?.id
       });
     },
     onSuccess: () => {
@@ -122,7 +125,7 @@ export default function VibeMatchPage() {
   const matchActionMutation = useMutation({
     mutationFn: async ({ matchUserId, action }: { matchUserId: string; action: 'like' | 'pass' }) => {
       return apiRequest("POST", "/api/vibe-matches/action", {
-        userId: user?.id,
+        userId: currentUser?.id,
         matchUserId,
         action
       });
@@ -563,222 +566,6 @@ export default function VibeMatchPage() {
 
                 {/* Connection Type */}
                 <div>
-                  <h3 className="font-medium mb-2">Seeking</h3>
-                  <Badge className="bg-gradient-to-r from-pink-500 to-purple-600">
-                    {CONNECTION_TYPES.find(t => t.id === currentMatch.profile.seekingConnection)?.label}
-                  </Badge>
-                </div>
-
-                {/* Distance */}
-                {currentMatch.distance && (
-                  <div>
-                    <h3 className="font-medium mb-2">Distance</h3>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {currentMatch.distance}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-6">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="flex-1 border-red-200 hover:bg-red-50 hover:border-red-300"
-                  onClick={() => handleMatchAction('pass')}
-                  disabled={matchActionMutation.isPending}
-                >
-                  <X className="h-5 w-5 mr-2 text-red-500" />
-                  Pass
-                </Button>
-                <Button
-                  size="lg"
-                  className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                  onClick={() => handleMatchAction('like')}
-                  disabled={matchActionMutation.isPending}
-                >
-                  <Heart className="h-5 w-5 mr-2" />
-                  Resonate
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="w-full h-[600px] flex items-center justify-center">
-            <CardContent className="text-center">
-              <Compass className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-xl font-semibold mb-2">No More Souls To Discover</h2>
-              <p className="text-muted-foreground mb-4">
-                Check back later for new potential connections
-              </p>
-              <Button onClick={() => setCurrentView('matches')}>
-                View Your Matches
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  }
-
-  // Active matches view
-  if (currentView === 'matches') {
-    return (
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Your Resonance Connections</h1>
-            <p className="text-muted-foreground">
-              {currentMatches.length} active soul connections
-            </p>
-          </div>
-          <Button 
-            variant="outline"
-            onClick={() => setCurrentView('discovery')}
-          >
-            <Compass className="h-4 w-4 mr-2" />
-            Discover More
-          </Button>
-        </div>
-
-        {currentMatches.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Heart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-xl font-semibold mb-2">No Matches Yet</h2>
-              <p className="text-muted-foreground mb-6">
-                Keep exploring to find your soul resonances
-              </p>
-              <Button onClick={() => setCurrentView('discovery')}>
-                Start Discovering
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentMatches.map((match) => (
-              <Card key={match.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center mb-3">
-                      <Heart className="h-8 w-8 text-white" />
-                    </div>
-                    <Badge variant="secondary">
-                      {match.matchScore}% resonance
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      Soul connection established through energetic alignment...
-                    </p>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">
-                        {Math.floor(Math.random() * 7) + 1} days ago
-                      </span>
-                      <Button size="sm" variant="outline">
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        Chat
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // PrismPoint unlocks view
-  if (currentView === 'prism') {
-    return (
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">PrismPoint Moments</h1>
-            <p className="text-muted-foreground">
-              The consensual reveal - where soul connections become visible
-            </p>
-          </div>
-          <Button 
-            variant="outline"
-            onClick={() => setCurrentView('discovery')}
-          >
-            <Compass className="h-4 w-4 mr-2" />
-            Back to Discovery
-          </Button>
-        </div>
-
-        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
-          <CardContent className="p-8 text-center">
-            <Lock className="h-16 w-16 mx-auto mb-4 text-purple-500" />
-            <h2 className="text-2xl font-semibold mb-4">The Anti-Swipe Moment</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              In most apps, the face comes first. In VibeMatch, the face is the reward for showing up with your truth.
-              PrismPoint is the moment when both people consent to reveal more - you can choose how you want to connect.
-            </p>
-          </CardContent>
-        </Card>
-
-        {prismPoints.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Unlock className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-xl font-semibold mb-2">No PrismPoints Yet</h2>
-              <p className="text-muted-foreground">
-                Build deeper connections first, then unlock the moment of revelation
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {prismPoints.map((point) => (
-              <Card key={point.id}>
-                <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center mb-3">
-                      {point.unlocked ? <Unlock className="h-8 w-8 text-white" /> : <Lock className="h-8 w-8 text-white" />}
-                    </div>
-                    <Badge variant={point.unlocked ? "default" : "secondary"}>
-                      {point.unlocked ? "Unlocked" : "Pending Consent"}
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm text-center">
-                      {point.unlocked 
-                        ? "Both souls have consented to reveal deeper connection details"
-                        : "Waiting for mutual consent to unlock PrismPoint"}
-                    </p>
-                    
-                    {point.unlocked ? (
-                      <Button className="w-full">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Connection
-                      </Button>
-                    ) : (
-                      <Button variant="outline" className="w-full" disabled>
-                        <EyeOff className="h-4 w-4 mr-2" />
-                        Awaiting Consent
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return null;
-}
                   <h3 className="font-medium mb-2">Seeking</h3>
                   <Badge className="bg-gradient-to-r from-pink-500 to-purple-600">
                     {CONNECTION_TYPES.find(t => t.id === currentMatch.profile.seekingConnection)?.label}
