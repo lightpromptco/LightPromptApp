@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Check if we have Supabase configuration
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || "https://oupmelrulhnbaojpgugs.supabase.co";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91cG1lbHJ1bGhuYmFvanBndWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3Nzc5MTEsImV4cCI6MjA2NjM1MzkxMX0.Zr3X1hhsgp2dKznyJd0R1rVfragHGZRnH3ZYHad_Lhs";
 
 let supabaseClient;
 
