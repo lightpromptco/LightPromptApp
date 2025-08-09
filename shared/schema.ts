@@ -240,10 +240,22 @@ export const astrologyProfiles = pgTable("astrology_profiles", {
   birthDate: timestamp("birth_date").notNull(),
   birthTime: text("birth_time"), // "14:30" format
   birthLocation: text("birth_location").notNull(), // "New York, NY, USA"
+  latitude: text("latitude"),
+  longitude: text("longitude"),
+  timezone: text("timezone"),
   sunSign: text("sun_sign").notNull(),
   moonSign: text("moon_sign"),
   risingSign: text("rising_sign"),
   birthChart: jsonb("birth_chart").default({}), // full astrological chart data
+  planetaryPositions: jsonb("planetary_positions").default({}),
+  houses: jsonb("houses").default({}),
+  aspects: jsonb("aspects").default({}),
+  report: text("report"),
+  insights: jsonb("insights").default({}),
+  moonPhase: text("moon_phase"),
+  schumannResonance: jsonb("schumann_resonance").default({}),
+  personalityProfile: jsonb("personality_profile").default({}),
+  lifePathGuidance: text("life_path_guidance"),
   personalityTraits: jsonb("personality_traits").default({}), // AI-generated insights
   currentTransits: jsonb("current_transits").default({}), // active planetary influences
   lastUpdated: timestamp("last_updated").notNull().defaultNow(),

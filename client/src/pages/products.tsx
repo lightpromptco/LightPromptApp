@@ -273,7 +273,9 @@ export default function ProductsPage() {
                     id: 'bundle',
                     title: 'LightPrompt Complete Package - Course + Book',
                     price: 125,
-                    originalPrice: 224
+                    originalPrice: 224,
+                    description: 'Complete course and ebook bundle',
+                    type: 'bundle'
                   } as any)}
                   disabled={loadingProduct === 'bundle'}
                 >

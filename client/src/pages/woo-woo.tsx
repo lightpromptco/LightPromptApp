@@ -153,11 +153,10 @@ export default function WooWooPage() {
             <Stars className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Soul Map
+            Soul Map Navigator
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover your cosmic blueprint through birth chart analysis and deep personality insights. 
-            Understand your shadows, gifts, and potentials when you're ready.
+            Comprehensive astrology system with birth charts, moon cycles, planetary positions, Schumann resonance data, and AI-powered personality insights for deep self-understanding.
           </p>
         </div>
 
@@ -165,22 +164,34 @@ export default function WooWooPage() {
           <Card className="border-purple-200 dark:border-purple-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Moon className="h-5 w-5 text-purple-500" />
-                Birth Chart Analysis
+                <Stars className="h-5 w-5 text-purple-500" />
+                Complete Astrology System
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Your birth chart reveals the cosmic energies present at your moment of arrival. 
-                We'll analyze planetary positions, house placements, and aspect patterns to 
-                uncover your soul's blueprint.
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li>• Sun, Moon & Rising sign influences</li>
-                <li>• Planetary house positions</li>
-                <li>• Major aspect patterns</li>
-                <li>• Elemental balance analysis</li>
-              </ul>
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Generate comprehensive birth charts with full planetary positions, houses, aspects, moon phases, and Earth's electromagnetic field data.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <Sun className="h-6 w-6 mx-auto mb-1 text-yellow-500" />
+                    <span className="text-sm font-medium">Birth Charts</span>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <Moon className="h-6 w-6 mx-auto mb-1 text-blue-500" />
+                    <span className="text-sm font-medium">Moon Cycles</span>
+                  </div>
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <Sparkles className="h-6 w-6 mx-auto mb-1 text-green-500" />
+                    <span className="text-sm font-medium">Star Placements</span>
+                  </div>
+                  <div className="text-center p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
+                    <Waves className="h-6 w-6 mx-auto mb-1 text-teal-500" />
+                    <span className="text-sm font-medium">Schumann Resonance</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -188,20 +199,33 @@ export default function WooWooPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5 text-blue-500" />
-                Personality Deep Dive
+                AI-Powered Insights
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Beyond the stars, we explore your unique psychological patterns, 
-                emotional landscape, and the beautiful shadows that hold your greatest gifts.
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li>• Core essence & motivations</li>
-                <li>• Emotional processing patterns</li>
-                <li>• Shadow work opportunities</li>
-                <li>• Life purpose indicators</li>
-              </ul>
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Combine astrological data with AI analysis to generate personalized insights, life path guidance, and deep personality understanding.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <Brain className="h-6 w-6 mx-auto mb-1 text-blue-500" />
+                    <span className="text-sm font-medium">AI Analysis</span>
+                  </div>
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <Heart className="h-6 w-6 mx-auto mb-1 text-purple-500" />
+                    <span className="text-sm font-medium">Life Path</span>
+                  </div>
+                  <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <Eye className="h-6 w-6 mx-auto mb-1 text-orange-500" />
+                    <span className="text-sm font-medium">Shadow Work</span>
+                  </div>
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <Compass className="h-6 w-6 mx-auto mb-1 text-green-500" />
+                    <span className="text-sm font-medium">Guidance</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -127,76 +127,87 @@ export default function VisionQuestPage() {
   if (currentView === 'intro') {
     return (
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        <div className="text-center space-y-4">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-orange-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-            <Compass className="h-10 w-10 text-white" />
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-500 to-purple-500 rounded-2xl flex items-center justify-center">
+            <Compass className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
-            Vision Quest
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A guided spiritual journey to discover your authentic purpose, 
-            connect with your inner wisdom, and integrate your gifts into the world.
-          </p>
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Vision Quest
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed">
+              A modern approach to self-discovery through conscious AI reflection and personalized guidance
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="border-orange-200 dark:border-orange-800">
+        <div className="grid lg:grid-cols-2 gap-8">
+          <Card className="hover:shadow-lg transition-all duration-300">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mountain className="h-5 w-5 text-orange-500" />
-                The Hero's Journey
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <Mountain className="h-6 w-6 text-teal-600" />
+                Four-Stage Journey
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Follow the ancient pattern of departure, initiation, revelation, and return. 
-                Each stage offers guided practices, reflections, and AI support to help you 
-                navigate your inner landscape.
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                A structured path of self-discovery using AI-guided reflections and modern wisdom practices.
               </p>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {QUEST_STAGES.map((stage, index) => (
-                  <div key={stage.id} className="flex items-center gap-2 text-sm">
-                    <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${stage.color}`}></div>
-                    <span>{stage.name}</span>
+                  <div key={stage.id} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stage.color} flex items-center justify-center flex-shrink-0`}>
+                      <stage.icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">{stage.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{stage.description}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-purple-200 dark:border-purple-800">
+          <Card className="hover:shadow-lg transition-all duration-300">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-500" />
-                Integration with Soul Map
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <Sparkles className="h-6 w-6 text-purple-600" />
+                Enhanced with Soul Map
               </CardTitle>
             </CardHeader>
             <CardContent>
               {soulMap ? (
-                <div>
-                  <p className="text-green-600 dark:text-green-400 font-medium mb-2">
-                    Your Soul Map is ready for integration!
-                  </p>
-                  <p className="text-muted-foreground mb-4">
-                    Your Vision Quest will be personalized based on your birth chart analysis 
-                    and personality insights, creating a deeply customized spiritual journey.
-                  </p>
-                  <Badge variant="outline" className="mb-2">Soul Map Available</Badge>
+                <div className="space-y-4">
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="font-medium text-green-700 dark:text-green-400">Soul Map Connected</span>
+                    </div>
+                    <p className="text-sm text-green-600 dark:text-green-400">
+                      Your journey will be personalized with astrological insights and birth chart guidance
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Personalized Features:</h4>
+                    <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                      <li>• Birth chart-aligned reflections</li>
+                      <li>• Current planetary transit insights</li>
+                      <li>• Personalized affirmations</li>
+                    </ul>
+                  </div>
                 </div>
               ) : (
-                <div>
-                  <p className="text-muted-foreground mb-4">
-                    Consider creating your Soul Map first for a more personalized Vision Quest experience. 
-                    The cosmic insights will enhance your journey with astrological guidance and 
-                    birth chart wisdom.
+                <div className="space-y-4">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Connect your Soul Map for a personalized experience with astrological insights and birth chart wisdom.
                   </p>
                   <Button 
                     variant="outline" 
-                    size="sm"
                     onClick={() => window.location.href = '/woo-woo'}
+                    className="w-full"
                   >
-                    Create Soul Map First
+                    Create Soul Map
                   </Button>
                 </div>
               )}
@@ -204,42 +215,29 @@ export default function VisionQuestPage() {
           </Card>
         </div>
 
-        <Card className="border-blue-200 dark:border-blue-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-blue-500" />
-              What to Expect
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium mb-2">Gentle Guidance</h4>
-                <p className="text-sm text-muted-foreground">
-                  No forcing or pushing. We honor your readiness and pace, 
-                  offering wisdom only when you're open to receive it.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">AI Companions</h4>
-                <p className="text-sm text-muted-foreground">
-                  Specialized AI guides for each stage, offering reflections, 
-                  practices, and insights tailored to your journey.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Shadow Integration</h4>
-                <p className="text-sm text-muted-foreground">
-                  Safely explore your shadows with compassionate guidance, 
-                  discovering the gifts hidden in your challenges.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Practical Application</h4>
-                <p className="text-sm text-muted-foreground">
-                  Bring your insights into daily life with actionable practices 
-                  and community support for lasting transformation.
-                </p>
+        <Card className="bg-gradient-to-r from-gray-50 to-teal-50 dark:from-gray-800 dark:to-teal-900/20 border-teal-200">
+          <CardContent className="py-8">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-semibold">Modern Self-Discovery</h3>
+              <p className="text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+                This isn't about ancient mysticism or outdated practices. It's a structured approach to understanding yourself using AI-guided reflection and evidence-based insights.
+              </p>
+              <div className="grid md:grid-cols-3 gap-4 mt-6">
+                <div className="text-center">
+                  <Brain className="h-8 w-8 mx-auto mb-2 text-teal-600" />
+                  <h4 className="font-medium">AI Guidance</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Thoughtful prompts and reflections</p>
+                </div>
+                <div className="text-center">
+                  <Heart className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                  <h4 className="font-medium">Personal Insights</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Discover patterns and strengths</p>
+                </div>
+                <div className="text-center">
+                  <Mountain className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                  <h4 className="font-medium">Practical Actions</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Apply insights to daily life</p>
+                </div>
               </div>
             </div>
           </CardContent>

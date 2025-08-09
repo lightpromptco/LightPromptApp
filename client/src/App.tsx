@@ -14,7 +14,6 @@ import DashboardPage from "@/pages/dashboard";
 import ChallengesPage from "@/pages/challenges";
 import SignupPage from "@/pages/signup";
 import PlansPage from "@/pages/plans";
-import CommunityPage from "@/pages/community";
 import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import PrismPointsPage from "@/pages/prism-points";
@@ -27,6 +26,8 @@ import SettingsPage from "@/pages/settings";
 import WooWooPage from "@/pages/woo-woo";
 import VisionQuestPage from "@/pages/vision-quest";
 import ContentManagement from "@/pages/admin/content";
+import BlogPage from "@/pages/blog";
+import CommunityPage from "@/pages/community";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -137,6 +138,16 @@ function Router() {
       <Route path="/admin/content" component={() => (
         <MainLayout>
           <ContentManagement />
+        </MainLayout>
+      )} />
+      <Route path="/blog" component={() => (
+        <MainLayout>
+          <BlogPage />
+        </MainLayout>
+      )} />
+      <Route path="/community" component={() => (
+        <MainLayout>
+          <CommunityPage />
         </MainLayout>
       )} />
       <Route component={NotFound} />
