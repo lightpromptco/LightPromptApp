@@ -71,12 +71,9 @@ export default function B2BPage() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex justify-center">
           <Button size="lg" className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4">
             Schedule Demo
-          </Button>
-          <Button size="lg" variant="outline" className="px-8 py-4">
-            Download Case Studies
           </Button>
         </div>
 
