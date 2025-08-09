@@ -46,9 +46,7 @@ const ACCOUNT_ITEMS = [
 ];
 
 const PRODUCT_ITEMS = [
-  { path: "/products", label: "Products", icon: ShoppingBag, description: "Course & Book Store" },
-  { path: "/book", label: "The Book", icon: BookOpen, description: "LightPrompted Guide" },
-  { path: "/course", label: "LightPrompt:ed", icon: Target, description: "Online Course" },
+  { path: "/products", label: "Store", icon: ShoppingBag, description: "Course & Book Store" },
   { path: "/b2b", label: "For Business", icon: Users, description: "Enterprise Solutions" },
 ];
 

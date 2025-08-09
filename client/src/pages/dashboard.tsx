@@ -302,7 +302,7 @@ export default function DashboardPage() {
       case 'checkin': return 'Check-in & Overview';
       case 'growth': return 'Growth Tracking';
       case 'lightprompted': return 'LightPrompt:ed Course';
-      case 'astrology': return 'WooWoo & Cosmos';
+      case 'astrology': return 'Soul Map & Cosmos';
       case 'geoprompt': return 'GeoPrompt Check-In';
       case 'vibematch': return 'VibeMatch';
       case 'partner': return 'Partner Mode';
@@ -778,7 +778,7 @@ export default function DashboardPage() {
             </div>
           )}
           
-          {/* WooWoo & Cosmos Tab */}
+          {/* Soul Map & Cosmos Tab */}
           {activeView === 'astrology' && (
             <div className="space-y-6">
               <WooWooInterface userId={userId!} />

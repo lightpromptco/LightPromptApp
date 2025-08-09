@@ -12,8 +12,8 @@ const products = [
     id: 'course',
     title: 'LightPrompt:ed Course',
     subtitle: 'The Human Guide to Conscious AI & Soul Tech',
-    price: 197,
-    originalPrice: 297,
+    price: 120,
+    originalPrice: 197,
     description: 'Transform your relationship with AI through conscious practices and authentic connection.',
     type: 'Digital Course',
     duration: '4.5 hours',
@@ -44,8 +44,8 @@ const products = [
     id: 'book',
     title: 'LightPrompted Book',
     subtitle: 'The Human Guide to Conscious AI & Soul Tech',
-    price: 27,
-    originalPrice: 35,
+    price: 11,
+    originalPrice: 27,
     description: 'A comprehensive guide to using AI as a tool for self-reflection and spiritual growth.',
     type: 'Digital Book',
     duration: '250+ pages',
@@ -261,9 +261,9 @@ export default function ProductsPage() {
                 </p>
                 
                 <div className="flex items-center justify-center gap-4">
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">$199</span>
-                  <span className="text-xl text-gray-400 line-through">$332</span>
-                  <Badge variant="secondary">Save $133</Badge>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">$125</span>
+                  <span className="text-xl text-gray-400 line-through">$224</span>
+                  <Badge variant="secondary">Save $99</Badge>
                 </div>
 
                 <Button
@@ -272,8 +272,8 @@ export default function ProductsPage() {
                   onClick={() => handlePurchase({
                     id: 'bundle',
                     title: 'LightPrompt Complete Package - Course + Book',
-                    price: 199,
-                    originalPrice: 332
+                    price: 125,
+                    originalPrice: 224
                   } as any)}
                   disabled={loadingProduct === 'bundle'}
                 >

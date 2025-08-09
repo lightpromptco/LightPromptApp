@@ -32,7 +32,7 @@ export const BOTS: Bot[] = [
   },
   {
     id: "woowoo",
-    name: "WooWoo",
+    name: "CosmosBot",
     tagline: "Your cosmic mirror & metaphysical guide.",
     description: "Your highest self reflected through metaphysical wisdom. Knows personalities, gene keys, astrology, oracle knowledge, and cosmic insights. Honest, insightful, and fun - never lies or deceives, a true mirror of consciousness.",
     icon: "fas fa-star",

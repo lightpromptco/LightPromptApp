@@ -217,7 +217,7 @@ export function WooWooInterface({ userId }: WooWooInterfaceProps) {
         >
           <i className="fas fa-star text-white text-xl"></i>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">WooWoo & Cosmos</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Soul Map & Cosmos</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           Explore your cosmic blueprint, astrology insights, and celestial guidance for your wellness journey.
         </p>

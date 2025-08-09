@@ -36,10 +36,10 @@ const PRICING_TIERS: PricingTier[] = [
     description: 'Perfect for discovering your wellness journey',
     price: { monthly: 0, yearly: 0 },
     features: [
-      '🤖 All Bots: LightPrompt, BodyMirror, WooWoo, GeoPrompt, VisionQuest (within token limits)',
+      '🤖 All Bots: LightPrompt, BodyMirror, CosmosBot, GeoPrompt, VisionQuest (within token limits)',
       '📊 5 daily check-ins per month',
       '🎯 3 custom habits tracking', 
-      '🌟 Basic WooWoo (astrology, metaphysical wisdom)',
+      '🌟 Basic CosmosBot (astrology, metaphysical wisdom)',
       '👥 Community group access',
       '📈 2 wellness patterns per month',
       '💑 Partner mode preview (1 connection)'
@@ -70,7 +70,7 @@ const PRICING_TIERS: PricingTier[] = [
       'VibeMatch community features',
       'Voice conversations',
       'Export wellness data',
-      'Full WooWoo birth chart & resources',
+      'Full CosmosBot birth chart & resources',
       'Unlimited partner mode connections'
     ],
     limits: {
@@ -292,7 +292,7 @@ export function PricingInterface({ user }: PricingInterfaceProps) {
                     <span>{tier.limits.habits === 999 ? 'Unlimited' : tier.limits.habits || 0}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>WooWoo readings:</span>
+                    <span>CosmosBot readings:</span>
                     <span>{tier.limits.astrology === 999 ? 'Unlimited' : tier.limits.astrology || 0}/month</span>
                   </div>
                   <div className="flex justify-between">

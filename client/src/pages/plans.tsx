@@ -275,7 +275,7 @@ export default function PlansPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                  <span>All Bots: LightPrompt, BodyMirror, WooWoo, GeoPrompt, VisionQuest (within token limits)</span>
+                  <span>All Bots: LightPrompt, BodyMirror, CosmosBot, GeoPrompt, VisionQuest (within token limits)</span>
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
@@ -287,7 +287,7 @@ export default function PlansPage() {
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                  <span>Basic WooWoo (astrology, metaphysical wisdom)</span>
+                  <span>Basic CosmosBot (astrology, metaphysical wisdom)</span>
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
@@ -308,7 +308,7 @@ export default function PlansPage() {
                 <div><strong>AI Bots:</strong> 2</div>
                 <div><strong>Daily check-ins:</strong> 5/month</div>
                 <div><strong>Habits tracking:</strong> 3</div>
-                <div><strong>WooWoo readings:</strong> 2/month</div>
+                <div><strong>CosmosBot readings:</strong> 2/month</div>
                 <div><strong>GeoPrompts:</strong> 10/month</div>
               </div>
 
@@ -365,7 +365,7 @@ export default function PlansPage() {
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
-                  <span>Full WooWoo birth chart & resources</span>
+                  <span>Full CosmosBot birth chart & resources</span>
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check text-green-500 mr-2 w-4"></i>
@@ -378,7 +378,7 @@ export default function PlansPage() {
                 <div><strong>AI Bots:</strong> All</div>
                 <div><strong>Daily check-ins:</strong> Unlimited/month</div>
                 <div><strong>Habits tracking:</strong> Unlimited</div>
-                <div><strong>WooWoo readings:</strong> Unlimited/month</div>
+                <div><strong>CosmosBot readings:</strong> Unlimited/month</div>
                 <div><strong>GeoPrompts:</strong> Unlimited/month</div>
               </div>
 
@@ -449,7 +449,7 @@ export default function PlansPage() {
                 <div><strong>AI Bots:</strong> All</div>
                 <div><strong>Daily check-ins:</strong> 0/month</div>
                 <div><strong>Habits tracking:</strong> 0</div>
-                <div><strong>WooWoo readings:</strong> 0/month</div>
+                <div><strong>CosmosBot readings:</strong> 0/month</div>
                 <div><strong>GeoPrompts:</strong> 0/month</div>
               </div>
 
@@ -520,7 +520,7 @@ export default function PlansPage() {
                 <div><strong>AI Bots:</strong> All</div>
                 <div><strong>Daily check-ins:</strong> 0/month</div>
                 <div><strong>Habits tracking:</strong> 0</div>
-                <div><strong>WooWoo readings:</strong> 0/month</div>
+                <div><strong>CosmosBot readings:</strong> 0/month</div>
                 <div><strong>GeoPrompts:</strong> 0/month</div>
               </div>
 
@@ -636,7 +636,7 @@ export default function PlansPage() {
               <div className="text-center space-y-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
                 <div className="text-3xl">🔮</div>
                 <h3 className="font-semibold text-emerald-800">Metaphysical Integration</h3>
-                <p className="text-sm text-emerald-700">Unique WooWoo features for astrology and spiritual wellness guidance</p>
+                <p className="text-sm text-emerald-700">Unique CosmosBot features for astrology and spiritual wellness guidance</p>
               </div>
             </div>
           </CardContent>

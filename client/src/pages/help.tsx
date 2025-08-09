@@ -46,7 +46,7 @@ const FAQ_CATEGORIES = [
       },
       {
         question: 'What are the different AI bots and their specialties?',
-        answer: 'LightPromptBot focuses on general emotional wellness and reflection. BodyBot specializes in physical health, fitness tracking, and body awareness. SpiritBot guides spiritual practices, meditation, and higher consciousness exploration. WooWoo handles mystical topics like astrology and energy work. Each bot has unique personality and expertise.'
+        answer: 'LightPromptBot focuses on general emotional wellness and reflection. BodyBot specializes in physical health, fitness tracking, and body awareness. SpiritBot guides spiritual practices, meditation, and higher consciousness exploration. CosmosBot handles mystical topics like astrology and energy work. Each bot has unique personality and expertise.'
       }
     ]
   },
@@ -95,7 +95,7 @@ const FAQ_CATEGORIES = [
     items: [
       {
         question: 'How does the astrology integration work?',
-        answer: 'WooWoo bot can generate personalized birth charts and provide astrological insights. Enter your birth date, time, and location for accurate chart generation. The AI interprets planetary positions and aspects to offer guidance on your spiritual journey and optimal timing for various activities.'
+        answer: 'CosmosBot can generate personalized birth charts and provide astrological insights. Enter your birth date, time, and location for accurate chart generation. The AI interprets planetary positions and aspects to offer guidance on your spiritual journey and optimal timing for various activities.'
       },
       {
         question: 'What are Easter Eggs and how do I find them?',
