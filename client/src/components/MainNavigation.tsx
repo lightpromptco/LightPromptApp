@@ -32,6 +32,7 @@ const NAV_ITEMS = [
   { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
   { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
+  { path: "/partner-mode", label: "Partner Mode", icon: UserPlus, description: "Connect & Share with Partners" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
   { path: "/geoprompt", label: "GeoPrompt", icon: MapPin, description: "Location-based Reflections" },
   { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },

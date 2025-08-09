@@ -31,6 +31,7 @@ import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
 import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
+import PartnerModePage from "@/pages/partner-mode";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -166,6 +167,11 @@ function Router() {
       <Route path="/community" component={() => (
         <MainLayout>
           <CommunityPage />
+        </MainLayout>
+      )} />
+      <Route path="/partner-mode" component={() => (
+        <MainLayout>
+          <PartnerModePage />
         </MainLayout>
       )} />
       <Route component={NotFound} />
