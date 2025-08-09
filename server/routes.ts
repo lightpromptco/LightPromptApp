@@ -81,6 +81,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/vision-quest/:userId", async (req, res) => {
     try {
       const quest = await storage.getVisionQuest(req.params.userId);
+      if (!quest) {
+        return res.status(404).json({ error: "Vision Quest not found" });
+      }
       res.json(quest);
     } catch (error) {
       res.status(404).json({ error: "Vision Quest not found" });
@@ -89,7 +92,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vision-quest/begin", async (req, res) => {
     try {
-      const quest = await storage.createVisionQuest(req.body);
+      const quest = await storage.createVisionQuest({
+        userId: req.body.userId,
+        practices: req.body.practices || [],
+        progress: req.body.progress || {}
+      });
       res.json(quest);
     } catch (error) {
       console.error('Vision Quest creation error:', error);
