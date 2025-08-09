@@ -132,16 +132,15 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
           <div
             ref={provided.innerRef}
             {...provided.draggableProps}
-            {...provided.dragHandleProps}
             className={`transition-all duration-200 ${
               snapshot.isDragging ? 'rotate-2 scale-105 z-50' : ''
-            } ${isEditMode ? 'cursor-grab active:cursor-grabbing' : ''}`}
+            }`}
           >
             <Card className={`
               ${getWidgetSizeClass(widget.size)} 
               ${isEditMode ? 'border-blue-300 border-2 border-dashed bg-blue-50' : ''}
               ${snapshot.isDragging ? 'shadow-2xl border-blue-500' : ''}
-              hover:shadow-lg transition-all duration-200
+              hover:shadow-lg transition-all duration-200 relative
             `}>
               {isEditMode && (
                 <div className="absolute top-2 right-2 z-50">
@@ -157,14 +156,22 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
                       e.stopPropagation();
                       e.preventDefault();
                     }}
-                    className="h-6 w-6 p-0 bg-white/90 hover:bg-red-100 shadow-sm border border-gray-200"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    className="h-6 w-6 p-0 bg-white/90 hover:bg-red-100 shadow-sm border border-gray-200 pointer-events-auto"
+                    style={{ pointerEvents: 'auto' }}
                   >
                     <i className="fas fa-times text-red-500 text-xs"></i>
                   </Button>
                 </div>
               )}
               
-              <CardHeader className={isEditMode ? 'pb-2' : ''}>
+              <CardHeader 
+                {...provided.dragHandleProps}
+                className={`${isEditMode ? 'pb-2 cursor-grab active:cursor-grabbing' : ''}`}
+              >
                 <CardTitle className="flex items-center text-lg">
                   {isEditMode && <i className="fas fa-grip-vertical mr-2 text-gray-400"></i>}
                   {getWidgetIcon(widget.type)}
