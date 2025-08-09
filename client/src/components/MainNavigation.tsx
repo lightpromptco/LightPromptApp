@@ -21,7 +21,8 @@ import {
   Stars,
   Compass,
   ShoppingBag,
-  BookOpen
+  BookOpen,
+  Code
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -42,6 +43,7 @@ const ACCOUNT_ITEMS = [
   { path: "/signup", label: "Sign Up", icon: UserPlus, description: "Create Account" },
   { path: "/plans", label: "Plans", icon: Gem, description: "Upgrade Account" },
   { path: "/settings", label: "Settings", icon: Settings, description: "User Settings" },
+  { path: "/admin/settings", label: "Admin Settings", icon: Code, description: "Admin Dashboard (lightprompt.co@gmail.com only)" },
   { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy" },
 ];
 

@@ -26,6 +26,8 @@ import SettingsPage from "@/pages/settings";
 import AdminSettingsPage from "@/pages/admin-settings";
 import WooWooPage from "@/pages/woo-woo";
 import VisionQuestPage from "@/pages/vision-quest";
+import VisionQuestIndexPage from "@/pages/vision-quest/index";
+import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
 import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
@@ -139,6 +141,16 @@ function Router() {
       <Route path="/vision-quest" component={() => (
         <MainLayout>
           <VisionQuestPage />
+        </MainLayout>
+      )} />
+      <Route path="/vision-quest/index" component={() => (
+        <MainLayout>
+          <VisionQuestIndexPage />
+        </MainLayout>
+      )} />
+      <Route path="/vision-quest/stage/:stageId" component={() => (
+        <MainLayout>
+          <VisionQuestStagePage />
         </MainLayout>
       )} />
       <Route path="/admin/content" component={() => (
