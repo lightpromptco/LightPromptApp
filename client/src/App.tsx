@@ -21,6 +21,7 @@ import PrismPointsPage from "@/pages/prism-points";
 import HelpPage from "@/pages/help";
 import BookPage from "@/pages/book";
 import CoursePage from "@/pages/course";
+import ProductsPage from "@/pages/products";
 import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
 import WooWooPage from "@/pages/woo-woo";
@@ -105,6 +106,11 @@ function Router() {
       <Route path="/course" component={() => (
         <MainLayout>
           <CoursePage />
+        </MainLayout>
+      )} />
+      <Route path="/products" component={() => (
+        <MainLayout>
+          <ProductsPage />
         </MainLayout>
       )} />
       <Route path="/b2b" component={() => (

@@ -19,7 +19,9 @@ import {
   User,
   Moon,
   Stars,
-  Compass
+  Compass,
+  ShoppingBag,
+  BookOpen
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -44,7 +46,8 @@ const ACCOUNT_ITEMS = [
 ];
 
 const PRODUCT_ITEMS = [
-  { path: "/book", label: "The Book", icon: HelpCircle, description: "LightPrompted Guide" },
+  { path: "/products", label: "Products", icon: ShoppingBag, description: "Course & Book Store" },
+  { path: "/book", label: "The Book", icon: BookOpen, description: "LightPrompted Guide" },
   { path: "/course", label: "LightPrompt:ed", icon: Target, description: "Online Course" },
   { path: "/b2b", label: "For Business", icon: Users, description: "Enterprise Solutions" },
 ];

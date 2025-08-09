@@ -2002,7 +2002,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: 'Stripe not configured' });
       }
 
-      const Stripe = require('stripe');
+      const { default: Stripe } = await import('stripe');
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
       
       // Create checkout session
