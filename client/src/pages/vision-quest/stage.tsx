@@ -1,29 +1,26 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useRoute, Link } from "wouter";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { 
-  ArrowLeft,
-  ArrowRight,
   Compass, 
   Mountain, 
   Eye,
   Star,
-  Play,
+  ArrowLeft,
+  ArrowRight,
   CheckCircle,
-  BookOpen,
-  Target,
-  Heart
+  Clock,
+  Play,
+  Pause,
+  RotateCcw
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 
-const QUEST_STAGES = {
-  departure: {
+const QUEST_STAGES = [
+  {
     id: 'departure',
     name: 'The Departure',
     icon: Compass,
@@ -31,26 +28,50 @@ const QUEST_STAGES = {
     color: 'from-blue-500 to-cyan-500',
     practices: [
       {
-        title: 'Intention Setting',
-        description: 'Define your quest purpose and personal intentions',
-        duration: '15 minutes',
-        type: 'reflection'
+        id: 'intention-setting',
+        name: 'Intention Setting',
+        duration: 15,
+        description: 'Create a sacred intention for your quest journey',
+        instructions: [
+          'Find a quiet space where you won\'t be disturbed',
+          'Light a candle or create a simple altar',
+          'Reflect on what you seek to discover about yourself',
+          'Write down your intention in present tense',
+          'Speak your intention aloud three times'
+        ],
+        reflection: 'What intention feels most authentic to your soul right now?'
       },
       {
-        title: 'Sacred Space Creation', 
-        description: 'Establish a physical and mental space for your journey',
-        duration: '20 minutes',
-        type: 'action'
+        id: 'sacred-space',
+        name: 'Sacred Space Creation',
+        duration: 20,
+        description: 'Establish a physical and energetic container for your work',
+        instructions: [
+          'Choose a space that feels special and private',
+          'Cleanse the space with sage, sound, or intention',
+          'Place meaningful objects that represent the four elements',
+          'Create clear boundaries around your sacred time',
+          'Invoke protection and guidance from your highest self'
+        ],
+        reflection: 'How does this sacred space support your inner journey?'
       },
       {
-        title: 'Fear Release Meditation',
-        description: 'Acknowledge and release fears about stepping into the unknown',
-        duration: '25 minutes', 
-        type: 'meditation'
+        id: 'fear-release',
+        name: 'Fear Release Ceremony',
+        duration: 25,
+        description: 'Release the fears that hold you back from growth',
+        instructions: [
+          'Write down your fears about this journey on paper',
+          'Acknowledge each fear with compassion',
+          'Burn the paper safely or bury it in earth',
+          'Visualize the fears transforming into courage',
+          'Step forward symbolically into your quest'
+        ],
+        reflection: 'What fears are you ready to transform into wisdom?'
       }
     ]
   },
-  initiation: {
+  {
     id: 'initiation',
     name: 'The Initiation',
     icon: Mountain,
@@ -58,26 +79,50 @@ const QUEST_STAGES = {
     color: 'from-orange-500 to-red-500',
     practices: [
       {
-        title: 'Shadow Integration',
-        description: 'Explore and integrate rejected aspects of yourself',
-        duration: '30 minutes',
-        type: 'introspection'
+        id: 'shadow-integration',
+        name: 'Shadow Integration',
+        duration: 30,
+        description: 'Meet and integrate the rejected aspects of yourself',
+        instructions: [
+          'Identify a quality you judge in others',
+          'Find where this quality exists within you',
+          'Dialogue with this shadow aspect',
+          'Discover the gift hidden in the shadow',
+          'Practice loving acceptance of your wholeness'
+        ],
+        reflection: 'What shadow aspect is ready to become an ally?'
       },
       {
-        title: 'Inner Dialogue Practice',
-        description: 'Develop conversation with your inner wisdom',
-        duration: '20 minutes',
-        type: 'dialogue'
+        id: 'inner-dialogue',
+        name: 'Inner Dialogue Practice',
+        duration: 20,
+        description: 'Develop a conscious relationship with your inner voices',
+        instructions: [
+          'Identify the different voices in your head',
+          'Give each voice a name and character',
+          'Have a conversation between your wise self and critic',
+          'Set boundaries with unhelpful internal voices',
+          'Strengthen the voice of your authentic self'
+        ],
+        reflection: 'Which inner voice deserves more airtime in your life?'
       },
       {
-        title: 'Courage Building Exercises',
-        description: 'Strengthen your capacity to face difficult truths',
-        duration: '25 minutes',
-        type: 'exercise'
+        id: 'courage-building',
+        name: 'Courage Building Ritual',
+        duration: 25,
+        description: 'Cultivate the courage to live authentically',
+        instructions: [
+          'Recall a time when you acted with great courage',
+          'Feel that courage energy in your body',
+          'Identify an area where you need courage now',
+          'Create a power gesture or phrase',
+          'Commit to one courageous action this week'
+        ],
+        reflection: 'How will you embody courage in your daily life?'
       }
     ]
   },
-  revelation: {
+  {
     id: 'revelation',
     name: 'The Revelation',
     icon: Eye,
@@ -85,26 +130,50 @@ const QUEST_STAGES = {
     color: 'from-purple-500 to-indigo-500',
     practices: [
       {
-        title: 'Vision Seeking',
-        description: 'Open to receiving guidance about your life direction',
-        duration: '40 minutes',
-        type: 'vision'
+        id: 'vision-seeking',
+        name: 'Vision Seeking Meditation',
+        duration: 40,
+        description: 'Open to receiving visions of your highest potential',
+        instructions: [
+          'Enter deep meditation or trance state',
+          'Ask for a vision of your soul\'s purpose',
+          'Remain open without forcing anything',
+          'Receive whatever images, words, or feelings come',
+          'Record your vision immediately after'
+        ],
+        reflection: 'What vision wants to be born through you?'
       },
       {
-        title: 'Dream Work',
-        description: 'Explore insights from your unconscious through dreams',
-        duration: '45 minutes',
-        type: 'dream'
+        id: 'dream-work',
+        name: 'Dream Work Analysis',
+        duration: 30,
+        description: 'Decode the wisdom messages from your unconscious',
+        instructions: [
+          'Review recent dreams for patterns and symbols',
+          'Choose one dream that feels significant',
+          'Identify the key symbols and their personal meaning',
+          'Dialogue with dream characters',
+          'Extract the guidance for your waking life'
+        ],
+        reflection: 'What is your unconscious trying to tell you?'
       },
       {
-        title: 'Symbolic Understanding',
-        description: 'Interpret the deeper meanings in your experiences',
-        duration: '35 minutes',
-        type: 'interpretation'
+        id: 'symbolic-understanding',
+        name: 'Symbolic Understanding',
+        duration: 25,
+        description: 'Interpret the signs and synchronicities around you',
+        instructions: [
+          'Notice recent synchronicities in your life',
+          'Identify recurring symbols or themes',
+          'Research the archetypal meaning of key symbols',
+          'Find the personal meaning for your journey',
+          'Create a symbol or totem for your quest'
+        ],
+        reflection: 'What symbols are guiding your path forward?'
       }
     ]
   },
-  integration: {
+  {
     id: 'integration',
     name: 'The Integration',
     icon: Star,
@@ -112,297 +181,304 @@ const QUEST_STAGES = {
     color: 'from-green-500 to-emerald-500',
     practices: [
       {
-        title: 'Wisdom Anchoring',
-        description: 'Create practical ways to remember your insights',
-        duration: '30 minutes',
-        type: 'integration'
+        id: 'wisdom-anchoring',
+        name: 'Wisdom Anchoring',
+        duration: 20,
+        description: 'Anchor your insights into practical wisdom',
+        instructions: [
+          'Review all insights from your quest journey',
+          'Identify the 3 most important realizations',
+          'Create a daily practice to embody each insight',
+          'Design reminders to keep wisdom active',
+          'Share your wisdom with a trusted friend'
+        ],
+        reflection: 'How will you live differently because of this quest?'
       },
       {
-        title: 'Life Design Planning',
-        description: 'Plan how to implement your revelations practically',
-        duration: '45 minutes',
-        type: 'planning'
+        id: 'life-design',
+        name: 'Life Design Planning',
+        duration: 35,
+        description: 'Redesign your life aligned with your authentic self',
+        instructions: [
+          'Envision your life 1 year from now',
+          'Identify what needs to change to honor your authentic self',
+          'Create a step-by-step action plan',
+          'Set specific goals with timelines',
+          'Commit to your first three action steps'
+        ],
+        reflection: 'What changes will you make to live more authentically?'
       },
       {
-        title: 'Community Sharing',
-        description: 'Share your journey with others for mutual support',
-        duration: '25 minutes',
-        type: 'sharing'
+        id: 'community-sharing',
+        name: 'Community Sharing',
+        duration: 15,
+        description: 'Share your journey to inspire others',
+        instructions: [
+          'Choose how you want to share your quest story',
+          'Identify the key lessons that could help others',
+          'Find your authentic voice for sharing wisdom',
+          'Connect with others on similar journeys',
+          'Commit to ongoing service and support'
+        ],
+        reflection: 'How will your journey serve the greater good?'
       }
     ]
   }
-};
+];
 
 export default function VisionQuestStagePage() {
-  const [match, params] = useRoute("/vision-quest/stage/:stageId");
-  const { toast } = useToast();
-  const stageId = params?.stageId || 'departure';
-  const stage = QUEST_STAGES[stageId] || QUEST_STAGES.departure;
-  
+  const [, params] = useRoute('/vision-quest/stage/:stageId');
+  const [, setLocation] = useLocation();
+  const [currentPractice, setCurrentPractice] = useState(0);
+  const [practiceTimer, setPracticeTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [reflection, setReflection] = useState('');
   const [completedPractices, setCompletedPractices] = useState<string[]>([]);
-  const [currentPractice, setCurrentPractice] = useState<number | null>(null);
 
-  // Get user's quest progress
-  const { data: questProgress } = useQuery({
-    queryKey: ['/api/vision-quest/progress', stageId],
-  });
+  const stageId = params?.stageId;
+  const stage = QUEST_STAGES.find(s => s.id === stageId);
+  
+  const currentStageIndex = QUEST_STAGES.findIndex(s => s.id === stageId);
+  const previousStage = currentStageIndex > 0 ? QUEST_STAGES[currentStageIndex - 1] : null;
+  const nextStage = currentStageIndex < QUEST_STAGES.length - 1 ? QUEST_STAGES[currentStageIndex + 1] : null;
 
-  const completePracticeMutation = useMutation({
-    mutationFn: async (practiceIndex: number) => {
-      return apiRequest("POST", "/api/vision-quest/complete-practice", {
-        stageId,
-        practiceIndex,
-        practiceTitle: stage.practices[practiceIndex].title
-      });
-    },
-    onSuccess: (_, practiceIndex) => {
-      setCompletedPractices(prev => [...prev, `${stageId}-${practiceIndex}`]);
-      toast({
-        title: "Practice Completed",
-        description: "Your progress has been recorded on your journey.",
-      });
-    },
-  });
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning && practiceTimer > 0) {
+      interval = setInterval(() => {
+        setPracticeTimer(prev => {
+          if (prev <= 1) {
+            setIsTimerRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, practiceTimer]);
 
-  const beginPractice = (practiceIndex: number) => {
-    setCurrentPractice(practiceIndex);
-    toast({
-      title: "Practice Begun",
-      description: `Starting: ${stage.practices[practiceIndex].title}`,
-    });
+  if (!stage) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Stage Not Found</h2>
+            <Link href="/vision-quest/index">
+              <Button>Return to Quest Overview</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const StageIcon = stage.icon;
+  const practice = stage.practices[currentPractice];
+
+  const startPracticeTimer = () => {
+    setPracticeTimer(practice.duration * 60); // Convert minutes to seconds
+    setIsTimerRunning(true);
   };
 
-  const completePractice = (practiceIndex: number) => {
-    completePracticeMutation.mutate(practiceIndex);
-    setCurrentPractice(null);
+  const toggleTimer = () => {
+    setIsTimerRunning(!isTimerRunning);
   };
 
-  const getStageProgress = () => {
-    const totalPractices = stage.practices.length;
-    const completed = completedPractices.filter(p => p.startsWith(stageId)).length;
-    return (completed / totalPractices) * 100;
+  const resetTimer = () => {
+    setPracticeTimer(practice.duration * 60);
+    setIsTimerRunning(false);
   };
 
-  const getNextStage = () => {
-    const stageOrder = ['departure', 'initiation', 'revelation', 'integration'];
-    const currentIndex = stageOrder.indexOf(stageId);
-    return currentIndex < stageOrder.length - 1 ? stageOrder[currentIndex + 1] : null;
+  const completePractice = () => {
+    const practiceId = practice.id;
+    if (!completedPractices.includes(practiceId)) {
+      setCompletedPractices([...completedPractices, practiceId]);
+    }
   };
 
-  const getPrevStage = () => {
-    const stageOrder = ['departure', 'initiation', 'revelation', 'integration'];
-    const currentIndex = stageOrder.indexOf(stageId);
-    return currentIndex > 0 ? stageOrder[currentIndex - 1] : null;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const IconComponent = stage.icon;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Navigation Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/vision-quest">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Quest Overview
-          </Button>
-        </Link>
-        <div className="flex-1" />
-        <div className="flex gap-2">
-          {getPrevStage() && (
-            <Link href={`/vision-quest/stage/${getPrevStage()}`}>
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Previous
-              </Button>
-            </Link>
-          )}
-          {getNextStage() && (
-            <Link href={`/vision-quest/stage/${getNextStage()}`}>
-              <Button variant="outline" size="sm">
-                Next
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* Stage Header */}
-      <div className={`relative rounded-2xl p-8 bg-gradient-to-br ${stage.color} text-white overflow-hidden`}>
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <IconComponent className="h-8 w-8" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">{stage.name}</h1>
-              <p className="text-white/80 text-lg">{stage.description}</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-cyan-50 dark:from-purple-950 dark:via-indigo-950 dark:to-cyan-950">
+      <div className="container mx-auto px-4 py-8">
+        {/* Navigation */}
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/vision-quest/index">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Overview
+            </Button>
+          </Link>
           
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Stage Progress</span>
-              <span className="text-sm">{Math.round(getStageProgress())}%</span>
-            </div>
-            <Progress value={getStageProgress()} className="h-2 bg-white/20" />
+          <div className="flex gap-2">
+            {previousStage && (
+              <Link href={`/vision-quest/stage/${previousStage.id}`}>
+                <Button variant="outline" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {previousStage.name}
+                </Button>
+              </Link>
+            )}
+            {nextStage && (
+              <Link href={`/vision-quest/stage/${nextStage.id}`}>
+                <Button variant="outline" size="sm">
+                  {nextStage.name}
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
-        
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
-      </div>
 
-      {/* Practices */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Stage Practices</h2>
-        
-        {stage.practices.map((practice, index) => {
-          const practiceKey = `${stageId}-${index}`;
-          const isCompleted = completedPractices.includes(practiceKey);
-          const isActive = currentPractice === index;
-          
-          return (
-            <Card key={index} className={`transition-all duration-300 ${
-              isActive ? 'ring-2 ring-blue-500 shadow-lg' : 
-              isCompleted ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''
-            }`}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      isCompleted ? 'bg-green-500 text-white' :
-                      isActive ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800'
-                    }`}>
-                      {isCompleted ? (
-                        <CheckCircle className="h-6 w-6" />
-                      ) : isActive ? (
-                        <Play className="h-6 w-6" />
-                      ) : (
-                        <span className="font-bold">{index + 1}</span>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="flex items-center gap-2">
-                        {practice.title}
-                        <Badge variant="outline">{practice.type}</Badge>
-                      </CardTitle>
-                      <p className="text-muted-foreground mt-1">{practice.description}</p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Duration: {practice.duration}
-                      </p>
-                    </div>
+        {/* Stage Header */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className={`p-4 rounded-full bg-gradient-to-r ${stage.color}`}>
+                <StageIcon className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">{stage.name}</CardTitle>
+                <p className="text-muted-foreground">{stage.description}</p>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Practice Navigation */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Stage Practices</h3>
+              <Badge variant="outline">
+                {currentPractice + 1} of {stage.practices.length}
+              </Badge>
+            </div>
+            <div className="flex gap-2">
+              {stage.practices.map((p, index) => (
+                <Button
+                  key={index}
+                  variant={index === currentPractice ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPractice(index)}
+                  className="flex-1"
+                >
+                  {completedPractices.includes(p.id) && (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  )}
+                  {p.name}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Current Practice */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Practice Instructions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {completedPractices.includes(practice.id) ? (
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                ) : (
+                  <Clock className="h-5 w-5" />
+                )}
+                {practice.name}
+              </CardTitle>
+              <p className="text-muted-foreground">{practice.description}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Timer */}
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-3xl font-mono font-bold mb-2">
+                    {practiceTimer > 0 ? formatTime(practiceTimer) : `${practice.duration}:00`}
                   </div>
-                  <div className="flex gap-2">
-                    {isCompleted ? (
-                      <Badge variant="default" className="bg-green-500">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Completed
-                      </Badge>
-                    ) : isActive ? (
-                      <div className="space-x-2">
-                        <Button 
-                          size="sm" 
-                          onClick={() => completePractice(index)}
-                          disabled={completePracticeMutation.isPending}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Complete
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setCurrentPractice(null)}
-                        >
-                          Pause
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button 
-                        onClick={() => beginPractice(index)}
-                        size="sm"
-                        variant="outline"
-                      >
+                  <div className="flex justify-center gap-2">
+                    {practiceTimer === 0 ? (
+                      <Button onClick={startPracticeTimer} size="sm">
                         <Play className="h-4 w-4 mr-2" />
-                        Begin
+                        Start Timer
                       </Button>
+                    ) : (
+                      <>
+                        <Button onClick={toggleTimer} size="sm" variant="outline">
+                          {isTimerRunning ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button onClick={resetTimer} size="sm" variant="outline">
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
-              </CardHeader>
-              
-              {isActive && (
-                <CardContent>
-                  <Separator className="mb-4" />
-                  <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        Practice Guidance
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Take your time with this practice. Find a quiet space where you won't be interrupted. 
-                        Focus on being present and honest with yourself. Trust whatever insights arise.
-                      </p>
-                    </div>
-                    
-                    <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <Target className="h-4 w-4" />
-                        Reflection Questions
-                      </h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• What am I noticing in my body right now?</li>
-                        <li>• What emotions or feelings are arising?</li>
-                        <li>• What insights or messages am I receiving?</li>
-                        <li>• How does this connect to my overall quest?</li>
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          );
-        })}
-      </div>
 
-      {/* Stage Navigation */}
-      <div className="flex justify-between items-center pt-8 border-t">
-        <div>
-          {getPrevStage() && (
-            <Link href={`/vision-quest/stage/${getPrevStage()}`}>
-              <Button variant="outline">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Previous Stage
-              </Button>
-            </Link>
-          )}
-        </div>
-        
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
-            Stage {Object.keys(QUEST_STAGES).indexOf(stageId) + 1} of {Object.keys(QUEST_STAGES).length}
-          </p>
-        </div>
-        
-        <div>
-          {getNextStage() ? (
-            <Link href={`/vision-quest/stage/${getNextStage()}`}>
-              <Button>
-                Next Stage
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/vision-quest/completion">
-              <Button className="bg-gradient-to-r from-green-500 to-emerald-500">
-                <Star className="h-4 w-4 mr-2" />
-                Complete Quest
-              </Button>
-            </Link>
-          )}
+                {/* Instructions */}
+                <div>
+                  <h4 className="font-semibold mb-2">Practice Steps:</h4>
+                  <ol className="list-decimal list-inside space-y-2">
+                    {practice.instructions.map((instruction, index) => (
+                      <li key={index} className="text-sm">{instruction}</li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reflection */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Reflection</CardTitle>
+              <p className="text-muted-foreground">{practice.reflection}</p>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={reflection}
+                onChange={(e) => setReflection(e.target.value)}
+                placeholder="Write your reflections here..."
+                className="min-h-[200px] mb-4"
+              />
+              
+              <div className="space-y-2">
+                <Button 
+                  onClick={completePractice}
+                  className="w-full"
+                  disabled={completedPractices.includes(practice.id)}
+                >
+                  {completedPractices.includes(practice.id) ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Practice Completed
+                    </>
+                  ) : (
+                    'Mark as Complete'
+                  )}
+                </Button>
+                
+                {currentPractice < stage.practices.length - 1 && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setCurrentPractice(currentPractice + 1)}
+                  >
+                    Next Practice
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
