@@ -1083,3 +1083,82 @@ export type InsertAdminSetting = z.infer<typeof insertAdminSettingSchema>;
 
 export type ContentBlock = typeof contentBlocks.$inferSelect;
 export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;
+
+// GeoPrompt Check-ins Types
+export type GeoPromptCheckIn = typeof geoPromptCheckIns.$inferSelect;
+export type InsertGeoPromptCheckIn = z.infer<typeof insertGeoPromptCheckInSchema>;
+
+// Foundation Memory - Core knowledge and memory for LightPrompt
+export const foundationMemory = pgTable("foundation_memory", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  category: text("category").notNull(),
+  key: text("key").notNull(),
+  value: jsonb("value").notNull(),
+  description: text("description"),
+  importance: integer("importance").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Insights - Patterns and insights from user interactions
+export const userInsights = pgTable("user_insights", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(),
+  pattern: text("pattern").notNull(),
+  data: jsonb("data"),
+  confidence: real("confidence").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Platform Evolution - Track how LightPrompt grows and improves
+export const platformEvolution = pgTable("platform_evolution", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  version: text("version").notNull(),
+  feature: text("feature").notNull(),
+  impact: text("impact").notNull(),
+  userFeedback: jsonb("user_feedback"),
+  metrics: jsonb("metrics"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// Bot Learning - AI bot improvements and learning
+export const botLearning = pgTable("bot_learning", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  botId: text("bot_id").notNull(),
+  conversationId: text("conversation_id"),
+  userFeedback: text("user_feedback").notNull(),
+  improvement: text("improvement").notNull(),
+  effectiveness: real("effectiveness").notNull(),
+  learnedAt: timestamp("learned_at").defaultNow(),
+});
+
+// Content Evolution - Track content improvements and user engagement
+export const contentEvolution = pgTable("content_evolution", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(),
+  originalContent: text("original_content").notNull(),
+  improvedContent: text("improved_content").notNull(),
+  reason: text("reason").notNull(),
+  userEngagement: real("user_engagement").notNull(),
+  evolvedAt: timestamp("evolved_at").defaultNow(),
+});
+
+// Knowledge Storage Schemas
+export const insertFoundationMemorySchema = createInsertSchema(foundationMemory);
+export const insertUserInsightSchema = createInsertSchema(userInsights);
+export const insertPlatformEvolutionSchema = createInsertSchema(platformEvolution);
+export const insertBotLearningSchema = createInsertSchema(botLearning);
+export const insertContentEvolutionSchema = createInsertSchema(contentEvolution);
+
+// Knowledge Storage Types
+export type FoundationMemory = typeof foundationMemory.$inferSelect;
+export type InsertFoundationMemory = z.infer<typeof insertFoundationMemorySchema>;
+export type UserInsight = typeof userInsights.$inferSelect;
+export type InsertUserInsight = z.infer<typeof insertUserInsightSchema>;
+export type PlatformEvolution = typeof platformEvolution.$inferSelect;
+export type InsertPlatformEvolution = z.infer<typeof insertPlatformEvolutionSchema>;
+export type BotLearning = typeof botLearning.$inferSelect;
+export type InsertBotLearning = z.infer<typeof insertBotLearningSchema>;
+export type ContentEvolution = typeof contentEvolution.$inferSelect;
+export type InsertContentEvolution = z.infer<typeof insertContentEvolutionSchema>;

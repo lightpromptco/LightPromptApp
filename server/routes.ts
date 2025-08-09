@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
+import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 import { generateBirthChart } from "./astrology.js";
 import { 
@@ -56,6 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register content management routes
   registerContentRoutes(app);
+  
+  // Register knowledge storage routes
+  app.use("/api/knowledge", knowledgeRoutes);
   
   // Soul Map routes
   app.get("/api/soul-map/:userId", async (req, res) => {
