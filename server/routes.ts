@@ -53,6 +53,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })();
   
+  // Soul Map routes
+  app.get("/api/soul-map/:userId", async (req, res) => {
+    try {
+      const soulMap = await storage.getSoulMap(req.params.userId);
+      res.json(soulMap);
+    } catch (error) {
+      res.status(404).json({ error: "Soul Map not found" });
+    }
+  });
+
+  app.post("/api/soul-map/generate", async (req, res) => {
+    try {
+      const soulMapData = await storage.createSoulMap(req.body);
+      res.json(soulMapData);
+    } catch (error) {
+      console.error('Soul Map generation error:', error);
+      res.status(500).json({ error: "Failed to generate Soul Map" });
+    }
+  });
+
+  // Vision Quest routes
+  app.get("/api/vision-quest/:userId", async (req, res) => {
+    try {
+      const quest = await storage.getVisionQuest(req.params.userId);
+      res.json(quest);
+    } catch (error) {
+      res.status(404).json({ error: "Vision Quest not found" });
+    }
+  });
+
+  app.post("/api/vision-quest/begin", async (req, res) => {
+    try {
+      const quest = await storage.createVisionQuest(req.body);
+      res.json(quest);
+    } catch (error) {
+      console.error('Vision Quest creation error:', error);
+      res.status(500).json({ error: "Failed to begin Vision Quest" });
+    }
+  });
+
+  // Course access routes
+  app.get("/api/course-access/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.userId);
+      res.json({ hasAccess: user?.courseAccess || false });
+    } catch (error) {
+      res.status(404).json({ hasAccess: false });
+    }
+  });
+
+  app.post("/api/course/purchase", async (req, res) => {
+    try {
+      const { userId, courseId } = req.body;
+      
+      // Create Stripe checkout session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'LightPrompt:ed - The Complete Course',
+              description: 'The Human Guide to Conscious AI & Soul Tech',
+            },
+            unit_amount: 9700, // $97.00
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${req.headers.origin}/course?success=true`,
+        cancel_url: `${req.headers.origin}/course?canceled=true`,
+        metadata: {
+          userId,
+          courseId,
+        },
+      });
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error('Course purchase error:', error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
   // User routes
   app.post("/api/users", async (req, res) => {
     try {
@@ -1860,6 +1944,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(mockAchievements);
     } catch (error) {
       res.status(500).json({ error: 'Failed to get achievements' });
+    }
+  });
+
+  // Soul Map API routes
+  app.get('/api/soul-map/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const soulMap = await storage.getSoulMap(userId);
+      res.json(soulMap);
+    } catch (error) {
+      console.error('Error fetching soul map:', error);
+      res.status(500).json({ error: 'Failed to fetch soul map' });
+    }
+  });
+
+  app.post('/api/soul-map/generate', async (req, res) => {
+    try {
+      const soulMapData = req.body;
+      const generatedMap = await storage.createSoulMap(soulMapData);
+      res.json(generatedMap);
+    } catch (error) {
+      console.error('Error generating soul map:', error);
+      res.status(500).json({ error: 'Failed to generate soul map' });
+    }
+  });
+
+  // Vision Quest API routes
+  app.get('/api/vision-quest/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const visionQuest = await storage.getVisionQuest(userId);
+      res.json(visionQuest);
+    } catch (error) {
+      console.error('Error fetching vision quest:', error);
+      res.status(500).json({ error: 'Failed to fetch vision quest' });
+    }
+  });
+
+  app.post('/api/vision-quest/generate', async (req, res) => {
+    try {
+      const questData = req.body;
+      const generatedQuest = await storage.createVisionQuest(questData);
+      res.json(generatedQuest);
+    } catch (error) {
+      console.error('Error generating vision quest:', error);
+      res.status(500).json({ error: 'Failed to generate vision quest' });
     }
   });
 

@@ -366,88 +366,13 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="space-y-6">
-          {/* Navigation Dropdown */}
-          <div className="flex items-center justify-between mb-6">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-64">
-                  <i className="fas fa-bars mr-2"></i>
-                  {getViewName()}
-                  <i className="fas fa-chevron-down ml-auto"></i>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                <DropdownMenuItem onClick={() => setActiveView('home')}>
-                  <i className="fas fa-home mr-2"></i>
-                  Home
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('checkin')}>
-                  <i className="fas fa-heart mr-2"></i>
-                  Check-in & Overview
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('growth')}>
-                  <i className="fas fa-chart-line mr-2"></i>
-                  Growth Tracking
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/challenges'}>
-                  <i className="fas fa-trophy mr-2"></i>
-                  Challenges & Rewards
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('lightprompted')}>
-                  <i className="fas fa-graduation-cap mr-2"></i>
-                  LightPrompt:ed Course
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('astrology')}>
-                  <i className="fas fa-star mr-2"></i>
-                  WooWoo & Cosmos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('geoprompt')}>
-                  <i className="fas fa-map-marker-alt mr-2"></i>
-                  GeoPrompt
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('vibematch')}>
-                  <i className="fas fa-users mr-2"></i>
-                  VibeMatch
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('partner')}>
-                  <i className="fas fa-heart mr-2"></i>
-                  Partner Mode
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('community')}>
-                  <i className="fas fa-comments mr-2"></i>
-                  Community
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('blog')}>
-                  <i className="fas fa-book mr-2"></i>
-                  Blog & Insights
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('about')}>
-                  <i className="fas fa-info-circle mr-2"></i>
-                  About
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('contact')}>
-                  <i className="fas fa-envelope mr-2"></i>
-                  Contact
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('help')}>
-                  <i className="fas fa-question-circle mr-2"></i>
-                  AI Help & Support
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('integrations')}>
-                  <i className="fas fa-mobile-alt mr-2"></i>
-                  Device Integrations
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveView('settings')}>
-                  <i className="fas fa-cog mr-2"></i>
-                  Settings & Plans
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/signup'}>
-                  <i className="fas fa-user-plus mr-2"></i>
-                  Sign Up
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Use the main navigation instead of dropdown - it's redundant */}
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{getViewName()}</h2>
+            <p className="text-gray-600">Use the sidebar navigation to explore different features</p>
           </div>
+
+
 
           {/* Content Rendering */}
           {activeView === 'home' && (
