@@ -123,14 +123,34 @@ export function AdminToggle({ isAdmin, onAdminChange }: AdminToggleProps) {
   return (
     <div className="flex items-center space-x-2">
       {getAdminBadge()}
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={handleLogout}
-        className="text-xs opacity-70 hover:opacity-100"
-      >
-        Exit
-      </Button>
+      <div className="flex items-center space-x-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => window.open('/admin/content', '_blank')}
+          className="text-xs opacity-70 hover:opacity-100"
+          title="Content Editor"
+        >
+          Edit
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => window.open('/admin/settings', '_blank')}
+          className="text-xs opacity-70 hover:opacity-100"
+          title="Admin Settings"
+        >
+          Settings
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLogout}
+          className="text-xs opacity-70 hover:opacity-100"
+        >
+          Exit
+        </Button>
+      </div>
     </div>
   );
 }

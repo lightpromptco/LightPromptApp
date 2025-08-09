@@ -34,8 +34,7 @@ const NAV_ITEMS = [
   { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
   { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
-  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Free Connection & Goal Sharing" },
-  { path: "/partner-mode", label: "Partner Mode", icon: UserPlus, description: "Advanced Partner Features" },
+  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
   { path: "/geoprompt", label: "GeoPrompt", icon: MapPin, description: "Location-based Reflections" },
   { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
@@ -182,14 +181,18 @@ export function MainNavigation() {
             <div className="text-xs text-muted-foreground">
               v1.0.0 • Privacy-First Wellness
             </div>
-            <AdminToggle 
-              isAdmin={isAdmin}
-              onAdminChange={(enabled) => {
-                if (enabled) {
-                  console.log('🔧 Admin mode activated from navigation');
-                }
-              }}
-            />
+            <div className="flex items-center">
+              <AdminToggle 
+                isAdmin={isAdmin}
+                onAdminChange={(enabled) => {
+                  if (enabled) {
+                    console.log('🔧 Admin mode activated from navigation');
+                    // Refresh to show admin features
+                    window.location.reload();
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       </nav>

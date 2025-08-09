@@ -175,11 +175,6 @@ function Router() {
           <SoulSyncPage />
         </MainLayout>
       )} />
-      <Route path="/partner-mode" component={() => (
-        <MainLayout>
-          <PartnerModePage />
-        </MainLayout>
-      )} />
       <Route component={NotFound} />
     </Switch>
   );

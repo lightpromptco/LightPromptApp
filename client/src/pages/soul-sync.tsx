@@ -297,14 +297,14 @@ export default function SoulSyncPage() {
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200">
             <CardContent className="py-8">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="text-2xl font-bold mb-4">Want Advanced Partner Features?</h3>
+              <h3 className="text-2xl font-bold mb-4">Want Premium Soul Sync Features?</h3>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Upgrade to Partner Mode for unlimited connections, detailed wellness data sharing, custom relationship types, 
+                Upgrade for unlimited connections, detailed wellness data sharing, custom relationship types, 
                 and advanced privacy controls.
               </p>
               <div className="flex gap-4 justify-center">
                 <Button className="bg-purple-600 hover:bg-purple-700">
-                  Upgrade to Partner Mode
+                  Get Premium Features
                 </Button>
                 <Button variant="outline">
                   Learn More
