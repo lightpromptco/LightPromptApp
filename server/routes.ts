@@ -61,6 +61,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register knowledge storage routes
   app.use("/api/knowledge", knowledgeRoutes);
+
+  // Soul Sync connection storage
+  app.post("/api/soul-sync/connections", async (req, res) => {
+    try {
+      const { name, type, email } = req.body;
+      
+      // Create demo connection record
+      const connection = {
+        id: Math.random().toString(36).substring(2, 8),
+        name,
+        type,
+        email,
+        status: "Active",
+        streak: 0,
+        lastActivity: "Just created",
+        energy: Math.floor(Math.random() * 30) + 70,
+        createdAt: new Date().toISOString()
+      };
+
+      console.log('💫 Soul Sync connection created:', connection);
+      res.json(connection);
+    } catch (error: any) {
+      console.error("Error creating Soul Sync connection:", error);
+      res.status(500).json({ error: "Failed to create connection" });
+    }
+  });
+
+  app.get("/api/soul-sync/connections/:email", async (req, res) => {
+    try {
+      const { email } = req.params;
+      
+      // For demo - return empty array, would query Supabase in production
+      console.log('📋 Fetching Soul Sync connections for:', email);
+      res.json([]);
+    } catch (error: any) {
+      console.error("Error fetching Soul Sync connections:", error);
+      res.status(500).json({ error: "Failed to fetch connections" });
+    }
+  });
   
   // Soul Map routes
   app.get("/api/soul-map/:userId", async (req, res) => {
