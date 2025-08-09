@@ -31,7 +31,14 @@ import {
   Music,
   Book,
   Zap,
-  Star
+  Star,
+  Moon,
+  Sun,
+  Stars,
+  Compass,
+  Lightbulb,
+  MessageSquare,
+  Activity
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,6 +49,9 @@ export default function SoulSyncPage() {
   const [sharedGoal, setSharedGoal] = useState("");
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<any>(null);
+  const [birthChartDialogOpen, setBirthChartDialogOpen] = useState(false);
+  const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   // Connection types with fun options
@@ -58,21 +68,67 @@ export default function SoulSyncPage() {
     { value: "soul_tribe", label: "✨ Soul Tribe", description: "Spiritual connection & growth" }
   ];
 
+  // Birth chart compatibility insights
+  const astrologyInsights = {
+    romantic_partner: {
+      fire_fire: {
+        compatibility: 92,
+        insight: "Explosive passion and endless adventures await! You both bring incredible energy and spontaneity.",
+        communication: "Be direct and passionate. Share your dreams boldly - you both thrive on big visions.",
+        activities: ["Surprise date adventures", "Competitive games", "Travel planning", "Dance together"],
+        challenges: "Both can be impulsive - take turns being the steady one when making big decisions."
+      },
+      earth_water: {
+        compatibility: 88,
+        insight: "A beautiful balance of stability and emotion. You ground each other while nurturing deep connection.",
+        communication: "Earth: Be patient with Water's emotional processing. Water: Appreciate Earth's practical love.",
+        activities: ["Cooking together", "Garden planning", "Cozy movie nights", "Nature walks"],
+        challenges: "Earth may seem too practical, Water too emotional - remember both styles show love."
+      },
+      air_fire: {
+        compatibility: 85,
+        insight: "Mental sparks fly! You inspire each other's ideas and fuel each other's passions.",
+        communication: "Keep conversations lively and intellectually stimulating. Share ideas freely.",
+        activities: ["Deep conversations", "Cultural events", "Learning new skills", "Social gatherings"],
+        challenges: "Air thinks, Fire acts - balance planning with spontaneity for best results."
+      }
+    },
+    best_friend: {
+      air_air: {
+        compatibility: 94,
+        insight: "Mental twins! You understand each other's thought processes and share amazing conversations.",
+        communication: "Talk about everything - ideas, dreams, random thoughts. You're natural communicators.",
+        activities: ["Brainstorming sessions", "Book clubs", "Debate nights", "Creative projects"],
+        challenges: "You might overthink instead of feeling - remember to check in emotionally too."
+      },
+      fire_water: {
+        compatibility: 78,
+        insight: "Opposites that fascinate each other. Fire brings excitement, Water brings depth.",
+        communication: "Fire: Slow down for Water's feelings. Water: Express needs clearly to Fire.",
+        activities: ["Adventure planning", "Heart-to-heart talks", "Trying new experiences", "Supporting dreams"],
+        challenges: "Very different paces - Fire rushes, Water flows. Find your shared rhythm."
+      }
+    }
+  };
+
   // Fun activities for different connection types
   const connectionActivities = {
     romantic_partner: [
       { icon: Heart, name: "Love Notes", description: "Daily affirmations for each other" },
+      { icon: Stars, name: "Birth Chart Match", description: "Explore your astrological compatibility" },
       { icon: Calendar, name: "Date Planning", description: "Plan surprise dates together" },
       { icon: Camera, name: "Memory Jar", description: "Collect special moments" }
     ],
     best_friend: [
       { icon: Gamepad2, name: "Challenge Mode", description: "Fun dares & challenges" },
       { icon: Music, name: "Playlist Swap", description: "Share your current vibes" },
+      { icon: Stars, name: "Friendship Compatibility", description: "Discover your cosmic connection" },
       { icon: Trophy, name: "Achievement Hunt", description: "Unlock life milestones" }
     ],
     family: [
       { icon: Book, name: "Story Sharing", description: "Family memories & wisdom" },
       { icon: Calendar, name: "Tradition Tracker", description: "Keep family traditions alive" },
+      { icon: Moon, name: "Family Astrology", description: "Understand family dynamics" },
       { icon: Heart, name: "Gratitude Circle", description: "Daily family appreciation" }
     ],
     workout_buddy: [
@@ -139,6 +195,71 @@ export default function SoulSyncPage() {
       title: "Invite link copied! 🔗",
       description: "Share this link with your connection to join your Soul Sync",
     });
+  };
+
+  // Generate AI-powered astrology compatibility
+  const generateAstrologyMatch = async (connection: any) => {
+    setIsAnalyzing(true);
+    setBirthChartDialogOpen(true);
+    setSelectedConnection(connection);
+
+    try {
+      // Simulate birth chart data for demo
+      const person1Chart = {
+        sunSign: 'Leo',
+        moonSign: 'Scorpio', 
+        risingSign: 'Gemini',
+        element: 'Fire'
+      };
+      
+      const person2Chart = {
+        sunSign: 'Sagittarius',
+        moonSign: 'Pisces',
+        risingSign: 'Libra', 
+        element: 'Fire'
+      };
+
+      // Call API for AI analysis
+      const response = await fetch('/api/astrology/compatibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          person1: person1Chart,
+          person2: person2Chart,
+          connectionType: connection.type
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setCompatibilityResult(result);
+      } else {
+        // Fallback to demo data
+        const demoResult = {
+          overall_compatibility: 87,
+          element_match: 'fire_fire',
+          communication_style: "Both Leo and Sagittarius are fire signs who communicate with passion and directness. You inspire each other's boldest dreams and adventures. Share your visions openly - you both thrive on big, exciting ideas.",
+          relationship_activities: [
+            "Plan spontaneous weekend adventures together",
+            "Challenge each other to try new experiences monthly", 
+            "Share your biggest dreams and support each other's ambitions",
+            "Create a vision board of places you want to travel together"
+          ],
+          growth_areas: "Both being fire signs, you might clash when you're both feeling impulsive. Take turns being the grounded one when making important decisions. Leo needs appreciation, Sagittarius needs freedom - honor both needs.",
+          love_language_match: "Leo: Words of affirmation and acts of service. Sagittarius: Quality time and physical touch. Plan active dates where you can appreciate each other's adventurous spirit.",
+          conflict_resolution: "When tensions arise, give each other space first, then come back with honest, direct communication. Both signs appreciate authenticity over passive-aggressive behavior."
+        };
+        setCompatibilityResult(demoResult);
+      }
+    } catch (error) {
+      console.error('Error generating compatibility:', error);
+      toast({
+        title: "Using demo compatibility analysis",
+        description: "Showing sample astrological insights for this connection type"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleCreateConnection = () => {
@@ -392,13 +513,29 @@ export default function SoulSyncPage() {
                             <div className="text-xs text-muted-foreground">Share your day</div>
                           </div>
                         </Button>
-                        <Button size="sm" variant="outline" className="h-auto p-3">
-                          <Gamepad2 className="h-4 w-4 mr-2" />
-                          <div className="text-left">
-                            <div className="font-medium">Start Challenge</div>
-                            <div className="text-xs text-muted-foreground">Fun activity</div>
-                          </div>
-                        </Button>
+                        {(connection.type === 'romantic_partner' || connection.type === 'best_friend' || connection.type === 'family') && (
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-auto p-3 bg-purple-50/50 dark:bg-purple-900/20 border-purple-200"
+                            onClick={() => generateAstrologyMatch(connection)}
+                          >
+                            <Stars className="h-4 w-4 mr-2 text-purple-600" />
+                            <div className="text-left">
+                              <div className="font-medium">Astro Match</div>
+                              <div className="text-xs text-muted-foreground">Birth chart insights</div>
+                            </div>
+                          </Button>
+                        )}
+                        {!(connection.type === 'romantic_partner' || connection.type === 'best_friend' || connection.type === 'family') && (
+                          <Button size="sm" variant="outline" className="h-auto p-3">
+                            <Gamepad2 className="h-4 w-4 mr-2" />
+                            <div className="text-left">
+                              <div className="font-medium">Start Challenge</div>
+                              <div className="text-xs text-muted-foreground">Fun activity</div>
+                            </div>
+                          </Button>
+                        )}
                       </div>
 
                       {/* Invite & Share */}
@@ -563,6 +700,139 @@ export default function SoulSyncPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Astrology Compatibility Dialog */}
+        <Dialog open={birthChartDialogOpen} onOpenChange={setBirthChartDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <Stars className="h-5 w-5 mr-2 text-purple-600" />
+                Birth Chart Compatibility: {selectedConnection?.name}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {isAnalyzing ? (
+              <div className="text-center py-8">
+                <Sparkles className="h-12 w-12 mx-auto mb-4 text-purple-600 animate-spin" />
+                <p className="text-lg font-medium">Analyzing birth chart compatibility...</p>
+                <p className="text-sm text-muted-foreground">Consulting the stars for relationship insights</p>
+              </div>
+            ) : compatibilityResult ? (
+              <div className="space-y-6">
+                {/* Compatibility Score */}
+                <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-4xl font-bold text-purple-600 mb-2">
+                      {compatibilityResult.overall_compatibility}%
+                    </div>
+                    <div className="text-lg font-medium">Overall Compatibility</div>
+                    <Progress value={compatibilityResult.overall_compatibility} className="mt-3 h-3" />
+                  </CardContent>
+                </Card>
+
+                {/* Communication Style */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <MessageSquare className="h-5 w-5 mr-2 text-blue-600" />
+                      How to Communicate
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {compatibilityResult.communication_style}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Recommended Activities */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Activity className="h-5 w-5 mr-2 text-green-600" />
+                      Recommended Activities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {compatibilityResult.relationship_activities?.map((activity: string, index: number) => (
+                        <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-green-50/50 dark:bg-green-900/20">
+                          <Heart className="h-4 w-4 text-green-600 mt-0.5" />
+                          <span className="text-sm">{activity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Growth Areas */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Lightbulb className="h-5 w-5 mr-2 text-yellow-600" />
+                      Growth Opportunities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {compatibilityResult.growth_areas}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Love Language Match */}
+                {compatibilityResult.love_language_match && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Heart className="h-5 w-5 mr-2 text-red-600" />
+                        Love Language Insights
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {compatibilityResult.love_language_match}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Conflict Resolution */}
+                {compatibilityResult.conflict_resolution && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Compass className="h-5 w-5 mr-2 text-orange-600" />
+                        Conflict Resolution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {compatibilityResult.conflict_resolution}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <div className="flex gap-3 pt-4">
+                  <Button onClick={() => setBirthChartDialogOpen(false)} className="flex-1">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Apply Insights
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share with Partner
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Stars className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p>Click "Astro Match" to analyze your birth chart compatibility</p>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

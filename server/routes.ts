@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
-import { generateBirthChart } from "./astrology.js";
+import { generateBirthChart, calculateCompatibilityScore, getElementMatch } from "./astrology.js";
+import OpenAI from 'openai';
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
@@ -450,6 +451,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Failed to generate birth chart",
         details: error instanceof Error ? error.message : "Unknown error"
       });
+    }
+  });
+
+  // Astrology compatibility analysis with AI insights
+  app.post("/api/astrology/compatibility", async (req, res) => {
+    try {
+      const { person1, person2, connectionType } = req.body;
+      
+      // Calculate basic compatibility score
+      const compatibilityScore = calculateCompatibilityScore(person1, person2);
+      const elementMatch = getElementMatch(person1, person2);
+      
+      // Initialize OpenAI for AI-generated insights
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      // Create detailed prompt for relationship analysis
+      const prompt = `You are an expert relationship astrologer providing personalized compatibility insights. Analyze this birth chart compatibility for a ${connectionType.replace('_', ' ')} relationship:
+
+Person 1: Sun in ${person1.sunSign}, Moon in ${person1.moonSign}, Rising in ${person1.risingSign}
+Person 2: Sun in ${person2.sunSign}, Moon in ${person2.moonSign}, Rising in ${person2.risingSign}
+
+Connection Type: ${connectionType.replace('_', ' ')}
+Calculated Compatibility: ${compatibilityScore}%
+Element Match: ${elementMatch}
+
+Provide a comprehensive analysis with these specific sections:
+
+1. COMMUNICATION_STYLE: How should they communicate with each other? Be specific about their different communication needs and how to bridge them. (2-3 sentences)
+
+2. RELATIONSHIP_ACTIVITIES: Suggest 4 specific activities that would strengthen their bond based on their astrological compatibility. Make them practical and enjoyable. Return as array format.
+
+3. GROWTH_AREAS: What challenges might they face and how can they overcome them? Focus on practical advice. (2-3 sentences)
+
+${connectionType === 'romantic_partner' ? '4. LOVE_LANGUAGE_MATCH: How do their signs express and receive love differently? What should each person know about the other\'s love style? (2-3 sentences)' : ''}
+
+${connectionType === 'romantic_partner' ? '5. CONFLICT_RESOLUTION: When they disagree, what\'s the best approach based on their signs? (2-3 sentences)' : ''}
+
+Keep the tone warm, insightful, and practical. Focus on actionable advice they can use immediately.
+
+Return ONLY a JSON object with these exact keys: communication_style, relationship_activities (array), growth_areas${connectionType === 'romantic_partner' ? ', love_language_match, conflict_resolution' : ''}.`;
+
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+          max_tokens: 1000
+        });
+
+        const aiInsights = JSON.parse(response.choices[0].message.content || '{}');
+        
+        // Combine calculated compatibility with AI insights
+        const result = {
+          overall_compatibility: compatibilityScore,
+          element_match: elementMatch,
+          ...aiInsights
+        };
+
+        console.log('🔮 Generated astrology compatibility:', {
+          connectionType,
+          compatibility: compatibilityScore,
+          elementMatch,
+          aiGenerated: true
+        });
+
+        res.json(result);
+      } catch (aiError: any) {
+        console.error('AI compatibility analysis failed:', aiError);
+        
+        // Fallback to pre-defined insights
+        const fallbackInsights = {
+          overall_compatibility: compatibilityScore,
+          element_match: elementMatch,
+          communication_style: `Based on your ${person1.sunSign} and ${person2.sunSign} combination, you both bring unique strengths to communication. Focus on understanding each other's different approaches and finding common ground.`,
+          relationship_activities: [
+            "Share your dreams and aspirations with each other",
+            "Try new experiences that challenge both of you",
+            "Practice active listening during important conversations",
+            "Create shared goals that align with both your values"
+          ],
+          growth_areas: "Your different astrological energies can sometimes create misunderstandings. Remember that these differences are opportunities for growth and learning from each other."
+        };
+
+        if (connectionType === 'romantic_partner') {
+          (fallbackInsights as any).love_language_match = `${person1.sunSign} and ${person2.sunSign} express love in different ways. Take time to understand and appreciate each other's unique love language.`;
+          (fallbackInsights as any).conflict_resolution = "When disagreements arise, give each other space to process, then come back together with openness and honesty.";
+        }
+
+        res.json(fallbackInsights);
+      }
+    } catch (error: any) {
+      console.error("Compatibility analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze compatibility" });
     }
   });
 

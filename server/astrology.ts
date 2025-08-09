@@ -319,3 +319,59 @@ export async function generateBirthChart(birthData: BirthData): Promise<BirthCha
     interpretation
   };
 }
+
+// Determine element from zodiac sign
+function getElement(sign: string): string {
+  const fireSignes = ['Aries', 'Leo', 'Sagittarius'];
+  const earthSigns = ['Taurus', 'Virgo', 'Capricorn'];
+  const airSigns = ['Gemini', 'Libra', 'Aquarius'];
+  const waterSigns = ['Cancer', 'Scorpio', 'Pisces'];
+  
+  if (fireSignes.includes(sign)) return 'Fire';
+  if (earthSigns.includes(sign)) return 'Earth';
+  if (airSigns.includes(sign)) return 'Air';
+  if (waterSigns.includes(sign)) return 'Water';
+  return 'Fire'; // fallback
+}
+
+// Calculate compatibility score based on elements and signs
+export function calculateCompatibilityScore(person1: any, person2: any): number {
+  const element1 = getElement(person1.sunSign);
+  const element2 = getElement(person2.sunSign);
+  
+  // Element compatibility matrix
+  const elementScores: Record<string, Record<string, number>> = {
+    Fire: { Fire: 85, Earth: 65, Air: 90, Water: 70 },
+    Earth: { Fire: 65, Earth: 80, Air: 60, Water: 90 },
+    Air: { Fire: 90, Earth: 60, Air: 85, Water: 65 },
+    Water: { Fire: 70, Earth: 90, Air: 65, Water: 85 }
+  };
+  
+  let baseScore = elementScores[element1]?.[element2] || 70;
+  
+  // Adjust for moon sign compatibility
+  const moonElement1 = getElement(person1.moonSign);
+  const moonElement2 = getElement(person2.moonSign);
+  const moonCompatibility = elementScores[moonElement1]?.[moonElement2] || 70;
+  
+  // Adjust for rising sign compatibility
+  const risingElement1 = getElement(person1.risingSign);
+  const risingElement2 = getElement(person2.risingSign);
+  const risingCompatibility = elementScores[risingElement1]?.[risingElement2] || 70;
+  
+  // Weighted average: Sun 50%, Moon 30%, Rising 20%
+  return Math.round(
+    (baseScore * 0.5) + 
+    (moonCompatibility * 0.3) + 
+    (risingCompatibility * 0.2)
+  );
+}
+
+// Generate element combination key
+export function getElementMatch(person1: any, person2: any): string {
+  const element1 = getElement(person1.sunSign).toLowerCase();
+  const element2 = getElement(person2.sunSign).toLowerCase();
+  
+  // Sort elements alphabetically for consistent keys
+  return [element1, element2].sort().join('_');
+}
