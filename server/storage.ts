@@ -2400,6 +2400,47 @@ export class MemStorage implements IStorage {
       this.contentBlocks.set(contentBlock.id, contentBlock);
     });
   }
+
+  // Soul Map methods
+  async getSoulMap(userId: string): Promise<any | undefined> {
+    return Array.from(this.soulMaps.values())
+      .find(soulMap => soulMap.userId === userId);
+  }
+
+  async createSoulMap(soulMapData: any): Promise<any> {
+    const id = randomUUID();
+    const soulMap = {
+      id,
+      ...soulMapData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.soulMaps.set(id, soulMap);
+    return soulMap;
+  }
+
+  // Vision Quest methods
+  async getVisionQuest(userId: string): Promise<any | undefined> {
+    return Array.from(this.visionQuests.values())
+      .find(quest => quest.userId === userId);
+  }
+
+  async createVisionQuest(questData: any): Promise<any> {
+    const id = randomUUID();
+    const quest = {
+      id,
+      userId: questData.userId,
+      status: 'active',
+      currentStage: 'departure',
+      startedAt: new Date(),
+      practices: questData.practices || [],
+      progress: questData.progress || {},
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.visionQuests.set(id, quest);
+    return quest;
+  }
 }
 
 import { SupabaseStorage } from "./supabaseStorage";

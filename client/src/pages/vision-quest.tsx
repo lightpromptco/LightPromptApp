@@ -72,6 +72,7 @@ export default function VisionQuestPage() {
   const [currentStage, setCurrentStage] = useState(0);
   const [questProgress, setQuestProgress] = useState(0);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Get current user
   const { data: user } = useQuery({

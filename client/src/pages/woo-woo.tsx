@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { LocationPicker } from "@/components/LocationPicker";
 import { 
   Stars, 
   Moon, 
@@ -21,7 +22,8 @@ import {
   Mountain,
   Waves,
   Flame,
-  Wind
+  Wind,
+  MapPin
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -61,7 +63,10 @@ export default function WooWooPage() {
   const [birthData, setBirthData] = useState({
     birthDate: '',
     birthTime: '',
+    timeApproximate: false,
     birthLocation: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
     name: '',
     questions: {
       intuition: '',
