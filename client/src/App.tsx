@@ -29,9 +29,10 @@ import VisionQuestPage from "@/pages/vision-quest";
 import VisionQuestIndexPage from "@/pages/vision-quest/index";
 import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
+import AdminSettings from "@/pages/admin/settings";
 import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
-import PartnerModePage from "@/pages/partner-mode";
+
 import SoulSyncPage from "@/pages/soul-sync";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
@@ -131,9 +132,7 @@ function Router() {
         </MainLayout>
       )} />
       <Route path="/admin/settings" component={() => (
-        <MainLayout>
-          <AdminSettingsPage />
-        </MainLayout>
+        <AdminSettings />
       )} />
       <Route path="/woo-woo" component={() => (
         <MainLayout>
@@ -156,9 +155,7 @@ function Router() {
         </MainLayout>
       )} />
       <Route path="/admin/content" component={() => (
-        <MainLayout>
-          <ContentManagement />
-        </MainLayout>
+        <ContentManagement />
       )} />
       <Route path="/blog" component={() => (
         <MainLayout>
