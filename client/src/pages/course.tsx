@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Clock, Users, CheckCircle, Star, Target } from "lucide-react";
+import { Play, Clock, Users, CheckCircle, Star, Target, ShoppingCart } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const modules = [
   {
@@ -43,6 +47,37 @@ const modules = [
 ];
 
 export default function CoursePage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const purchaseCourseMutation = useMutation({
+    mutationFn: async () => {
+      setIsLoading(true);
+      const response = await apiRequest("POST", "/api/create-course-payment", {
+        courseTitle: "LightPrompt:ed - The Human Guide to Conscious AI & Soul Tech",
+        amount: 19700 // $197.00 in cents
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      // Redirect to Stripe checkout
+      window.location.href = data.checkoutUrl;
+    },
+    onError: (error) => {
+      console.error('Purchase error:', error);
+      toast({
+        title: "Purchase Error",
+        description: "Unable to process payment. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  });
+
+  const handlePurchase = () => {
+    purchaseCourseMutation.mutate();
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Hero Section */}
@@ -79,8 +114,23 @@ export default function CoursePage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4">
-            Enroll Now - $197
+          <Button 
+            size="lg" 
+            className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4"
+            onClick={handlePurchase}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Enroll Now - $197
+              </>
+            )}
           </Button>
           <Button size="lg" variant="outline" className="px-8 py-4">
             Watch Free Preview
@@ -194,8 +244,23 @@ export default function CoursePage() {
           and authentic relationships.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-teal-500 hover:bg-teal-600 text-white px-12 py-4">
-            Enroll Today
+          <Button 
+            size="lg" 
+            className="bg-teal-500 hover:bg-teal-600 text-white px-12 py-4"
+            onClick={handlePurchase}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Enroll Today - $197
+              </>
+            )}
           </Button>
           <Button size="lg" variant="outline" className="px-8 py-4">
             Learn More

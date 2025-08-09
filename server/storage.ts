@@ -215,6 +215,12 @@ export interface IStorage {
   // GeoPrompt Check-ins
   createGeoPromptCheckIn(checkIn: InsertGeoPromptCheckIn): Promise<GeoPromptCheckIn>;
   getGeoPromptCheckInsByUser(userId: string): Promise<GeoPromptCheckIn[]>;
+
+  // Soul Map and Vision Quest
+  getSoulMap(userId: string): Promise<any | undefined>;
+  createSoulMap(soulMapData: any): Promise<any>;
+  getVisionQuest(userId: string): Promise<any | undefined>;
+  createVisionQuest(questData: any): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -259,6 +265,8 @@ export class MemStorage implements IStorage {
   private adminSettings: Map<string, AdminSetting> = new Map();
   private contentBlocks: Map<string, ContentBlock> = new Map();
   private geoPromptCheckIns: Map<string, GeoPromptCheckIn> = new Map();
+  private soulMaps: Map<string, any> = new Map();
+  private visionQuests: Map<string, any> = new Map();
   
   constructor() {
     this.initializeReflectionPrompts();

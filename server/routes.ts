@@ -1993,6 +1993,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Course purchase endpoint
+  app.post('/api/create-course-payment', async (req, res) => {
+    try {
+      const { courseTitle, amount } = req.body;
+      
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({ error: 'Stripe not configured' });
+      }
+
+      const Stripe = require('stripe');
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      
+      // Create checkout session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: courseTitle,
+              description: 'Transform your relationship with AI and technology through conscious practices and authentic connection.',
+            },
+            unit_amount: amount,
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${req.headers.origin}/course-access?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/course`,
+        metadata: {
+          course_name: 'lightprompted',
+          user_email: 'customer_email'
+        }
+      });
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error('Course payment error:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
