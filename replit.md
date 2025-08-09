@@ -64,9 +64,14 @@ Domain transition: Moving to lightprompt.co as main landing page.
 
 - **Product-Centered Approach**: Simplified navigation to focus on selling LightPrompt:ed course and ebook
 - **Content Management System**: Added admin panel at `/admin/content` for editing pages, images, and fonts
+- **Admin Settings Panel**: Created `/admin/settings` for lightprompt.co@gmail.com with developer mode toggle
+- **Developer Mode**: Wix.com-style editing capabilities when enabled for full platform control
 - **Google Maps Integration**: Created new GoogleMap component for GeoPrompt functionality
-- **Database Issues**: Experiencing ETIMEDOUT errors preventing schema migrations (using in-memory storage as fallback)
+- **Comprehensive Astrology**: Enhanced Soul Map Navigator with birth charts, moon cycles, Schumann resonance
+- **AI Philosophy**: Updated all bots to emphasize conscious AI reflection rather than AI becoming human
 - **Clean Navigation**: Removed confusing terminology, implemented Stripe-style professional design
+- **Vision Quest Updates**: Fixed crashes, modernized self-discovery approach with practical exercises
+- **Database Issues**: Experiencing ETIMEDOUT errors preventing schema migrations (using in-memory storage as fallback)
 - **Pricing Structure**: Finalized Course $120, Ebook $11, Bundle $125 pricing
 
-The architecture emphasizes e-commerce functionality and content management while maintaining the original wellness-focused features. Database connection issues are being worked around with in-memory storage solutions.
+The architecture emphasizes e-commerce functionality and content management while maintaining the original wellness-focused features. Personal admin access is configured for lightprompt.co@gmail.com with toggleable developer mode for complete platform editing control.

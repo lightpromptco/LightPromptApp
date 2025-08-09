@@ -17,7 +17,8 @@ import {
   Waves,
   Flame,
   TreePine,
-  Sparkles
+  Sparkles,
+  Brain
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";

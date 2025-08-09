@@ -23,6 +23,7 @@ import CoursePage from "@/pages/course";
 import ProductsPage from "@/pages/products";
 import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
+import AdminSettingsPage from "@/pages/admin-settings";
 import WooWooPage from "@/pages/woo-woo";
 import VisionQuestPage from "@/pages/vision-quest";
 import ContentManagement from "@/pages/admin/content";
@@ -123,6 +124,11 @@ function Router() {
       <Route path="/settings" component={() => (
         <MainLayout>
           <SettingsPage />
+        </MainLayout>
+      )} />
+      <Route path="/admin/settings" component={() => (
+        <MainLayout>
+          <AdminSettingsPage />
         </MainLayout>
       )} />
       <Route path="/woo-woo" component={() => (
