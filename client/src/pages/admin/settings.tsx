@@ -226,7 +226,7 @@ export default function AdminSettings() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Button 
                 variant="outline" 
                 onClick={() => window.open('/admin/content', '_blank')}
@@ -243,6 +243,15 @@ export default function AdminSettings() {
               >
                 <Globe className="h-4 w-4 mr-2" />
                 View Site
+              </Button>
+
+              <Button 
+                variant="outline" 
+                onClick={() => window.open('/dashboard', '_blank')}
+                className="flex items-center justify-center"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Dashboard
               </Button>
               
               <Button 

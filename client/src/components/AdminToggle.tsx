@@ -145,6 +145,24 @@ export function AdminToggle({ isAdmin, onAdminChange }: AdminToggleProps) {
         <Button 
           variant="ghost" 
           size="sm" 
+          onClick={() => window.open('/', '_blank')}
+          className="text-xs opacity-70 hover:opacity-100"
+          title="View Live Site"
+        >
+          Live
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => window.open('/dashboard', '_blank')}
+          className="text-xs opacity-70 hover:opacity-100"
+          title="Dashboard"
+        >
+          Dash
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
           onClick={handleLogout}
           className="text-xs opacity-70 hover:opacity-100"
         >
