@@ -5,16 +5,7 @@ import {
   Habit, InsertHabit, HabitEntry, InsertHabitEntry,
   AppleHealthData, InsertAppleHealthData, HomeKitData, InsertHomeKitData,
   WellnessPattern, Recommendation, InsertRecommendation,
-  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration,
-  VibeProfile, InsertVibeProfile, VibeMatch, InsertVibeMatch,
-  MatchChat, InsertMatchChat, ReflectionPrompt, InsertReflectionPrompt,
-  ChatSafetyLog, InsertChatSafetyLog, PrismPoint, InsertPrismPoint,
-  PartnerConnection, InsertPartnerConnection, UserPreferences, InsertUserPreferences,
-  WellnessCircle, InsertWellnessCircle, CircleMember, InsertCircleMember,
-  CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
-  HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
-  AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock,
-  GeoPromptCheckIn, InsertGeoPromptCheckIn
+  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { 
@@ -28,6 +19,9 @@ import {
   getSupabaseSessionMessages,
   createAdminUser
 } from "./supabase";
+import { db } from "./db";
+import { eq, desc, and, gte } from "drizzle-orm";
+import * as schema from "@shared/schema";
 
 export interface IStorage {
   // Users
@@ -2608,6 +2602,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { SupabaseStorage } from "./supabaseStorage";
+import { DatabaseStorage } from "./databaseStorage";
 
-export const storage = new SupabaseStorage();
+export const storage = new DatabaseStorage();
