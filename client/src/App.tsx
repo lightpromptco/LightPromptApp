@@ -32,6 +32,7 @@ import ContentManagement from "@/pages/admin/content";
 import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
 import PartnerModePage from "@/pages/partner-mode";
+import SoulSyncPage from "@/pages/soul-sync";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -167,6 +168,11 @@ function Router() {
       <Route path="/community" component={() => (
         <MainLayout>
           <CommunityPage />
+        </MainLayout>
+      )} />
+      <Route path="/soul-sync" component={() => (
+        <MainLayout>
+          <SoulSyncPage />
         </MainLayout>
       )} />
       <Route path="/partner-mode" component={() => (

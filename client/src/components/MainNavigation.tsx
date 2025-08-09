@@ -22,7 +22,8 @@ import {
   Compass,
   ShoppingBag,
   BookOpen,
-  Code
+  Code,
+  Heart
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -32,7 +33,8 @@ const NAV_ITEMS = [
   { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
   { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
-  { path: "/partner-mode", label: "Partner Mode", icon: UserPlus, description: "Connect & Share with Partners" },
+  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Free Connection & Goal Sharing" },
+  { path: "/partner-mode", label: "Partner Mode", icon: UserPlus, description: "Advanced Partner Features" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
   { path: "/geoprompt", label: "GeoPrompt", icon: MapPin, description: "Location-based Reflections" },
   { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },

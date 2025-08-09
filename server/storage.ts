@@ -153,6 +153,10 @@ export interface IStorage {
   createPartnerConnection(connection: InsertPartnerConnection): Promise<PartnerConnection>;
   updatePartnerConnection(id: string, updates: Partial<PartnerConnection>): Promise<PartnerConnection>;
   invitePartner(userId: string, email: string, relationshipType: string): Promise<any>;
+
+  // Vision Quest
+  getVisionQuest(userId: string): Promise<any | undefined>;
+  createVisionQuest(questData: any): Promise<any>;
   
   // Challenge System
   getActiveChallenges(): Promise<Challenge[]>;
