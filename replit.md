@@ -66,9 +66,10 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - **Admin Toggle Restoration**: Fixed missing admin toggle for lightprompt.co@gmail.com with discreet access dot in navigation
 - **Authentication Fixes**: Removed login requirements from Soul Sync and Privacy pages - now accessible to all users
 - **Database Integration**: Successfully migrated from in-memory storage to PostgreSQL database using Neon
-- **DatabaseStorage Implementation**: Created complete database storage layer replacing MemStorage with proper Drizzle ORM integration
+- **DatabaseStorage Implementation**: Created complete database storage layer replacing MemStorage with proper Drizzle ORM integration  
 - **Schema Migration**: Pushed full database schema to PostgreSQL, all tables created successfully
 - **Admin User Creation**: Database now properly creates and manages admin user (lightprompt.co@gmail.com)
+- **Supabase Storage Setup**: Configured automatic storage selection - will use Supabase when credentials provided, falls back to Neon
 - **Vision Quest Backend**: Fixed createVisionQuest interface method missing from IStorage, begin button now functional
 - **Navigation Structure**: Soul Sync (free) → Partner Mode (premium) progression with clear upgrade path
 - **Product-Centered Approach**: Simplified navigation to focus on selling LightPrompt:ed course and ebook

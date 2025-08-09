@@ -1,19 +1,45 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required for Supabase connection');
+// Check if we have Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+let supabaseClient;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('⚠️ Supabase URL and key not found in environment variables.');
+  
+  // Try to extract Supabase URL from DATABASE_URL if it's a Supabase connection
+  if (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('supabase')) {
+    const dbUrl = new URL(process.env.DATABASE_URL);
+    const extractedUrl = `https://${dbUrl.hostname.split('.')[0]}.supabase.co`;
+    const extractedKey = process.env.SUPABASE_ANON_KEY || '';
+    
+    if (!extractedKey) {
+      throw new Error('SUPABASE_ANON_KEY is required when using Supabase DATABASE_URL');
+    }
+    
+    supabaseClient = createClient(extractedUrl, extractedKey, {
+      auth: { persistSession: false }
+    });
+    console.log('✅ Using Supabase connection extracted from DATABASE_URL');
+  } else {
+    // For development, we'll create a mock client that throws helpful errors
+    console.warn('⚠️ No Supabase configuration found. Please provide SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+    supabaseClient = {
+      from: () => {
+        throw new Error('Supabase not configured. Please provide SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.');
+      }
+    } as any;
+  }
+} else {
+  supabaseClient = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+  console.log('✅ Using Supabase connection from environment variables');
 }
 
-// Parse the DATABASE_URL to get Supabase project details
-const dbUrl = new URL(process.env.DATABASE_URL);
-const supabaseUrl = `https://${dbUrl.hostname.split('.')[0]}.supabase.co`;
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: false
-  }
-});
+export const supabase = supabaseClient;
 
 // Helper functions for user management
 export async function createSupabaseUser(userData: {

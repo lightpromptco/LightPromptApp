@@ -2603,5 +2603,21 @@ export class MemStorage implements IStorage {
 }
 
 import { DatabaseStorage } from "./databaseStorage";
+import { SupabaseStorage } from "./supabaseStorage";
 
-export const storage = new DatabaseStorage();
+// Use SupabaseStorage if Supabase credentials are available, otherwise fallback to DatabaseStorage
+export const storage = (() => {
+  try {
+    // Check if Supabase is configured
+    if (process.env.SUPABASE_URL || (process.env.DATABASE_URL?.includes('supabase'))) {
+      console.log('🔄 Initializing Supabase storage...');
+      return new SupabaseStorage();
+    } else {
+      console.log('🔄 Initializing Database storage...');
+      return new DatabaseStorage();
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to initialize Supabase storage, falling back to DatabaseStorage:', error);
+    return new DatabaseStorage();
+  }
+})();
