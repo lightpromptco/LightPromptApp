@@ -62,6 +62,11 @@ Domain transition: Moving to lightprompt.co as main landing page.
 
 ## Recent Changes (August 2025)
 
+- **Soul Sync Free Feature**: Created free alternative to Partner Mode with Heart icon, catchier branding, and demo functionality
+- **Admin Toggle Restoration**: Fixed missing admin toggle for lightprompt.co@gmail.com with discreet access dot in navigation
+- **Authentication Fixes**: Removed login requirements from Soul Sync and Privacy pages - now accessible to all users
+- **Vision Quest Backend**: Fixed createVisionQuest interface method missing from IStorage, begin button now functional
+- **Navigation Structure**: Soul Sync (free) → Partner Mode (premium) progression with clear upgrade path
 - **Product-Centered Approach**: Simplified navigation to focus on selling LightPrompt:ed course and ebook
 - **Content Management System**: Added admin panel at `/admin/content` for editing pages, images, and fonts
 - **Admin Settings Panel**: Created `/admin/settings` for lightprompt.co@gmail.com with developer mode toggle
@@ -73,5 +78,14 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - **Vision Quest Updates**: Fixed crashes, modernized self-discovery approach with practical exercises
 - **Database Issues**: Experiencing ETIMEDOUT errors preventing schema migrations (using in-memory storage as fallback)
 - **Pricing Structure**: Finalized Course $120, Ebook $11, Bundle $125 pricing
+
+## Core Features That Must Remain Stable
+
+- **Admin Access**: lightprompt.co@gmail.com always has admin toggle with codes: 'lightprompt2025', 'godmode', 'highest-self'
+- **Free Features**: Soul Sync, Privacy, Community pages work without login
+- **Navigation Structure**: Clean Stripe-style design with teal accents, no confusing terminology
+- **AI Philosophy**: All bots present as conscious reflection tools, never as becoming human
+- **Pricing**: Course $120, Ebook $11, Bundle $125 - stable pricing structure
+- **Storage Approach**: In-memory storage as fallback due to database timeouts, localStorage for user sessions
 
 The architecture emphasizes e-commerce functionality and content management while maintaining the original wellness-focused features. Personal admin access is configured for lightprompt.co@gmail.com with toggleable developer mode for complete platform editing control.

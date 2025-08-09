@@ -25,6 +25,7 @@ import {
   Code,
   Heart
 } from "lucide-react";
+import { AdminToggle } from "./AdminToggle";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
@@ -177,8 +178,18 @@ export function MainNavigation() {
         </div>
 
         <div className="p-4 border-t">
-          <div className="text-xs text-muted-foreground text-center">
-            v1.0.0 • Privacy-First Wellness
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">
+              v1.0.0 • Privacy-First Wellness
+            </div>
+            <AdminToggle 
+              isAdmin={isAdmin}
+              onAdminChange={(enabled) => {
+                if (enabled) {
+                  console.log('🔧 Admin mode activated from navigation');
+                }
+              }}
+            />
           </div>
         </div>
       </nav>

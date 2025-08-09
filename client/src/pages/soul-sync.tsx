@@ -83,16 +83,8 @@ export default function SoulSyncPage() {
     setSharedGoal("");
   };
 
-  if (!userId) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-4">Soul Sync</h1>
-          <p className="text-muted-foreground">Please log in to access Soul Sync features.</p>
-        </div>
-      </div>
-    );
-  }
+  // Soul Sync works without login - just show demo for now
+  const showDemo = !userId;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900">

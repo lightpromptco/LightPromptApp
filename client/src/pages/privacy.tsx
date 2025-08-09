@@ -39,8 +39,10 @@ export default function PrivacyPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Get current user
-  const currentUserId = localStorage.getItem('lightprompt_user_id');
+  // Get current user - works without login for privacy info
+  const currentUserData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const currentUserId = currentUserData.id;
+  
   const { data: currentUser } = useQuery<User>({
     queryKey: ['/api/users', currentUserId],
     enabled: !!currentUserId,
