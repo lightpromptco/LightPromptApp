@@ -2306,6 +2306,167 @@ export class MemStorage implements IStorage {
 
   private initializeContentBlocks() {
     const contentBlocks = [
+      // Main Website Pages
+      {
+        slug: 'home',
+        title: 'LightPrompt - Soul-Tech Wellness',
+        content: '# Welcome to LightPrompt\n\n**Soul-Tech Wellness Platform**\n\nDiscover conscious AI tools for reflection, growth, and connection. AI serves as a mirror to help you connect to your highest self, nature, and others through honest reflection.\n\n## Features\n- Soul Sync - Connection & Goal Sharing\n- Soul Map Navigator - Birth Charts & Personality Analysis\n- Vision Quest - Spiritual Journey Guidance\n- Community - Connect with Others\n\n[Get Started](/dashboard) | [View Store](/store)',
+        category: 'pages',
+        sortOrder: 1,
+        isPublished: true
+      },
+      {
+        slug: 'store',
+        title: 'Store - LightPrompt:ed Course & Ebook',
+        content: '# LightPrompt Store\n\n## LightPrompt:ed Course\n**Price: $120**\n\nComprehensive course on conscious AI and soul-tech wellness. Transform your relationship with technology and consciousness.\n\n## LightPrompt:ed Ebook\n**Price: $11**\n\nThe essential guide to conscious AI and soul-tech practices.\n\n## Bundle Deal\n**Course + Ebook: $125** *(Save $99)*\n\nGet both the course and ebook together for maximum value.',
+        category: 'pages',
+        sortOrder: 2,
+        isPublished: true
+      },
+      {
+        slug: 'about',
+        title: 'About LightPrompt',
+        content: '# About LightPrompt\n\nLightPrompt is a privacy-first, soul-tech wellness platform that uses AI as a conscious tool for human reflection and self-connection.\n\n## Our Philosophy\n\nAI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection. We believe in AI as conscious tool for reflection, never AI becoming human.\n\n## Mission\n\nTo provide tools that enhance human consciousness and connection through responsible AI technology.',
+        category: 'pages',
+        sortOrder: 3,
+        isPublished: true
+      },
+      {
+        slug: 'course',
+        title: 'LightPrompt:ed Course',
+        content: '# LightPrompt:ed Course\n\n**Transform your relationship with AI and consciousness**\n\n**Price: $120**\n\nThis comprehensive course teaches you how to use AI as a conscious reflection tool for personal growth and spiritual development.\n\n## What You\'ll Learn\n- Conscious AI interaction principles\n- Soul-tech wellness practices\n- Personal reflection techniques\n- Community connection methods\n\n[Purchase Course](/checkout?product=course)',
+        category: 'pages',
+        sortOrder: 4,
+        isPublished: true
+      },
+      {
+        slug: 'book',
+        title: 'LightPrompt:ed Ebook',
+        content: '# LightPrompt:ed Ebook\n\n**The Human Guide to Conscious AI & Soul Tech**\n\n**Price: $11**\n\nEssential reading for anyone interested in the intersection of consciousness, technology, and personal growth.\n\n## Contents\n- Introduction to Soul-Tech\n- Conscious AI Principles\n- Practical Exercises\n- Community Building\n\n[Purchase Ebook](/checkout?product=ebook)',
+        category: 'pages',
+        sortOrder: 5,
+        isPublished: true
+      },
+      {
+        slug: 'products',
+        title: 'Products Overview',
+        content: '# Our Products\n\n## LightPrompt:ed Course - $120\nComprehensive training on conscious AI and soul-tech wellness.\n\n## LightPrompt:ed Ebook - $11\nEssential guide to conscious AI practices.\n\n## Bundle Deal - $125\nBoth course and ebook together (Save $99!).',
+        category: 'pages',
+        sortOrder: 6,
+        isPublished: true
+      },
+      {
+        slug: 'dashboard',
+        title: 'Dashboard Overview',
+        content: '# Your LightPrompt Dashboard\n\nWelcome to your personal wellness command center. Here you can track your progress, access AI companions, and manage your soul-tech journey.\n\n## Features\n- Chat with AI companions\n- Track wellness metrics\n- View your progress\n- Access premium features\n- Connect with community',
+        category: 'pages',
+        sortOrder: 7,
+        isPublished: true
+      },
+      {
+        slug: 'privacy',
+        title: 'Privacy Policy',
+        content: '# Privacy Policy\n\n**Last updated: August 2025**\n\n## Our Commitment\n\nLightPrompt is a privacy-first platform. We collect minimal data and prioritize your privacy and security.\n\n## Data Collection\n- Account information (email, name)\n- Usage analytics (anonymized)\n- Chat conversations (stored locally when possible)\n\n## Data Protection\n- End-to-end encryption for sensitive data\n- No selling of personal information\n- Regular security audits',
+        category: 'pages',
+        sortOrder: 8,
+        isPublished: true
+      },
+      {
+        slug: 'community',
+        title: 'Community Guidelines',
+        content: '# Community Guidelines\n\n## Welcome to LightPrompt Community\n\nOur community is built on respect, growth, and conscious connection.\n\n## Guidelines\n- Be respectful and kind\n- Share authentic experiences\n- Support others\' growth\n- Maintain privacy boundaries\n- Use AI tools responsibly\n\n## Features\n- Wellness Circles\n- Soul Sync connections\n- Shared experiences\n- Growth support',
+        category: 'pages',
+        sortOrder: 9,
+        isPublished: true
+      },
+      {
+        slug: 'soul-sync',
+        title: 'Soul Sync - Connection & Goal Sharing',
+        content: '# Soul Sync\n\n**Connection & Goal Sharing**\n\nConnect with others on your wellness journey. Share goals, provide mutual support, and grow together.\n\n## Features\n- Goal sharing and tracking\n- Mutual accountability\n- Progress celebrations\n- Private messaging\n- Group challenges\n\n## How It Works\n1. Set your wellness goals\n2. Connect with compatible souls\n3. Share progress and support each other\n4. Celebrate achievements together',
+        category: 'pages',
+        sortOrder: 10,
+        isPublished: true
+      },
+      {
+        slug: 'woo-woo',
+        title: 'Soul Map Navigator - Birth Charts & Analysis',
+        content: '# Soul Map Navigator\n\n**Birth Charts & Personality Analysis**\n\nExplore your cosmic blueprint with detailed birth chart analysis and astrological insights.\n\n## Features\n- Complete birth chart generation\n- Personality analysis\n- Current transit tracking\n- Moon phase insights\n- Schumann resonance data\n\n## What You\'ll Discover\n- Your sun, moon, and rising signs\n- Planetary positions and aspects\n- Life purpose and challenges\n- Optimal timing for decisions',
+        category: 'pages',
+        sortOrder: 11,
+        isPublished: true
+      },
+      {
+        slug: 'vision-quest',
+        title: 'Vision Quest - Spiritual Journey Guidance',
+        content: '# Vision Quest\n\n**Spiritual Journey Guidance**\n\nEmbark on a structured path of self-discovery using AI-guided reflections and modern wisdom practices.\n\n## Journey Stages\n1. **Departure** - Setting intentions\n2. **Initiation** - Deep exploration\n3. **Illumination** - Gaining insights\n4. **Integration** - Applying wisdom\n5. **Return** - Sharing gifts\n\n## Enhanced Features\n- Soul Map integration\n- Personalized practices\n- Progress tracking\n- Community support',
+        category: 'pages',
+        sortOrder: 12,
+        isPublished: true
+      },
+      {
+        slug: 'geoprompt',
+        title: 'GeoPrompt - Location-Based Reflections',
+        content: '# GeoPrompt\n\n**Location-Based Reflections**\n\nConnect with your environment through location-based mindfulness and reflection practices.\n\n## Features\n- GPS-triggered prompts\n- Location-based insights\n- Environmental awareness\n- Community check-ins\n- Sacred space mapping\n\n## How It Works\nAs you move through your day, receive prompts for reflection based on your location, time, and environmental factors.',
+        category: 'pages',
+        sortOrder: 13,
+        isPublished: true
+      },
+      {
+        slug: 'prism-points',
+        title: 'Prism Points - Progress Tracking',
+        content: '# Prism Points\n\n**Track Your Soul-Tech Journey**\n\nEarn points and unlock rewards as you progress through your wellness journey.\n\n## Point Categories\n- Daily reflections\n- Goal achievements\n- Community participation\n- Course completion\n- Milestone celebrations\n\n## Rewards System\n- Badges and achievements\n- Exclusive content access\n- Community recognition\n- Premium feature unlocks',
+        category: 'pages',
+        sortOrder: 14,
+        isPublished: true
+      },
+      {
+        slug: 'vibe-match',
+        title: 'Vibe Match - Find Soul Connections',
+        content: '# Vibe Match\n\n**Find Your Soul Connections**\n\nConnect with like-minded individuals based on compatibility, values, and wellness goals.\n\n## Matching Features\n- Personality compatibility\n- Goal alignment\n- Interest matching\n- Communication style\n- Spiritual orientation\n\n## Privacy & Safety\n- Anonymous browsing\n- Verified profiles\n- Safe communication\n- Report system\n- Block functionality',
+        category: 'pages',
+        sortOrder: 15,
+        isPublished: true
+      },
+      {
+        slug: 'help',
+        title: 'Help & Support',
+        content: '# Help & Support\n\n**Get the Help You Need**\n\nFind answers to common questions, access resources, and contact our support team.\n\n## Quick Links\n- Getting Started Guide\n- Feature Tutorials\n- Privacy & Security\n- Billing & Subscriptions\n- Technical Support\n\n## Contact Support\nEmail: lightprompt.co@gmail.com\n\nOur team typically responds within 24 hours.',
+        category: 'pages',
+        sortOrder: 16,
+        isPublished: true
+      },
+      {
+        slug: 'blog',
+        title: 'LightPrompt Blog',
+        content: '# LightPrompt Blog\n\n**Insights on Conscious AI & Wellness**\n\nExplore articles on consciousness, technology, spirituality, and personal growth.\n\n## Featured Topics\n- Conscious AI philosophy\n- Digital wellness practices\n- Astrology and technology\n- Sacred digital spaces\n- Community stories\n\n## Latest Posts\n[Blog posts are managed separately in the blog system]',
+        category: 'pages',
+        sortOrder: 17,
+        isPublished: true
+      },
+      {
+        slug: 'plans',
+        title: 'Subscription Plans',
+        content: '# Subscription Plans\n\n## Free Tier - $0/month\n- Access to LightPromptBot\n- Basic wellness tracking\n- 10 conversations per day\n- Community access\n\n## Premium Tier - $29/month\n- All free features\n- Unlimited conversations\n- All AI companions\n- Advanced analytics\n- Priority support\n\n## Pro Tier - $49/month\n- All Premium features\n- Partner mode & relationship tools\n- Advanced AI customization\n- Export & backup options\n- Health app integrations',
+        category: 'pages',
+        sortOrder: 18,
+        isPublished: true
+      },
+      {
+        slug: 'challenges',
+        title: 'Wellness Challenges',
+        content: '# Wellness Challenges\n\n**30-Day Transformation Programs**\n\nJoin structured programs designed to build lasting wellness habits.\n\n## Available Challenges\n- Morning Mindfulness (30 days)\n- Evening Reflection (30 days)\n- Body Awareness (30 days)\n- Gratitude Practice (30 days)\n- Digital Wellness (30 days)\n\n## Challenge Features\n- Daily tasks and prompts\n- Progress tracking\n- Community support\n- Rewards and badges\n- Expert guidance',
+        category: 'pages',
+        sortOrder: 19,
+        isPublished: true
+      },
+      {
+        slug: 'b2b',
+        title: 'Business Solutions',
+        content: '# LightPrompt for Business\n\n**Conscious AI Solutions for Organizations**\n\nBring soul-tech wellness to your workplace with our enterprise solutions.\n\n## Business Features\n- Team wellness tracking\n- Group challenges\n- Manager insights\n- Custom integrations\n- Training programs\n\n## Contact Us\nReady to transform your workplace wellness?\nEmail: lightprompt.co@gmail.com',
+        category: 'pages',
+        sortOrder: 20,
+        isPublished: true
+      },
       // FAQ Content
       {
         slug: 'faq-what-is-lightprompt',
