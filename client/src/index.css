@@ -97,6 +97,45 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
   
+  /* Mobile optimizations */
+  @media (max-width: 767px) {
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    /* Improve touch targets */
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Prevent horizontal scrolling */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    /* Optimize scrolling */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better button spacing for mobile */
+    .mobile-button {
+      padding: 0.75rem 1rem;
+      min-height: 48px;
+    }
+    
+    /* Mobile-friendly focus states */
+    button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
+      outline: 2px solid hsl(173 80% 40%);
+      outline-offset: 2px;
+    }
+  }
+  
   /* Easter Egg Sparkle Animation */
   .easter-egg-sparkle {
     position: relative;

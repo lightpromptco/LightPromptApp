@@ -72,14 +72,15 @@ export function MainNavigation() {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-4 right-4 z-50">
+      <div className="md:hidden fixed top-2 right-2 z-50">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-background/95 backdrop-blur"
+          className="bg-background/95 backdrop-blur shadow-lg border-2 h-12 w-12 p-0 mobile-button transition-transform duration-200 hover:scale-105 active:scale-95"
+          aria-label={isOpen ? "Close menu" : "Open menu"}
         >
-          {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
 
@@ -200,37 +201,48 @@ export function MainNavigation() {
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="md:hidden fixed inset-0 bg-background/95 backdrop-blur z-40"
+          className="md:hidden fixed inset-0 bg-background/98 backdrop-blur-md z-40 animate-in fade-in duration-200"
           onClick={() => setIsOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
         >
-          <div className="h-full overflow-y-auto">
-            <div className="pt-16 p-6 pb-20 space-y-4">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center space-x-2 mb-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                    <Sparkles className="h-4 w-4 text-white" />
+          <div 
+            className="h-full overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="pt-20 px-4 pb-24 space-y-6 max-w-sm mx-auto animate-in slide-in-from-top duration-300">
+              {/* Mobile Header */}
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Sparkles className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h1 className="font-bold text-lg">LightPrompt</h1>
-                    <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
+                    <h1 className="font-bold text-xl">LightPrompt</h1>
+                    <p className="text-sm text-muted-foreground">Soul-Tech Wellness</p>
                   </div>
                 </div>
               </div>
 
               {/* Main Navigation */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {NAV_ITEMS.map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
                       <Button
-                        variant={active ? "default" : "outline"}
-                        className="w-full justify-start h-auto p-4"
+                        variant={active ? "default" : "ghost"}
+                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
+                          active 
+                            ? "bg-primary text-primary-foreground shadow-md" 
+                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
+                        }`}
                       >
-                        <item.icon className="h-5 w-5 mr-3" />
-                        <div className="text-left">
-                          <div className="font-medium">{item.label}</div>
-                          <div className="text-xs opacity-70">{item.description}</div>
+                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-base truncate">{item.label}</div>
+                          <div className="text-sm opacity-70 truncate">{item.description}</div>
                         </div>
                       </Button>
                     </Link>
@@ -239,22 +251,26 @@ export function MainNavigation() {
               </div>
 
               {/* Products Section */}
-              <div className="space-y-3 border-t pt-6">
-                <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Products
+              <div className="space-y-2 border-t border-border/30 pt-6">
+                <div className="px-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  Store
                 </div>
                 {PRODUCT_ITEMS.map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
                       <Button
-                        variant={active ? "default" : "outline"}
-                        className="w-full justify-start h-auto p-4"
+                        variant={active ? "default" : "ghost"}
+                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
+                          active 
+                            ? "bg-primary text-primary-foreground shadow-md" 
+                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
+                        }`}
                       >
-                        <item.icon className="h-5 w-5 mr-3" />
-                        <div className="text-left">
-                          <div className="font-medium">{item.label}</div>
-                          <div className="text-xs opacity-70">{item.description}</div>
+                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-base truncate">{item.label}</div>
+                          <div className="text-sm opacity-70 truncate">{item.description}</div>
                         </div>
                       </Button>
                     </Link>
@@ -263,8 +279,8 @@ export function MainNavigation() {
               </div>
 
               {/* Account Section */}
-              <div className="space-y-3 border-t pt-6">
-                <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="space-y-2 border-t border-border/30 pt-6">
+                <div className="px-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   Account
                 </div>
                 {ACCOUNT_ITEMS.map((item) => {
@@ -272,29 +288,75 @@ export function MainNavigation() {
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
                       <Button
-                        variant={active ? "default" : "outline"}
-                        className="w-full justify-start h-auto p-4"
+                        variant={active ? "default" : "ghost"}
+                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
+                          active 
+                            ? "bg-primary text-primary-foreground shadow-md" 
+                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
+                        }`}
                       >
-                        <item.icon className="h-5 w-5 mr-3" />
-                        <div className="text-left">
-                          <div className="font-medium">{item.label}</div>
-                          <div className="text-xs opacity-70">{item.description}</div>
+                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-base truncate">{item.label}</div>
+                          <div className="text-sm opacity-70 truncate">{item.description}</div>
                         </div>
                       </Button>
                     </Link>
                   );
                 })}
               </div>
+              
+              {/* Mobile Footer */}
+              <div className="border-t border-border/30 pt-6 text-center">
+                <div className="text-sm text-muted-foreground mb-4">
+                  v1.0.0 • Privacy-First Wellness
+                </div>
+                <div className="flex justify-center">
+                  <AdminToggle 
+                    isAdmin={isAdmin}
+                    onAdminChange={(enabled) => {
+                      if (enabled) {
+                        console.log('🔧 Admin mode activated from mobile navigation');
+                        setIsOpen(false);
+                        window.location.reload();
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Desktop main content padding */}
+      {/* Responsive main content padding */}
       <style>{`
+        .main-content {
+          padding-top: 1rem;
+        }
+        
+        @media (max-width: 767px) {
+          .main-content {
+            padding-top: 4rem;
+            margin-left: 0;
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+        }
+        
         @media (min-width: 768px) {
           .main-content {
             margin-left: 256px;
+            padding-top: 2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+          }
+        }
+        
+        /* Ensure mobile menu doesn't interfere with content */
+        @media (max-width: 767px) {
+          body {
+            overflow-x: hidden;
           }
         }
       `}</style>
