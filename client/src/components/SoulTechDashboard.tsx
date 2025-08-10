@@ -183,17 +183,17 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
                     <p className="text-xs text-muted-foreground">
                       {widget.description}
                     </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                    <div 
+                      className="relative group h-5 w-5 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center cursor-help text-xs font-medium text-gray-600"
                       title={`${widget.title}: ${widget.description}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
                     >
                       ?
-                    </Button>
+                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                        <div className="font-medium">{widget.title}</div>
+                        <div className="text-gray-300">{widget.description}</div>
+                        <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                      </div>
+                    </div>
                   </div>
                   
                   {isSelected && (

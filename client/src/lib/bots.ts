@@ -12,7 +12,7 @@ export interface Bot {
 export const BOTS: Bot[] = [
   {
     id: "lightpromptbot",
-    name: "Conscious Companion",
+    name: "Conscious AI Mirror",
     tagline: "Your AI reflection partner.",
     description: "Your conscious AI mirror designed to help you reflect, explore thoughts, and connect with your inner wisdom through mindful dialogue and self-discovery prompts.",
     icon: "fas fa-mirror",

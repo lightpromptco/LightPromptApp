@@ -44,8 +44,23 @@ export default function ContentManagement() {
   const queryClient = useQueryClient();
 
   // Get all content pages
+  // Mock data for content management since API endpoints don't exist yet
   const { data: pages = [], isLoading, error } = useQuery({
     queryKey: ['/api/content/pages'],
+    queryFn: () => Promise.resolve([
+      {
+        id: '1',
+        title: 'Home Page',
+        slug: 'home',
+        description: 'Main landing page',
+        content: { body: 'Welcome to LightPrompt', fontFamily: 'default', customCss: '' },
+        template: 'landing',
+        isPublished: true,
+        seoTitle: 'LightPrompt - Soul Tech Wellness',
+        seoKeywords: ['ai', 'wellness', 'consciousness'],
+        featuredImage: ''
+      }
+    ]),
     refetchInterval: 30000,
     retry: 1,
   });
@@ -53,6 +68,7 @@ export default function ContentManagement() {
   // Get media assets
   const { data: mediaAssets = [] } = useQuery({
     queryKey: ['/api/content/media'],
+    queryFn: () => Promise.resolve([]),
     enabled: showMediaLibrary,
   });
 

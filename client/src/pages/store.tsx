@@ -236,7 +236,16 @@ export default function Store() {
               className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 px-8 py-3"
               onClick={() => {
                 console.log('Checkout clicked, cart:', cartItems);
-                window.location.href = '/#/checkout';
+                if (cartItems.length === 0) {
+                  toast({
+                    title: "Cart is Empty",
+                    description: "Please add items to your cart before checkout.",
+                    variant: "destructive"
+                  });
+                  return;
+                }
+                // Use proper navigation
+                window.location.hash = '#/checkout';
               }}
             >
               Proceed to Checkout • ${getCartTotal()}

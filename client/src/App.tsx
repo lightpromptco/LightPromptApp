@@ -209,6 +209,11 @@ function Router() {
           <CheckoutPage />
         </MainLayout>
       )} />
+      <Route path="/checkout/success" component={() => (
+        <MainLayout>
+          <CheckoutSuccess />
+        </MainLayout>
+      )} />
       <Route path="/checkout/success" component={() => <CheckoutSuccess />} />
       <Route component={NotFound} />
     </Switch>

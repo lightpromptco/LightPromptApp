@@ -362,7 +362,7 @@ export function ChatInterface({
                 {message.role === 'assistant' ? (
                   <div className="flex space-x-3 max-w-3xl">
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 mt-1">
-                      <i className={`${activeBot.icon} text-white text-sm`}></i>
+                      <i className={`${activeBot?.icon || 'fas fa-robot'} text-white text-sm`}></i>
                     </div>
                     <div className="chat-bubble bg-gray-50 border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-bl-md">
                       <div className="prose prose-sm max-w-none text-gray-800" dangerouslySetInnerHTML={{ 

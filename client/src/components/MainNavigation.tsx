@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview", glyph: "◈" },
   { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook", glyph: "⬡" },
   { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart", glyph: "◉" },
-  { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis", glyph: "✧" },
+  { path: "/woo-woo", label: "Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis", glyph: "✧" },
   { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance", glyph: "⟡" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others", glyph: "◎" },
   { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing", glyph: "♦" },

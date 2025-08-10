@@ -39,7 +39,7 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     icon: Stars,
     description: "Self-Discovery & Growth",
     subItems: [
-      { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
+      { path: "/woo-woo", label: "Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis" },
       { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" }
     ]
   },

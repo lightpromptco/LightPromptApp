@@ -306,11 +306,20 @@ export default function HelpPage() {
                 </Button>
               </div>
               <div className="flex-1 overflow-hidden">
-                <ChatInterface 
-                  userId="support-user"
-                  botId="support"
-                  className="h-full"
-                />
+                <div className="p-6 text-center">
+                  <p className="text-muted-foreground mb-4">
+                    AI Support Assistant is currently being set up. 
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    For immediate help, please email us at support@lightprompt.co
+                  </p>
+                  <Button
+                    onClick={() => window.open('mailto:support@lightprompt.co')}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Email Support
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
