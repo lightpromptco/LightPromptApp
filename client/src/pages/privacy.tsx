@@ -39,16 +39,17 @@ export default function PrivacyPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Get current user - works without login for privacy info
+  // Privacy page is accessible without login - show static policy
   const currentUserData = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const currentUserId = currentUserData.id;
   
+  // Only fetch user data if logged in
   const { data: currentUser } = useQuery<User>({
     queryKey: ['/api/users', currentUserId],
     enabled: !!currentUserId,
   });
 
-  // Get user profile with privacy settings
+  // Only fetch user profile if logged in
   const { data: userProfile } = useQuery<UserProfile>({
     queryKey: ['/api/users', currentUserId, 'profile'],
     enabled: !!currentUserId,
@@ -121,18 +122,67 @@ export default function PrivacyPage() {
     }
   }, [privacySettings]);
 
+  // Show simplified privacy policy for non-logged-in users
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600 mb-4">Please log in to access privacy settings.</p>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+              <p className="text-gray-600 mt-2">Your privacy and data protection</p>
+            </div>
             <Link href="/">
-              <Button>Return to Chat</Button>
+              <Button variant="outline">Back to Home</Button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+
+          <Card>
+            <CardContent className="p-8">
+              <div className="prose max-w-none">
+                <h2 className="text-2xl font-semibold mb-4">LightPrompt Privacy Policy</h2>
+                
+                <h3 className="text-xl font-semibold mt-6 mb-3">Data We Collect</h3>
+                <p className="mb-4">
+                  LightPrompt collects minimal data necessary to provide our AI wellness services:
+                </p>
+                <ul className="list-disc pl-6 mb-4">
+                  <li>Account information (email, username)</li>
+                  <li>Chat conversations for service continuity</li>
+                  <li>Wellness preferences and settings</li>
+                  <li>Voice recordings (temporarily, for transcription only)</li>
+                </ul>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">How We Use Your Data</h3>
+                <ul className="list-disc pl-6 mb-4">
+                  <li>Provide personalized AI wellness guidance</li>
+                  <li>Improve our services and user experience</li>
+                  <li>Maintain conversation history for continuity</li>
+                  <li>Send important service updates</li>
+                </ul>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">Data Protection</h3>
+                <p className="mb-4">
+                  Your data is encrypted in transit and at rest. We never sell your personal information
+                  to third parties. All data processing follows GDPR and privacy best practices.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">Your Rights</h3>
+                <p className="mb-4">
+                  You have the right to access, modify, or delete your data at any time.
+                  Contact us at privacy@lightprompt.co for any privacy-related requests.
+                </p>
+
+                <div className="mt-8 p-4 bg-teal-50 rounded-lg">
+                  <p className="text-sm text-teal-800">
+                    <strong>Note:</strong> This is a simplified privacy policy. 
+                    Log in to access detailed privacy settings and data controls.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

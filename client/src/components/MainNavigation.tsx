@@ -22,7 +22,6 @@ import {
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
-  { path: "/body-mirror", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview", glyph: "⬢" },
   { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
   { 
     path: "/wellness-tools", 
@@ -54,7 +53,7 @@ const NAV_ITEMS = [
     description: "Platform Features", 
     glyph: "⟡",
     subItems: [
-      { path: "/dashboard", label: "Soul-Tech Dashboard", icon: Activity, description: "AI-Powered Insights" },
+      { path: "/dashboard", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview" },
       { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
       { path: "/prism-points", label: "Prism Points", icon: Sparkles, description: "Reward System" }
     ]
