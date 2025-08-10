@@ -97,8 +97,8 @@ export function MainNavigation() {
         </div>
       </div>
 
-      {/* Desktop Sidebar */}
-      <nav className="hidden md:flex fixed left-0 top-0 h-full w-64 bg-background border-r z-40 flex-col">
+      {/* Desktop Sidebar - HIDDEN ON MOBILE */}
+      <nav className="hidden md:block fixed left-0 top-0 h-full w-64 bg-background border-r z-30">
         <div className="p-4 border-b">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
@@ -327,6 +327,13 @@ export function MainNavigation() {
             padding-top: 2rem;
             padding-left: 2rem;
             padding-right: 2rem;
+          }
+        }
+        
+        /* Force hide desktop nav on mobile */
+        @media (max-width: 767px) {
+          nav.hidden.md\\:block {
+            display: none !important;
           }
         }
         
