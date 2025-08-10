@@ -2381,10 +2381,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         .select()
         .from(platformEvolution)
         .where(
-          and(
-            eq(platformEvolution.category, 'page_content'),
-            eq(platformEvolution.data, { path })
-          )
+          eq(platformEvolution.category, 'page_content')
         )
         .orderBy(desc(platformEvolution.detectedAt))
         .limit(1);
