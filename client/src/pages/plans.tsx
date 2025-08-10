@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { StripeCheckout } from '@/components/StripeCheckout';
+import { CheckCircle, Crown, Zap, Heart, Star, Users } from 'lucide-react';
 
 interface User {
   id: string;
@@ -347,7 +348,12 @@ export default function PlansPage() {
                   className={`w-full mt-6 bg-gradient-to-r ${plan.color} hover:opacity-90`}
                   onClick={() => plan.id === 'business' ? 
                     window.open('mailto:support@lightprompt.co?subject=Enterprise%20Inquiry') : 
-                    handleSelectPlan(plan.id, plan.name, plan.price.replace('$', ''))
+                    setCheckoutState({
+                      isOpen: true,
+                      planId: plan.id,
+                      planName: plan.name,
+                      price: plan.price.replace('$', '')
+                    })
                   }
                   disabled={isCurrentPlan(plan.id)}
                 >

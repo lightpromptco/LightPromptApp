@@ -232,6 +232,45 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
         })}
       </div>
 
+      {/* Data Collection Alternatives */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-sm">📱</span>
+          </div>
+          <div>
+            <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+              Alternative Data Collection Methods (No App Store Required)
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed mb-3">
+              Since we're not on the App Store yet, here are proven ways to track your Soul-Tech data:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700 dark:text-blue-300">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                  <span><strong>Manual Check-ins:</strong> Daily mood, energy, and intention tracking via our dashboard</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                  <span><strong>Wearable CSV Import:</strong> Upload data from Fitbit, Garmin, or Oura Ring exports</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                  <span><strong>Voice Journaling:</strong> Record reflections that our AI analyzes for patterns</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                  <span><strong>Browser Sensors:</strong> Use Web APIs for heart rate via camera (HRV detection)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Action Center */}
       <Card className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-purple-900/10 dark:to-blue-900/10"></div>
