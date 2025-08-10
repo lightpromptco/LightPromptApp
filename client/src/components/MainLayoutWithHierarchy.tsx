@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { HierarchicalNavigation } from "./HierarchicalNavigation";
+import { MainNavigation } from "./MainNavigation";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -7,9 +7,9 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HierarchicalNavigation />
-      <main className="flex-1 overflow-auto">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <MainNavigation />
+      <main className="main-content">
         {children}
       </main>
     </div>
