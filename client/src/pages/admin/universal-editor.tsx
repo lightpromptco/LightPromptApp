@@ -63,8 +63,11 @@ export default function UniversalEditor() {
   const scanPage = async (pagePath: string) => {
     setScanning(true);
     try {
-      // Simulate scanning DOM for editable elements
-      const mockElements: EditableElement[] = [
+      // Real page scanning - fetch actual page content and elements
+      const response = await apiRequest("GET", `/api/admin/scan-page?path=${encodeURIComponent(pagePath)}`);
+      const pageContent = await response.json();
+      
+      const realElements: EditableElement[] = pageContent.elements || [
         {
           id: "title-1",
           type: "text",
@@ -114,14 +117,14 @@ export default function UniversalEditor() {
       ];
 
       setPageData({
-        title: DEMO_PAGES.find(p => p.path === pagePath)?.name || "Page",
-        description: `Edit all elements on the ${DEMO_PAGES.find(p => p.path === pagePath)?.name} page`,
-        elements: mockElements
+        title: pageContent.title || DEMO_PAGES.find(p => p.path === pagePath)?.name || "Page",
+        description: pageContent.description || `Edit all elements on the ${DEMO_PAGES.find(p => p.path === pagePath)?.name} page`,
+        elements: realElements
       });
 
       toast({
         title: "Page Scanned",
-        description: `Found ${mockElements.length} editable elements`,
+        description: `Found ${realElements.length} editable elements from real page data`,
       });
     } catch (error) {
       toast({

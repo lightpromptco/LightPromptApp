@@ -40,6 +40,7 @@ import CommunityPage from "@/pages/community";
 import SoulSyncPage from "@/pages/soul-sync";
 import StorePage from "@/pages/store";
 import CheckoutPage from "@/pages/checkout";
+import CheckoutSuccess from "@/pages/checkout/success";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -208,6 +209,7 @@ function Router() {
           <CheckoutPage />
         </MainLayout>
       )} />
+      <Route path="/checkout/success" component={() => <CheckoutSuccess />} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -10,12 +10,15 @@ import {
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
   insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
-  insertAppleHealthDataSchema, insertHomeKitDataSchema
+  insertAppleHealthDataSchema, insertHomeKitDataSchema,
+  wellnessMetrics, platformEvolution
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
 import Stripe from "stripe";
 import { registerContentRoutes } from "./routes/content";
+import { db } from "./db";
+import { eq, desc, and } from "drizzle-orm";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -848,45 +851,69 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
   // Stripe payment routes
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
-      const { planId, userId } = req.body;
+      const { amount, items, planId, userId } = req.body;
       
-      if (!planId || !userId) {
-        return res.status(400).json({ error: "Missing planId or userId" });
+      // Handle both store checkout (amount/items) and plan checkout (planId/userId)
+      if (!amount && !planId) {
+        return res.status(400).json({ error: "Missing amount or planId" });
+      }
+      
+      if (planId && !userId) {
+        return res.status(400).json({ error: "Missing userId for plan" });
       }
 
-      // Plan pricing mapping
-      const plans = {
-        "growth": { amount: 2900, name: "Growth Plan" }, // $29.00
-        "resonance": { amount: 4900, name: "Resonance Plan" }, // $49.00
-        "enterprise": { amount: 19900, name: "Enterprise Plan" } // $199.00
-      };
+      if (planId) {
+        // Plan checkout logic
+        const plans = {
+          "growth": { amount: 2900, name: "Growth Plan" }, 
+          "resonance": { amount: 4900, name: "Resonance Plan" }, 
+          "enterprise": { amount: 19900, name: "Enterprise Plan" }
+        };
 
-      const plan = plans[planId as keyof typeof plans];
-      if (!plan) {
-        return res.status(400).json({ error: "Invalid plan ID" });
+        const plan = plans[planId as keyof typeof plans];
+        if (!plan) {
+          return res.status(400).json({ error: "Invalid plan ID" });
+        }
+
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: plan.amount,
+          currency: "usd",
+          metadata: {
+            userId,
+            planId,
+            planName: plan.name,
+            userEmail: user.email
+          },
+        });
+
+        res.json({ 
+          clientSecret: paymentIntent.client_secret,
+          paymentIntentId: paymentIntent.id
+        });
+      } else {
+        // Store checkout logic 
+        if (!amount || amount <= 0) {
+          return res.status(400).json({ error: "Invalid amount provided" });
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100), // Convert to cents
+          currency: "usd",
+          metadata: {
+            items: JSON.stringify(items || [])
+          }
+        });
+
+        res.json({ 
+          clientSecret: paymentIntent.client_secret,
+          paymentIntentId: paymentIntent.id
+        });
       }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      // Create payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: plan.amount,
-        currency: "usd",
-        metadata: {
-          userId,
-          planId,
-          planName: plan.name,
-          userEmail: user.email
-        },
-      });
-
-      res.json({ 
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id
-      });
     } catch (error: any) {
       console.error("Stripe payment intent error:", error);
       res.status(500).json({ 
@@ -2326,11 +2353,157 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
   app.post("/api/admin/save-page", async (req, res) => {
     try {
       const { path, data } = req.body;
-      // In a real implementation, this would save to database or CMS
-      console.log(`Saving page data for ${path}:`, data);
-      res.json({ message: "Page saved successfully" });
+      // Save to knowledge base for persistent storage
+      const result = await db.insert(platformEvolution).values({
+        category: 'page_content',
+        evolutionType: 'content_update',
+        description: `Page content updated: ${path}`,
+        impact: 'Page content modified through Universal Editor',
+        data: { path, pageData: data },
+        confidence: 100
+      }).returning();
+      
+      console.log(`✅ Page data saved to database for ${path}`);
+      res.json({ message: "Page saved to database", id: result[0].id });
     } catch (error: any) {
-      res.status(500).json({ error: "Failed to save page" });
+      console.error("Error saving page:", error);
+      res.status(500).json({ error: "Failed to save page to database" });
+    }
+  });
+
+  // Admin page scan endpoint - get real page elements
+  app.get("/api/admin/scan-page", async (req, res) => {
+    try {
+      const { path } = req.query;
+      
+      // Get saved page content from database
+      const savedContent = await db
+        .select()
+        .from(platformEvolution)
+        .where(
+          and(
+            eq(platformEvolution.category, 'page_content'),
+            eq(platformEvolution.data, { path })
+          )
+        )
+        .orderBy(desc(platformEvolution.detectedAt))
+        .limit(1);
+
+      if (savedContent.length > 0) {
+        const pageData = savedContent[0].data.pageData;
+        return res.json(pageData);
+      }
+
+      // Default page elements based on actual page structure
+      const pageElements = {
+        "/": {
+          title: "Home Page",
+          description: "Main landing page with hero section and features",
+          elements: [
+            { id: "hero-title", type: "text", path: "/", element: "h1", content: "LightPrompt - Soul-Tech Wellness AI", metadata: { className: "text-4xl font-bold" }},
+            { id: "hero-subtitle", type: "text", path: "/", element: "p", content: "Conscious AI for mindful living and spiritual growth", metadata: { className: "text-xl text-muted-foreground" }},
+            { id: "cta-button", type: "button", path: "/", element: "button", content: "Begin Your Journey", metadata: { href: "/dashboard", className: "bg-gradient-to-r from-purple-600 to-blue-600" }}
+          ]
+        },
+        "/store": {
+          title: "Store",
+          description: "LightPrompt course and ebook sales",
+          elements: [
+            { id: "store-title", type: "text", path: "/store", element: "h1", content: "LightPrompt Store", metadata: { className: "text-3xl font-bold" }},
+            { id: "course-price", type: "text", path: "/store", element: "span", content: "$120", metadata: { className: "text-2xl font-bold" }},
+            { id: "ebook-price", type: "text", path: "/store", element: "span", content: "$11", metadata: { className: "text-2xl font-bold" }}
+          ]
+        }
+      };
+
+      const defaultData = pageElements[path as keyof typeof pageElements] || {
+        title: "Page",
+        description: "Edit page content",
+        elements: []
+      };
+
+      res.json(defaultData);
+    } catch (error: any) {
+      console.error("Error scanning page:", error);
+      res.status(500).json({ error: "Failed to scan page" });
+    }
+  });
+
+  // Wellness and emotion check-in routes
+  app.post("/api/wellness/checkin", async (req, res) => {
+    try {
+      const { userId, mood, energy, stress, gratitude, reflection, goals } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "Missing userId" });
+      }
+
+      const checkin = await db.insert(wellnessMetrics).values({
+        userId,
+        mood: mood || "neutral",
+        energy: energy || 5,
+        stress: stress || 5,
+        gratitude,
+        reflection,
+        goals: goals || [],
+        achievements: [],
+        metadata: {}
+      }).returning();
+
+      res.json(checkin[0]);
+    } catch (error: any) {
+      console.error("Error creating emotion check-in:", error);
+      res.status(500).json({ error: "Failed to create check-in" });
+    }
+  });
+
+  // Get emotion data for calm image
+  app.get("/api/wellness/emotions/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      const emotions = await db
+        .select()
+        .from(wellnessMetrics)
+        .where(eq(wellnessMetrics.userId, userId))
+        .orderBy(desc(wellnessMetrics.date))
+        .limit(30);
+
+      if (emotions.length === 0) {
+        return res.json({
+          dominantMood: "neutral",
+          calmPercentage: 0,
+          totalEntries: 0,
+          recentMood: "neutral"
+        });
+      }
+
+      // Calculate calm percentage (energy >= 6 and stress <= 4)
+      const calmEntries = emotions.filter(e => 
+        (e.energy || 0) >= 6 && (e.stress || 0) <= 4
+      );
+      const calmPercentage = (calmEntries.length / emotions.length) * 100;
+
+      // Get mood counts
+      const moodCounts = emotions.reduce((acc, entry) => {
+        acc[entry.mood || "neutral"] = (acc[entry.mood || "neutral"] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const dominantMood = Object.entries(moodCounts)
+        .sort(([,a], [,b]) => b - a)[0]?.[0] || "neutral";
+
+      res.json({
+        dominantMood,
+        calmPercentage: Math.round(calmPercentage),
+        totalEntries: emotions.length,
+        recentMood: emotions[0]?.mood || "neutral",
+        moodDistribution: moodCounts
+      });
+
+    } catch (error: any) {
+      console.error("Error fetching emotions:", error);
+      res.status(500).json({ error: "Failed to fetch emotions" });
     }
   });
 

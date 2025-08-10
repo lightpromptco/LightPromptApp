@@ -184,7 +184,7 @@ export default function Store() {
                   </div>
                 </CardHeader>
                 
-                <CardContent>
+                <CardContent className="flex-grow">
                   <CardDescription className="text-center mb-4">
                     {product.description}
                   </CardDescription>
@@ -199,31 +199,29 @@ export default function Store() {
                   </ul>
                 </CardContent>
                 
-                <CardFooter className="flex flex-col gap-2">
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      onClick={() => handleAddToCart(product)}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                      size="lg"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                      {cartCount > 0 && (
-                        <Badge variant="secondary" className="ml-2">
-                          {cartCount}
-                        </Badge>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      onClick={() => handleBuyNow(product)}
-                      variant="outline"
-                      className="flex-1 border-purple-500 text-purple-600 hover:bg-purple-50"
-                      size="lg"
-                    >
-                      Buy Now
-                    </Button>
-                  </div>
+                <CardFooter className="flex flex-col gap-2 mt-auto">
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    size="lg"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Add to Cart
+                    {cartCount > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {cartCount}
+                      </Badge>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => handleBuyNow(product)}
+                    variant="outline"
+                    className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950"
+                    size="lg"
+                  >
+                    Buy Now
+                  </Button>
                 </CardFooter>
               </Card>
             );
