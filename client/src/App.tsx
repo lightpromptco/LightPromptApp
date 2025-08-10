@@ -17,6 +17,8 @@ import SignupPage from "@/pages/signup";
 import PlansPage from "@/pages/plans";
 import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
+import GeoPromptNew from "@/pages/geoprompt-new";
+import AdminBlog from "@/pages/admin/blog";
 import PrismPointsPage from "@/pages/prism-points";
 import HelpPage from "@/pages/help";
 import BookPage from "@/pages/book";
@@ -97,6 +99,16 @@ function Router() {
       <Route path="/geoprompt" component={() => (
         <MainLayout>
           <GeoPromptPage />
+        </MainLayout>
+      )} />
+      <Route path="/geoprompt-new" component={() => (
+        <MainLayout>
+          <GeoPromptNew />
+        </MainLayout>
+      )} />
+      <Route path="/admin/blog" component={() => (
+        <MainLayout>
+          <AdminBlog />
         </MainLayout>
       )} />
       <Route path="/prism-points" component={() => (

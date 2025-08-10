@@ -259,9 +259,11 @@ export function ChatInterface({
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => playTTS(messages[messages.length - 1]?.content || activeBot.tagline)}
                 className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600"
+                title="Read last message aloud"
               >
-                <i className="fas fa-ellipsis-h"></i>
+                <i className="fas fa-volume-up"></i>
               </Button>
             </div>
           </div>
