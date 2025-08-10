@@ -209,26 +209,28 @@ export function MainNavigation() {
         </div>
       </nav>
 
-      {/* Mobile Overlay */}
+      {/* Mobile Bottom Sheet Menu */}
       {isOpen && (
-        <>
+        <div 
+          className="md:hidden fixed inset-0 z-50"
+          onClick={() => setIsOpen(false)}
+        >
           {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/50" />
+          
+          {/* Bottom Sheet */}
           <div 
-            className="md:hidden fixed inset-0 bg-black/50 z-40 animate-in fade-in duration-200"
-            onClick={() => setIsOpen(false)}
-          />
-          {/* Slide-out menu */}
-          <div 
-            className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-background border-l border-border shadow-2xl z-50 animate-in slide-in-from-right duration-300"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation menu"
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[75vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-full overflow-y-auto">
-              <div className="pt-6 px-4 pb-6 space-y-4">
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+            </div>
+            
+            <div className="px-4 pb-6 overflow-y-auto max-h-[65vh]">
               {/* Mobile Header */}
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
                     <Sparkles className="h-4 w-4 text-white" />
@@ -236,7 +238,7 @@ export function MainNavigation() {
                   <div>
                     <h1 className="font-bold text-lg">LightPrompt</h1>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-muted-foreground">Soul-Tech</p>
+                      <p className="text-xs text-gray-500">Soul-Tech</p>
                       <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded">
                         BETA
                       </span>
@@ -253,108 +255,43 @@ export function MainNavigation() {
                 </Button>
               </div>
 
-              {/* Main Navigation */}
-              <div className="space-y-1">
-                {NAV_ITEMS.map((item) => {
+              {/* Main Navigation Grid */}
+              <div className="grid grid-cols-3 gap-3 py-4">
+                {NAV_ITEMS.slice(0, 9).map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
-                      <Button
-                        variant={active ? "default" : "ghost"}
-                        className={`w-full justify-start h-auto p-3 text-left rounded-lg transition-all duration-200 ${
+                      <div
+                        className={`p-3 rounded-xl text-center transition-all ${
                           active 
-                            ? "bg-primary text-primary-foreground" 
-                            : "hover:bg-accent hover:text-accent-foreground"
+                            ? "bg-teal-500 text-white" 
+                            : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                         }`}
                       >
-                        <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate">{item.label}</div>
-                          <div className="text-xs opacity-70 truncate">{item.description}</div>
-                        </div>
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Products Section */}
-              <div className="space-y-2 border-t border-border/30 pt-6">
-                <div className="px-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Store
-                </div>
-                {PRODUCT_ITEMS.map((item) => {
-                  const active = isActive(item.path);
-                  return (
-                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
-                      <Button
-                        variant={active ? "default" : "ghost"}
-                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
-                          active 
-                            ? "bg-primary text-primary-foreground shadow-md" 
-                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-base truncate">{item.label}</div>
-                          <div className="text-sm opacity-70 truncate">{item.description}</div>
-                        </div>
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Account Section */}
-              <div className="space-y-2 border-t border-border/30 pt-6">
-                <div className="px-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Account
-                </div>
-                {ACCOUNT_ITEMS.map((item) => {
-                  const active = isActive(item.path);
-                  return (
-                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
-                      <Button
-                        variant={active ? "default" : "ghost"}
-                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
-                          active 
-                            ? "bg-primary text-primary-foreground shadow-md" 
-                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-base truncate">{item.label}</div>
-                          <div className="text-sm opacity-70 truncate">{item.description}</div>
-                        </div>
-                      </Button>
+                        <item.icon className="h-6 w-6 mx-auto mb-1" />
+                        <div className="text-xs font-medium truncate">{item.label}</div>
+                      </div>
                     </Link>
                   );
                 })}
               </div>
               
-              {/* Mobile Footer */}
-              <div className="border-t border-border/30 pt-6 text-center">
-                <div className="text-sm text-muted-foreground mb-4">
-                  v1.0.0 • Privacy-First Wellness
-                </div>
-                <div className="flex justify-center">
-                  <AdminToggle 
-                    isAdmin={isAdmin}
-                    onAdminChange={(enabled) => {
-                      if (enabled) {
-                        console.log('🔧 Admin mode activated from mobile navigation');
-                        setIsOpen(false);
-                        window.location.reload();
-                      }
-                    }}
-                  />
-                </div>
+              {/* Admin Toggle */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <AdminToggle 
+                  isAdmin={isAdmin}
+                  onAdminChange={(enabled) => {
+                    if (enabled) {
+                      console.log('🔧 Admin mode activated from mobile navigation');
+                      setIsOpen(false);
+                      window.location.reload();
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Responsive main content padding */}
