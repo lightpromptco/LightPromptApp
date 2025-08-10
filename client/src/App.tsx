@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { MainLayout } from "@/components/MainNavigation";
+import { CartProvider } from "@/hooks/use-cart";
 import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
@@ -34,6 +35,8 @@ import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
 
 import SoulSyncPage from "@/pages/soul-sync";
+import StorePage from "@/pages/store";
+import CheckoutPage from "@/pages/checkout";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -172,6 +175,16 @@ function Router() {
           <SoulSyncPage />
         </MainLayout>
       )} />
+      <Route path="/store" component={() => (
+        <MainLayout>
+          <StorePage />
+        </MainLayout>
+      )} />
+      <Route path="/checkout" component={() => (
+        <MainLayout>
+          <CheckoutPage />
+        </MainLayout>
+      )} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -276,12 +289,14 @@ function EasterEggProvider({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <EasterEggProvider>
-          <Toaster />
-          <Router />
-        </EasterEggProvider>
-      </TooltipProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <EasterEggProvider>
+            <Toaster />
+            <Router />
+          </EasterEggProvider>
+        </TooltipProvider>
+      </CartProvider>
     </QueryClientProvider>
   );
 }

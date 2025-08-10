@@ -24,7 +24,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
+  apiVersion: "2023-10-16",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2181,6 +2181,32 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     } catch (error) {
       console.error('Course payment error:', error);
       res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Stripe payment route for one-time payments
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, items } = req.body;
+      
+      // Create payment intent with amount in cents
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          items: JSON.stringify(items)
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error('Stripe payment intent error:', error);
+      res.status(500).json({ 
+        message: "Error creating payment intent: " + error.message 
+      });
     }
   });
 
