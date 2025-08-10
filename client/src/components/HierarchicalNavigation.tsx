@@ -60,7 +60,7 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     icon: MapPin,
     description: "Platform Features",
     subItems: [
-      { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians" },
+      { path: "/geoprompt", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians" },
       { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
       { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" },
       { path: "/blog", label: "Blog", icon: BookOpen, description: "Latest Articles" }
@@ -78,6 +78,7 @@ const ADMIN_NAVIGATION: NavItem[] = [
     subItems: [
       { path: "/admin/blog", label: "Blog & Links", icon: Edit, description: "Content Management" },
       { path: "/admin/page-editor", label: "Page Editor", icon: BookOpen, description: "Edit Site Content" },
+      { path: "/admin/universal-editor", label: "Universal Editor", icon: Edit, description: "Complete Content Control" },
       { path: "/admin/settings", label: "Settings", icon: Settings, description: "Admin Settings" }
     ]
   }

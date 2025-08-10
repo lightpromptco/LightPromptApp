@@ -162,14 +162,14 @@ export default function Store() {
             const cartCount = getCartItemCount(product.id);
             
             return (
-              <Card key={product.id} className="relative hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
+              <Card key={product.id} className="relative hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm dark:bg-slate-800/80 flex flex-col h-full">
                 {product.badge && (
                   <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-blue-500">
                     {product.badge}
                   </Badge>
                 )}
                 
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 flex-shrink-0">
                   <div className="mx-auto mb-4 p-3 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 rounded-full w-16 h-16 flex items-center justify-center">
                     <Icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                   </div>

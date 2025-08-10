@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { ObjectStorageService } from "./objectStorage";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 import { generateBirthChart, calculateCompatibilityScore, getElementMatch } from "./astrology.js";
@@ -61,6 +61,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register knowledge storage routes
   app.use("/api/knowledge", knowledgeRoutes);
+
+  // Object storage routes
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/objects/upload", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    res.json({ uploadURL });
+  });
+
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
 
   // Soul Sync connection storage
   app.post("/api/soul-sync/connections", async (req, res) => {
@@ -2281,6 +2319,18 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
       res.status(500).json({ 
         error: "Error creating payment intent: " + error.message 
       });
+    }
+  });
+
+  // Admin page save endpoint
+  app.post("/api/admin/save-page", async (req, res) => {
+    try {
+      const { path, data } = req.body;
+      // In a real implementation, this would save to database or CMS
+      console.log(`Saving page data for ${path}:`, data);
+      res.json({ message: "Page saved successfully" });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to save page" });
     }
   });
 

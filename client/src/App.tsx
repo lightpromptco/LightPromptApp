@@ -19,6 +19,7 @@ import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import AdminBlog from "@/pages/admin/blog";
 import PageEditor from "@/pages/admin/page-editor";
+import UniversalEditor from "@/pages/admin/universal-editor";
 import BlogPage from "@/pages/blog";
 import PrismPointsPage from "@/pages/prism-points";
 import HelpPage from "@/pages/help";
@@ -109,6 +110,11 @@ function Router() {
       <Route path="/admin/page-editor" component={() => (
         <MainLayout>
           <PageEditor />
+        </MainLayout>
+      )} />
+      <Route path="/admin/universal-editor" component={() => (
+        <MainLayout>
+          <UniversalEditor />
         </MainLayout>
       )} />
       <Route path="/blog" component={() => (
