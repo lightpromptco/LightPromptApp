@@ -241,15 +241,7 @@ export function ChatInterface({
       <ParticleSystem sentiment={currentSentiment} intensity={isLoading ? 2 : 1} />
       
       <div className="flex-1 flex flex-col min-h-screen bg-white dark:bg-gray-900 pb-20 relative">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none">
-          <svg width="100%" height="100%" viewBox="0 0 100 100" className="text-purple-500">
-            <pattern id="soul-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <text x="10" y="15" textAnchor="middle" fontSize="12" fill="currentColor">◈</text>
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#soul-pattern)" />
-          </svg>
-        </div>
+
         {/* Header */}
         <div className="p-6 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm relative z-10">
           <div className="flex items-center justify-between">
@@ -286,7 +278,7 @@ export function ChatInterface({
             <WooWooInterface userId={user?.id || ''} />
           </div>
         ) : activeBot.id === 'geoprompt' ? (
-          <div className="flex-1 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+          <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900" style={{ maxHeight: 'calc(100vh - 240px)' }}>
             <SimpleGeoCheckIn 
               userId={user?.id || ''} 
               onComplete={() => console.log('Geo check-in completed')} 
@@ -295,13 +287,13 @@ export function ChatInterface({
         ) : (
         <div className="flex-1 flex flex-col">
         {/* Regular Chat Messages */}
-        <div className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-white via-purple-50/20 to-blue-50/20 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+        <div className="flex-1 p-6 overflow-y-auto bg-white dark:bg-gray-900" style={{ maxHeight: 'calc(100vh - 240px)' }}>
           <div className="max-w-4xl mx-auto space-y-6">
             
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex justify-center mb-8">
-                <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-purple-50/80 to-blue-50/80 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 max-w-md animate-fade-in relative z-10">
+                <div className="text-center p-6 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 max-w-md animate-fade-in relative z-10">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg">
                     <span className="text-white text-2xl">⟐</span>
                   </div>

@@ -2450,19 +2450,45 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         "/": {
           title: "Home Page",
           description: "Main landing page with hero section and features",
+          pagePath: "/",
           elements: [
-            { id: "hero-title", type: "text", path: "/", element: "h1", content: "LightPrompt - Soul-Tech Wellness AI", metadata: { className: "text-4xl font-bold" }},
-            { id: "hero-subtitle", type: "text", path: "/", element: "p", content: "Conscious AI for mindful living and spiritual growth", metadata: { className: "text-xl text-muted-foreground" }},
-            { id: "cta-button", type: "button", path: "/", element: "button", content: "Begin Your Journey", metadata: { href: "/dashboard", className: "bg-gradient-to-r from-purple-600 to-blue-600" }}
+            { id: "hero-title", type: "text", path: "/", element: "h1", content: "LightPrompt", metadata: { className: "text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent" }},
+            { id: "hero-subtitle", type: "text", path: "/", element: "p", content: "Soul-Tech Wellness AI", metadata: { className: "text-xl text-muted-foreground" }},
+            { id: "hero-description", type: "text", path: "/", element: "p", content: "Conscious AI for mindful living and spiritual growth", metadata: { className: "text-lg text-gray-600" }},
+            { id: "cta-button", type: "button", path: "/", element: "button", content: "Begin Your Journey", metadata: { href: "/dashboard", className: "bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity" }},
+            { id: "beta-badge", type: "badge", path: "/", element: "span", content: "BETA", metadata: { className: "bg-teal-100 text-teal-800 px-2 py-1 rounded text-sm font-medium" }}
           ]
         },
         "/store": {
           title: "Store",
           description: "LightPrompt course and ebook sales",
+          pagePath: "/store",
           elements: [
-            { id: "store-title", type: "text", path: "/store", element: "h1", content: "LightPrompt Store", metadata: { className: "text-3xl font-bold" }},
-            { id: "course-price", type: "text", path: "/store", element: "span", content: "$120", metadata: { className: "text-2xl font-bold" }},
-            { id: "ebook-price", type: "text", path: "/store", element: "span", content: "$11", metadata: { className: "text-2xl font-bold" }}
+            { id: "store-title", type: "text", path: "/store", element: "h1", content: "LightPrompt Store", metadata: { className: "text-3xl font-bold text-center mb-8" }},
+            { id: "course-title", type: "text", path: "/store", element: "h2", content: "LightPrompt:ed Course", metadata: { className: "text-2xl font-semibold" }},
+            { id: "course-price", type: "text", path: "/store", element: "span", content: "$120", metadata: { className: "text-3xl font-bold text-purple-600" }},
+            { id: "ebook-title", type: "text", path: "/store", element: "h2", content: "Digital Ebook", metadata: { className: "text-2xl font-semibold" }},
+            { id: "ebook-price", type: "text", path: "/store", element: "span", content: "$11", metadata: { className: "text-3xl font-bold text-blue-600" }},
+            { id: "bundle-price", type: "text", path: "/store", element: "span", content: "$125", metadata: { className: "text-3xl font-bold text-teal-600" }}
+          ]
+        },
+        "/woo-woo": {
+          title: "Soul Maps & Cosmos",
+          description: "Astrology and soul guidance tools",
+          pagePath: "/woo-woo",
+          elements: [
+            { id: "soul-map-title", type: "text", path: "/woo-woo", element: "h1", content: "Soul Maps & Cosmos", metadata: { className: "text-3xl font-bold text-center" }},
+            { id: "soul-map-subtitle", type: "text", path: "/woo-woo", element: "p", content: "Discover your cosmic blueprint through AI-powered astrology", metadata: { className: "text-lg text-muted-foreground text-center" }},
+            { id: "begin-button", type: "button", path: "/woo-woo", element: "button", content: "Begin Your Soul Map Journey", metadata: { className: "bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold" }}
+          ]
+        },
+        "/community": {
+          title: "Community",
+          description: "Connect with others on the journey",
+          pagePath: "/community",
+          elements: [
+            { id: "community-title", type: "text", path: "/community", element: "h1", content: "LightPrompt Community", metadata: { className: "text-3xl font-bold text-center" }},
+            { id: "discord-link", type: "link", path: "/community", element: "a", content: "Join Discord", metadata: { href: "https://discord.gg/lightprompt", className: "bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700" }}
           ]
         }
       };
