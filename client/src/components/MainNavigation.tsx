@@ -1,55 +1,33 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
+  Menu, 
+  X, 
   Home, 
-  Users, 
-  MapPin, 
-  Gem, 
-  HelpCircle, 
-  BarChart3, 
-  Target, 
-  MessageCircle,
-  Menu,
-  X,
+  MessageCircle, 
+  User, 
+  Heart, 
+  Activity, 
+  BookOpen, 
+  Map,
+  Users,
   Sparkles,
-  Settings,
-  UserPlus,
-  User,
-  Moon,
-  Stars,
   Compass,
-  ShoppingBag,
-  BookOpen,
-  Code,
-  Heart
+  Settings
 } from "lucide-react";
-import { AdminToggle } from "./AdminToggle";
 
 const NAV_ITEMS = [
-  { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "◊" },
-  { path: "/chat", label: "LightPromptBot", icon: MessageCircle, description: "Conscious AI Mirror", glyph: "⟐" },
-  { path: "/dashboard", label: "BodyMirror", icon: BarChart3, description: "Your Wellness Overview", glyph: "◈" },
-  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook", glyph: "⬡" },
-  { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart", glyph: "◉" },
-  { path: "/woo-woo", label: "Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis", glyph: "✧" },
-  { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance", glyph: "⟡" },
-  { path: "/community", label: "Community", icon: Users, description: "Connect with Others", glyph: "◎" },
-  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing", glyph: "♦" },
-  { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections", glyph: "✦" },
-  { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians", glyph: "⬢" },
-  { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress", glyph: "◆" },
-  { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals", glyph: "⬟" },
-  { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources", glyph: "◐" },
-];
-
-const ACCOUNT_ITEMS = [
-  { path: "/signup", label: "Sign Up", icon: UserPlus, description: "Create Account" },
-  { path: "/plans", label: "Plans", icon: Gem, description: "Upgrade Account" },
-  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings" },
-
-  { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy" },
+  { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
+  { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
+  { path: "/body-mirror", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview", glyph: "⬢" },
+  { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
+  { path: "/wellness-tools", label: "Wellness Tools", icon: Compass, description: "Self-Discovery & Growth", glyph: "✦" },
+  { path: "/soul-sync", label: "Connect", icon: Users, description: "Community & Relationships", glyph: "◇" },
+  { path: "/features", label: "Features", icon: Sparkles, description: "Platform Features", glyph: "⟡" },
+  { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
+  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" },
+  { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy", glyph: "⟤" },
 ];
 
 const PRODUCT_ITEMS = [
@@ -72,51 +50,62 @@ export function MainNavigation() {
 
   return (
     <>
-      {/* Mobile Header Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-50 h-16">
-        <div className="flex items-center justify-between px-4 h-full">
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">LightPrompt</h1>
-              <p className="text-xs text-gray-500">Soul-Tech</p>
-            </div>
-          </Link>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsOpen(!isOpen)}
-            className="h-10 w-10 p-0"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-        </div>
+      {/* Navigation Menu Button - Top Right Corner */}
+      <div className="fixed top-3 right-3 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsOpen(!isOpen)}
+          className="bg-background/95 backdrop-blur shadow-lg border-2 h-10 w-10 p-0 transition-transform duration-200 hover:scale-105 active:scale-95"
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+        >
+          {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
       </div>
 
-      {/* Desktop Sidebar - HIDDEN ON MOBILE */}
-      <nav className="hidden md:block fixed left-0 top-0 h-full w-64 bg-background border-r z-30">
-        <div className="p-4 border-b">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">LightPrompt</h1>
-              <div className="flex items-center gap-1">
-                <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
-                <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-[10px] font-medium rounded-full">
-                  BETA
-                </span>
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Slide-out Menu */}
+      <div className={`fixed top-0 right-0 h-full w-80 bg-background border-l shadow-xl z-50 transform transition-transform duration-300 ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="p-6 border-b">
+          <div className="flex items-center justify-between">
+            <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="h-5 w-5 text-white" />
               </div>
-            </div>
+              <div>
+                <h1 className="font-bold text-xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  LightPrompt
+                </h1>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-muted-foreground">Soul-Tech</p>
+                  <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded-full">
+                    BETA
+                  </span>
+                </div>
+              </div>
+            </Link>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(false)}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+        <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-screen">
           {/* Main Navigation */}
           <div className="space-y-2">
             {NAV_ITEMS.map((item) => {
@@ -124,6 +113,7 @@ export function MainNavigation() {
               return (
                 <Link key={item.path} href={item.path}>
                   <Button
+                    onClick={() => setIsOpen(false)}
                     variant={active ? "default" : "ghost"}
                     className={`w-full justify-start h-auto p-3 ${
                       active ? "bg-primary text-primary-foreground" : ""
@@ -145,6 +135,35 @@ export function MainNavigation() {
             })}
           </div>
 
+          {/* Admin Section */}
+          {isAdmin && (
+            <div className="space-y-2 border-t pt-4">
+              <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Admin
+              </div>
+              <Link href="/admin/content">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Content Manager
+                </Button>
+              </Link>
+              <Link href="/admin/page-editor">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Page Editor
+                </Button>
+              </Link>
+            </div>
+          )}
+
           {/* Products Section */}
           <div className="space-y-2 border-t pt-4">
             <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -155,206 +174,38 @@ export function MainNavigation() {
               return (
                 <Link key={item.path} href={item.path}>
                   <Button
+                    onClick={() => setIsOpen(false)}
                     variant={active ? "default" : "ghost"}
                     className="w-full justify-start text-sm"
-                    size="sm"
                   >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{item.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.description}
-                      </span>
-                    </div>
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Account Section */}
-          <div className="space-y-2 border-t pt-4">
-            <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Account
-            </div>
-            {ACCOUNT_ITEMS.map((item) => {
-              const active = isActive(item.path);
-              return (
-                <Link key={item.path} href={item.path}>
-                  <Button
-                    variant={active ? "default" : "ghost"}
-                    className="w-full justify-start text-sm"
-                    size="sm"
-                  >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{item.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.description}
-                      </span>
-                    </div>
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.label}
                   </Button>
                 </Link>
               );
             })}
           </div>
         </div>
+      </div>
 
-        <div className="p-4 border-t">
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-muted-foreground">
-              v1.0.0 • Privacy-First Wellness
-            </div>
-            <div className="flex items-center">
-              <AdminToggle 
-                isAdmin={isAdmin}
-                onAdminChange={(enabled) => {
-                  if (enabled) {
-                    console.log('🔧 Admin mode activated from navigation');
-                    // Refresh to show admin features
-                    window.location.reload();
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Bottom Sheet Menu */}
-      {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 z-50"
-          onClick={() => setIsOpen(false)}
-        >
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50" />
-          
-          {/* Bottom Sheet */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[75vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Handle bar */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-            </div>
-            
-            <div className="px-4 pb-6 overflow-y-auto max-h-[65vh]">
-              {/* Mobile Header */}
-              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                    <Sparkles className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="font-bold text-lg">LightPrompt</h1>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-500">Soul-Tech</p>
-                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded">
-                        BETA
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 p-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Main Navigation Grid */}
-              <div className="grid grid-cols-3 gap-3 py-4">
-                {NAV_ITEMS.slice(0, 9).map((item) => {
-                  const active = isActive(item.path);
-                  return (
-                    <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
-                      <div
-                        className={`p-3 rounded-xl text-center transition-all ${
-                          active 
-                            ? "bg-teal-500 text-white" 
-                            : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                        }`}
-                      >
-                        <item.icon className="h-6 w-6 mx-auto mb-1" />
-                        <div className="text-xs font-medium truncate">{item.label}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-              
-              {/* Admin Toggle */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <AdminToggle 
-                  isAdmin={isAdmin}
-                  onAdminChange={(enabled) => {
-                    if (enabled) {
-                      console.log('🔧 Admin mode activated from mobile navigation');
-                      setIsOpen(false);
-                      window.location.reload();
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Responsive main content padding */}
+      {/* Global Styles for Full Width Layout */}
       <style>{`
         .main-content {
           padding-top: 1rem;
-        }
-        
-        @media (max-width: 767px) {
-          .main-content {
-            padding-top: 5rem;
-            margin-left: 0;
-            padding-left: 1rem;
-            padding-right: 1rem;
-          }
+          margin-left: 0;
+          padding-left: 1rem;
+          padding-right: 1rem;
+          width: 100%;
         }
         
         @media (min-width: 768px) {
           .main-content {
-            margin-left: 256px;
             padding-top: 2rem;
             padding-left: 2rem;
             padding-right: 2rem;
           }
         }
-        
-        /* Force hide desktop nav on mobile */
-        @media (max-width: 767px) {
-          nav.hidden.md\\:block {
-            display: none !important;
-          }
-        }
-        
-        /* Ensure mobile menu doesn't interfere with content */
-        @media (max-width: 767px) {
-          body {
-            overflow-x: hidden;
-          }
-        }
       `}</style>
-    </>
-  );
-}
-
-export function MainLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <MainNavigation />
-      <div className="main-content min-h-screen">
-        {children}
-      </div>
     </>
   );
 }
