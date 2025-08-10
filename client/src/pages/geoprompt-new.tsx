@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   QrCode, 
   MapPin, 
@@ -14,9 +15,12 @@ import {
   Plus,
   Eye,
   MessageCircle,
-  Share
+  Share,
+  Mail,
+  Globe
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import GoogleMap from "@/components/GoogleMap";
 
 interface QRLocation {
   id: string;
@@ -48,6 +52,32 @@ export default function GeoPromptNew() {
   const [selectedLocation, setSelectedLocation] = useState<QRLocation | null>(null);
   const [showInteractionForm, setShowInteractionForm] = useState(false);
   const [userMessage, setUserMessage] = useState('');
+  const [guardianEmail, setGuardianEmail] = useState('');
+  const [guardianMessage, setGuardianMessage] = useState('');
+  const { toast } = useToast();
+
+  const handleGuardianSignup = () => {
+    if (!guardianEmail.trim() || !guardianMessage.trim()) {
+      toast({
+        title: "Please complete all fields",
+        description: "Email and message are required to become a Guardian",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Guardian Application Sent!",
+      description: "We'll review your application and get back to you within 24 hours.",
+    });
+    setGuardianEmail('');
+    setGuardianMessage('');
+  };
+
+  const handleLocationClick = (location: { lat: number; lng: number }) => {
+    console.log('New location selected:', location);
+  };
+
   const [locations, setLocations] = useState<QRLocation[]>([
     {
       id: '1',
@@ -78,8 +108,6 @@ export default function GeoPromptNew() {
       isActive: true
     }
   ]);
-
-  const { toast } = useToast();
 
   // Check if current user is admin
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

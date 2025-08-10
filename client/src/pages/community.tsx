@@ -15,43 +15,89 @@ import {
   BookOpen,
   HelpCircle,
   Send,
-  ExternalLink
+  ExternalLink,
+  ArrowRight,
+  Github,
+  Coffee,
+  Clock,
+  Globe,
+  Code,
+  Lightbulb
 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
-const COMMUNITY_FEATURES = [
+const COMMUNITY_TABS = [
   {
-    title: 'Private Discussion Groups',
-    description: 'Connect with like-minded individuals exploring conscious AI and digital wellness',
+    title: 'General Discussion',
+    description: 'Share ideas, ask questions, and connect with the community',
     icon: MessageCircle,
-    status: 'Available',
-    color: 'text-green-600',
-    link: '/products' // Links to course purchase
+    posts: 24,
+    lastActivity: '2 minutes ago',
+    color: 'bg-blue-50 text-blue-700'
   },
   {
-    title: 'Monthly Live Sessions',
-    description: 'Join our founder for Q&A sessions and guided AI reflection practices',
-    icon: Video,
-    status: 'Coming Soon',
-    color: 'text-blue-600',
-    link: '/products'
+    title: 'Conscious AI',
+    description: 'Explore ethical AI practices and mindful technology use',
+    icon: Lightbulb,
+    posts: 18,
+    lastActivity: '15 minutes ago',
+    color: 'bg-purple-50 text-purple-700'
   },
   {
-    title: 'Local Meetups',
-    description: 'Find and organize in-person gatherings in your area',
-    icon: MapPin,
-    status: 'Coming Soon',
-    color: 'text-blue-600',
-    link: null
+    title: 'Show & Tell',
+    description: 'Share your projects, insights, and discoveries',
+    icon: Star,
+    posts: 12,
+    lastActivity: '1 hour ago',
+    color: 'bg-yellow-50 text-yellow-700'
   },
   {
-    title: 'Resource Library',
-    description: 'Access shared templates, guides, and community-created content',
+    title: 'Course Q&A',
+    description: 'Get help with course content and exercises',
     icon: BookOpen,
-    status: 'Coming Soon',
-    color: 'text-blue-600',
-    link: '/blog'
+    posts: 8,
+    lastActivity: '3 hours ago',
+    color: 'bg-green-50 text-green-700'
+  },
+  {
+    title: 'Feature Requests',
+    description: 'Suggest new features and improvements',
+    icon: Code,
+    posts: 15,
+    lastActivity: '5 hours ago',
+    color: 'bg-teal-50 text-teal-700'
+  }
+];
+
+const RECENT_POSTS = [
+  {
+    title: 'How do you practice mindful AI interactions?',
+    author: 'Sarah M.',
+    replies: 12,
+    time: '2 minutes ago',
+    category: 'Conscious AI'
+  },
+  {
+    title: 'Soul Map insights - birth chart accuracy',
+    author: 'Alex K.',
+    replies: 8,
+    time: '15 minutes ago',
+    category: 'Course Q&A'
+  },
+  {
+    title: 'Built a meditation reminder using the platform',
+    author: 'Jordan L.',
+    replies: 6,
+    time: '1 hour ago',
+    category: 'Show & Tell'
+  },
+  {
+    title: 'Request: Integration with Apple Health',
+    author: 'Maya P.',
+    replies: 4,
+    time: '3 hours ago',
+    category: 'Feature Requests'
   }
 ];
 
@@ -80,188 +126,224 @@ const SUPPORT_OPTIONS = [
 ];
 
 export default function CommunityPage() {
-  const [supportMessage, setSupportMessage] = useState('');
-  const [selectedSupport, setSelectedSupport] = useState<string | null>(null);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('General Discussion');
   const { toast } = useToast();
 
-  const handleSupportSubmit = () => {
-    if (!supportMessage.trim()) {
+  const handleCreatePost = () => {
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
       toast({
-        title: "Please enter a message",
-        description: "Tell us how we can help you",
+        title: "Please fill in all fields",
+        description: "Both title and content are required",
         variant: "destructive"
       });
       return;
     }
 
-    // This would normally send to support system
     toast({
-      title: "Support request sent",
-      description: "We'll get back to you within 24 hours",
+      title: "Post created!",
+      description: "Your post has been shared with the community",
     });
-    setSupportMessage('');
-    setSelectedSupport(null);
+    setNewPostTitle('');
+    setNewPostContent('');
+  };
+
+  const joinDiscord = () => {
+    window.open('https://discord.gg/lightprompt', '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-teal-600 bg-clip-text text-transparent">
-            LightPrompt Community
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Connect with others exploring conscious AI, share insights, and grow together on your journey of self-discovery
-          </p>
-        </div>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                LightPrompt Community
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Connect, share, and grow together in conscious AI exploration
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={joinDiscord} className="bg-[#5865F2] hover:bg-[#4752C4] text-white">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Join Discord
+              </Button>
+              <Link href="/store">
+                <Button variant="outline">
+                  <Users className="w-4 h-4 mr-2" />
+                  Join Course
+                </Button>
+              </Link>
+            </div>
+          </div>
 
-        {/* Community Features */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 flex items-center">
-            <Users className="h-6 w-6 mr-2 text-purple-600" />
-            Community Features
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {COMMUNITY_FEATURES.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <feature.icon className="h-6 w-6 mr-3 text-purple-600" />
-                      <CardTitle className="text-lg">{feature.title}</CardTitle>
-                    </div>
-                    <Badge variant={feature.status === 'Available' ? 'default' : 'secondary'} className={feature.color}>
-                      {feature.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">{feature.description}</p>
-                  {feature.link && (
-                    <Link href={feature.link}>
-                      <Button variant="outline" size="sm" className="w-full">
-                        Learn More <ExternalLink className="h-4 w-4 ml-2" />
-                      </Button>
-                    </Link>
-                  )}
-                  {!feature.link && (
-                    <Button variant="outline" size="sm" className="w-full" disabled>
-                      Coming Soon
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          {/* Stats Bar */}
+          <div className="flex gap-6 text-sm text-gray-600 dark:text-gray-400">
+            <span className="flex items-center">
+              <Users className="w-4 h-4 mr-1" />
+              247 members
+            </span>
+            <span className="flex items-center">
+              <MessageCircle className="w-4 h-4 mr-1" />
+              1,203 posts
+            </span>
+            <span className="flex items-center">
+              <Clock className="w-4 h-4 mr-1" />
+              Active today
+            </span>
           </div>
         </div>
 
-        {/* Community Guidelines */}
-        <div className="mb-16">
-          <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-teal-50 dark:from-purple-950/20 dark:to-teal-950/20">
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl">
-                <Heart className="h-6 w-6 mr-2 text-purple-600" />
-                Our Community Values
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <Star className="h-8 w-8 mx-auto mb-3 text-yellow-500" />
-                  <h3 className="font-semibold mb-2">Conscious Connection</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    We approach AI and each other with mindfulness and intention
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Heart className="h-8 w-8 mx-auto mb-3 text-red-500" />
-                  <h3 className="font-semibold mb-2">Authentic Sharing</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    We create safe spaces for honest reflection and growth
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Users className="h-8 w-8 mx-auto mb-3 text-teal-500" />
-                  <h3 className="font-semibold mb-2">Mutual Support</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    We lift each other up on our individual journeys
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Support Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-8 flex items-center">
-            <HelpCircle className="h-6 w-6 mr-2 text-purple-600" />
-            Get Support
-          </h2>
-          
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Support Options */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">How can we help?</h3>
-              <div className="space-y-4">
-                {SUPPORT_OPTIONS.map((option, index) => (
-                  <Card key={index} className="cursor-pointer hover:shadow-md transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Category Tabs */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Globe className="w-5 h-5 mr-2" />
+                  Discussion Categories
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {COMMUNITY_TABS.map((tab, index) => (
+                    <div key={index} className={`p-4 rounded-lg border cursor-pointer hover:shadow-md transition-all ${tab.color}`}>
+                      <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center">
-                          <option.icon className="h-5 w-5 mr-3 text-purple-600" />
-                          <div>
-                            <h4 className="font-medium">{option.title}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{option.description}</p>
-                          </div>
+                          <tab.icon className="w-5 h-5 mr-2" />
+                          <h3 className="font-semibold">{tab.title}</h3>
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => setSelectedSupport(option.title)}
-                        >
-                          {option.action}
-                        </Button>
+                        <Badge variant="secondary" className="text-xs">
+                          {tab.posts} posts
+                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Send us a message</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {selectedSupport && (
-                    <div className="p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-                      <p className="text-sm font-medium">Support Type: {selectedSupport}</p>
+                      <p className="text-sm opacity-80 mb-2">{tab.description}</p>
+                      <p className="text-xs opacity-60">Last activity: {tab.lastActivity}</p>
                     </div>
-                  )}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Your Message</label>
-                    <Textarea
-                      placeholder="Tell us how we can help you..."
-                      value={supportMessage}
-                      onChange={(e) => setSupportMessage(e.target.value)}
-                      rows={6}
-                    />
-                  </div>
-                  <Button onClick={handleSupportSubmit} className="w-full">
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Message
-                  </Button>
-                  <p className="text-xs text-gray-500 text-center">
-                    We typically respond within 24 hours. For urgent technical issues, 
-                    course members can access priority support through the course portal.
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Posts */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Discussions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {RECENT_POSTS.map((post, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                          <span>by {post.author}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {post.category}
+                          </Badge>
+                          <span>{post.time}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        {post.replies}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Create Post */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Send className="w-5 h-5 mr-2" />
+                  Start a Discussion
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Title</label>
+                  <Input
+                    placeholder="What's on your mind?"
+                    value={newPostTitle}
+                    onChange={(e) => setNewPostTitle(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Content</label>
+                  <Textarea
+                    placeholder="Share your thoughts, questions, or insights..."
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <Button onClick={handleCreatePost} className="w-full">
+                  Create Post
+                </Button>
+                <p className="text-xs text-gray-500 text-center">
+                  Join our Discord for real-time conversations!
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Community Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Community Highlights</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-teal-50 dark:from-purple-950/20 dark:to-teal-950/20 rounded-lg">
+                  <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+                  <h3 className="font-semibold mb-1">Most Helpful</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Sarah M. - 15 helpful answers this month
                   </p>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg">
+                  <Heart className="w-8 h-8 mx-auto mb-2 text-red-500" />
+                  <h3 className="font-semibold mb-1">Community Love</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    98% positive interaction rating
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Guidelines */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Community Guidelines</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li className="flex items-start">
+                    <Heart className="w-4 h-4 mr-2 mt-0.5 text-red-500 flex-shrink-0" />
+                    Be kind and respectful to all members
+                  </li>
+                  <li className="flex items-start">
+                    <Lightbulb className="w-4 h-4 mr-2 mt-0.5 text-yellow-500 flex-shrink-0" />
+                    Share insights and ask thoughtful questions
+                  </li>
+                  <li className="flex items-start">
+                    <Star className="w-4 h-4 mr-2 mt-0.5 text-purple-500 flex-shrink-0" />
+                    Celebrate others' achievements and growth
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -274,7 +356,7 @@ export default function CommunityPage() {
                 Get access to our private community groups and live sessions when you join the LightPrompt:ed course
               </p>
               <div className="flex gap-4 justify-center">
-                <Link href="/products">
+                <Link href="/store">
                   <Button className="bg-purple-600 hover:bg-purple-700">
                     Join Course + Community
                   </Button>

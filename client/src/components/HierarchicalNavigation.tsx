@@ -49,7 +49,7 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     icon: Users,
     description: "Community & Relationships",
     subItems: [
-      { path: "https://discord.gg/lightprompt", label: "Discord Community", icon: Users, description: "Join our Discord server" },
+      { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
       { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing" },
       { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" }
     ]
