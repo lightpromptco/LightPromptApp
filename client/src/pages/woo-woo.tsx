@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { LocationPicker } from "@/components/LocationPicker";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { 
   Stars, 
   Moon, 
@@ -326,15 +326,17 @@ export default function WooWooPage() {
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="birthLocation">Birth Location (City, Country)</Label>
-              <Input
-                id="birthLocation"
-                value={birthData.birthLocation}
-                onChange={(e) => setBirthData(prev => ({ ...prev, birthLocation: e.target.value }))}
-                placeholder="Where were you born?"
-              />
-            </div>
+            <LocationAutocomplete
+              value={birthData.birthLocation}
+              onChange={(location, lat, lng) => setBirthData(prev => ({ 
+                ...prev, 
+                birthLocation: location,
+                latitude: lat || null,
+                longitude: lng || null
+              }))}
+              placeholder="Where were you born?"
+              label="Birth Location (City, Country)"
+            />
           </CardContent>
         </Card>
 

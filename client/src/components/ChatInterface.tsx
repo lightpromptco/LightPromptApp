@@ -240,7 +240,7 @@ export function ChatInterface({
     <>
       <ParticleSystem sentiment={currentSentiment} intensity={isLoading ? 2 : 1} />
       
-      <div className="flex-1 flex flex-col min-h-screen bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30 dark:from-purple-900/10 dark:via-gray-900 dark:to-blue-900/10 pb-20 relative">
+      <div className="flex-1 flex flex-col min-h-screen bg-white dark:bg-gray-900 pb-20 relative">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5 pointer-events-none">
           <svg width="100%" height="100%" viewBox="0 0 100 100" className="text-purple-500">
