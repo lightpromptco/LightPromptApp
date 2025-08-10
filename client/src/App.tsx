@@ -210,6 +210,11 @@ function Router() {
           <StorePage />
         </MainLayout>
       )} />
+      <Route path="/product-info" component={() => (
+        <MainLayout>
+          <ProductInfo />
+        </MainLayout>
+      )} />
       <Route path="/checkout" component={() => (
         <MainLayout>
           <CheckoutPage />

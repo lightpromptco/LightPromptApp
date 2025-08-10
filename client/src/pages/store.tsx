@@ -215,12 +215,12 @@ export default function Store() {
                   </Button>
                   
                   <Button
-                    onClick={() => handleBuyNow(product)}
+                    onClick={() => window.location.href = '/product-info'}
                     variant="outline"
                     className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950"
                     size="lg"
                   >
-                    Buy Now
+                    Learn More
                   </Button>
                 </CardFooter>
               </Card>
