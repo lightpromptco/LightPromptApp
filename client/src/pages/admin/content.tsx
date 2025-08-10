@@ -44,9 +44,10 @@ export default function ContentManagement() {
   const queryClient = useQueryClient();
 
   // Get all content pages
-  const { data: pages = [], isLoading } = useQuery({
+  const { data: pages = [], isLoading, error } = useQuery({
     queryKey: ['/api/content/pages'],
     refetchInterval: 30000,
+    retry: 1,
   });
 
   // Get media assets
