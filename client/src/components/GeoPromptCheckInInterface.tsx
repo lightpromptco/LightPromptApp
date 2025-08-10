@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPin, Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { GoogleMap } from "./GoogleMap";
 
 const LOCATION_TYPES = [
   { id: 'home', name: 'Home', emoji: '🏠', description: 'Your personal sanctuary' },

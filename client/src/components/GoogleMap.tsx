@@ -1,7 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Plus, Users, Mail } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Compass, Globe } from 'lucide-react';
+
+interface GoogleMapProps {
+  center?: { lat: number; lng: number };
+  zoom?: number;
+  onLocationSelect?: (location: { lat: number; lng: number; address?: string }) => void;
+  markers?: Array<{
+    lat: number;
+    lng: number;
+    title?: string;
+    description?: string;
+  }>;
+  height?: string;
+  className?: string;
+}
 
 declare global {
   interface Window {
@@ -10,242 +25,240 @@ declare global {
   }
 }
 
-interface Location {
-  id: string;
-  name: string;
-  lat: number;
-  lng: number;
-  description: string;
-  guardianEmail?: string;
-  checkIns: number;
-}
-
-interface GoogleMapProps {
-  onLocationSelect?: (location: { lat: number; lng: number }) => void;
-  locations?: Location[];
-  height?: string;
-}
-
-export default function GoogleMap({ onLocationSelect, locations = [], height = "400px" }: GoogleMapProps) {
+export function GoogleMap({ 
+  center = { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
+  zoom = 13,
+  onLocationSelect,
+  markers = [],
+  height = "400px",
+  className = ""
+}: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const [map, setMap] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  const defaultLocations: Location[] = [
-    {
-      id: '1',
-      name: 'Central Park Meditation Spot',
-      lat: 40.7829,
-      lng: -73.9654,
-      description: 'A peaceful corner for mindful reflection',
-      guardianEmail: 'guardian@lightprompt.co',
-      checkIns: 127
-    },
-    {
-      id: '2', 
-      name: 'Golden Gate Bridge Viewpoint',
-      lat: 37.8199,
-      lng: -122.4783,
-      description: 'Sunrise contemplation point',
-      guardianEmail: 'sf.guardian@lightprompt.co',
-      checkIns: 89
-    },
-    {
-      id: '3',
-      name: 'Griffith Observatory',
-      lat: 34.1184,
-      lng: -118.3004,
-      description: 'Stars and cosmic connection',
-      guardianEmail: 'la.guardian@lightprompt.co', 
-      checkIns: 156
-    },
-    {
-      id: '4',
-      name: 'Brooklyn Bridge',
-      lat: 40.7061,
-      lng: -73.9969,
-      description: 'Urban mindfulness walk',
-      guardianEmail: 'brooklyn.guardian@lightprompt.co',
-      checkIns: 203
-    }
-  ];
-
-  const allLocations = [...defaultLocations, ...locations];
-
+  // Load Google Maps API
   useEffect(() => {
-    const initializeMap = () => {
-      if (window.google && mapRef.current) {
-        const map = new window.google.maps.Map(mapRef.current, {
-          zoom: 4,
-          center: { lat: 39.8283, lng: -98.5795 }, // Center of US
+    if (window.google?.maps) {
+      setIsLoaded(true);
+      return;
+    }
+
+    // Check if script is already loading
+    if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+      const checkGoogle = setInterval(() => {
+        if (window.google?.maps) {
+          setIsLoaded(true);
+          clearInterval(checkGoogle);
+        }
+      }, 100);
+      return () => clearInterval(checkGoogle);
+    }
+
+    // Create script tag to load Google Maps
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = () => {
+      setIsLoaded(true);
+    };
+    
+    script.onerror = () => {
+      setError('Failed to load Google Maps. Please check your API key configuration.');
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script if component unmounts
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
+  // Initialize map when API is loaded
+  useEffect(() => {
+    if (isLoaded && mapRef.current && !map) {
+      try {
+        const googleMap = new window.google.maps.Map(mapRef.current, {
+          center,
+          zoom,
           styles: [
             {
+              featureType: 'all',
+              elementType: 'geometry',
+              stylers: [{ color: '#f5f5f5' }]
+            },
+            {
+              featureType: 'water',
+              elementType: 'all',
+              stylers: [{ color: '#e9e9e9' }, { visibility: 'on' }]
+            },
+            {
               featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }]
+              elementType: 'all',
+              stylers: [{ visibility: 'simplified' }]
             }
           ]
         });
 
-        mapInstanceRef.current = map;
+        setMap(googleMap);
 
-        // Add markers for all locations
-        allLocations.forEach(location => {
-          const marker = new window.google.maps.Marker({
-            position: { lat: location.lat, lng: location.lng },
-            map: map,
-            title: location.name,
-            icon: {
-              path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 8,
-              fillColor: '#14B8A6',
-              fillOpacity: 0.8,
-              strokeWeight: 2,
-              strokeColor: '#ffffff'
-            }
-          });
-
-          const infoWindow = new window.google.maps.InfoWindow({
-            content: `
-              <div style="padding: 8px; max-width: 200px;">
-                <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${location.name}</h3>
-                <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">${location.description}</p>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                  <span style="color: #14B8A6; font-weight: bold;">${location.checkIns} check-ins</span>
-                </div>
-                ${location.guardianEmail ? `
-                  <div style="padding: 8px; background: #f3f4f6; border-radius: 4px; margin-top: 8px;">
-                    <p style="margin: 0; font-size: 12px; color: #6b7280;">Guardian: ${location.guardianEmail}</p>
-                  </div>
-                ` : ''}
-              </div>
-            `
-          });
-
-          marker.addListener('click', () => {
-            infoWindow.open(map, marker);
-            setSelectedLocation(location);
-          });
-        });
-
-        // Add click listener for new locations
+        // Add click listener for location selection
         if (onLocationSelect) {
-          map.addListener('click', (event: any) => {
+          googleMap.addListener('click', (event: any) => {
             const lat = event.latLng.lat();
             const lng = event.latLng.lng();
             onLocationSelect({ lat, lng });
           });
         }
-
-        setIsLoaded(true);
+      } catch (err) {
+        setError('Failed to initialize Google Maps');
       }
-    };
+    }
+  }, [isLoaded, center, zoom, onLocationSelect, map]);
 
-    const loadGoogleMaps = () => {
-      if (window.google) {
-        initializeMap();
-        return;
-      }
+  // Add markers when they change
+  useEffect(() => {
+    if (map && markers.length > 0) {
+      markers.forEach(marker => {
+        new window.google.maps.Marker({
+          position: { lat: marker.lat, lng: marker.lng },
+          map,
+          title: marker.title,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            fillColor: '#8b5cf6',
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2,
+            scale: 8
+          }
+        });
+      });
+    }
+  }, [map, markers]);
 
-      window.initMap = initializeMap;
-      
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOkmgQ4Kj-CKkA&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    };
+  // Get current location
+  const getCurrentLocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const newLocation = { lat: latitude, lng: longitude };
+          setCurrentLocation(newLocation);
+          
+          if (map) {
+            map.setCenter(newLocation);
+            map.setZoom(15);
+            
+            // Add marker for current location
+            new window.google.maps.Marker({
+              position: newLocation,
+              map,
+              title: 'Your Location',
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                fillColor: '#10b981',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 3,
+                scale: 10
+              }
+            });
+          }
+          
+          onLocationSelect?.(newLocation);
+        },
+        () => {
+          setError('Unable to get your current location');
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by this browser');
+    }
+  };
 
-    loadGoogleMaps();
-
-    return () => {
-      // Cleanup if needed
-    };
-  }, [onLocationSelect, allLocations]);
-
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardContent className="p-0">
-          <div 
-            ref={mapRef} 
-            style={{ height, width: '100%' }}
-            className="rounded-lg"
-          />
-          {!isLoaded && (
-            <div 
-              style={{ height }}
-              className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg"
-            >
-              <div className="text-center">
-                <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-gray-500">Loading map...</p>
-              </div>
+  if (error) {
+    return (
+      <Card className={`w-full ${className}`}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-600">
+            <MapPin className="h-5 w-5" />
+            Google Maps Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 space-y-4">
+            <Globe className="h-12 w-12 mx-auto text-gray-400" />
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <div className="text-xs text-gray-500">
+              <p>To enable Google Maps:</p>
+              <ul className="mt-2 space-y-1">
+                <li>• Ensure GOOGLE_MAPS_API_KEY is configured</li>
+                <li>• Enable Maps JavaScript API in Google Cloud Console</li>
+                <li>• Add your domain to API restrictions</li>
+              </ul>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
+    );
+  }
 
-      {selectedLocation && (
-        <Card className="border-teal-200 bg-teal-50 dark:bg-teal-950/20">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-2">{selectedLocation.name}</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-3">{selectedLocation.description}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
-                    {selectedLocation.checkIns} check-ins
-                  </span>
-                  {selectedLocation.guardianEmail && (
-                    <span className="flex items-center">
-                      <Mail className="w-4 h-4 mr-1" />
-                      Guardian available
-                    </span>
-                  )}
-                </div>
-              </div>
-              <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
-                Check In
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+  if (!isLoaded) {
+    return (
+      <Card className={`w-full ${className}`}>
+        <CardContent>
+          <div className="flex items-center justify-center py-8 space-x-3" style={{ height }}>
+            <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full"></div>
+            <span className="text-sm text-muted-foreground">Loading Google Maps...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-2 flex items-center">
-              <Plus className="w-4 h-4 mr-2 text-teal-600" />
-              Add New Location
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Click anywhere on the map to suggest a new GeoPrompt location
-            </p>
-            <Button variant="outline" size="sm" className="w-full">
-              Suggest Location
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-2 flex items-center">
-              <Mail className="w-4 h-4 mr-2 text-purple-600" />
-              Become a Guardian
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Help guide others in mindful practices at special locations
-            </p>
-            <Button variant="outline" size="sm" className="w-full">
-              Join as Guardian
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+  return (
+    <Card className={`w-full ${className}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-purple-500 text-lg">⬢</span>
+            <span>GeoPrompt Map</span>
+            <Badge variant="outline" className="text-xs">
+              Interactive
+            </Badge>
+          </div>
+          <Button
+            onClick={getCurrentLocation}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Compass className="h-4 w-4" />
+            My Location
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div 
+          ref={mapRef} 
+          style={{ height, width: '100%' }}
+          className="rounded-b-lg overflow-hidden"
+        />
+        {currentLocation && (
+          <div className="p-3 bg-muted/50 text-xs text-muted-foreground border-t">
+            Current Location: {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
