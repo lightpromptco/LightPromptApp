@@ -1,369 +1,419 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Compass, 
-  Mountain, 
-  Star, 
-  Eye,
-  Heart,
+  Brain,
   Zap,
-  Moon,
-  Sun,
-  Wind,
-  Waves,
-  Flame,
-  TreePine,
   Sparkles,
-  Brain
+  Star,
+  Rocket,
+  Cpu,
+  Monitor,
+  Heart,
+  Eye,
+  ArrowRight,
+  PlayCircle,
+  RotateCcw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-const QUEST_STAGES = [
+const FUTURE_QUEST_PHASES = [
   {
-    id: 'departure',
-    name: 'The Departure',
-    icon: Compass,
-    description: 'Leaving the familiar to discover your truth',
-    color: 'from-blue-500 to-cyan-500',
-    practices: ['Intention Setting', 'Sacred Space Creation', 'Fear Release']
+    id: 'neural-init',
+    name: 'Neural Initialization',
+    icon: Brain,
+    description: 'Booting up your consciousness matrix',
+    color: 'from-cyan-400 to-blue-600',
+    challenges: ['Digital Detox Challenge', 'Mindfulness Scan', 'Reality Check Protocol']
   },
   {
-    id: 'initiation',
-    name: 'The Initiation',
-    icon: Mountain,
-    description: 'Facing challenges that forge your spirit',
-    color: 'from-orange-500 to-red-500',
-    practices: ['Shadow Integration', 'Inner Dialogue', 'Courage Building']
+    id: 'quantum-dive',
+    name: 'Quantum Dive',
+    icon: Zap,
+    description: 'Exploring infinite possibility states',
+    color: 'from-purple-500 to-pink-500',
+    challenges: ['Parallel Life Simulator', 'Decision Tree Explorer', 'What-If Generator']
   },
   {
-    id: 'revelation',
-    name: 'The Revelation',
-    icon: Eye,
-    description: 'Receiving insights about your purpose',
-    color: 'from-purple-500 to-indigo-500',
-    practices: ['Vision Seeking', 'Dream Work', 'Symbolic Understanding']
+    id: 'cosmic-sync',
+    name: 'Cosmic Synchronization',
+    icon: Sparkles,
+    description: 'Aligning with universal frequencies',
+    color: 'from-indigo-500 to-purple-600',
+    challenges: ['Astro-Personality Merge', 'Energy Pattern Reading', 'Vibe Calibration']
   },
   {
-    id: 'integration',
-    name: 'The Integration',
+    id: 'timeline-lock',
+    name: 'Timeline Lock-In',
     icon: Star,
-    description: 'Bringing wisdom back to daily life',
-    color: 'from-green-500 to-emerald-500',
-    practices: ['Life Planning', 'Community Sharing', 'Ongoing Practice']
+    description: 'Committing to your optimal reality branch',
+    color: 'from-emerald-400 to-teal-600',
+    challenges: ['Future Self Interview', 'Goal Crystallization', 'Reality Anchor Setup']
   }
 ];
 
-const SPIRIT_ANIMALS = [
-  { name: 'Eagle', element: 'Air', gift: 'Vision & Perspective', emoji: '🦅' },
-  { name: 'Bear', element: 'Earth', gift: 'Strength & Healing', emoji: '🐻' },
-  { name: 'Wolf', element: 'Air', gift: 'Loyalty & Intuition', emoji: '🐺' },
-  { name: 'Dolphin', element: 'Water', gift: 'Joy & Communication', emoji: '🐬' },
-  { name: 'Owl', element: 'Air', gift: 'Wisdom & Mystery', emoji: '🦉' },
-  { name: 'Lion', element: 'Fire', gift: 'Courage & Leadership', emoji: '🦁' }
+const DIGITAL_TOTEMS = [
+  { name: 'Cyber Phoenix', element: 'Code', gift: 'Infinite Renewal', emoji: '🔥', quirk: 'Restarts when confused' },
+  { name: 'Quantum Cat', element: 'Logic', gift: 'Superposition Thinking', emoji: '🐱', quirk: 'Exists in multiple states' },
+  { name: 'Neon Dragon', element: 'Energy', gift: 'Electric Creativity', emoji: '⚡', quirk: 'Glows when excited' },
+  { name: 'Data Whale', element: 'Flow', gift: 'Deep Pattern Recognition', emoji: '🐋', quirk: 'Sings in binary' },
+  { name: 'Pixel Butterfly', element: 'Change', gift: 'Beautiful Transformation', emoji: '🦋', quirk: 'Renders in 8-bit sometimes' },
+  { name: 'Solar Octopus', element: 'Adapt', gift: 'Multi-Dimensional Problem Solving', emoji: '🐙', quirk: 'Each arm thinks differently' }
+];
+
+const FUNNY_LOADING_MESSAGES = [
+  "Calibrating your reality perception...",
+  "Downloading wisdom from the cosmic cloud...",
+  "Optimizing your life's source code...",
+  "Syncing with parallel universe you...",
+  "Defragmenting your soul's hard drive...",
+  "Installing consciousness upgrade 2.0...",
+  "Buffering enlightenment... 47% complete",
+  "Teaching AI to meditate (it's complicated)"
 ];
 
 export default function VisionQuestPage() {
-  const [currentView, setCurrentView] = useState<'intro' | 'quest' | 'journey' | 'completion'>('intro');
-  const [currentStage, setCurrentStage] = useState(0);
+  const [currentView, setCurrentView] = useState<'intro' | 'totem-select' | 'quest' | 'journey' | 'completion'>('intro');
+  const [currentPhase, setCurrentPhase] = useState(0);
   const [questProgress, setQuestProgress] = useState(0);
+  const [selectedTotem, setSelectedTotem] = useState<typeof DIGITAL_TOTEMS[0] | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState(FUNNY_LOADING_MESSAGES[0]);
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
 
   // Get current user
-  const { data: user } = useQuery({
-    queryKey: ['/api/users/email/lightprompt.co@gmail.com'],
-  });
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const userId = currentUser?.id || 'demo-user';
 
-  // Get user's quest progress
-  const { data: userQuest } = useQuery({
-    queryKey: ['/api/vision-quest', user?.id],
-    enabled: !!user?.id,
-  });
-
-  // Get user's soul map for integration
-  const { data: soulMap } = useQuery({
-    queryKey: ['/api/soul-map', user?.id],
-    enabled: !!user?.id,
-  });
-
+  // Begin quest mutation
   const beginQuestMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id) {
-        throw new Error("Please log in to begin your vision quest");
-      }
-      const response = await fetch("/api/vision-quest/begin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id })
+      const response = await apiRequest('POST', '/api/vision-quest/begin', {
+        userId: userId,
+        totem: selectedTotem
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to begin vision quest");
-      }
       return response.json();
     },
     onSuccess: () => {
-      setCurrentView('journey');
-      setCurrentStage(0);
-      setQuestProgress(25);
+      setCurrentView('totem-select');
       toast({
-        title: "Vision Quest Begun",
-        description: "Your spiritual journey has started",
+        title: "Quest Initialized! 🚀",
+        description: "Your consciousness matrix is now booting up...",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Quest Start Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
   });
 
-  const completeStage = () => {
-    const newProgress = Math.min(questProgress + 25, 100);
-    setQuestProgress(newProgress);
-    
-    if (newProgress === 100) {
-      setCurrentView('completion');
-      toast({
-        title: "Quest Complete!",
-        description: "You have completed your Vision Quest journey",
-      });
-    } else {
-      setCurrentStage(currentStage + 1);
-      toast({
-        title: "Stage Complete",
-        description: `You've completed ${QUEST_STAGES[currentStage].name}`,
-      });
-    }
-  };
-
-  // Intro View
+  // Intro View - Futuristic landing
   if (currentView === 'intro') {
     return (
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-teal-500 to-purple-500 rounded-2xl flex items-center justify-center">
-            <Compass className="h-8 w-8 text-white" />
-          </div>
-          <div className="space-y-3">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Vision Quest
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed">
-              A modern approach to self-discovery through conscious AI reflection and personalized guidance
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white">
+        <div className="max-w-4xl mx-auto p-6 space-y-8">
+          
+          {/* Header */}
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Vision Quest 3.0
+              </h1>
+              <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-purple-500 animate-pulse">
+                BETA
+              </Badge>
+            </div>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              A next-gen self-discovery experience that's like a video game for your soul, 
+              but with actual useful insights (and way cooler graphics in your imagination)
             </p>
           </div>
-        </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="hover:shadow-lg transition-all duration-300">
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-gradient-to-br from-cyan-900/50 to-blue-900/50 border-cyan-500/30 hover:border-cyan-400/50 transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-cyan-400">
+                  <Brain className="h-6 w-6" />
+                  AI-Powered Introspection
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Like having a wise mentor, therapist, and slightly sarcastic friend all rolled into one. 
+                  Our AI asks the right questions (and some weird ones too).
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 border-purple-500/30 hover:border-purple-400/50 transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-purple-400">
+                  <Sparkles className="h-6 w-6" />
+                  Digital Spirit Guides
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Choose your digital totem companion! Each one has unique personality quirks 
+                  (yes, the Quantum Cat really does exist in multiple states).
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border-emerald-500/30 hover:border-emerald-400/50 transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-emerald-400">
+                  <Zap className="h-6 w-6" />
+                  Future-Self Interviews
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Actually talk to your future self (through AI simulation). 
+                  Spoiler alert: they're probably still procrastinating, but with better excuses.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-900/50 to-red-900/50 border-orange-500/30 hover:border-orange-400/50 transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-orange-400">
+                  <Rocket className="h-6 w-6" />
+                  Practical Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  This isn't just philosophical navel-gazing. Get actual actionable insights 
+                  you can use in real life (revolutionary concept, we know).
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Progress Phases */}
+          <Card className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 border-gray-600/50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <Mountain className="h-6 w-6 text-teal-600" />
-                Four-Stage Journey
-              </CardTitle>
+              <CardTitle className="text-center text-2xl">Your Journey Phases</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                A structured path of self-discovery using AI-guided reflections and modern wisdom practices.
-              </p>
-              <div className="space-y-4">
-                {QUEST_STAGES.map((stage, index) => (
-                  <div key={stage.id} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stage.color} flex items-center justify-center flex-shrink-0`}>
-                      <stage.icon className="h-5 w-5 text-white" />
+              <div className="grid md:grid-cols-4 gap-4">
+                {FUTURE_QUEST_PHASES.map((phase, index) => (
+                  <div key={phase.id} className="text-center space-y-3">
+                    <div className={`w-16 h-16 mx-auto bg-gradient-to-r ${phase.color} rounded-xl flex items-center justify-center`}>
+                      <phase.icon className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">{stage.name}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{stage.description}</p>
+                      <h4 className="font-semibold text-gray-200">{phase.name}</h4>
+                      <p className="text-sm text-gray-400">{phase.description}</p>
                     </div>
+                    {index < FUTURE_QUEST_PHASES.length - 1 && (
+                      <ArrowRight className="h-4 w-4 text-gray-500 mx-auto hidden md:block" />
+                    )}
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <Sparkles className="h-6 w-6 text-purple-600" />
-                Enhanced with Soul Map
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {soulMap ? (
-                <div className="space-y-4">
-                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="font-medium text-green-700 dark:text-green-400">Soul Map Connected</span>
-                    </div>
-                    <p className="text-sm text-green-600 dark:text-green-400">
-                      Your journey will be personalized with astrological insights and birth chart guidance
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Personalized Features:</h4>
-                    <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                      <li>• Birth chart-aligned reflections</li>
-                      <li>• Current planetary transit insights</li>
-                      <li>• Personalized affirmations</li>
-                    </ul>
-                  </div>
-                </div>
+          {/* Start Button */}
+          <div className="text-center space-y-4">
+            <p className="text-gray-400 italic">
+              "The only way to make sense out of change is to plunge into it, move with it, and join the dance." 
+              <br />- Alan Watts (but with more LEDs)
+            </p>
+            
+            <Button 
+              onClick={() => beginQuestMutation.mutate()}
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg"
+              disabled={beginQuestMutation.isPending}
+            >
+              {beginQuestMutation.isPending ? (
+                <>
+                  <Monitor className="h-5 w-5 mr-2 animate-spin" />
+                  {loadingMessage}
+                </>
               ) : (
-                <div className="space-y-4">
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Connect your Soul Map for a personalized experience with astrological insights and birth chart wisdom.
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => window.location.href = '/woo-woo'}
-                    className="w-full"
-                  >
-                    Create Soul Map
-                  </Button>
-                </div>
+                <>
+                  <PlayCircle className="h-5 w-5 mr-2" />
+                  Initialize Vision Quest 3.0
+                </>
               )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="bg-gradient-to-r from-gray-50 to-teal-50 dark:from-gray-800 dark:to-teal-900/20 border-teal-200">
-          <CardContent className="py-8">
-            <div className="text-center space-y-4">
-              <h3 className="text-xl font-semibold">Modern Self-Discovery</h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
-                This isn't about ancient mysticism or outdated practices. It's a structured approach to understanding yourself using AI-guided reflection and evidence-based insights.
-              </p>
-              <div className="grid md:grid-cols-3 gap-4 mt-6">
-                <div className="text-center">
-                  <Brain className="h-8 w-8 mx-auto mb-2 text-teal-600" />
-                  <h4 className="font-medium">AI Guidance</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Thoughtful prompts and reflections</p>
-                </div>
-                <div className="text-center">
-                  <Heart className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                  <h4 className="font-medium">Personal Insights</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Discover patterns and strengths</p>
-                </div>
-                <div className="text-center">
-                  <Mountain className="h-8 w-8 mx-auto mb-2 text-orange-600" />
-                  <h4 className="font-medium">Practical Actions</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Apply insights to daily life</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground italic">
-            "The cave you fear to enter holds the treasure you seek." - Joseph Campbell
-          </p>
-          
-          {userQuest ? (
-            <div className="space-y-3">
-              <p className="text-green-600 dark:text-green-400 font-medium">
-                You have an active Vision Quest in progress
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button onClick={() => setCurrentView('journey')} size="lg">
-                  Continue Quest
-                </Button>
-                <Button variant="outline" onClick={() => beginQuestMutation.mutate()} size="lg">
-                  Begin New Quest
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button onClick={() => beginQuestMutation.mutate()} size="lg">
-              Begin Your Vision Quest
             </Button>
-          )}
+          </div>
         </div>
       </div>
     );
   }
 
-  // Journey View
-  if (currentView === 'journey') {
-    const currentStageData = QUEST_STAGES[currentStage];
-    const IconComponent = currentStageData.icon;
+  // Totem Selection View
+  if (currentView === 'totem-select') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white">
+        <div className="max-w-4xl mx-auto p-6 space-y-8">
+          
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Choose Your Digital Totem
+            </h2>
+            <p className="text-xl text-gray-300">
+              Your AI companion for this journey. Each has unique quirks and superpowers!
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {DIGITAL_TOTEMS.map((totem, index) => (
+              <Card 
+                key={index}
+                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                  selectedTotem?.name === totem.name 
+                    ? 'bg-gradient-to-br from-purple-600/30 to-pink-600/30 border-purple-400 ring-2 ring-purple-400' 
+                    : 'bg-gradient-to-br from-gray-800/50 to-gray-700/50 border-gray-600/50 hover:border-purple-400/50'
+                }`}
+                onClick={() => setSelectedTotem(totem)}
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <span className="text-3xl">{totem.emoji}</span>
+                    <div>
+                      <div className="text-lg">{totem.name}</div>
+                      <Badge variant="outline" className="text-xs">
+                        {totem.element}
+                      </Badge>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-gray-300">
+                    <strong>Gift:</strong> {totem.gift}
+                  </p>
+                  <p className="text-sm text-gray-400 italic">
+                    <strong>Quirk:</strong> {totem.quirk}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center space-y-4">
+            {selectedTotem && (
+              <div className="p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-lg border border-purple-500/30">
+                <p className="text-purple-300">
+                  <strong>{selectedTotem.name}</strong> has joined your quest! 
+                  They're ready to help you {selectedTotem.gift.toLowerCase()}.
+                </p>
+              </div>
+            )}
+            
+            <div className="flex gap-4 justify-center">
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentView('intro')}
+                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              
+              <Button 
+                onClick={() => setCurrentView('quest')}
+                disabled={!selectedTotem}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                Begin Quest with {selectedTotem?.name}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Quest Phase View
+  if (currentView === 'quest') {
+    const currentPhaseData = FUTURE_QUEST_PHASES[currentPhase];
+    const IconComponent = currentPhaseData.icon;
 
     return (
-      <div className="max-w-3xl mx-auto p-6 space-y-6">
-        <div className="text-center space-y-4">
-          <div className={`w-16 h-16 mx-auto bg-gradient-to-r ${currentStageData.color} rounded-full flex items-center justify-center`}>
-            <IconComponent className="h-8 w-8 text-white" />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white">
+        <div className="max-w-3xl mx-auto p-6 space-y-6">
+          
+          {/* Phase Header */}
+          <div className="text-center space-y-4">
+            <div className={`w-20 h-20 mx-auto bg-gradient-to-r ${currentPhaseData.color} rounded-full flex items-center justify-center`}>
+              <IconComponent className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold">{currentPhaseData.name}</h2>
+            <p className="text-xl text-gray-300">{currentPhaseData.description}</p>
+            <Progress value={(currentPhase + 1) * 25} className="w-full max-w-md mx-auto" />
           </div>
-          <h2 className="text-2xl font-bold">{currentStageData.name}</h2>
-          <p className="text-muted-foreground">{currentStageData.description}</p>
-          <Progress value={questProgress} className="w-full max-w-md mx-auto" />
-        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Practice</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              {currentStageData.practices.map((practice, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span className="font-medium">{practice}</span>
+          {/* Totem Companion */}
+          {selectedTotem && (
+            <Card className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{selectedTotem.emoji}</span>
+                  <div>
+                    <p className="font-medium text-purple-300">{selectedTotem.name} says:</p>
+                    <p className="text-gray-300 italic">
+                      "Ready to {currentPhaseData.challenges[0].toLowerCase()}? Let's make some digital magic happen!"
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Challenges */}
+          <Card className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 border-gray-600/50">
+            <CardHeader>
+              <CardTitle>Phase Challenges</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {currentPhaseData.challenges.map((challenge, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                  <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-white">{index + 1}</span>
+                  </div>
+                  <span className="font-medium text-gray-200">{challenge}</span>
                 </div>
               ))}
-            </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 justify-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentView('totem-select')}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Change Totem
+            </Button>
             
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">AI Guide Reflection</h4>
-              <p className="text-sm text-muted-foreground italic">
-                "Take a moment to breathe deeply and connect with your inner landscape. 
-                What is calling for your attention in this moment? What part of yourself 
-                is ready to be witnessed and honored?"
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setCurrentView('intro')}>
-                Pause Quest
-              </Button>
-              <Button onClick={completeStage} className="flex-1">
-                Complete Stage
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Spirit Animal Oracle */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TreePine className="h-5 w-5 text-green-500" />
-              Spirit Animal Guidance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {SPIRIT_ANIMALS.map((animal, index) => (
-                <div key={index} className="text-center p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="text-2xl mb-1">{animal.emoji}</div>
-                  <div className="font-medium text-sm">{animal.name}</div>
-                  <div className="text-xs text-muted-foreground">{animal.gift}</div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            <Button 
+              onClick={() => {
+                if (currentPhase < FUTURE_QUEST_PHASES.length - 1) {
+                  setCurrentPhase(currentPhase + 1);
+                  setQuestProgress(questProgress + 25);
+                } else {
+                  setCurrentView('completion');
+                }
+                toast({
+                  title: `${currentPhaseData.name} Complete! ✨`,
+                  description: "Your consciousness matrix is upgrading...",
+                });
+              }}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              Complete Phase
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -371,56 +421,93 @@ export default function VisionQuestPage() {
   // Completion View
   if (currentView === 'completion') {
     return (
-      <div className="max-w-3xl mx-auto p-6 space-y-8">
-        <div className="text-center space-y-4">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gold-500 to-yellow-500 rounded-full flex items-center justify-center">
-            <Star className="h-10 w-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold">Quest Complete!</h1>
-          <p className="text-xl text-muted-foreground">
-            You have successfully completed your Vision Quest journey
-          </p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Journey Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              {QUEST_STAGES.map((stage, index) => {
-                const IconComponent = stage.icon;
-                return (
-                  <div key={stage.id} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                    <div className={`w-8 h-8 bg-gradient-to-r ${stage.color} rounded-full flex items-center justify-center`}>
-                      <IconComponent className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{stage.name}</div>
-                      <div className="text-sm text-muted-foreground">Completed</div>
-                    </div>
-                  </div>
-                );
-              })}
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white">
+        <div className="max-w-3xl mx-auto p-6 space-y-8 text-center">
+          
+          <div className="space-y-6">
+            <div className="w-24 h-24 mx-auto bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center">
+              <Star className="h-12 w-12 text-white" />
             </div>
-          </CardContent>
-        </Card>
+            
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              Quest Complete!
+            </h2>
+            
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Congratulations! You've successfully navigated the digital realms of self-discovery. 
+              Your consciousness has been upgraded to version 2.0 (with better error handling).
+            </p>
+          </div>
 
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground">
-            Your vision quest insights are now part of your ongoing journey. 
-            Consider revisiting your Soul Map or beginning a new quest when you feel called.
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={() => window.location.href = '/woo-woo'}>
-              View Soul Map
+          {selectedTotem && (
+            <Card className="bg-gradient-to-r from-emerald-900/30 to-cyan-900/30 border-emerald-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <span className="text-3xl">{selectedTotem.emoji}</span>
+                  <div>
+                    <p className="font-medium text-emerald-300">{selectedTotem.name}'s Final Message:</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 italic text-lg">
+                  "You've mastered the art of {selectedTotem.gift.toLowerCase()}! 
+                  Remember, the real treasure was the self-awareness we found along the way. 
+                  Also, I'll be here if you need to restart anything."
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-purple-300">Quest Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-left text-gray-300 space-y-2">
+                  <li>• Unlocked new perspectives on life goals</li>
+                  <li>• Discovered hidden personality patterns</li>
+                  <li>• Calibrated future-self compatibility</li>
+                  <li>• Achieved cosmic synchronization (mostly)</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-500/30">
+              <CardHeader>
+                <CardTitle className="text-cyan-300">Next Steps</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-left text-gray-300 space-y-2">
+                  <li>• Apply insights to daily decisions</li>
+                  <li>• Share wisdom with other questers</li>
+                  <li>• Continue the journey in other modes</li>
+                  <li>• Remember to update your reality regularly</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex gap-4 justify-center">
+            <Button 
+              onClick={() => {
+                setCurrentView('intro');
+                setCurrentPhase(0);
+                setQuestProgress(0);
+                setSelectedTotem(null);
+              }}
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Start New Quest
             </Button>
-            <Button onClick={() => {
-              setCurrentView('intro');
-              setCurrentStage(0);
-              setQuestProgress(0);
-            }}>
-              Begin New Quest
+            
+            <Button 
+              onClick={() => window.location.href = '/woo-woo'}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              Explore Soul Map
+              <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
         </div>

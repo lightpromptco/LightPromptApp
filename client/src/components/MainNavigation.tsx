@@ -43,6 +43,7 @@ const NAV_ITEMS = [
     glyph: "◇",
     subItems: [
       { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Find Your Connection" },
+      { path: "/vibe-match", label: "VibeMatch", icon: Sparkles, description: "AI-Powered Compatibility" },
       { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" }
     ]
   },
