@@ -28,20 +28,20 @@ import {
 import { AdminToggle } from "./AdminToggle";
 
 const NAV_ITEMS = [
-  { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
-  { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
-  { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview" },
-  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook" },
-  { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart" },
-  { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
-  { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
-  { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
-  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing" },
-  { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
-  { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians" },
-  { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
-  { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" },
-  { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources" },
+  { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "◊" },
+  { path: "/chat", label: "LightPromptBot", icon: MessageCircle, description: "AI Conversations", glyph: "⟐" },
+  { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview", glyph: "◈" },
+  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook", glyph: "⬡" },
+  { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart", glyph: "◉" },
+  { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis", glyph: "✧" },
+  { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance", glyph: "⟡" },
+  { path: "/community", label: "Community", icon: Users, description: "Connect with Others", glyph: "◎" },
+  { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing", glyph: "♦" },
+  { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections", glyph: "✦" },
+  { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians", glyph: "⬢" },
+  { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress", glyph: "◆" },
+  { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals", glyph: "⬟" },
+  { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources", glyph: "◐" },
 ];
 
 const ACCOUNT_ITEMS = [
@@ -94,7 +94,12 @@ export function MainNavigation() {
             </div>
             <div>
               <h1 className="font-bold text-lg">LightPrompt</h1>
-              <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-muted-foreground">Soul-Tech Wellness</p>
+                <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-[10px] font-medium rounded-full">
+                  BETA
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -112,10 +117,15 @@ export function MainNavigation() {
                       active ? "bg-primary text-primary-foreground" : ""
                     }`}
                   >
-                    <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium">{item.label}</div>
-                      <div className="text-xs opacity-70">{item.description}</div>
+                    <div className="flex items-center gap-3 w-full">
+                      <span className="text-purple-500 dark:text-purple-400 text-sm font-bold flex-shrink-0">
+                        {item.glyph}
+                      </span>
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <div className="flex-1 text-left">
+                        <div className="font-medium">{item.label}</div>
+                        <div className="text-xs opacity-70">{item.description}</div>
+                      </div>
                     </div>
                   </Button>
                 </Link>
@@ -221,7 +231,12 @@ export function MainNavigation() {
                   </div>
                   <div>
                     <h1 className="font-bold text-xl">LightPrompt</h1>
-                    <p className="text-sm text-muted-foreground">Soul-Tech Wellness</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">Soul-Tech Wellness</p>
+                      <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded-full">
+                        BETA
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

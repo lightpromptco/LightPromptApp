@@ -94,9 +94,19 @@ export default function VisionQuestPage() {
 
   const beginQuestMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/vision-quest/begin", {
-        userId: user?.id
+      if (!user?.id) {
+        throw new Error("Please log in to begin your vision quest");
+      }
+      const response = await fetch("/api/vision-quest/begin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id })
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to begin vision quest");
+      }
+      return response.json();
     },
     onSuccess: () => {
       setCurrentView('journey');
@@ -105,6 +115,13 @@ export default function VisionQuestPage() {
       toast({
         title: "Vision Quest Begun",
         description: "Your spiritual journey has started",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Quest Start Failed",
+        description: error.message,
+        variant: "destructive",
       });
     }
   });

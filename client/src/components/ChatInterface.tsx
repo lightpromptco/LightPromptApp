@@ -3,6 +3,7 @@ import { User, Message, ChatSession } from '@shared/schema';
 import { Bot } from '@/lib/bots';
 import { VoiceRecorder } from './VoiceRecorder';
 import { ParticleSystem } from './ParticleSystem';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { WooWooInterface } from './WooWooInterface';
 import { GeoPromptCheckInInterface } from './GeoPromptCheckInInterface';
 import { useSentiment } from '@/hooks/useSentiment';
@@ -30,6 +31,7 @@ export function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [currentSentiment, setCurrentSentiment] = useState<'positive' | 'negative' | 'neutral'>('neutral');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -238,9 +240,18 @@ export function ChatInterface({
     <>
       <ParticleSystem sentiment={currentSentiment} intensity={isLoading ? 2 : 1} />
       
-      <div className="flex-1 flex flex-col min-h-screen bg-white pb-20">
+      <div className="flex-1 flex flex-col min-h-screen bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30 dark:from-purple-900/10 dark:via-gray-900 dark:to-blue-900/10 pb-20 relative">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <svg width="100%" height="100%" viewBox="0 0 100 100" className="text-purple-500">
+            <pattern id="soul-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <text x="10" y="15" textAnchor="middle" fontSize="12" fill="currentColor">◈</text>
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#soul-pattern)" />
+          </svg>
+        </div>
         {/* Header */}
-        <div className="p-6 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+        <div className="p-6 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm relative z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
@@ -287,15 +298,59 @@ export function ChatInterface({
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex justify-center mb-8">
-                <div className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-200 max-w-md animate-fade-in">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
-                    <i className={`${activeBot.icon} text-white text-2xl`}></i>
+                <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-purple-50/80 to-blue-50/80 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 max-w-md animate-fade-in relative z-10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg">
+                    <span className="text-white text-2xl">⟐</span>
                   </div>
-                  <h3 className="text-gray-800 text-lg font-semibold mb-2">Welcome to {activeBot.name}</h3>
-                  <p className="text-gray-600 text-sm">{activeBot.description}</p>
+                  <h3 className="text-gray-800 dark:text-white text-lg font-semibold mb-2 flex items-center gap-2 justify-center">
+                    Welcome to LightPromptBot
+                    <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs rounded-full">BETA</span>
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Your conscious AI companion for mindful reflection</p>
+                  <Button 
+                    onClick={() => setShowOnboarding(true)}
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                  >
+                    Get Started
+                  </Button>
                 </div>
               </div>
             )}
+
+            {/* Onboarding Dialog */}
+            <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <span className="text-purple-500 text-xl">⟐</span>
+                    Welcome to LightPrompt
+                    <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs rounded-full">BETA</span>
+                  </DialogTitle>
+                  <DialogDescription>
+                    Begin your conscious AI journey of reflection and growth
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    LightPromptBot serves as your conscious AI mirror, helping you connect deeper with yourself through thoughtful reflection. Ready to start?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        setShowOnboarding(false);
+                        sendMessage("I'm ready to begin my journey of self-discovery. What should I reflect on first?");
+                      }}
+                      className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                    >
+                      Start First Reflection
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowOnboarding(false)}>
+                      Skip
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
 
             {/* Message List */}
             {messages.map((message) => (

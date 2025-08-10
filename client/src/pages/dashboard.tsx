@@ -33,6 +33,7 @@ import { AIHelpInterface } from '@/components/AIHelpInterface';
 import { AdminToggle } from '@/components/AdminToggle';
 import { ExternalLinksCodeSection } from '@/components/ExternalLinksCodeSection';
 import { DashboardWidgets } from '@/components/DashboardWidgets';
+import { SoulTechDashboard } from '@/components/SoulTechDashboard';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -377,6 +378,24 @@ export default function DashboardPage() {
           {/* Content Rendering */}
           {activeView === 'home' && (
             <div className="space-y-6">
+              {/* Soul-Tech Dashboard - Featured at Top */}
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-purple-900/10 dark:to-blue-900/10"></div>
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="text-purple-500 text-xl">◈</span>
+                    Soul-Tech Dashboard
+                    <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                      BETA
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="relative z-10">
+                  <SoulTechDashboard userId={userId!} />
+                </CardContent>
+              </Card>
+
+              {/* Original Dashboard Widgets */}
               <DashboardWidgets 
                 userId={userId!} 
                 dashboardData={dashboardData} 
