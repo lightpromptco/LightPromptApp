@@ -158,7 +158,7 @@ export default function GeoPromptNew() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            GeoPROMPT
+            GeoPrompt
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Discover QR code locations for mindful connection and AI-powered presence
@@ -365,7 +365,7 @@ export default function GeoPromptNew() {
           <Card>
             <CardContent className="p-8 text-center">
               <QrCode className="mx-auto mb-4" size={48} />
-              <h3 className="text-2xl font-bold mb-4">How GeoPROMPT Works</h3>
+              <h3 className="text-2xl font-bold mb-4">How GeoPrompt Works</h3>
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <Camera className="mx-auto mb-2" size={32} />

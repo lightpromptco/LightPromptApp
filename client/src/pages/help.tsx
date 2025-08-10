@@ -27,7 +27,7 @@ export default function Help() {
       answer: "Your birth chart analysis combined with AI insights for self-discovery."
     },
     {
-      question: "What is GeoPROMPT?",
+      question: "What is GeoPrompt?",
       answer: "Scan QR codes at special locations for unique AI conversations and community connections."
     }
   ];
@@ -109,7 +109,7 @@ export default function Help() {
 
         {/* Quick Links */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="hover:shadow-md transition-shadow">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/chat'}>
             <CardContent className="p-6 text-center">
               <h3 className="font-semibold mb-2">Getting Started</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -118,7 +118,7 @@ export default function Help() {
             </CardContent>
           </Card>
           
-          <Card className="hover:shadow-md transition-shadow">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/store'}>
             <CardContent className="p-6 text-center">
               <h3 className="font-semibold mb-2">Course Access</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -127,7 +127,7 @@ export default function Help() {
             </CardContent>
           </Card>
           
-          <Card className="hover:shadow-md transition-shadow">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = '/community'}>
             <CardContent className="p-6 text-center">
               <h3 className="font-semibold mb-2">Community</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">

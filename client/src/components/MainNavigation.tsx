@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
   { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing" },
   { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" },
-  { path: "/geoprompt-new", label: "GeoPROMPT", icon: MapPin, description: "QR Code Locations & Guardians" },
+  { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians" },
   { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
   { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" },
   { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources" },

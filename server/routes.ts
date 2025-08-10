@@ -2256,12 +2256,19 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     try {
       const { amount, items } = req.body;
       
+      // Validate input
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ 
+          error: "Invalid amount provided" 
+        });
+      }
+      
       // Create payment intent with amount in cents
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: "usd",
         metadata: {
-          items: JSON.stringify(items)
+          items: JSON.stringify(items || [])
         }
       });
       
@@ -2272,7 +2279,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     } catch (error: any) {
       console.error('Stripe payment intent error:', error);
       res.status(500).json({ 
-        message: "Error creating payment intent: " + error.message 
+        error: "Error creating payment intent: " + error.message 
       });
     }
   });

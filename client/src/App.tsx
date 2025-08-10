@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { MainLayout } from "@/components/MainNavigation";
+import { MainLayout } from "@/components/MainLayoutWithHierarchy";
 import { CartProvider } from "@/hooks/use-cart";
 import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
@@ -19,6 +19,7 @@ import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import GeoPromptNew from "@/pages/geoprompt-new";
 import AdminBlog from "@/pages/admin/blog";
+import BlogPage from "@/pages/blog";
 import PrismPointsPage from "@/pages/prism-points";
 import HelpPage from "@/pages/help";
 import BookPage from "@/pages/book";
@@ -33,7 +34,6 @@ import VisionQuestIndexPage from "@/pages/vision-quest/index";
 import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
 import AdminSettings from "@/pages/admin/settings";
-import BlogPage from "@/pages/blog";
 import CommunityPage from "@/pages/community";
 
 import SoulSyncPage from "@/pages/soul-sync";
@@ -109,6 +109,11 @@ function Router() {
       <Route path="/admin/blog" component={() => (
         <MainLayout>
           <AdminBlog />
+        </MainLayout>
+      )} />
+      <Route path="/blog" component={() => (
+        <MainLayout>
+          <BlogPage />
         </MainLayout>
       )} />
       <Route path="/prism-points" component={() => (
