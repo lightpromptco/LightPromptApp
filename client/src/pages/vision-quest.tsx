@@ -100,6 +100,8 @@ export default function VisionQuestPage() {
     },
     onSuccess: () => {
       setCurrentView('journey');
+      setCurrentStage(0);
+      setQuestProgress(25);
       toast({
         title: "Vision Quest Begun",
         description: "Your spiritual journey has started",

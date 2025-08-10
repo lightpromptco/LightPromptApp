@@ -520,25 +520,25 @@ export default function SoulSyncPage() {
               <CardContent>
                 <div className="space-y-6">
                   {demoConnections.map((connection) => (
-                    <div key={connection.id} className="border rounded-xl p-6 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-purple-900/20">
+                    <div key={connection.id} className="border rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-purple-900/20">
                       {/* Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-bold text-lg">{connection.name}</h4>
-                            <Badge variant="secondary" className="text-xs">{connection.typeLabel}</Badge>
+                            <h4 className="font-semibold text-base truncate">{connection.name}</h4>
+                            <Badge variant="secondary" className="text-xs whitespace-nowrap">{connectionTypes.find(t => t.value === connection.type)?.label.split(' ')[0] || connection.type}</Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Last sync: {connection.lastSync}
+                          <p className="text-xs text-muted-foreground flex items-center">
+                            <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">Last sync: {connection.lastActivity || 'Recently'}</span>
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right ml-2">
                           <div className="flex items-center justify-end">
                             <TrendingUp className="h-4 w-4 mr-1 text-green-600" />
-                            <span className="text-lg font-bold">{connection.resonance}%</span>
+                            <span className="text-lg font-bold">{connection.energy}%</span>
                           </div>
-                          <p className="text-xs text-muted-foreground">Sync Score</p>
+                          <p className="text-xs text-muted-foreground">Energy</p>
                         </div>
                       </div>
 
