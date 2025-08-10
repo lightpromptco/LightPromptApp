@@ -51,7 +51,7 @@ const ACCOUNT_ITEMS = [
 ];
 
 const PRODUCT_ITEMS = [
-  { path: "/products", label: "Store", icon: ShoppingBag, description: "Course & Book Store" },
+  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook" },
   { path: "/b2b", label: "For Business", icon: Users, description: "Enterprise Solutions" },
 ];
 

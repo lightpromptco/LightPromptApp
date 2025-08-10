@@ -2142,11 +2142,9 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
-  // Course purchase endpoint
-  app.post('/api/create-course-payment', async (req, res) => {
+  // Ebook Payment
+  app.post('/api/create-ebook-payment', async (req, res) => {
     try {
-      const { courseTitle, amount } = req.body;
-      
       if (!process.env.STRIPE_SECRET_KEY) {
         return res.status(500).json({ error: 'Stripe not configured' });
       }
@@ -2154,23 +2152,92 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
       const { default: Stripe } = await import('stripe');
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
       
-      // Create checkout session
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{
           price_data: {
             currency: 'usd',
             product_data: {
-              name: courseTitle,
-              description: 'Transform your relationship with AI and technology through conscious practices and authentic connection.',
+              name: 'LightPrompt Ebook',
+              description: 'The Human Guide to Conscious AI & Soul Tech',
             },
-            unit_amount: amount,
+            unit_amount: 1100, // $11.00
           },
           quantity: 1,
         }],
         mode: 'payment',
         success_url: `${req.headers.origin}/course-access?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/course`,
+        cancel_url: `${req.headers.origin}/store`,
+      });
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error('Ebook payment error:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Bundle Payment
+  app.post('/api/create-bundle-payment', async (req, res) => {
+    try {
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({ error: 'Stripe not configured' });
+      }
+
+      const { default: Stripe } = await import('stripe');
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'LightPrompt Complete Bundle',
+              description: 'Course + Ebook - Complete consciousness package',
+            },
+            unit_amount: 12500, // $125.00
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${req.headers.origin}/course-access?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/store`,
+      });
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error('Bundle payment error:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Course purchase endpoint
+  app.post('/api/create-course-payment', async (req, res) => {
+    try {
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({ error: 'Stripe not configured' });
+      }
+
+      const { default: Stripe } = await import('stripe');
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'LightPrompt Course',
+              description: 'Complete access to LightPrompt wellness course and AI companions',
+            },
+            unit_amount: 12000, // $120.00
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${req.headers.origin}/course-access?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/store`,
         metadata: {
           course_name: 'lightprompted',
           user_email: 'customer_email'

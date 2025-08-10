@@ -81,6 +81,35 @@ export default function Store() {
     });
   };
 
+  const handleBuyNow = async (product: Product) => {
+    try {
+      let endpoint = '/api/create-course-payment';
+      
+      if (product.id === 'lightprompt-ebook') {
+        endpoint = '/api/create-ebook-payment';
+      } else if (product.id === 'complete-bundle') {
+        endpoint = '/api/create-bundle-payment';
+      }
+      
+      const response = await apiRequest("POST", endpoint, {
+        amount: product.price
+      });
+      
+      if (response && response.checkoutUrl) {
+        window.location.href = response.checkoutUrl;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast({
+        title: "Purchase Error",
+        description: "Unable to process purchase. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getCartItemCount = (productId: string) => {
     const item = cartItems.find(item => item.id === productId);
     return item?.quantity || 0;
@@ -162,20 +191,31 @@ export default function Store() {
                   </ul>
                 </CardContent>
                 
-                <CardFooter>
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                    size="lg"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                    {cartCount > 0 && (
-                      <Badge variant="secondary" className="ml-2">
-                        {cartCount}
-                      </Badge>
-                    )}
-                  </Button>
+                <CardFooter className="flex flex-col gap-2">
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      onClick={() => handleAddToCart(product)}
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      size="lg"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                      {cartCount > 0 && (
+                        <Badge variant="secondary" className="ml-2">
+                          {cartCount}
+                        </Badge>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      onClick={() => handleBuyNow(product)}
+                      variant="outline"
+                      className="flex-1 border-purple-500 text-purple-600 hover:bg-purple-50"
+                      size="lg"
+                    >
+                      Buy Now
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             );
