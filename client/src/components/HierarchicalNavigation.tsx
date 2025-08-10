@@ -49,7 +49,7 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     icon: Users,
     description: "Community & Relationships",
     subItems: [
-      { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
+      { path: "https://discord.gg/lightprompt", label: "Discord Community", icon: Users, description: "Join our Discord server" },
       { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Connection & Goal Sharing" },
       { path: "/vibe-match", label: "Vibe Match", icon: Sparkles, description: "Find Soul Connections" }
     ]
@@ -62,7 +62,8 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     subItems: [
       { path: "/geoprompt-new", label: "GeoPrompt", icon: MapPin, description: "QR Code Locations & Guardians" },
       { path: "/prism-points", label: "Prism Points", icon: Gem, description: "Track Your Progress" },
-      { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" }
+      { path: "/challenges", label: "Challenges", icon: Target, description: "Wellness Goals" },
+      { path: "/blog", label: "Blog", icon: BookOpen, description: "Latest Articles" }
     ]
   },
   { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources" }
@@ -76,7 +77,7 @@ const ADMIN_NAVIGATION: NavItem[] = [
     description: "Platform Management",
     subItems: [
       { path: "/admin/blog", label: "Blog & Links", icon: Edit, description: "Content Management" },
-      { path: "/admin/content", label: "Page Editor", icon: BookOpen, description: "Edit Site Content" },
+      { path: "/admin/page-editor", label: "Page Editor", icon: BookOpen, description: "Edit Site Content" },
       { path: "/admin/settings", label: "Settings", icon: Settings, description: "Admin Settings" }
     ]
   }

@@ -1060,9 +1060,8 @@ export class SupabaseStorage implements IStorage {
       const basePoints = 245; // Mock base points for demo
       const level = Math.floor(basePoints / 100) + 1;
       
-      // Get current unlocks to count badges
-      const unlocks = await this.getUserUnlocks(userId);
-      const badges = unlocks.filter(u => u.type === 'badge').length;
+      // Return stats without calling getUserUnlocks to prevent infinite recursion
+      const badges = 2; // Mock badge count
       
       const mockStats = {
         totalPoints: basePoints,
@@ -1071,7 +1070,7 @@ export class SupabaseStorage implements IStorage {
         challengesCompleted: 2,
         badgesEarned: badges,
         easterEggsFound: 1, // Mock: user has found 1 easter egg
-        availableUnlocks: unlocks.filter(u => u.type === 'unlock'),
+        availableUnlocks: [], // Remove recursive call
         nextMilestone: this.getNextMilestone(basePoints),
         rewards: [
           {
@@ -1226,18 +1225,18 @@ export class SupabaseStorage implements IStorage {
   
   async getUserUnlocks(userId: string): Promise<any[]> {
     // In production, this would query the userRewards table
-    // For now, return mock unlocks based on current points
-    const stats = await this.getUserStats(userId);
+    // For now, return mock unlocks based on static data to prevent recursion
+    const basePoints = 245; // Static points to prevent recursion
     const unlockedRewards = [];
     
     for (const reward of this.rewardDefinitions) {
       const requirements = reward.requirements;
       let qualifies = false;
       
-      if (requirements.pointsReached && stats.totalPoints >= requirements.pointsReached) qualifies = true;
-      if (requirements.streakDays && stats.streakDays >= requirements.streakDays) qualifies = true;
-      if (requirements.challengesCompleted && stats.challengesCompleted >= requirements.challengesCompleted) qualifies = true;
-      if (requirements.easterEggsFound && (stats.easterEggsFound || 0) >= requirements.easterEggsFound) qualifies = true;
+      if (requirements.pointsReached && basePoints >= requirements.pointsReached) qualifies = true;
+      if (requirements.streakDays && 5 >= requirements.streakDays) qualifies = true; // Mock streak
+      if (requirements.challengesCompleted && 2 >= requirements.challengesCompleted) qualifies = true; // Mock challenges
+      if (requirements.easterEggsFound && 1 >= requirements.easterEggsFound) qualifies = true; // Mock eggs
       
       if (qualifies) {
         unlockedRewards.push({
