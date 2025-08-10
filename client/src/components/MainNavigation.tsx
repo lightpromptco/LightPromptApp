@@ -211,54 +211,66 @@ export function MainNavigation() {
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-background/98 backdrop-blur-md z-40 animate-in fade-in duration-200"
-          onClick={() => setIsOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-        >
+        <>
+          {/* Backdrop */}
           <div 
-            className="h-full overflow-y-auto"
+            className="md:hidden fixed inset-0 bg-black/50 z-40 animate-in fade-in duration-200"
+            onClick={() => setIsOpen(false)}
+          />
+          {/* Slide-out menu */}
+          <div 
+            className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-background border-l border-border shadow-2xl z-50 animate-in slide-in-from-right duration-300"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="pt-20 px-4 pb-24 space-y-6 max-w-sm mx-auto animate-in slide-in-from-top duration-300">
+            <div className="h-full overflow-y-auto">
+              <div className="pt-6 px-4 pb-6 space-y-4">
               {/* Mobile Header */}
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Sparkles className="h-5 w-5 text-white" />
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                    <Sparkles className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <h1 className="font-bold text-xl">LightPrompt</h1>
+                    <h1 className="font-bold text-lg">LightPrompt</h1>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground">Soul-Tech Wellness</p>
-                      <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded-full">
+                      <p className="text-xs text-muted-foreground">Soul-Tech</p>
+                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded">
                         BETA
                       </span>
                     </div>
                   </div>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsOpen(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
 
               {/* Main Navigation */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {NAV_ITEMS.map((item) => {
                   const active = isActive(item.path);
                   return (
                     <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
                       <Button
                         variant={active ? "default" : "ghost"}
-                        className={`w-full justify-start h-auto p-4 text-left rounded-xl transition-all duration-200 ${
+                        className={`w-full justify-start h-auto p-3 text-left rounded-lg transition-all duration-200 ${
                           active 
-                            ? "bg-primary text-primary-foreground shadow-md" 
-                            : "hover:bg-accent hover:text-accent-foreground border border-border/50"
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-accent hover:text-accent-foreground"
                         }`}
                       >
-                        <item.icon className="h-5 w-5 mr-4 flex-shrink-0" />
+                        <item.icon className="h-4 w-4 mr-3 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-base truncate">{item.label}</div>
-                          <div className="text-sm opacity-70 truncate">{item.description}</div>
+                          <div className="font-medium text-sm truncate">{item.label}</div>
+                          <div className="text-xs opacity-70 truncate">{item.description}</div>
                         </div>
                       </Button>
                     </Link>
@@ -342,7 +354,7 @@ export function MainNavigation() {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Responsive main content padding */}
