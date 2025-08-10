@@ -72,17 +72,29 @@ export function MainNavigation() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-3 right-3 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsOpen(!isOpen)}
-          className="bg-background/95 backdrop-blur shadow-lg border-2 h-10 w-10 p-0 mobile-button transition-transform duration-200 hover:scale-105 active:scale-95"
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-        >
-          {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
+      {/* Mobile Header Bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-50 h-16">
+        <div className="flex items-center justify-between px-4 h-full">
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg">LightPrompt</h1>
+              <p className="text-xs text-gray-500">Soul-Tech</p>
+            </div>
+          </Link>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsOpen(!isOpen)}
+            className="h-10 w-10 p-0"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Desktop Sidebar */}
@@ -302,7 +314,7 @@ export function MainNavigation() {
         
         @media (max-width: 767px) {
           .main-content {
-            padding-top: 4rem;
+            padding-top: 5rem;
             margin-left: 0;
             padding-left: 1rem;
             padding-right: 1rem;
