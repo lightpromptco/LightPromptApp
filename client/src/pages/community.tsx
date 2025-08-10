@@ -33,7 +33,7 @@ const COMMUNITY_FEATURES = [
     title: 'Monthly Live Sessions',
     description: 'Join our founder for Q&A sessions and guided AI reflection practices',
     icon: Video,
-    status: 'Course Members',
+    status: 'Coming Soon',
     color: 'text-blue-600',
     link: '/products'
   },
@@ -42,15 +42,15 @@ const COMMUNITY_FEATURES = [
     description: 'Find and organize in-person gatherings in your area',
     icon: MapPin,
     status: 'Coming Soon',
-    color: 'text-amber-600',
+    color: 'text-blue-600',
     link: null
   },
   {
     title: 'Resource Library',
     description: 'Access shared templates, guides, and community-created content',
     icon: BookOpen,
-    status: 'Available',
-    color: 'text-teal-600',
+    status: 'Coming Soon',
+    color: 'text-blue-600',
     link: '/blog'
   }
 ];
