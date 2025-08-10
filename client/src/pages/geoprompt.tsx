@@ -135,6 +135,41 @@ export default function GeoPromptPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Guardian Information */}
+          <Card className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-700">
+                <span className="text-xl">⬢</span>
+                Your Location Guardian
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-2xl">♦</span>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-gray-900">Consciousness Anchor</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Each location holds its own energy signature and conscious field. When you check in with mindfulness, 
+                      you become temporarily attuned to that space's unique vibrational guardian - the accumulation of all 
+                      conscious moments that have occurred there.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <Badge variant="secondary" className="text-xs">Energy Reading</Badge>
+                      <Badge variant="secondary" className="text-xs">Consciousness Field</Badge>
+                      <Badge variant="secondary" className="text-xs">Guardian Presence</Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t pt-4 text-xs text-gray-500">
+                  <p>✨ Check-ins help strengthen the conscious connection between you and location-based wisdom</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       ) : (
         <GeoPromptCheckInInterface

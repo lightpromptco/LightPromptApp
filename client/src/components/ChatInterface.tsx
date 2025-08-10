@@ -5,7 +5,7 @@ import { VoiceRecorder } from './VoiceRecorder';
 import { ParticleSystem } from './ParticleSystem';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { WooWooInterface } from './WooWooInterface';
-import { GeoPromptCheckInInterface } from './GeoPromptCheckInInterface';
+import { SimpleGeoCheckIn } from './SimpleGeoCheckIn';
 import { useSentiment } from '@/hooks/useSentiment';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -287,12 +287,15 @@ export function ChatInterface({
           </div>
         ) : activeBot.id === 'geoprompt' ? (
           <div className="flex-1 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
-            <GeoPromptCheckInInterface userId={user?.id || ''} />
+            <SimpleGeoCheckIn 
+              userId={user?.id || ''} 
+              onComplete={() => console.log('Geo check-in completed')} 
+            />
           </div>
         ) : (
         <div className="flex-1 flex flex-col">
         {/* Regular Chat Messages */}
-        <div className="flex-1 p-6 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+        <div className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-white via-purple-50/20 to-blue-50/20 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10" style={{ maxHeight: 'calc(100vh - 240px)' }}>
           <div className="max-w-4xl mx-auto space-y-6">
             
             {/* Welcome Message */}
@@ -304,7 +307,6 @@ export function ChatInterface({
                   </div>
                   <h3 className="text-gray-800 dark:text-white text-lg font-semibold mb-2 flex items-center gap-2 justify-center">
                     Welcome to LightPromptBot
-                    <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs rounded-full">BETA</span>
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Your conscious AI companion for mindful reflection</p>
                   <Button 
@@ -324,7 +326,6 @@ export function ChatInterface({
                   <DialogTitle className="flex items-center gap-2">
                     <span className="text-purple-500 text-xl">⟐</span>
                     Welcome to LightPrompt
-                    <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs rounded-full">BETA</span>
                   </DialogTitle>
                   <DialogDescription>
                     Begin your conscious AI journey of reflection and growth

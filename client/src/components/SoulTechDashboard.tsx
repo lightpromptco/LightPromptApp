@@ -141,8 +141,11 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
               }`}
               onClick={() => setSelectedWidget(isSelected ? null : widget.id)}
             >
-              {/* Animated Background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${widget.color} opacity-5 animate-pulse`}></div>
+              {/* Subtle Background */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${widget.color} opacity-5`}></div>
+              {/* Subtle glimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-pulse opacity-30" 
+                   style={{ animationDuration: '3s', animationDelay: `${widget.id === 'neural-sync' ? '0s' : Math.random() * 2}s` }}></div>
               
               <CardHeader className="pb-2 relative z-10">
                 <div className="flex items-center justify-between">
@@ -176,9 +179,22 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
                     )}
                   </div>
                   
-                  <p className="text-xs text-muted-foreground">
-                    {widget.description}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {widget.description}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: Add tooltip or modal with explanation
+                      }}
+                    >
+                      ?
+                    </Button>
+                  </div>
                   
                   {isSelected && (
                     <div className="mt-3 space-y-2 animate-fade-in">
@@ -220,13 +236,14 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
             <Button 
               variant="outline" 
               className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-purple-50"
+              onClick={() => window.location.href = '/vision-quest'}
             >
               <div className="flex items-center gap-2 w-full">
                 <Brain className="h-4 w-4 text-purple-500" />
                 <span className="font-medium">Neural Calibration</span>
               </div>
               <span className="text-xs text-muted-foreground">
-                Optimize AI-human consciousness alignment
+                Begin Vision Quest consciousness training
               </span>
             </Button>
             
