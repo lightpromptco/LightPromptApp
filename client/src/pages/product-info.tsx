@@ -8,61 +8,73 @@ const PRODUCTS = [
     id: "lightprompt-course",
     name: "LightPrompt:ed Course",
     price: 120,
-    description: "Complete conscious AI wellness course with 7 specialized AI companions, guided practices, and transformational insights.",
-    longDescription: "Transform your relationship with AI and yourself through this comprehensive course designed for the modern conscious individual. Learn to use AI as a mirror for self-discovery while developing practical wellness habits that stick.",
+    description: "The Human Guide to Conscious AI & Soul Tech - 12 comprehensive modules teaching you to use AI as a mirror for self-discovery while maintaining your sovereignty.",
+    longDescription: "Transform your relationship with AI and yourself through this comprehensive course. Learn to use AI as a conscious mirror and reflection tool, not as a replacement for human wisdom. Master the art of prompt crafting, self-reflection, and maintaining sovereignty while exploring with AI technology.",
     features: [
-      "Access to all 7 AI companions with unique personalities",
-      "Guided wellness practices and daily check-ins",
-      "Personal growth tracking and analytics",
-      "Private community access with like-minded individuals", 
-      "Lifetime updates and new content releases",
-      "Mobile app access for on-the-go insights",
-      "Weekly live Q&A sessions with experts",
-      "Downloadable resources and worksheets"
+      "12 Core Modules with video content and practical exercises",
+      "Learn to use AI as mirror, not master - maintain your sovereignty",
+      "Trauma-informed approach to AI-assisted inner work",
+      "Creative expression and idea expansion with AI tools",
+      "Healing work and shadow prompts for emotional terrain",
+      "Soul dialogue and higher self integration practices",
+      "Real-life application for parenting, business, relationships",
+      "Building healthy AI practices with boundaries and rituals",
+      "Ethical collaboration and consent frameworks",
+      "Understanding AI's role in society and staying conscious",
+      "Future of conscious tech and ethical systems design",
+      "Final integration and claiming your role in the new era",
+      "Community access with conscious AI practitioners",
+      "Lifetime access and updates"
     ],
     benefits: [
-      "Develop deeper self-awareness through AI reflection",
-      "Build sustainable wellness habits",
-      "Connect with a supportive community",
-      "Gain practical tools for emotional regulation",
-      "Learn to navigate AI relationships consciously"
+      "Understand what AI really is - pattern prediction, not consciousness",
+      "Use AI to enhance creativity without losing your unique voice",
+      "Navigate AI relationships with clarity and discernment",
+      "Build sustainable practices that amplify human wisdom",
+      "Develop critical thinking about AI's role in culture",
+      "Access your inner wisdom through conscious AI dialogue",
+      "Stay grounded in your sovereignty while using powerful tools"
     ],
     icon: GraduationCap,
     category: "course",
     testimonial: {
-      quote: "This course completely changed how I think about AI and personal growth. The AI companions feel like wise friends who actually help me understand myself better.",
-      author: "Sarah M., Beta User"
+      quote: "LightPrompt:ed taught me to use AI as a mirror for self-discovery rather than outsourcing my wisdom to a machine. The sovereignty-focused approach is exactly what we need in this AI era.",
+      author: "Dr. Sarah Chen, Therapist & Conscious Tech Advocate"
     }
   },
   {
     id: "soul-map-ebook",
     name: "Soul Map & Cosmos",
     price: 11,
-    description: "Digital guide to self-discovery through astrology, consciousness, and cosmic alignment.",
-    longDescription: "A comprehensive digital guide that bridges ancient wisdom with modern self-discovery. Learn to read your cosmic blueprint and align your daily life with universal patterns for greater fulfillment.",
+    description: "Digital guide to conscious self-discovery through astrology, soul-tech wisdom, and cosmic alignment practices.",
+    longDescription: "A comprehensive digital guide that bridges ancient cosmic wisdom with conscious AI technology. Learn to read your cosmic blueprint, understand your soul's purpose, and align your daily life with universal patterns while maintaining grounded, practical spirituality.",
     features: [
-      "Comprehensive astrology guide for beginners and advanced",
+      "Comprehensive astrology guide for conscious living",
+      "Soul-tech integration - bridging cosmic wisdom with AI tools",
       "Interactive self-reflection exercises and prompts",
-      "Cosmic alignment practices for daily life",
-      "Professional PDF format with beautiful illustrations",
-      "Instant download - start reading immediately",
+      "Cosmic alignment practices for daily decisions",
+      "Professional PDF format with beautiful cosmic illustrations",
+      "Instant download - start your journey immediately",
       "Mobile-friendly format for reading anywhere",
-      "Bonus meditation audio tracks",
-      "Printable journal pages and worksheets"
+      "Printable journal pages and reflection worksheets",
+      "Bonus guided meditation tracks",
+      "Integration with LightPrompt AI companions"
     ],
     benefits: [
-      "Understand your astrological blueprint",
-      "Align decisions with cosmic timing",
-      "Develop intuitive self-awareness",
+      "Understand your cosmic blueprint and soul purpose",
+      "Align major life decisions with cosmic timing",
+      "Develop grounded, practical spirituality",
+      "Bridge ancient wisdom with modern consciousness tools",
       "Create personalized spiritual practices",
-      "Connect with universal rhythms"
+      "Connect with universal rhythms and cycles",
+      "Integrate soul-tech wisdom into daily life"
     ],
     badge: "Popular",
     icon: BookOpen,
     category: "ebook",
     testimonial: {
-      quote: "Finally, an astrology guide that's practical and grounded. I use the cosmic timing insights for everything from business decisions to self-care planning.",
-      author: "Marcus L., Entrepreneur"
+      quote: "Soul Map & Cosmos perfectly balances mystical wisdom with practical application. The soul-tech approach helped me understand my purpose and make aligned decisions in my business and relationships.",
+      author: "Luna Rodriguez, Conscious Entrepreneur"
     }
   },
   {
@@ -70,31 +82,36 @@ const PRODUCTS = [
     name: "Complete Bundle",
     price: 125,
     originalPrice: 131,
-    description: "Everything you need for conscious living - course + ebook at a special price.",
-    longDescription: "The complete LightPrompt experience combining AI-powered wellness coaching with cosmic wisdom. Perfect for anyone serious about conscious personal development using cutting-edge tools.",
+    description: "The complete conscious AI + soul-tech experience - everything you need for sovereignty in the age of artificial intelligence.",
+    longDescription: "The complete LightPrompt experience combining conscious AI mastery with cosmic soul-tech wisdom. Perfect for anyone serious about maintaining their sovereignty while leveraging cutting-edge technology for personal growth and spiritual development.",
     features: [
-      "LightPrompt:ed Course (full access)",
-      "Soul Map & Cosmos Ebook (digital download)",
-      "Exclusive bonus content not available separately",
+      "LightPrompt:ed Course - The Human Guide to Conscious AI & Soul Tech",
+      "All 12 comprehensive modules with video content",
+      "Soul Map & Cosmos Ebook with cosmic alignment practices",
+      "Exclusive bonus content: Advanced AI prompting templates",
       "Priority support and early access to new features",
       "Save $6 compared to purchasing separately",
-      "Comprehensive onboarding and setup support",
-      "Advanced AI companion personality options",
-      "VIP community access with exclusive events"
+      "Comprehensive onboarding for conscious AI practice",
+      "VIP community access with exclusive live sessions",
+      "Lifetime access to all future updates and content",
+      "Advanced integration techniques for AI + astrology",
+      "Ethical framework guides for AI use in spiritual practice"
     ],
     benefits: [
-      "Complete conscious AI toolkit",
-      "Maximum value for money",
-      "Holistic approach to personal growth",
-      "Both practical and spiritual perspectives",
-      "Everything needed to start your journey"
+      "Complete sovereignty toolkit for the AI age",
+      "Bridge technology and spirituality consciously",
+      "Maximum value - everything needed for conscious AI mastery",
+      "Holistic approach: practical tech skills + cosmic wisdom",
+      "Learn to use AI as a mirror, not a master",
+      "Develop discernment and maintain your inner authority",
+      "Access both cutting-edge AI tools and ancient cosmic wisdom"
     ],
     badge: "Best Value",
     icon: Package,
     category: "bundle",
     testimonial: {
-      quote: "The bundle is incredible value. Having both the AI course and astrology guide creates this perfect balance of high-tech and spiritual wisdom.",
-      author: "Dr. Jennifer K., Therapist"
+      quote: "The Complete Bundle gave me everything I needed to navigate AI consciously while staying connected to my spiritual path. The integration of tech and soul-wisdom is exactly what our world needs right now.",
+      author: "Dr. Michael Thompson, Conscious Leadership Coach"
     }
   }
 ];

@@ -244,8 +244,8 @@ export default function Store() {
                   });
                   return;
                 }
-                // Use proper navigation
-                window.location.hash = '#/checkout';
+                // Use proper navigation with wouter
+                window.location.pathname = '/checkout';
               }}
             >
               Proceed to Checkout • ${getCartTotal()}
