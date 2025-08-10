@@ -43,38 +43,34 @@ const PRODUCTS = [
     }
   },
   {
-    id: "soul-map-ebook",
-    name: "Soul Map & Cosmos",
+    id: "lightprompt-ed-novel",
+    name: "LightPrompt:Ed",
     price: 11,
-    description: "Digital guide to conscious self-discovery through astrology, soul-tech wisdom, and cosmic alignment practices.",
-    longDescription: "A comprehensive digital guide that bridges ancient cosmic wisdom with conscious AI technology. Learn to read your cosmic blueprint, understand your soul's purpose, and align your daily life with universal patterns while maintaining grounded, practical spirituality.",
+    description: "A novel by Ashley Daniel - The Human Guide to AI, Soul, and the Future. A visionary sci-fi story exploring consciousness, technology, and human potential.",
+    longDescription: "Join this captivating journey through the intersection of consciousness and technology. Ashley Daniel's LightPrompt:Ed is a thought-provoking novel that explores what it means to be human in an age of artificial intelligence, weaving together themes of soul-tech, consciousness expansion, and the future of human-AI collaboration.",
     features: [
-      "Comprehensive astrology guide for conscious living",
-      "Soul-tech integration - bridging cosmic wisdom with AI tools",
-      "Interactive self-reflection exercises and prompts",
-      "Cosmic alignment practices for daily decisions",
-      "Professional PDF format with beautiful cosmic illustrations",
-      "Instant download - start your journey immediately",
+      "Visionary sci-fi novel exploring AI and consciousness",
+      "Themes of soul-tech and human potential",
+      "Professional digital format with stunning cover art",
+      "Instant download - start reading immediately",
       "Mobile-friendly format for reading anywhere",
-      "Printable journal pages and reflection worksheets",
-      "Bonus guided meditation tracks",
-      "Integration with LightPrompt AI companions"
+      "Engaging story that bridges technology and spirituality",
+      "Perfect companion to the LightPrompt:ed course",
+      "Explores the future of human-AI relationships"
     ],
     benefits: [
-      "Understand your cosmic blueprint and soul purpose",
-      "Align major life decisions with cosmic timing",
-      "Develop grounded, practical spirituality",
-      "Bridge ancient wisdom with modern consciousness tools",
-      "Create personalized spiritual practices",
-      "Connect with universal rhythms and cycles",
-      "Integrate soul-tech wisdom into daily life"
+      "Expand your imagination about AI and consciousness",
+      "Explore soul-tech concepts through engaging storytelling", 
+      "Gain new perspectives on human potential",
+      "Experience the future through visionary fiction",
+      "Perfect blend of entertainment and consciousness expansion"
     ],
     badge: "Popular",
     icon: BookOpen,
     category: "ebook",
     testimonial: {
-      quote: "Soul Map & Cosmos perfectly balances mystical wisdom with practical application. The soul-tech approach helped me understand my purpose and make aligned decisions in my business and relationships.",
-      author: "Luna Rodriguez, Conscious Entrepreneur"
+      quote: "LightPrompt:Ed beautifully captures the essence of conscious AI and human potential. Ashley Daniel has created a story that's both entertaining and deeply thought-provoking about our technological future.",
+      author: "Alex Rivera, Conscious Tech Reader"
     }
   },
   {
@@ -87,30 +83,30 @@ const PRODUCTS = [
     features: [
       "LightPrompt:ed Course - The Human Guide to Conscious AI & Soul Tech",
       "All 12 comprehensive modules with video content",
-      "Soul Map & Cosmos Ebook with cosmic alignment practices",
+      "LightPrompt:Ed Novel by Ashley Daniel - visionary sci-fi story",
       "Exclusive bonus content: Advanced AI prompting templates",
       "Priority support and early access to new features",
       "Save $6 compared to purchasing separately",
       "Comprehensive onboarding for conscious AI practice",
       "VIP community access with exclusive live sessions",
       "Lifetime access to all future updates and content",
-      "Advanced integration techniques for AI + astrology",
+      "Visionary fiction exploring consciousness and AI",
       "Ethical framework guides for AI use in spiritual practice"
     ],
     benefits: [
       "Complete sovereignty toolkit for the AI age",
       "Bridge technology and spirituality consciously",
       "Maximum value - everything needed for conscious AI mastery",
-      "Holistic approach: practical tech skills + cosmic wisdom",
+      "Holistic approach: practical tech skills + visionary storytelling",
       "Learn to use AI as a mirror, not a master",
       "Develop discernment and maintain your inner authority",
-      "Access both cutting-edge AI tools and ancient cosmic wisdom"
+      "Access both cutting-edge AI tools and visionary storytelling about our technological future"
     ],
     badge: "Best Value",
     icon: Package,
     category: "bundle",
     testimonial: {
-      quote: "The Complete Bundle gave me everything I needed to navigate AI consciously while staying connected to my spiritual path. The integration of tech and soul-wisdom is exactly what our world needs right now.",
+      quote: "The Complete Bundle combines practical AI mastery with visionary storytelling perfectly. The course teaches conscious AI use while the novel expands your imagination about what's possible.",
       author: "Dr. Michael Thompson, Conscious Leadership Coach"
     }
   }

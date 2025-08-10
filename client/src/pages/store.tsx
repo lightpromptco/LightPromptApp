@@ -35,15 +35,15 @@ const PRODUCTS: Product[] = [
     category: "course"
   },
   {
-    id: "soul-map-ebook",
-    name: "Soul Map & Cosmos",
+    id: "lightprompt-ed-novel",
+    name: "LightPrompt:Ed",
     price: 11,
-    description: "Digital guide to self-discovery through astrology, consciousness, and cosmic alignment.",
+    description: "A novel by Ashley Daniel - The Human Guide to AI, Soul, and the Future. Visionary sci-fi exploring consciousness and technology.",
     features: [
-      "Comprehensive astrology guide",
-      "Self-reflection exercises",
-      "Cosmic alignment practices",
-      "Digital format (PDF)",
+      "Visionary sci-fi novel",
+      "Themes of AI and consciousness",
+      "Stunning cover art",
+      "Digital format (PDF/EPUB)",
       "Instant download"
     ],
     badge: "Popular",
@@ -58,7 +58,7 @@ const PRODUCTS: Product[] = [
     description: "Everything you need for conscious living - course + ebook at a special price.",
     features: [
       "LightPrompt:ed Course",
-      "Soul Map & Cosmos Ebook", 
+      "LightPrompt:Ed Novel", 
       "Exclusive bonus content",
       "Priority support",
       "Save $6!"
@@ -85,7 +85,7 @@ export default function Store() {
     try {
       let endpoint = '/api/create-course-payment';
       
-      if (product.id === 'soul-map-ebook') {
+      if (product.id === 'lightprompt-ed-novel') {
         endpoint = '/api/create-ebook-payment';
       } else if (product.id === 'complete-bundle') {
         endpoint = '/api/create-bundle-payment';
