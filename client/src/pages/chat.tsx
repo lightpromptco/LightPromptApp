@@ -296,8 +296,8 @@ export default function ChatPage() {
 
   return (
     <>
-      {/* Circadian Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-white to-gray-50 -z-10" />
+      {/* Clean Background */}
+      <div className="fixed inset-0 bg-white dark:bg-gray-900 -z-10" />
 
       {/* Usage Warning */}
       {currentUser && <UsageWarning user={currentUser} />}

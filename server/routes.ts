@@ -2389,6 +2389,54 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
+  // Admin pages endpoints for page editor
+  app.get("/api/admin/pages/:path", async (req, res) => {
+    try {
+      const { path } = req.params;
+      const decodedPath = decodeURIComponent(path);
+      
+      // Get saved page content from database
+      const savedContent = await db
+        .select()
+        .from(platformEvolution)
+        .where(eq(platformEvolution.category, 'page_content'))
+        .orderBy(desc(platformEvolution.detectedAt))
+        .limit(1);
+
+      if (savedContent.length > 0 && savedContent[0].data?.pageData?.pagePath === decodedPath) {
+        return res.json(savedContent[0].data.pageData);
+      }
+      
+      // Return 404 if no content found
+      res.status(404).json({ error: "Page not found" });
+    } catch (error: any) {
+      console.error("Error getting page:", error);
+      res.status(500).json({ error: "Failed to get page" });
+    }
+  });
+
+  app.post("/api/admin/pages", async (req, res) => {
+    try {
+      const pageData = req.body;
+      
+      // Save to knowledge base for persistent storage
+      const result = await db.insert(platformEvolution).values({
+        category: 'page_content',
+        evolutionType: 'content_update',
+        description: `Page content updated: ${pageData.pagePath}`,
+        impact: 'Page content modified through Page Editor',
+        data: { pageData },
+        confidence: 100
+      }).returning();
+      
+      console.log(`✅ Page data saved to database for ${pageData.pagePath}`);
+      res.json({ message: "Page saved successfully", id: result[0].id });
+    } catch (error: any) {
+      console.error("Error saving page:", error);
+      res.status(500).json({ error: "Failed to save page" });
+    }
+  });
+
   // Admin page scan endpoint - get real page elements
   app.get("/api/admin/scan-page", async (req, res) => {
     try {
@@ -2398,14 +2446,12 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
       const savedContent = await db
         .select()
         .from(platformEvolution)
-        .where(
-          eq(platformEvolution.category, 'page_content')
-        )
+        .where(eq(platformEvolution.category, 'page_content'))
         .orderBy(desc(platformEvolution.detectedAt))
         .limit(1);
 
       if (savedContent.length > 0) {
-        const pageData = savedContent[0].data.pageData;
+        const pageData = savedContent[0].data?.pageData;
         return res.json(pageData);
       }
 

@@ -99,7 +99,7 @@ export function BottomNavigation({
             
             {/* Bot Navigation */}
             <div className="flex items-center space-x-1 overflow-x-auto scrollbar-hide flex-1 min-w-0">
-              {BOTS.map((bot) => (
+              {BOTS.filter(bot => bot.id !== 'woowoo').map((bot) => (
                 <button
                   key={bot.id}
                   onClick={() => handleBotSelect(bot)}

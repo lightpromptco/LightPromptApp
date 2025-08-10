@@ -39,7 +39,7 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
     icon: Stars,
     description: "Self-Discovery & Growth",
     subItems: [
-      { path: "/woo-woo", label: "Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis" },
+      { path: "/woo-woo", label: "Soul Maps & Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis" },
       { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" }
     ]
   },
@@ -146,7 +146,7 @@ function NavItemComponent({ item, isExpanded, onToggle, currentPath }: NavItemCo
       </Button>
       {isExpanded && (
         <div className="ml-4 mt-1 space-y-1">
-          {item.subItems && item.subItems.map((subItem) => (
+          {item.subItems?.map((subItem) => (
             <Link key={subItem.path} href={subItem.path}>
               <Button 
                 variant={currentPath === subItem.path ? "default" : "ghost"} 
