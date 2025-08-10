@@ -85,18 +85,26 @@ export default function Store() {
     try {
       let endpoint = '/api/create-course-payment';
       
-      if (product.id === 'lightprompt-ebook') {
+      if (product.id === 'soul-map-ebook') {
         endpoint = '/api/create-ebook-payment';
       } else if (product.id === 'complete-bundle') {
         endpoint = '/api/create-bundle-payment';
       }
       
-      const response = await apiRequest("POST", endpoint, {
-        amount: product.price
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: product.price * 100, // Convert to cents for Stripe
+        }),
       });
       
-      if (response && response.checkoutUrl) {
-        window.location.href = response.checkoutUrl;
+      const data = await response.json();
+      
+      if (data && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
       } else {
         throw new Error('No checkout URL received');
       }

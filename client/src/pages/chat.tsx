@@ -324,39 +324,7 @@ export default function ChatPage() {
 
 
 
-      {/* Navigation & Controls */}
-      <div className="fixed top-6 right-6 z-50 flex items-center space-x-3">
-        {/* Dashboard Link */}
-        <Link href="/dashboard">
-          <Button
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg transition-all duration-300"
-            title="Wellness Dashboard"
-          >
-            <i className="fas fa-eye text-sm"></i>
-          </Button>
-        </Link>
 
-        {/* Test Dashboard Data Button (for development) */}
-
-        {/* Dark Mode Toggle */}
-        <Button
-          onClick={() => {
-            const isDark = document.documentElement.classList.contains('dark');
-            if (isDark) {
-              document.documentElement.classList.remove('dark');
-              localStorage.setItem('lightprompt-theme', 'light');
-            } else {
-              document.documentElement.classList.add('dark');
-              localStorage.setItem('lightprompt-theme', 'dark');
-            }
-          }}
-          className="w-10 h-10 rounded-xl bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm transition-all duration-300"
-          title="Toggle dark mode"
-        >
-          <i className="fas fa-moon dark:hidden text-sm"></i>
-          <i className="fas fa-sun hidden dark:block text-sm"></i>
-        </Button>
-      </div>
 
       {/* Login Modal */}
       <LoginModal

@@ -31,6 +31,8 @@ const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
   { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview" },
+  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook" },
+  { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart" },
   { path: "/woo-woo", label: "Soul Map", icon: Stars, description: "Birth Chart & Personality Analysis" },
   { path: "/vision-quest", label: "Vision Quest", icon: Compass, description: "Spiritual Journey Guidance" },
   { path: "/community", label: "Community", icon: Users, description: "Connect with Others" },
@@ -51,7 +53,6 @@ const ACCOUNT_ITEMS = [
 ];
 
 const PRODUCT_ITEMS = [
-  { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook" },
   { path: "/b2b", label: "For Business", icon: Users, description: "Enterprise Solutions" },
 ];
 
@@ -72,15 +73,15 @@ export function MainNavigation() {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-2 right-2 z-50">
+      <div className="md:hidden fixed top-3 right-3 z-50">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-background/95 backdrop-blur shadow-lg border-2 h-12 w-12 p-0 mobile-button transition-transform duration-200 hover:scale-105 active:scale-95"
+          className="bg-background/95 backdrop-blur shadow-lg border-2 h-10 w-10 p-0 mobile-button transition-transform duration-200 hover:scale-105 active:scale-95"
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
       </div>
 
