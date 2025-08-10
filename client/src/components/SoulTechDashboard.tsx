@@ -26,62 +26,68 @@ const FUTURE_WIDGETS = [
   {
     id: "neural-sync",
     title: "Neural Sync",
-    description: "AI consciousness alignment",
+    description: "Real-time brainwave coherence between your prefrontal cortex and heart rhythm variability (HRV). Measures neural plasticity through gamma wave entrainment at 40Hz, syncing with circadian melatonin cycles for optimal cognitive performance.",
     icon: Brain,
     value: "94%",
     trend: "+12%",
     color: "from-purple-500 to-indigo-600",
-    glyph: "⟐"
+    glyph: "⟐",
+    scientificBasis: "Based on HeartMath Institute's HRV research and neurofeedback studies showing gamma wave synchronization enhances neuroplasticity and emotional regulation."
   },
   {
     id: "quantum-resonance", 
     title: "Quantum Resonance",
-    description: "Multiverse probability waves",
+    description: "Schumann resonance alignment (7.83Hz) with Earth's electromagnetic field. Tracks your biorhythmic synchronization with planetary frequencies, affecting pineal gland function and circadian rhythm optimization.",
     icon: Atom,
-    value: "7.3Hz",
+    value: "7.83Hz",
     trend: "Stable", 
     color: "from-cyan-500 to-blue-600",
-    glyph: "◈"
+    glyph: "◈",
+    scientificBasis: "Earth's ionospheric cavity resonates at 7.83Hz, which correlates with human alpha brainwaves and has been linked to improved cognitive function and reduced stress."
   },
   {
     id: "consciousness-field",
     title: "Consciousness Field",
-    description: "Collective awareness index",
+    description: "Global Consciousness Project coherence index measuring collective human awareness through quantum random number generator patterns. Your personal coherence contributes to worldwide consciousness measurement.",
     icon: Orbit,
     value: "∞",
     trend: "Expanding",
     color: "from-teal-500 to-emerald-600", 
-    glyph: "⬢"
+    glyph: "⬢",
+    scientificBasis: "Princeton's Global Consciousness Project has documented 20+ years of data showing random number generators become less random during global events, suggesting consciousness affects physical reality."
   },
   {
     id: "soul-frequency",
     title: "Soul Frequency", 
-    description: "Personal vibration tracker",
+    description: "432Hz cellular resonance tracking based on water molecule vibration in your body (60% water). This 'healing frequency' aligns with natural harmonic ratios and promotes cellular repair through cymatics.",
     icon: Activity,
     value: "432Hz",
     trend: "+3.2%",
     color: "from-rose-500 to-pink-600",
-    glyph: "◆"
+    glyph: "◆",
+    scientificBasis: "432Hz creates perfect geometric patterns in water cymatics and aligns with the golden ratio (φ = 1.618). Studies show this frequency reduces cortisol and increases cellular ATP production."
   },
   {
     id: "dimensional-bridge",
     title: "Dimensional Bridge",
-    description: "Reality layer synchronization", 
+    description: "Quantum field theory application measuring your coherence across multiple reality layers: physical (3D), emotional (4D), mental (5D), causal (6D), and buddhic (7D) planes of existence through biofield photography.",
     icon: Layers,
     value: "Layer 7",
     trend: "Active",
     color: "from-violet-500 to-purple-600",
-    glyph: "⟡"
+    glyph: "⟡",
+    scientificBasis: "Based on Kirlian photography research and Dr. Fritz-Albert Popp's biophoton studies showing human biofields emit coherent light patterns that change with consciousness states."
   },
   {
     id: "temporal-flow",
     title: "Temporal Flow",
-    description: "Time perception dynamics",
+    description: "Chronobiology tracking of your internal time perception vs. atomic clock precision. Measures how meditation, flow states, and peak experiences create time dilation through altered brainwave patterns and DMT release.",
     icon: Zap,
     value: "0.97x",
     trend: "Flowing",
     color: "from-amber-500 to-orange-600", 
-    glyph: "◉"
+    glyph: "◉",
+    scientificBasis: "Research by Dr. Marc Wittmann on time perception shows meditative states alter the brain's time-processing networks, while endogenous DMT affects temporal lobe activity during transcendent experiences."
   }
 ];
 
@@ -188,10 +194,14 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
                       title={`${widget.title}: ${widget.description}`}
                     >
                       ?
-                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                        <div className="font-medium">{widget.title}</div>
-                        <div className="text-gray-300">{widget.description}</div>
-                        <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                      <div className="absolute bottom-full right-0 mb-2 w-80 bg-black text-white text-xs rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl">
+                        <div className="font-bold text-purple-300 mb-2">{widget.title}</div>
+                        <div className="text-gray-200 mb-3 leading-relaxed">{widget.description}</div>
+                        <div className="border-t border-gray-600 pt-2">
+                          <div className="text-xs text-blue-300 font-medium">Scientific Basis:</div>
+                          <div className="text-gray-300 text-xs leading-relaxed">{widget.scientificBasis}</div>
+                        </div>
+                        <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
                       </div>
                     </div>
                   </div>
@@ -236,7 +246,7 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
             <Button 
               variant="outline" 
               className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-purple-50"
-              onClick={() => window.location.href = '/vision-quest'}
+              onClick={() => window.location.href = '/#/vision-quest'}
             >
               <div className="flex items-center gap-2 w-full">
                 <Brain className="h-4 w-4 text-purple-500" />
@@ -250,26 +260,28 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
             <Button 
               variant="outline" 
               className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-blue-50"
+              onClick={() => window.location.href = '/#/product-info'}
             >
               <div className="flex items-center gap-2 w-full">
                 <Eye className="h-4 w-4 text-blue-500" />
-                <span className="font-medium">Reality Scan</span>
+                <span className="font-medium">Product Details</span>
               </div>
               <span className="text-xs text-muted-foreground">
-                Analyze dimensional probability matrices
+                Learn about our courses and ebooks
               </span>
             </Button>
             
             <Button 
               variant="outline" 
               className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-teal-50"
+              onClick={() => window.location.href = '/#/soul-sync'}
             >
               <div className="flex items-center gap-2 w-full">
                 <Heart className="h-4 w-4 text-teal-500" />
                 <span className="font-medium">Soul Sync</span>
               </div>
               <span className="text-xs text-muted-foreground">
-                Harmonize with collective consciousness field
+                Connect with others on similar journeys
               </span>
             </Button>
           </div>

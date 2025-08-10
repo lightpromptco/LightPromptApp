@@ -7,7 +7,7 @@ import { Link, useLocation } from "wouter";
 import { 
   Home, MessageCircle, BarChart3, ShoppingBag, Stars, Compass, 
   Users, Heart, Sparkles, MapPin, Gem, Target, HelpCircle,
-  ChevronDown, ChevronRight, Settings, Edit, BookOpen
+  ChevronDown, ChevronRight, Settings, Edit, BookOpen, CreditCard, Building2
 } from "lucide-react";
 import { AdminToggle } from "./AdminToggle";
 
@@ -22,7 +22,7 @@ interface NavItem {
 const NAVIGATION_STRUCTURE: NavItem[] = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations" },
-  { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview" },
+  { path: "/dashboard", label: "BodyMirror", icon: BarChart3, description: "Your Wellness Overview" },
   { 
     path: "/store", 
     label: "Store", 
@@ -66,7 +66,17 @@ const NAVIGATION_STRUCTURE: NavItem[] = [
       { path: "/blog", label: "Blog", icon: BookOpen, description: "Latest Articles" }
     ]
   },
-  { path: "/help", label: "Help", icon: HelpCircle, description: "Support & Resources" }
+  { 
+    path: "/help", 
+    label: "Help & Support", 
+    icon: HelpCircle, 
+    description: "Support & Resources",
+    subItems: [
+      { path: "/help", label: "Help Center", icon: HelpCircle, description: "FAQs & Support" },
+      { path: "/plans", label: "Pricing", icon: CreditCard, description: "View Plans & Pricing" },
+      { path: "/b2b", label: "For Business", icon: Building2, description: "Enterprise Solutions" }
+    ]
+  }
 ];
 
 const ADMIN_NAVIGATION: NavItem[] = [

@@ -30,7 +30,7 @@ import { AdminToggle } from "./AdminToggle";
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "◊" },
   { path: "/chat", label: "LightPromptBot", icon: MessageCircle, description: "Conscious AI Mirror", glyph: "⟐" },
-  { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Your Wellness Overview", glyph: "◈" },
+  { path: "/dashboard", label: "BodyMirror", icon: BarChart3, description: "Your Wellness Overview", glyph: "◈" },
   { path: "/store", label: "Store", icon: ShoppingBag, description: "Course & Ebook", glyph: "⬡" },
   { path: "/checkout", label: "Cart", icon: ShoppingBag, description: "Shopping Cart", glyph: "◉" },
   { path: "/woo-woo", label: "Cosmos", icon: Stars, description: "Birth Chart & Personality Analysis", glyph: "✧" },

@@ -23,8 +23,8 @@ export const BOTS: Bot[] = [
   {
     id: "bodymirror",
     name: "BodyMirror",
-    tagline: "Your body. Your rhythm. Reflected.",
-    description: "A wellness tracker that reflects your physical and emotional energy. Gives supportive suggestions for movement, mood, food, and flow based on how you're feeling.",
+    tagline: "Your personalized wellness AI guide.",
+    description: "Your AI wellness companion that understands your unique data, patterns, and highest self goals. Provides personalized guidance for movement, nutrition, sleep, and emotional wellbeing using LightPrompt ethics for conscious living.",
     icon: "fas fa-heart",
     gradient: "bg-gradient-to-br from-emerald-400 to-teal-500",
     tier: "Free",

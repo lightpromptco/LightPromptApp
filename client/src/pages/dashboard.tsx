@@ -333,11 +333,11 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                 <div className="w-8 h-8 mr-3 flex items-center justify-center bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full">
-                  <i className="fas fa-eye text-white text-sm"></i>
+                  <i className="fas fa-heart text-white text-sm"></i>
                 </div>
-                LightPrompt Dashboard
+                BodyMirror
               </h1>
-              <p className="text-sm text-gray-600">Track your soul-tech wellness journey</p>
+              <p className="text-sm text-gray-600">Your AI-powered wellness guide using your personal data</p>
             </div>
           </div>
           

@@ -26,6 +26,7 @@ import HelpPage from "@/pages/help";
 import BookPage from "@/pages/book";
 import CoursePage from "@/pages/course";
 import ProductsPage from "@/pages/products";
+import ProductInfo from "@/pages/product-info";
 import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
 import AdminSettingsPage from "@/pages/admin-settings";
@@ -146,6 +147,11 @@ function Router() {
       <Route path="/products" component={() => (
         <MainLayout>
           <ProductsPage />
+        </MainLayout>
+      )} />
+      <Route path="/product-info" component={() => (
+        <MainLayout>
+          <ProductInfo />
         </MainLayout>
       )} />
       <Route path="/b2b" component={() => (
