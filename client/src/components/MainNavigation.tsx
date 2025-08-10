@@ -14,7 +14,9 @@ import {
   Users,
   Sparkles,
   Compass,
-  Settings
+  Settings,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -22,9 +24,41 @@ const NAV_ITEMS = [
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
   { path: "/body-mirror", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview", glyph: "⬢" },
   { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
-  { path: "/wellness-tools", label: "Wellness Tools", icon: Compass, description: "Self-Discovery & Growth", glyph: "✦" },
-  { path: "/soul-sync", label: "Connect", icon: Users, description: "Community & Relationships", glyph: "◇" },
-  { path: "/features", label: "Features", icon: Sparkles, description: "Platform Features", glyph: "⟡" },
+  { 
+    path: "/wellness-tools", 
+    label: "Wellness Tools", 
+    icon: Compass, 
+    description: "Self-Discovery & Growth", 
+    glyph: "✦",
+    subItems: [
+      { path: "/woo-woo", label: "Soul Map Navigator", icon: Compass, description: "Cosmic Alignment & Insights" },
+      { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
+      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" }
+    ]
+  },
+  { 
+    path: "/soul-sync", 
+    label: "Connect", 
+    icon: Users, 
+    description: "Community & Relationships", 
+    glyph: "◇",
+    subItems: [
+      { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Find Your Connection" },
+      { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" }
+    ]
+  },
+  { 
+    path: "/features", 
+    label: "Features", 
+    icon: Sparkles, 
+    description: "Platform Features", 
+    glyph: "⟡",
+    subItems: [
+      { path: "/dashboard", label: "Soul-Tech Dashboard", icon: Activity, description: "AI-Powered Insights" },
+      { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
+      { path: "/prism-points", label: "Prism Points", icon: Sparkles, description: "Reward System" }
+    ]
+  },
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
   { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" },
   { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy", glyph: "⟤" },
@@ -36,6 +70,7 @@ const PRODUCT_ITEMS = [
 
 export function MainNavigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [location] = useLocation();
   
   // Check if current user is admin
@@ -46,6 +81,14 @@ export function MainNavigation() {
     if (path === "/" && location === "/") return true;
     if (path !== "/" && location.startsWith(path)) return true;
     return false;
+  };
+
+  const toggleExpanded = (path: string) => {
+    setExpandedItems(prev => 
+      prev.includes(path) 
+        ? prev.filter(item => item !== path)
+        : [...prev, path]
+    );
   };
 
   return (
@@ -110,27 +153,80 @@ export function MainNavigation() {
           <div className="space-y-2">
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.path);
+              const isExpanded = expandedItems.includes(item.path);
+              const hasSubItems = item.subItems && item.subItems.length > 0;
+              
               return (
-                <Link key={item.path} href={item.path}>
-                  <Button
-                    onClick={() => setIsOpen(false)}
-                    variant={active ? "default" : "ghost"}
-                    className={`w-full justify-start h-auto p-3 ${
-                      active ? "bg-primary text-primary-foreground" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 w-full">
-                      <span className="text-purple-500 dark:text-purple-400 text-sm font-bold flex-shrink-0">
-                        {item.glyph}
-                      </span>
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
-                      <div className="flex-1 text-left">
-                        <div className="font-medium">{item.label}</div>
-                        <div className="text-xs opacity-70">{item.description}</div>
+                <div key={item.path} className="space-y-1">
+                  {hasSubItems ? (
+                    <Button
+                      onClick={() => toggleExpanded(item.path)}
+                      variant={active ? "default" : "ghost"}
+                      className={`w-full justify-start h-auto p-3 ${
+                        active ? "bg-primary text-primary-foreground" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 w-full">
+                        <span className="text-purple-500 dark:text-purple-400 text-sm font-bold flex-shrink-0">
+                          {item.glyph}
+                        </span>
+                        <item.icon className="h-4 w-4 flex-shrink-0" />
+                        <div className="flex-1 text-left">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-70">{item.description}</div>
+                        </div>
+                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                       </div>
+                    </Button>
+                  ) : (
+                    <Link href={item.path}>
+                      <Button
+                        onClick={() => setIsOpen(false)}
+                        variant={active ? "default" : "ghost"}
+                        className={`w-full justify-start h-auto p-3 ${
+                          active ? "bg-primary text-primary-foreground" : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 w-full">
+                          <span className="text-purple-500 dark:text-purple-400 text-sm font-bold flex-shrink-0">
+                            {item.glyph}
+                          </span>
+                          <item.icon className="h-4 w-4 flex-shrink-0" />
+                          <div className="flex-1 text-left">
+                            <div className="font-medium">{item.label}</div>
+                            <div className="text-xs opacity-70">{item.description}</div>
+                          </div>
+                        </div>
+                      </Button>
+                    </Link>
+                  )}
+                  
+                  {/* Sub Items */}
+                  {hasSubItems && isExpanded && (
+                    <div className="ml-6 space-y-1">
+                      {item.subItems.map((subItem) => {
+                        const subActive = isActive(subItem.path);
+                        return (
+                          <Link key={subItem.path} href={subItem.path}>
+                            <Button
+                              onClick={() => setIsOpen(false)}
+                              variant={subActive ? "default" : "ghost"}
+                              className={`w-full justify-start text-sm p-2 ${
+                                subActive ? "bg-primary text-primary-foreground" : ""
+                              }`}
+                            >
+                              <subItem.icon className="h-4 w-4 mr-2" />
+                              <div className="text-left">
+                                <div className="font-medium">{subItem.label}</div>
+                                <div className="text-xs opacity-70">{subItem.description}</div>
+                              </div>
+                            </Button>
+                          </Link>
+                        );
+                      })}
                     </div>
-                  </Button>
-                </Link>
+                  )}
+                </div>
               );
             })}
           </div>
