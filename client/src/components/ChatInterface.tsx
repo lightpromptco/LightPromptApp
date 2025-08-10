@@ -274,7 +274,7 @@ export function ChatInterface({
 
         {/* Conditional Content Based on Bot Type */}
         {activeBot.id === 'woowoo' ? (
-          <div className="flex-1 overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+          <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900" style={{ maxHeight: 'calc(100vh - 240px)' }}>
             <WooWooInterface userId={user?.id || ''} />
           </div>
         ) : activeBot.id === 'geoprompt' ? (

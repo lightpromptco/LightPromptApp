@@ -21,8 +21,10 @@ import {
   Type,
   Layout,
   Palette,
-  Link as LinkIcon
+  Link as LinkIcon,
+  MousePointer
 } from "lucide-react";
+import { VisualPageEditor } from "@/components/VisualPageEditor";
 
 interface PageContent {
   id: string;
@@ -78,6 +80,7 @@ export default function PageEditor() {
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editorMode, setEditorMode] = useState<'list' | 'visual'>('list');
   const { toast } = useToast();
 
   // Check admin access
@@ -214,6 +217,11 @@ export default function PageEditor() {
     );
   }
 
+  // Show visual editor when in visual mode
+  if (editorMode === 'visual') {
+    return <VisualPageEditor currentPage={selectedPage} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
@@ -223,6 +231,22 @@ export default function PageEditor() {
             <p className="text-gray-600 dark:text-gray-400">Edit any page content, buttons, and links</p>
           </div>
           <div className="flex gap-4">
+            <Button
+              onClick={() => setEditorMode(editorMode === 'visual' ? 'list' : 'visual')}
+              variant="outline"
+            >
+              {editorMode === 'visual' ? (
+                <>
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  List Editor
+                </>
+              ) : (
+                <>
+                  <MousePointer className="w-4 h-4 mr-2" />
+                  Visual Editor
+                </>
+              )}
+            </Button>
             <Button onClick={savePageContent} disabled={isLoading}>
               <Save className="w-4 h-4 mr-2" />
               Save Changes
