@@ -46,6 +46,65 @@ export default function PlansPage() {
   const tokensRemaining = currentUser ? currentUser.tokenLimit - currentUser.tokensUsed : 0;
   const usagePercentage = currentUser ? (currentUser.tokensUsed / currentUser.tokenLimit) * 100 : 0;
 
+  const PRICING_PLANS = [
+    {
+      id: 'free',
+      name: 'Free Explorer',
+      price: '$0',
+      period: '/forever',
+      description: 'Start your conscious AI journey',
+      features: [
+        '5 AI conversations per day',
+        'Basic Soul Map access',
+        'Community features',
+        'Vision Quest (limited)',
+        'Basic dashboard'
+      ],
+      popular: false,
+      buttonText: 'Current Plan',
+      color: 'from-gray-500 to-gray-600'
+    },
+    {
+      id: 'premium',
+      name: 'Soul Seeker',
+      price: '$29',
+      period: '/month',
+      description: 'Unlock full conscious AI experience',
+      features: [
+        'Unlimited AI conversations',
+        'Full Soul Map & Birth Charts',
+        'Advanced Vision Quest',
+        'Soul-Tech Dashboard',
+        'Priority community access',
+        'Personal growth tracking',
+        'Export conversation insights'
+      ],
+      popular: true,
+      buttonText: 'Upgrade Now',
+      color: 'from-purple-500 to-blue-500'
+    },
+    {
+      id: 'business',
+      name: 'Organization',
+      price: '$199',
+      period: '/month',
+      description: 'Conscious AI for teams & enterprises',
+      features: [
+        'Everything in Soul Seeker',
+        'Team dashboards & analytics',
+        'Custom AI bot configurations',
+        'Admin management tools',
+        'White-label options',
+        'API access',
+        'Dedicated support',
+        'Custom integrations'
+      ],
+      popular: false,
+      buttonText: 'Contact Sales',
+      color: 'from-teal-500 to-emerald-500'
+    }
+  ];
+
   const features = [
     {
       icon: '🤖',
@@ -257,6 +316,47 @@ export default function PlansPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Pricing Plans */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {PRICING_PLANS.map((plan) => (
+            <Card key={plan.id} className={`relative ${plan.popular ? 'ring-2 ring-purple-500 scale-105' : ''}`}>
+              {plan.popular && (
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500">
+                  Most Popular
+                </Badge>
+              )}
+              <CardHeader className={`text-center bg-gradient-to-r ${plan.color} text-white rounded-t-lg`}>
+                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold">{plan.price}</div>
+                  <div className="text-sm opacity-90">{plan.period}</div>
+                  <p className="text-sm opacity-80">{plan.description}</p>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <ul className="space-y-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  className={`w-full mt-6 bg-gradient-to-r ${plan.color} hover:opacity-90`}
+                  onClick={() => plan.id === 'business' ? 
+                    window.open('mailto:support@lightprompt.co?subject=Enterprise%20Inquiry') : 
+                    handleSelectPlan(plan.id, plan.name, plan.price.replace('$', ''))
+                  }
+                  disabled={isCurrentPlan(plan.id)}
+                >
+                  {isCurrentPlan(plan.id) ? 'Current Plan' : plan.buttonText}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
         {/* Original Pricing Tiers */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

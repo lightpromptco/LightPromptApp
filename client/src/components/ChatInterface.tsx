@@ -308,7 +308,7 @@ export function ChatInterface({
                   <h3 className="text-gray-800 dark:text-white text-lg font-semibold mb-2 flex items-center gap-2 justify-center">
                     Welcome to LightPromptBot
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Your conscious AI companion for mindful reflection</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Your conscious AI mirror for mindful reflection</p>
                   <Button 
                     onClick={() => setShowOnboarding(true)}
                     className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"

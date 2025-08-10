@@ -187,9 +187,9 @@ export function SoulTechDashboard({ userId }: SoulTechDashboardProps) {
                       variant="ghost"
                       size="sm"
                       className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                      title={`${widget.title}: ${widget.description}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // TODO: Add tooltip or modal with explanation
                       }}
                     >
                       ?

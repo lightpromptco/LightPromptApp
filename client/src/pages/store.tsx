@@ -234,7 +234,10 @@ export default function Store() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 px-8 py-3"
-              onClick={() => window.location.hash = '/checkout'}
+              onClick={() => {
+                console.log('Checkout clicked, cart:', cartItems);
+                window.location.href = '/#/checkout';
+              }}
             >
               Proceed to Checkout • ${getCartTotal()}
             </Button>
