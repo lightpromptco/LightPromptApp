@@ -1,7 +1,7 @@
 # LightPrompt - Soul-Tech Wellness AI Platform
 
 ## Overview
-LightPrompt is a privacy-first, soul-tech wellness platform evolved into a digital product business. It offers the "LightPrompt:ed" course and ebook through a professional e-commerce interface. Built as a full-stack TypeScript application with React, Express, and PostgreSQL, it features secure payments via Stripe, content management, and location-based mindfulness capabilities (GeoPrompt). The platform aims to be a conscious AI tool for human reflection and self-connection, providing an ethical AI foundation for universal wellness.
+LightPrompt is a privacy-first, soul-tech wellness platform evolved into a digital product business focused on career path guidance through astrological insights. The platform now integrates VibeMatch and SoulSync concepts to help users discover their optimal career direction through professional-grade astrological analysis. Built as a full-stack TypeScript application with React, Express, and PostgreSQL, it features secure payments via Stripe, comprehensive career guidance systems, and location-based mindfulness capabilities (GeoPrompt). The platform aims to be a conscious AI tool for human reflection and professional alignment, providing an ethical AI foundation for career fulfillment and universal wellness.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -60,12 +60,14 @@ Domain transition: Moving to lightprompt.co as main landing page.
 
 ### Feature Specifications
 - **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses
-- **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings
+- **Career Path Guidance**: Integrated VibeMatch and SoulSync systems providing personalized career direction based on astrological analysis, including ideal careers, natural talents, work styles, and professional timing insights
+- **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings, enhanced with career-focused guidance
 - **Enhanced Birth Chart Report**: Updated with actual birth chart data from Cafe Astrology PDF for accurate planetary positions - Capricorn Rising 14°16', Sun Aquarius 28°01' in 2nd House, Moon Leo 15°27' in 7th House
-- **Redesigned Oracle Widgets**: Professional gradient-based Daily Oracle and Quick Oracle interface with improved UX and visual hierarchy
+- **Redesigned Oracle Widgets**: Professional gradient-based Daily Oracle, Quick Oracle, Moon Wisdom, and Career Path interface with improved UX and visual hierarchy
+- **VibeMatch Score**: Algorithmic compatibility assessment between current path and astrological potential (1-100 scale) based on planetary alignments
+- **SoulSync Areas**: Deep alignment guidance connecting personal values with professional fulfillment through astrological insights
 - **Store Experience**: Redesigned for clear customer journey from "Learn More" to product information pages (`/product-info`).
 - **Vision Quest**: Rebuilt with white/black/teal color scheme, featuring interactive challenges with detailed steps and completion tracking.
-- **Soul Sync**: Free access, includes 10 connection types, invite link system, custom activities, streak tracking, and achievements.
 - **GeoPrompt**: Google Maps integration for location-based mindfulness with map exploration and check-in functionality.
 - **Admin Access**: `lightprompt.co@gmail.com` has developer mode for full platform control.
 - **Content Management System**: Admin panel for editing any page content, sections, buttons, links, colors, and metadata.

@@ -49,6 +49,16 @@ export interface AstrologyChart {
     description: string;
     planets: string[];
   }>;
+  careerGuidance?: {
+    soulPurpose: string;
+    idealCareers: string[];
+    workStyle: string;
+    leadership: string;
+    challenges: string[];
+    naturalTalents: string[];
+    vibeMatchScore: number; // 1-100 compatibility with current path
+    soulSyncAreas: string[]; // Areas for deep soul alignment
+  };
   dashas?: {
     current: {
       mahadasha: string;
@@ -479,6 +489,9 @@ export function calculateAstrologyChart(birthData: BirthData): AstrologyChart {
   // Calculate yogas (simplified)
   chartData.yogas = calculateYogas(planetPositions);
   
+  // Add career guidance based on chart
+  chartData.careerGuidance = calculateCareerGuidance(chartData);
+  
   return chartData;
 }
 
@@ -518,6 +531,175 @@ function calculateYogas(positions: { [key: string]: { sign: string; degree: numb
   }
   
   return yogas;
+}
+
+// Calculate career guidance based on astrological chart
+function calculateCareerGuidance(chart: any): {
+  soulPurpose: string;
+  idealCareers: string[];
+  workStyle: string;
+  leadership: string;
+  challenges: string[];
+  naturalTalents: string[];
+  vibeMatchScore: number;
+  soulSyncAreas: string[];
+} {
+  const sun = chart.sun;
+  const moon = chart.moon;
+  const mars = chart.mars;
+  const mercury = chart.mercury;
+  const venus = chart.venus;
+  const jupiter = chart.jupiter;
+  const midheaven = chart.midheaven;
+  
+  // Career analysis based on 10th house and planetary influences
+  const soulPurposeMap: { [key: string]: string } = {
+    aries: "Pioneer and innovator, meant to lead and start new ventures",
+    taurus: "Builder of lasting value, creating stability and beauty in the world",
+    gemini: "Communicator and bridge-builder, connecting ideas and people",
+    cancer: "Nurturer and protector, caring for others and preserving traditions",
+    leo: "Creative leader and entertainer, inspiring others through self-expression",
+    virgo: "Healer and improver, serving others through practical skills",
+    libra: "Peacemaker and aesthete, bringing harmony and beauty to relationships",
+    scorpio: "Transformer and researcher, uncovering hidden truths and facilitating change",
+    sagittarius: "Teacher and explorer, sharing wisdom and expanding horizons",
+    capricorn: "Authority and architect, building lasting structures and systems",
+    aquarius: "Revolutionary and humanitarian, advancing society through innovation",
+    pisces: "Visionary and healer, bringing compassion and spirituality to the world"
+  };
+  
+  const careerMap: { [key: string]: string[] } = {
+    aries: ["Entrepreneur", "Military Leader", "Sports Coach", "Emergency Responder", "Startup Founder"],
+    taurus: ["Banking/Finance", "Agriculture", "Art/Design", "Real Estate", "Food Industry"],
+    gemini: ["Journalism", "Teaching", "Sales", "Technology", "Social Media", "Writing"],
+    cancer: ["Healthcare", "Education", "Social Work", "Hospitality", "Real Estate", "Family Business"],
+    leo: ["Entertainment", "Leadership Roles", "Creative Arts", "Public Speaking", "Politics"],
+    virgo: ["Healthcare", "Research", "Editing", "Analysis", "Administration", "Quality Control"],
+    libra: ["Law", "Diplomacy", "Design", "Counseling", "HR", "Beauty/Fashion"],
+    scorpio: ["Psychology", "Investigation", "Research", "Surgery", "Finance", "Transformation Work"],
+    sagittarius: ["Education", "Publishing", "Travel", "Philosophy", "International Business"],
+    capricorn: ["Management", "Government", "Architecture", "Engineering", "Corporate Leadership"],
+    aquarius: ["Technology", "Science", "Social Activism", "Innovation", "Humanitarian Work"],
+    pisces: ["Arts", "Healing", "Spirituality", "Psychology", "Film/Photography", "Charity Work"]
+  };
+  
+  const workStyleMap: { [key: string]: string } = {
+    aries: "Fast-paced, competitive, independent leadership style",
+    taurus: "Steady, methodical, prefers stability and routine",
+    gemini: "Flexible, communicative, thrives on variety and mental stimulation",
+    cancer: "Collaborative, nurturing, values emotional connections at work",
+    leo: "Creative, dramatic, needs recognition and opportunities to shine",
+    virgo: "Detail-oriented, practical, excels at improvement and organization",
+    libra: "Diplomatic, fair, works best in harmonious team environments",
+    scorpio: "Intense, transformative, prefers depth over breadth",
+    sagittarius: "Adventurous, philosophical, needs freedom and big-picture thinking",
+    capricorn: "Strategic, ambitious, natural executive and long-term planner",
+    aquarius: "Innovative, humanitarian, works best with cutting-edge ideas",
+    pisces: "Intuitive, compassionate, thrives in creative or healing environments"
+  };
+  
+  // Calculate VibeMatch score based on planetary alignments
+  let vibeScore = 50; // Base score
+  
+  // Sun-Mars harmony increases drive alignment
+  if (sun.sign === mars.sign || isCompatibleSigns(sun.sign, mars.sign)) {
+    vibeScore += 15;
+  }
+  
+  // Moon-Venus harmony increases emotional satisfaction
+  if (moon.sign === venus.sign || isCompatibleSigns(moon.sign, venus.sign)) {
+    vibeScore += 15;
+  }
+  
+  // Mercury-Jupiter harmony increases learning and growth
+  if (mercury.sign === jupiter.sign || isCompatibleSigns(mercury.sign, jupiter.sign)) {
+    vibeScore += 10;
+  }
+  
+  // Strong 10th house indicators
+  if (midheaven && ['capricorn', 'leo', 'aries'].includes(midheaven.sign)) {
+    vibeScore += 10;
+  }
+  
+  vibeScore = Math.min(vibeScore, 100);
+  
+  return {
+    soulPurpose: soulPurposeMap[sun.sign] || "Unique path of self-discovery and service",
+    idealCareers: careerMap[sun.sign] || ["Creative fields", "Service professions"],
+    workStyle: workStyleMap[sun.sign] || "Balanced approach to work and life",
+    leadership: mars.sign === 'aries' || mars.sign === 'leo' || mars.sign === 'capricorn' ? 
+      "Natural leader with strong executive abilities" : 
+      "Collaborative leader who inspires through expertise",
+    challenges: getCareerChallenges(sun.sign, mars.sign),
+    naturalTalents: getNaturalTalents(sun.sign, mercury.sign, venus.sign),
+    vibeMatchScore: vibeScore,
+    soulSyncAreas: getSoulSyncAreas(moon.sign, jupiter.sign)
+  };
+}
+
+// Helper functions for career guidance
+function isCompatibleSigns(sign1: string, sign2: string): boolean {
+  const fireSignsq = ['aries', 'leo', 'sagittarius'];
+  const earthSigns = ['taurus', 'virgo', 'capricorn'];
+  const airSigns = ['gemini', 'libra', 'aquarius'];
+  const waterSigns = ['cancer', 'scorpio', 'pisces'];
+  
+  return (fireSignsq.includes(sign1) && fireSignsq.includes(sign2)) ||
+         (earthSigns.includes(sign1) && earthSigns.includes(sign2)) ||
+         (airSigns.includes(sign1) && airSigns.includes(sign2)) ||
+         (waterSigns.includes(sign1) && waterSigns.includes(sign2));
+}
+
+function getCareerChallenges(sunSign: string, marsSign: string): string[] {
+  const challengeMap: { [key: string]: string[] } = {
+    aries: ["Impatience with slow progress", "Need to develop follow-through"],
+    taurus: ["Resistance to change", "May get stuck in comfort zones"],
+    gemini: ["Difficulty with long-term focus", "May scatter energy too widely"],
+    cancer: ["Taking work problems too personally", "Need for emotional security"],
+    leo: ["Need for constant recognition", "Pride may interfere with teamwork"],
+    virgo: ["Perfectionism causing delays", "May get lost in details"],
+    libra: ["Difficulty making tough decisions", "Avoiding necessary conflicts"],
+    scorpio: ["Intensity may overwhelm others", "Trust issues in workplace"],
+    sagittarius: ["Impatience with routine tasks", "May overcommit to projects"],
+    capricorn: ["Workaholic tendencies", "May neglect work-life balance"],
+    aquarius: ["Difficulty with traditional structures", "May seem aloof to colleagues"],
+    pisces: ["Boundary issues at work", "May avoid practical business matters"]
+  };
+  
+  return challengeMap[sunSign] || ["Learning to balance personal needs with professional demands"];
+}
+
+function getNaturalTalents(sunSign: string, mercurySign: string, venusSign: string): string[] {
+  const talents = [];
+  
+  // Sun sign talents
+  const sunTalents: { [key: string]: string[] } = {
+    aries: ["Leadership", "Innovation", "Quick decision-making"],
+    taurus: ["Reliability", "Building lasting systems", "Financial management"],
+    gemini: ["Communication", "Adaptability", "Information synthesis"],
+    cancer: ["Intuition", "Team building", "Customer relations"],
+    leo: ["Creativity", "Public speaking", "Inspiring others"],
+    virgo: ["Analysis", "Problem-solving", "Quality improvement"],
+    libra: ["Diplomacy", "Aesthetic sense", "Relationship building"],
+    scorpio: ["Research", "Transformation", "Crisis management"],
+    sagittarius: ["Teaching", "Vision casting", "Cultural bridge-building"],
+    capricorn: ["Strategic planning", "Executive skills", "Long-term thinking"],
+    aquarius: ["Innovation", "Systems thinking", "Social awareness"],
+    pisces: ["Intuition", "Compassion", "Creative vision"]
+  };
+  
+  talents.push(...(sunTalents[sunSign] || []));
+  
+  return talents;
+}
+
+function getSoulSyncAreas(moonSign: string, jupiterSign: string): string[] {
+  return [
+    "Emotional fulfillment through meaningful work",
+    "Alignment with personal values and ethics", 
+    "Contributing to collective growth and wisdom",
+    "Balancing material success with spiritual purpose"
+  ];
 }
 
 // Validate birth data

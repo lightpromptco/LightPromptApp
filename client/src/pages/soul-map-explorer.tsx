@@ -1073,10 +1073,10 @@ export default function SoulMapExplorerPage() {
                     </div>
                   </Button>
 
-                  {/* Soul Sync */}
+                  {/* Career Path */}
                   <Button
                     onClick={() => {
-                      setCurrentMessage("How can I align with my soul's highest purpose today? What does my chart reveal about my spiritual path and next steps?");
+                      setCurrentMessage("Based on my astrological chart, what career paths and professional opportunities align with my soul purpose? How can I find work that feels deeply fulfilling and matches my natural talents?");
                       setCurrentView('chat');
                     }}
                     variant="ghost"
@@ -1084,11 +1084,11 @@ export default function SoulMapExplorerPage() {
                   >
                     <div className="flex flex-col items-center justify-center h-full space-y-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-white" />
+                        <Target className="w-4 h-4 text-white" />
                       </div>
                       <div className="text-center">
-                        <div className="font-semibold text-emerald-900">Soul Sync</div>
-                        <div className="text-xs text-emerald-700 opacity-80">Purpose alignment</div>
+                        <div className="font-semibold text-emerald-900">Career Path</div>
+                        <div className="text-xs text-emerald-700 opacity-80">Professional guidance</div>
                       </div>
                     </div>
                   </Button>
