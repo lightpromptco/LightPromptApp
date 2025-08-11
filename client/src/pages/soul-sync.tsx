@@ -85,7 +85,7 @@ export default function SoulSyncPage() {
     enabled: !!currentUser?.id
   });
 
-  // Initialize current user from localStorage
+  // Initialize current user from localStorage (optional for free tier)
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -95,6 +95,15 @@ export default function SoulSyncPage() {
       } catch (error) {
         console.error('Failed to parse stored user:', error);
       }
+    } else {
+      // Create anonymous user for free tier access
+      setCurrentUser({
+        id: 'anonymous',
+        email: 'anonymous@free-tier.com',
+        name: 'Free User',
+        tier: 'free',
+        connectionCount: 0
+      });
     }
   }, []);
 
@@ -103,20 +112,11 @@ export default function SoulSyncPage() {
     toast({ title: "Refreshing real-time data...", description: "Fetching latest Soul Sync updates" });
   };
 
+  // Show loading while initializing user
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <Card className="w-96">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-gray-900 dark:text-white">Authentication Required</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-gray-600 dark:text-gray-400">Please log in to access Soul Sync connections</p>
-            <Button onClick={() => window.location.href = '/chat'} className="bg-teal-600 hover:bg-teal-700 text-white">
-              Go to Chat
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
       </div>
     );
   }

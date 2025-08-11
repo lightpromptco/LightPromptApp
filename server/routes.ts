@@ -1180,8 +1180,22 @@ Please provide astrological insights based on available data.`;
         return res.status(400).json({ error: "userId is required" });
       }
 
-      // For now, return empty array as connections system is not fully implemented
-      // This represents the "tech data nerd company" approach - real data, even if empty
+      // Handle anonymous users for free tier
+      if (userId === 'anonymous') {
+        res.json({ 
+          connections: [],
+          total: 0,
+          lastUpdated: new Date().toISOString(),
+          status: "anonymous_free_tier",
+          message: "Free tier: 5 connections available",
+          tier: "free",
+          connectionLimit: 5,
+          connectionsUsed: 0
+        });
+        return;
+      }
+
+      // For registered users, query the database
       res.json({ 
         connections: [],
         total: 0,
@@ -1202,6 +1216,20 @@ Please provide astrological insights based on available data.`;
 
       if (!userId) {
         return res.status(400).json({ error: "userId is required" });
+      }
+
+      // Handle anonymous users for free tier
+      if (userId === 'anonymous') {
+        res.json({ 
+          metrics: [],
+          total: 0,
+          period: `${days} days`,
+          lastUpdated: new Date().toISOString(),
+          status: "anonymous_free_tier",
+          message: "Sign up to track wellness metrics",
+          tier: "free"
+        });
+        return;
       }
 
       const metrics = await storage.getWellnessMetrics(userId as string, parseInt(days as string));
