@@ -467,10 +467,50 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
             </div>
 
             <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Star className="w-5 h-5 text-purple-500" />
+                Planetary Aspects & Interpretations
+              </h3>
+              <div className="space-y-4">
+                <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-blue-800 mb-2">Sun in Aquarius (3rd House)</h4>
+                    <p className="text-sm text-blue-700 mb-2">Your core identity is expressed through innovation, communication, and humanitarian ideals.</p>
+                    <p className="text-xs text-blue-600">At 26.73°, you're in the latter degrees of Aquarius, suggesting mastery of Aquarian qualities and readiness to pioneer new frontiers.</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-orange-200">
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-orange-800 mb-2">Moon in Leo (4th House)</h4>
+                    <p className="text-sm text-orange-700 mb-2">Your emotional nature craves creative expression and recognition within your home and family sphere.</p>
+                    <p className="text-xs text-orange-600">At 16.18°, this placement suggests a natural performer who finds emotional security through creative self-expression and family drama.</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-r from-green-50 to-teal-50 border-green-200">
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-green-800 mb-2">Mercury in Aries (3rd House)</h4>
+                    <p className="text-sm text-green-700 mb-2">Your communication style is direct, pioneering, and intellectually aggressive.</p>
+                    <p className="text-xs text-green-600">At 6.78°, early degrees suggest raw, unfiltered mental energy that cuts straight to the point.</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-pink-800 mb-2">Venus in Sagittarius (4th House)</h4>
+                    <p className="text-sm text-pink-700 mb-2">You love through adventure, philosophy, and expanding horizons within your personal foundation.</p>
+                    <p className="text-xs text-pink-600">This placement suggests attracting partners who share your love of learning and exploration.</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            <div>
               <h3 className="text-lg font-semibold mb-4">Privacy Notice</h3>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  🔒 Your birth data and conversations are completely private to your account. 
+                  Your birth data and conversations are completely private to your account. 
                   Chart calculations are processed server-side but not stored permanently. 
                   Only you can access your personal astrological information.
                 </p>

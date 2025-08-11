@@ -61,6 +61,8 @@ Domain transition: Moving to lightprompt.co as main landing page.
 ### Feature Specifications
 - **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses
 - **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings
+- **Enhanced Birth Chart Report**: Detailed planetary aspects section with comprehensive interpretations, including degree analysis and house meanings
+- **Redesigned Oracle Widgets**: Professional gradient-based Daily Oracle and Quick Oracle interface with improved UX and visual hierarchy
 - **Store Experience**: Redesigned for clear customer journey from "Learn More" to product information pages (`/product-info`).
 - **Vision Quest**: Rebuilt with white/black/teal color scheme, featuring interactive challenges with detailed steps and completion tracking.
 - **Soul Sync**: Free access, includes 10 connection types, invite link system, custom activities, streak tracking, and achievements.

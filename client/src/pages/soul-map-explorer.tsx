@@ -995,71 +995,87 @@ export default function SoulMapExplorerPage() {
         />
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Oracle Chat Quick Actions */}
+          {/* Enhanced Oracle Interface */}
           <div className="lg:col-span-2">
             <Card className={`transition-all duration-300 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-white border-gray-200 shadow-sm'}`}>
-              <CardHeader className="text-center pb-4">
-                <CardTitle className={`text-2xl font-bold mb-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>
-                  Ask Your Soul Oracle
-                </CardTitle>
-                <p className={`text-sm leading-relaxed ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
-                  Your interactive natal chart is displaying above. Click the buttons below to explore deeper insights.
-                </p>
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900">Soul Oracle Gateway</CardTitle>
+                    <p className="text-sm text-gray-600">Deep cosmic insights tailored to your unique chart</p>
+                  </div>
+                </div>
               </CardHeader>
               
-              <CardContent className="grid grid-cols-2 gap-4 p-6 pt-0">
-                <Button
-                  onClick={() => {
-                    setCurrentMessage("What does the current moon phase mean for my spiritual journey and how does it interact with my birth chart?");
-                    setCurrentView('chat');
-                  }}
-                  variant="outline"
-                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
-                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-blue-200 hover:bg-blue-50 hover:border-blue-300'
-                  }`}
-                >
-                  <div className="text-2xl">🌙</div>
-                  <span>Moon Wisdom</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setCurrentMessage(`How does today's Mayan day sign "${getMayanDaySign()}" align with my astrological chart and soul purpose?`);
-                    setCurrentView('chat');
-                  }}
-                  variant="outline"
-                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
-                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-purple-200 hover:bg-purple-50 hover:border-purple-300'
-                  }`}
-                >
-                  <div className="text-2xl">🔮</div>
-                  <span>Mayan Sync</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setCurrentMessage("Show me the cosmic aspects and planetary connections active in my chart right now and their spiritual significance");
-                    setCurrentView('chat');
-                  }}
-                  variant="outline"
-                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
-                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-yellow-200 hover:bg-yellow-50 hover:border-yellow-300'
-                  }`}
-                >
-                  <div className="text-2xl">⚡</div>
-                  <span>Live Aspects</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setCurrentMessage("What cosmic guidance does my chart offer for today's energy and how can I align with my highest self?");
-                    setCurrentView('chat');
-                  }}
-                  variant="outline"
-                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
-                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-green-200 hover:bg-green-50 hover:border-green-300'
-                  }`}
-                >
-                  <div className="text-2xl">✨</div>
-                  <span>Daily Guidance</span>
-                </Button>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => {
+                        setCurrentMessage("What does the current moon phase mean for my spiritual journey and how does it interact with my birth chart?");
+                        setCurrentView('chat');
+                      }}
+                      variant="outline"
+                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-300 transition-all duration-200"
+                    >
+                      <div className="text-2xl">🌙</div>
+                      <div className="text-center">
+                        <div className="font-medium text-blue-800">Moon Wisdom</div>
+                        <div className="text-xs text-blue-600">Current lunar energy</div>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => {
+                        setCurrentMessage("Show me the cosmic aspects and planetary connections active in my chart right now and their spiritual significance");
+                        setCurrentView('chat');
+                      }}
+                      variant="outline"
+                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 hover:from-amber-100 hover:to-orange-100 hover:border-amber-300 transition-all duration-200"
+                    >
+                      <div className="text-2xl">⚡</div>
+                      <div className="text-center">
+                        <div className="font-medium text-amber-800">Live Aspects</div>
+                        <div className="text-xs text-amber-600">Active planetary energy</div>
+                      </div>
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => {
+                        setCurrentMessage(`How does today's Mayan day sign "${getMayanDaySign()}" align with my astrological chart and soul purpose?`);
+                        setCurrentView('chat');
+                      }}
+                      variant="outline"
+                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100 hover:border-purple-300 transition-all duration-200"
+                    >
+                      <div className="text-2xl">🔮</div>
+                      <div className="text-center">
+                        <div className="font-medium text-purple-800">Mayan Sync</div>
+                        <div className="text-xs text-purple-600">Ancient wisdom alignment</div>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => {
+                        setCurrentMessage("What cosmic guidance does my chart offer for today's energy and how can I align with my highest self?");
+                        setCurrentView('chat');
+                      }}
+                      variant="outline"
+                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100 hover:border-green-300 transition-all duration-200"
+                    >
+                      <div className="text-2xl">✨</div>
+                      <div className="text-center">
+                        <div className="font-medium text-green-800">Daily Guidance</div>
+                        <div className="text-xs text-green-600">Align with highest self</div>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
