@@ -1,272 +1,237 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Star, BookOpen, GraduationCap, Package } from "lucide-react";
-import { useCart } from "../hooks/use-cart";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Star, Sparkles } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-interface Product {
+interface PricingPlan {
   id: string;
   name: string;
   price: number;
   originalPrice?: number;
   description: string;
   features: string[];
-  badge?: string;
-  icon: any;
-  category: "course" | "ebook" | "bundle";
+  popular?: boolean;
+  stripePriceId?: string;
 }
 
-const PRODUCTS: Product[] = [
+const pricingPlans: PricingPlan[] = [
   {
-    id: "lightprompt-course",
-    name: "LightPrompt:ed Course",
+    id: 'course',
+    name: 'Soul Map & Cosmos Course',
     price: 120,
-    description: "Complete conscious AI wellness course with 7 specialized AI companions, guided practices, and transformational insights.",
+    description: 'Complete astrological career guidance course with lifetime access',
     features: [
-      "Access to all 7 AI companions",
-      "Guided wellness practices",
-      "Personal growth tracking",
-      "Community access",
-      "Lifetime updates"
+      'Complete career astrology curriculum',
+      'Interactive birth chart analysis',
+      'Personalized career path guidance',
+      'VibeMatch compatibility scoring',
+      'SoulSync alignment tools',
+      'Lifetime platform access',
+      'Premium Oracle consultations',
+      'Career timing insights'
     ],
-    icon: GraduationCap,
-    category: "course"
+    stripePriceId: 'price_course_120'
   },
   {
-    id: "lightprompt-ed-novel",
-    name: "LightPrompt:Ed",
+    id: 'ebook',
+    name: 'Digital Guidebook',
     price: 11,
-    description: "A novel by Ashley Daniel - The Human Guide to AI, Soul, and the Future. Visionary sci-fi exploring consciousness and technology.",
+    description: 'Essential astrological career insights in digital format',
     features: [
-      "Visionary sci-fi novel",
-      "Themes of AI and consciousness",
-      "Stunning cover art",
-      "Digital format (PDF/EPUB)",
-      "Instant download"
+      'Comprehensive career astrology guide',
+      'Downloadable PDF format',
+      'Quick reference charts',
+      'Basic compatibility insights',
+      'Self-guided exercises'
     ],
-    badge: "Popular",
-    icon: BookOpen,
-    category: "ebook"
+    stripePriceId: 'price_ebook_11'
   },
   {
-    id: "complete-bundle",
-    name: "Complete Bundle",
+    id: 'bundle',
+    name: 'Complete Soul-Tech Bundle',
     price: 125,
-    originalPrice: 131,
-    description: "Everything you need for conscious living - course + ebook at a special price.",
+    originalPrice: 224,
+    description: 'Everything you need for conscious career transformation',
     features: [
-      "LightPrompt:ed Course",
-      "LightPrompt:Ed Novel", 
-      "Exclusive bonus content",
-      "Priority support",
-      "Save $6!"
+      'Full course access',
+      'Digital guidebook included',
+      'Premium Oracle unlimited access',
+      'Advanced VibeMatch scoring',
+      'Priority support',
+      'Bonus cosmic weather updates',
+      'Early access to new features',
+      'Lifetime updates'
     ],
-    badge: "Best Value",
-    icon: Package,
-    category: "bundle"
+    popular: true,
+    stripePriceId: 'price_bundle_125'
   }
 ];
 
 export default function Store() {
-  const { addToCart, cartItems, getCartTotal } = useCart();
+  const [loading, setLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
-  };
-
-  const handleBuyNow = async (product: Product) => {
+  const handlePurchase = async (plan: PricingPlan) => {
+    setLoading(plan.id);
     try {
-      let endpoint = '/api/create-course-payment';
-      
-      if (product.id === 'lightprompt-ed-novel') {
-        endpoint = '/api/create-ebook-payment';
-      } else if (product.id === 'complete-bundle') {
-        endpoint = '/api/create-bundle-payment';
-      }
-      
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: product.price * 100, // Convert to cents for Stripe
+          amount: plan.price,
+          productName: plan.name,
+          priceId: plan.stripePriceId
         }),
       });
-      
-      const data = await response.json();
-      
-      if (data && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        throw new Error('No checkout URL received');
+
+      if (!response.ok) {
+        throw new Error('Payment setup failed');
       }
+
+      const { clientSecret } = await response.json();
+      
+      // Redirect to checkout with Stripe
+      window.location.href = `/checkout?client_secret=${clientSecret}&product=${plan.id}`;
+      
     } catch (error) {
-      console.error('Purchase error:', error);
+      console.error('Payment error:', error);
       toast({
-        title: "Purchase Error",
-        description: "Unable to process purchase. Please try again.",
-        variant: "destructive",
+        title: 'Payment Error',
+        description: 'Unable to process payment. Please try again.',
+        variant: 'destructive',
       });
+    } finally {
+      setLoading(null);
     }
   };
 
-  const getCartItemCount = (productId: string) => {
-    const item = cartItems.find(item => item.id === productId);
-    return item?.quantity || 0;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto px-4 py-16">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            LightPrompt Store
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-6">
+            Store & Pricing
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Conscious AI tools for your wellness journey. Start with what feels right for you.
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Transform your career through conscious AI and soul-tech astrology. 
+            Choose the path that resonates with your cosmic blueprint.
           </p>
         </div>
 
-        {/* Cart Summary */}
-        {cartItems.length > 0 && (
-          <Card className="mb-8 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-950 dark:to-blue-950 border-teal-200 dark:border-teal-800">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5 text-teal-600" />
-                  <span className="font-medium">
-                    {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold">${getCartTotal()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Products Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {PRODUCTS.map((product) => {
-            const Icon = product.icon;
-            const cartCount = getCartItemCount(product.id);
-            
-            return (
-              <Card key={product.id} className="relative hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm dark:bg-slate-800/80 flex flex-col h-full">
-                {product.badge && (
-                  <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-blue-500">
-                    {product.badge}
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {pricingPlans.map((plan) => (
+            <Card
+              key={plan.id}
+              className={`relative h-full transition-all duration-300 hover:shadow-2xl ${
+                plan.popular
+                  ? 'ring-2 ring-teal-500 shadow-xl scale-105 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20'
+                  : 'hover:scale-105 bg-white dark:bg-slate-800'
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-2 text-sm font-semibold">
+                    <Star className="w-4 h-4 mr-1" />
+                    BEST VALUE
                   </Badge>
+                </div>
+              )}
+
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {plan.name}
+                </CardTitle>
+                <div className="flex items-center justify-center gap-2 my-4">
+                  <span className="text-4xl font-bold text-teal-600">
+                    ${plan.price}
+                  </span>
+                  {plan.originalPrice && (
+                    <span className="text-xl text-gray-500 line-through">
+                      ${plan.originalPrice}
+                    </span>
+                  )}
+                </div>
+                {plan.originalPrice && (
+                  <div className="text-sm text-green-600 font-semibold">
+                    Save ${plan.originalPrice - plan.price}
+                  </div>
                 )}
-                
-                <CardHeader className="text-center pb-4 flex-shrink-0">
-                  <div className="mx-auto mb-4 p-3 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 rounded-full w-16 h-16 flex items-center justify-center">
-                    <Icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <CardTitle className="text-xl">{product.name}</CardTitle>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-2xl font-bold">${product.price}</span>
-                    {product.originalPrice && (
-                      <span className="text-lg text-muted-foreground line-through">
-                        ${product.originalPrice}
-                      </span>
-                    )}
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="flex-grow">
-                  <CardDescription className="text-center mb-4">
-                    {product.description}
-                  </CardDescription>
-                  
-                  <ul className="space-y-2 text-sm">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <Star className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  {plan.description}
+                </p>
+              </CardHeader>
+
+              <CardContent className="flex-1">
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
                         {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                
-                <CardFooter className="flex flex-col gap-2 mt-auto">
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                    size="lg"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                    {cartCount > 0 && (
-                      <Badge variant="secondary" className="ml-2">
-                        {cartCount}
-                      </Badge>
-                    )}
-                  </Button>
-                  
-                  <Button
-                    onClick={() => window.location.href = '/product-info'}
-                    variant="outline"
-                    className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950"
-                    size="lg"
-                  >
-                    Learn More
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  onClick={() => handlePurchase(plan)}
+                  disabled={loading === plan.id}
+                  className={`w-full py-3 font-semibold transition-all duration-300 ${
+                    plan.popular
+                      ? 'bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-lg'
+                      : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'
+                  }`}
+                >
+                  {loading === plan.id ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      Processing...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Get Started
+                    </div>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Checkout Button */}
-        {cartItems.length > 0 && (
-          <div className="text-center">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 px-8 py-3"
-              onClick={() => {
-                console.log('Checkout clicked, cart:', cartItems);
-                if (cartItems.length === 0) {
-                  toast({
-                    title: "Cart is Empty",
-                    description: "Please add items to your cart before checkout.",
-                    variant: "destructive"
-                  });
-                  return;
-                }
-                // Use proper navigation with wouter
-                window.location.pathname = '/checkout';
-              }}
-            >
-              Proceed to Checkout • ${getCartTotal()}
-            </Button>
-          </div>
-        )}
-
-        {/* Trust Indicators */}
-        <div className="mt-16 text-center space-y-4">
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              Secure Checkout
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              Privacy-First
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              No Data Selling
+        {/* Additional Info */}
+        <div className="text-center mt-16">
+          <div className="bg-teal-50 dark:bg-teal-900/20 rounded-xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Why Choose LightPrompt Soul-Tech?
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
+              Our platform combines ancient astrological wisdom with modern AI to provide 
+              precise career guidance. Unlike generic astrology, we focus specifically on 
+              professional alignment and life purpose discovery.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+              <div className="flex flex-col items-center">
+                <CheckCircle className="w-8 h-8 text-teal-500 mb-2" />
+                <span className="font-semibold">Real Astronomical Data</span>
+                <span className="text-gray-500">Live planetary positions</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <CheckCircle className="w-8 h-8 text-teal-500 mb-2" />
+                <span className="font-semibold">AI-Powered Analysis</span>
+                <span className="text-gray-500">GPT-4o Oracle insights</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <CheckCircle className="w-8 h-8 text-teal-500 mb-2" />
+                <span className="font-semibold">Privacy-First</span>
+                <span className="text-gray-500">Your data stays secure</span>
+              </div>
             </div>
           </div>
         </div>

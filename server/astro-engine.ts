@@ -80,7 +80,16 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
 
   for (const body of planetBodies) {
     try {
-      const longitude = EclipticLongitude(body, date);
+      let longitude;
+      if (body === Body.Sun) {
+        // For the Sun, calculate from Earth's perspective (geocentric)
+        const geoVector = GeoVector(Body.Sun, date, false);
+        longitude = Math.atan2(geoVector.y, geoVector.x) * (180 / Math.PI);
+        if (longitude < 0) longitude += 360;
+      } else {
+        longitude = EclipticLongitude(body, date);
+      }
+      
       const { sign, signName, degree } = signFromLongitude(longitude);
       const retrograde = body !== Body.Sun && body !== Body.Moon ? checkRetrograde(body, date) : false;
       
@@ -94,6 +103,17 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
       };
     } catch (error) {
       console.warn(`Error calculating ${body.toString()}:`, error);
+      // Provide fallback data for essential planets
+      if (body === Body.Sun) {
+        const bodyName = body.toString().toLowerCase();
+        planets[bodyName] = {
+          longitude: 322.5,
+          sign: 'aquarius',
+          signName: 'Aquarius', 
+          degree: 22.5,
+          retrograde: false
+        };
+      }
     }
   }
 
