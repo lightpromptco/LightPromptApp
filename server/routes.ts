@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { analyticsRouter } from "./routes/analytics";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
+import pagesRoutes from "./routes/pages";
+import contentRoutes from "./routes/content";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
@@ -17,7 +19,7 @@ import {
 import multer from "multer";
 import { z } from "zod";
 import Stripe from "stripe";
-import { registerContentRoutes } from "./routes/content";
+
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -102,12 +104,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('❌ Failed to create admin user:', error);
     }
   })();
-  
-  // Register content management routes
-  registerContentRoutes(app);
+
   
   // Analytics and admin routes
   app.use('/api', analyticsRouter);
+  
+  // Pages management routes
+  app.use('/api', pagesRoutes);
+  
+  // Content management routes
+  app.use('/api', contentRoutes);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {
