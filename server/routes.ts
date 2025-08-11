@@ -1380,16 +1380,35 @@ Please provide astrological insights based on available data.`;
         return res.status(400).json({ error: "Subscription tier is required" });
       }
 
-      // Map subscription tiers to your Stripe price IDs
-      const tierPricing = {
-        "growth": "price_1QRxXYF3h4T5U6v7X8Y9Z0", // Growth Tier - $29/month (replace with actual price ID)
-        "resonance": "price_1QRxXZF3h4T5U6v7X8Y9Z1", // Resonance Tier - $49/month (replace with actual price ID)
-        "enterprise": "price_1QRxXaF3h4T5U6v7X8Y9Z2" // Enterprise Tier - $199/month (replace with actual price ID)
+      // First, let's try to find the prices dynamically from your products
+      const prices = await stripe.prices.list({
+        active: true,
+        type: 'recurring',
+        expand: ['data.product'],
+      });
+
+      // Map tier names to expected amounts (in cents)
+      const tierAmounts = {
+        "growth": 2900, // $29.00
+        "resonance": 4900, // $49.00  
+        "enterprise": 19900 // $199.00
       };
 
-      const priceId = tierPricing[tier as keyof typeof tierPricing];
-      if (!priceId) {
+      const targetAmount = tierAmounts[tier as keyof typeof tierAmounts];
+      if (!targetAmount) {
         return res.status(400).json({ error: "Invalid subscription tier" });
+      }
+
+      // Find the price that matches our tier amount
+      const matchingPrice = prices.data.find(price => 
+        price.unit_amount === targetAmount && 
+        price.recurring?.interval === 'month'
+      );
+
+      if (!matchingPrice) {
+        return res.status(400).json({ 
+          error: `No matching price found for ${tier} tier ($${targetAmount/100})` 
+        });
       }
 
       const session = await stripe.checkout.sessions.create({
@@ -1397,7 +1416,7 @@ Please provide astrological insights based on available data.`;
         payment_method_types: ['card'],
         line_items: [
           {
-            price: priceId,
+            price: matchingPrice.id,
             quantity: 1,
           },
         ],
