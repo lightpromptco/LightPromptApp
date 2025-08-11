@@ -41,7 +41,12 @@ import {
   Play,
   Send,
   User,
-  Mountain
+  Mountain,
+  Minimize2,
+  Palette,
+  CloudRain,
+  Sunset,
+  Waves
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -294,6 +299,8 @@ const CHART_AREAS = [
 export default function SoulMapExplorerPage() {
   const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('chart');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
+  const [zenMode, setZenMode] = useState(false);
+  const [zenBackground, setZenBackground] = useState<'sunset' | 'ocean' | 'forest' | 'cosmic'>('sunset');
   const [birthData, setBirthData] = useState(() => {
     // Load from localStorage if available
     const saved = localStorage.getItem('lightprompt-birth-data');
@@ -875,34 +882,108 @@ export default function SoulMapExplorerPage() {
     );
   }
 
+  // Zen Mode background styles
+  const getZenBackgroundStyle = () => {
+    const baseStyle = "transition-all duration-1000 ease-in-out";
+    const backgrounds = {
+      sunset: "bg-gradient-to-br from-orange-300 via-pink-300 to-purple-400",
+      ocean: "bg-gradient-to-br from-blue-400 via-cyan-300 to-teal-400", 
+      forest: "bg-gradient-to-br from-green-400 via-emerald-300 to-teal-400",
+      cosmic: "bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600"
+    };
+    
+    if (zenMode) {
+      return `${baseStyle} ${backgrounds[zenBackground]} min-h-screen`;
+    }
+    return baseStyle;
+  };
+
   if (currentView === 'chart') {
     return (
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Header with navigation */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Your Soul Map</h1>
-            <p className="text-muted-foreground">Click any planet or sign to explore deeper</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setCurrentView('chat')}>
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Ask Oracle
-            </Button>
-            <Button variant="outline" onClick={() => setCurrentView('welcome')}>
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Edit Birth Data
-            </Button>
-            <Button variant="outline" onClick={() => {
-              console.log('Debug: Test button clicked');
-              setSelectedPlanet('aries');
-              setCurrentMessage('Tell me about Aries in my birth chart and how it influences my soul journey');
-              console.log('Setting view to chat, current view:', currentView);
-              setCurrentView('chat');
-              console.log('View should now be chat');
-            }}>
-              Test Oracle
-            </Button>
+      <div className={getZenBackgroundStyle()}>
+        <div className="max-w-7xl mx-auto p-6">
+          {/* Header with navigation */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className={`text-3xl font-bold ${zenMode ? 'text-white' : ''}`}>Your Soul Map</h1>
+              <p className={`${zenMode ? 'text-white/80' : 'text-muted-foreground'}`}>
+                Click any planet or sign to explore deeper
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {/* Zen Mode Toggle */}
+              <Button 
+                variant={zenMode ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setZenMode(!zenMode)}
+                className={zenMode ? "bg-white/20 text-white hover:bg-white/30 border-white/30" : ""}
+              >
+                {zenMode ? <Minimize2 className="w-4 h-4 mr-2" /> : <Maximize2 className="w-4 h-4 mr-2" />}
+                {zenMode ? 'Exit Zen' : 'Zen Mode'}
+              </Button>
+              
+              {/* Background Selector (only visible in Zen Mode) */}
+              {zenMode && (
+                <Select value={zenBackground} onValueChange={(value: any) => setZenBackground(value)}>
+                  <SelectTrigger className="w-40 bg-white/20 text-white border-white/30">
+                    <Palette className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sunset">
+                      <div className="flex items-center gap-2">
+                        <Sunset className="w-4 h-4" />
+                        Sunset
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="ocean">
+                      <div className="flex items-center gap-2">
+                        <Waves className="w-4 h-4" />
+                        Ocean
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="forest">
+                      <div className="flex items-center gap-2">
+                        <Mountain className="w-4 h-4" />
+                        Forest
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="cosmic">
+                      <div className="flex items-center gap-2">
+                        <Stars className="w-4 h-4" />
+                        Cosmic
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+              
+              <Button variant="outline" onClick={() => setCurrentView('chat')}>
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Ask Oracle
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentView('welcome')}
+                className={zenMode ? "bg-white/20 text-white border-white/30 hover:bg-white/30" : ""}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Edit Birth Data
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  console.log('Debug: Test button clicked');
+                  setSelectedPlanet('aries');
+                  setCurrentMessage('Tell me about Aries in my birth chart and how it influences my soul journey');
+                  console.log('Setting view to chat, current view:', currentView);
+                  setCurrentView('chat');
+                  console.log('View should now be chat');
+                }}
+                className={zenMode ? "bg-white/20 text-white border-white/30 hover:bg-white/30" : ""}
+              >
+                Test Oracle
+              </Button>
           </div>
         </div>
 
@@ -912,10 +993,12 @@ export default function SoulMapExplorerPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Oracle Chat Quick Actions */}
           <div className="lg:col-span-2">
-            <Card className="p-6 text-center">
+            <Card className={`p-6 text-center ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : ''}`}>
               <CardHeader>
-                <CardTitle>Ask Your Soul Oracle</CardTitle>
-                <p className="text-muted-foreground">Your professional natal chart is displaying above. Click the buttons below to explore deeper insights.</p>
+                <CardTitle className={zenMode ? 'text-white' : ''}>Ask Your Soul Oracle</CardTitle>
+                <p className={zenMode ? 'text-white/80' : 'text-muted-foreground'}>
+                  Your professional natal chart is displaying above. Click the buttons below to explore deeper insights.
+                </p>
               </CardHeader>
               
               <CardContent className="grid grid-cols-2 gap-4">
@@ -925,7 +1008,7 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
                 >
                   🌙 Moon Wisdom
                 </Button>
@@ -935,7 +1018,7 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
                 >
                   🔮 Mayan Sync
                 </Button>
@@ -945,7 +1028,7 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
                 >
                   ⚡ Live Aspects
                 </Button>
@@ -955,7 +1038,7 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
                 >
                   ✨ Daily Guidance
                 </Button>
@@ -966,9 +1049,9 @@ export default function SoulMapExplorerPage() {
           {/* Planet/Sign Details */}
           <div className="space-y-6">
             {selectedPlanet ? (
-              <Card>
+              <Card className={`${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : ''}`}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className={`flex items-center gap-2 ${zenMode ? 'text-white' : ''}`}>
                     {CHART_AREAS.find(p => p.id === selectedPlanet)?.icon && (
                       <div className={CHART_AREAS.find(p => p.id === selectedPlanet)?.color}>
                         {(() => {
@@ -1195,6 +1278,7 @@ export default function SoulMapExplorerPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
       </div>
     );
