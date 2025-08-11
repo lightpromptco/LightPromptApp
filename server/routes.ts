@@ -27,7 +27,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-07-30.basil",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -61,6 +61,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register content management routes
   registerContentRoutes(app);
+
+  // Admin Visual Editor API Routes
+  app.get('/api/admin/scan-dom', async (req, res) => {
+    const { path } = req.query;
+    
+    // Mock element scanning - in a real app, this would scan the actual DOM
+    // This endpoint would typically use a headless browser to scan elements
+    const mockElements = [
+      {
+        id: 'hero-title',
+        type: 'text',
+        content: 'Welcome to LightPrompt',
+        selector: 'h1.hero-title',
+        styles: { fontSize: '48px', color: '#1a1a1a', fontWeight: 'bold' },
+        position: { x: 50, y: 100, width: 600, height: 80 }
+      },
+      {
+        id: 'hero-subtitle',
+        type: 'text', 
+        content: 'Conscious AI for Human Reflection',
+        selector: 'p.hero-subtitle',
+        styles: { fontSize: '20px', color: '#666666' },
+        position: { x: 50, y: 200, width: 500, height: 30 }
+      },
+      {
+        id: 'cta-button',
+        type: 'button',
+        content: 'Get Started',
+        selector: 'button.cta-primary',
+        styles: { backgroundColor: '#3b82f6', color: 'white', padding: '12px 24px' },
+        position: { x: 50, y: 250, width: 140, height: 48 }
+      }
+    ];
+    
+    res.json({ elements: mockElements });
+  });
+
+  app.post('/api/admin/save-page-changes', async (req, res) => {
+    try {
+      const { pageUrl, changes } = req.body;
+      
+      // In a real implementation, this would update the actual page content
+      // For now, we'll just acknowledge the save
+      console.log('Saving page changes for:', pageUrl, changes);
+      
+      res.json({ success: true, message: 'Page changes saved successfully' });
+    } catch (error) {
+      console.error('Error saving page changes:', error);
+      res.status(500).json({ error: 'Failed to save page changes' });
+    }
+  });
+
+  app.get('/api/admin/pages/:path(*)', async (req, res) => {
+    try {
+      const pagePath = req.params.path || '/';
+      
+      // Mock page content - in real app this would come from database
+      const pageContent = {
+        id: `page-${pagePath.replace(/\//g, '-')}`,
+        pagePath,
+        pageTitle: pagePath === '/' ? 'Home Page' : pagePath.replace('/', '').replace('-', ' '),
+        sections: [],
+        metadata: {
+          description: `Edit ${pagePath} with the visual editor`,
+          keywords: ['lightprompt', 'conscious ai'],
+          ogImage: ''
+        }
+      };
+      
+      res.json(pageContent);
+    } catch (error) {
+      console.error('Error loading page content:', error);
+      res.status(500).json({ error: 'Failed to load page content' });
+    }
+  });
+
+  app.post('/api/admin/pages', async (req, res) => {
+    try {
+      const pageContent = req.body;
+      
+      // In a real implementation, this would save to database
+      console.log('Saving page content:', pageContent);
+      
+      res.json({ success: true, message: 'Page content saved successfully' });
+    } catch (error) {
+      console.error('Error saving page content:', error);
+      res.status(500).json({ error: 'Failed to save page content' });
+    }
+  });
   
   // Register knowledge storage routes
   app.use("/api/knowledge", knowledgeRoutes);

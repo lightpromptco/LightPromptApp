@@ -80,7 +80,7 @@ export default function PageEditor() {
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [editorMode, setEditorMode] = useState<'list' | 'visual'>('list');
+  const [editorMode, setEditorMode] = useState<'list' | 'visual'>('visual');
   const { toast } = useToast();
 
   // Check admin access

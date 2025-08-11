@@ -254,7 +254,7 @@ export function MainNavigation() {
                   className="w-full justify-start text-sm"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Page Editor
+                  Universal Visual Editor
                 </Button>
               </Link>
             </div>
