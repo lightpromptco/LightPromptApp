@@ -1422,8 +1422,10 @@ Please provide astrological insights based on available data.`;
             quantity: 1,
           },
         ],
-        success_url: `${req.headers.origin || 'https://localhost:5000'}/dashboard?success=true&tier=${tier}`,
-        cancel_url: `${req.headers.origin || 'https://localhost:5000'}/store?canceled=true`,
+        success_url: `${req.headers.origin || 'http://localhost:5000'}/dashboard?success=true&tier=${tier}`,
+        cancel_url: `${req.headers.origin || 'http://localhost:5000'}/store?canceled=true`,
+        allow_promotion_codes: true,
+        billing_address_collection: 'auto',
         metadata: {
           tier: tier
         }

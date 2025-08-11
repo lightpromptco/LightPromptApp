@@ -125,6 +125,11 @@ export default function Store() {
 
   const handleSubscriptionUpgrade = async (tier: string) => {
     try {
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout...",
+      });
+      
       const response = await fetch('/api/create-subscription-checkout', {
         method: 'POST',
         headers: {
@@ -134,17 +139,19 @@ export default function Store() {
       });
       
       const data = await response.json();
+      console.log('Checkout response:', data);
       
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
+      if (response.ok && data.checkoutUrl) {
+        // Open in new tab to avoid any page loading issues
+        window.open(data.checkoutUrl, '_blank');
       } else {
-        throw new Error('No checkout URL received');
+        throw new Error(data.error || 'No checkout URL received');
       }
     } catch (error) {
       console.error('Subscription error:', error);
       toast({
         title: "Subscription Error",
-        description: "Unable to start subscription. Please try again.",
+        description: `Unable to start subscription: ${error.message}. Please try again or contact support.`,
         variant: "destructive",
       });
     }
