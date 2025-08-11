@@ -56,6 +56,7 @@ import EnhancedPageEditor from "@/pages/admin/enhanced-page-editor";
 import AnalyticsPage from "@/pages/admin/analytics";
 import EmailMarketingAdmin from "@/pages/admin/email-marketing";
 import NotFound from "@/pages/not-found";
+import TermsPage from "@/pages/terms";
 import { useEffect } from "react";
 
 function Router() {
@@ -75,6 +76,11 @@ function Router() {
       <Route path="/privacy" component={() => (
         <MainLayout>
           <PrivacyPage />
+        </MainLayout>
+      )} />
+      <Route path="/terms" component={() => (
+        <MainLayout>
+          <TermsPage />
         </MainLayout>
       )} />
       <Route path="/course-access" component={() => (
