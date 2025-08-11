@@ -514,3 +514,30 @@ function calculateYogas(positions: { [key: string]: { sign: string; degree: numb
   
   return yogas;
 }
+
+// Validate birth data
+export function validateBirthData(birthData: BirthData): { isValid: boolean; errors?: string[] } {
+  const errors: string[] = [];
+  
+  if (!birthData.date) {
+    errors.push('Birth date is required');
+  } else {
+    const date = new Date(birthData.date);
+    if (isNaN(date.getTime())) {
+      errors.push('Invalid birth date format');
+    }
+  }
+  
+  if (birthData.lat !== undefined && (birthData.lat < -90 || birthData.lat > 90)) {
+    errors.push('Latitude must be between -90 and 90');
+  }
+  
+  if (birthData.lng !== undefined && (birthData.lng < -180 || birthData.lng > 180)) {
+    errors.push('Longitude must be between -180 and 180');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors: errors.length > 0 ? errors : undefined
+  };
+}
