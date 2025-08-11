@@ -341,14 +341,46 @@ export default function SoulMapExplorerPage() {
     return 'aquarius'; // default for edge cases
   };
 
-  // Auto-select user's sun sign when birth data is available
+  // State for comprehensive chart data
+  const [chartData, setChartData] = useState<any>(null);
+  const [chartAccuracy, setChartAccuracy] = useState<'high' | 'medium' | 'low'>('medium');
+  const [chartRecommendations, setChartRecommendations] = useState<string[]>([]);
+
+  // Calculate comprehensive astrological chart
   useEffect(() => {
-    if (birthData.date && !selectedPlanet) {
+    if (birthData.date && birthData.lat && birthData.lng) {
+      const calculateChart = async () => {
+        try {
+          const response = await apiRequest('POST', '/api/astrology/chart', { birthData });
+          const data = await response.json();
+          
+          setChartData(data.chart);
+          setChartAccuracy(data.accuracy);
+          setChartRecommendations(data.recommendations);
+          
+          // Auto-select user's sun sign from calculated chart
+          if (data.chart.sun && !selectedPlanet) {
+            setSelectedPlanet(data.chart.sun.sign);
+            console.log(`Auto-selected sun sign from chart: ${data.chart.sun.sign} at ${data.chart.sun.degree}°`);
+          }
+        } catch (error) {
+          console.error('Failed to calculate astrological chart:', error);
+          
+          // Fallback to basic sun sign calculation
+          const sunSign = calculateSunSign(birthData.date);
+          setSelectedPlanet(sunSign);
+          console.log(`Fallback to basic sun sign: ${sunSign} for birth date: ${birthData.date}`);
+        }
+      };
+      
+      calculateChart();
+    } else if (birthData.date && !selectedPlanet) {
+      // Fallback to basic calculation if coordinates missing
       const sunSign = calculateSunSign(birthData.date);
       setSelectedPlanet(sunSign);
-      console.log(`Auto-selected sun sign: ${sunSign} for birth date: ${birthData.date}`);
+      console.log(`Basic sun sign calculation: ${sunSign} for birth date: ${birthData.date}`);
     }
-  }, [birthData.date, selectedPlanet]);
+  }, [birthData.date, birthData.lat, birthData.lng, selectedPlanet]);
 
   // Save birth data to localStorage whenever it changes
   useEffect(() => {

@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
-import { generateBirthChart, calculateCompatibilityScore, getElementMatch } from "./astrology.js";
+// Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
@@ -29,6 +29,35 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-07-30.basil",
 });
+
+// Sun sign compatibility calculation
+function calculateSunSignCompatibility(sign1: string, sign2: string) {
+  const elements = {
+    aries: 'fire', leo: 'fire', sagittarius: 'fire',
+    taurus: 'earth', virgo: 'earth', capricorn: 'earth',
+    gemini: 'air', libra: 'air', aquarius: 'air',
+    cancer: 'water', scorpio: 'water', pisces: 'water'
+  };
+  
+  const element1 = elements[sign1 as keyof typeof elements];
+  const element2 = elements[sign2 as keyof typeof elements];
+  
+  let score = 50;
+  let description = "Moderate Compatibility";
+  
+  if (element1 === element2) {
+    score += 30;
+    description = "High Compatibility";
+  } else if ((element1 === 'fire' && element2 === 'air') || (element1 === 'air' && element2 === 'fire')) {
+    score += 25;
+    description = "Dynamic Compatibility";
+  } else if ((element1 === 'earth' && element2 === 'water') || (element1 === 'water' && element2 === 'earth')) {
+    score += 25;
+    description = "Stable Compatibility";
+  }
+  
+  return { score: Math.min(100, score), description };
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -626,10 +655,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Generate birth chart using astronomical calculations
-      const birthChart = await generateBirthChart({
-        day, month, year, hour, min, lat, lon: longitude, tzone: tzone || 0
-      });
+      // Generate birth chart using comprehensive astrological calculations
+      const { calculateAstrologyChart } = await import('./astrology');
+      const birthData = {
+        date: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+        time: `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`,
+        location: `${lat}, ${longitude}`,
+        lat,
+        lng: longitude
+      };
+      const birthChart = calculateAstrologyChart(birthData);
       
       res.json(birthChart);
     } catch (error) {
@@ -646,9 +681,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { person1, person2, connectionType } = req.body;
       
-      // Calculate basic compatibility score
-      const compatibilityScore = calculateCompatibilityScore(person1, person2);
-      const elementMatch = getElementMatch(person1, person2);
+      // Calculate basic compatibility using sun signs
+      const compatibilityScore = calculateSunSignCompatibility(person1.sunSign, person2.sunSign);
+      const elementMatch = compatibilityScore.description;
       
       // Initialize OpenAI for AI-generated insights
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -692,14 +727,14 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         
         // Combine calculated compatibility with AI insights
         const result = {
-          overall_compatibility: compatibilityScore,
+          overall_compatibility: compatibilityScore.score,
           element_match: elementMatch,
           ...aiInsights
         };
 
         console.log('🔮 Generated astrology compatibility:', {
           connectionType,
-          compatibility: compatibilityScore,
+          compatibility: compatibilityScore.score,
           elementMatch,
           aiGenerated: true
         });
@@ -710,7 +745,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         
         // Fallback to pre-defined insights
         const fallbackInsights = {
-          overall_compatibility: compatibilityScore,
+          overall_compatibility: compatibilityScore.score,
           element_match: elementMatch,
           communication_style: `Based on your ${person1.sunSign} and ${person2.sunSign} combination, you both bring unique strengths to communication. Focus on understanding each other's different approaches and finding common ground.`,
           relationship_activities: [
@@ -735,7 +770,57 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
-  // Oracle chat endpoint for Soul Map Explorer
+  // Get comprehensive astrological chart
+  app.post("/api/astrology/chart", async (req, res) => {
+    try {
+      const { birthData } = req.body;
+      
+      if (!birthData || !birthData.date || !birthData.lat || !birthData.lng) {
+        return res.status(400).json({ error: "Complete birth data (date, latitude, longitude) is required" });
+      }
+
+      const { calculateAstrologyChart, validateBirthData } = await import('./astrology');
+      
+      // Validate birth data
+      const validation = validateBirthData(birthData);
+      if (!validation.isValid) {
+        return res.status(400).json({ error: "Invalid birth data" });
+      }
+
+      // Calculate comprehensive chart
+      const chart = calculateAstrologyChart(birthData);
+      
+      res.json({ 
+        chart,
+        accuracy: validation.accuracy,
+        recommendations: validation.recommendations
+      });
+    } catch (error: any) {
+      console.error("Astrology chart error:", error);
+      res.status(500).json({ error: "Failed to calculate astrological chart" });
+    }
+  });
+
+  // Get detailed interpretation for specific planet/sign combination
+  app.post("/api/astrology/interpret", async (req, res) => {
+    try {
+      const { planet, sign, house } = req.body;
+      
+      if (!planet || !sign) {
+        return res.status(400).json({ error: "Planet and sign are required" });
+      }
+
+      const { getPlanetInterpretation } = await import('./astrology');
+      const interpretation = getPlanetInterpretation(planet, sign, house);
+      
+      res.json({ interpretation });
+    } catch (error: any) {
+      console.error("Astrology interpretation error:", error);
+      res.status(500).json({ error: "Failed to generate interpretation" });
+    }
+  });
+
+  // Oracle chat endpoint for Soul Map Explorer with enhanced astrological context
   app.post("/api/chat/oracle", async (req, res) => {
     try {
       const { message, context, birthData, selectedPlanet } = req.body;
@@ -744,18 +829,51 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         return res.status(400).json({ error: "Message is required" });
       }
 
-      // Enhance user message with birth chart context for more accurate readings
       let enhancedMessage = message;
       
-      if (birthData) {
-        const chartContext = [];
-        if (birthData.date) {
-          // Calculate basic sun sign from birth date
+      if (birthData && birthData.lat && birthData.lng) {
+        try {
+          // Calculate comprehensive astrological chart
+          const { calculateAstrologyChart } = await import('./astrology');
+          const chart = calculateAstrologyChart(birthData);
+          
+          // Build detailed astrological context
+          const chartContext = [
+            `Sun in ${chart.sun.sign.charAt(0).toUpperCase() + chart.sun.sign.slice(1)} ${chart.sun.degree}°`,
+            `Moon in ${chart.moon.sign.charAt(0).toUpperCase() + chart.moon.sign.slice(1)} ${chart.moon.degree}°`,
+            `Rising Sign: ${chart.ascendant.sign.charAt(0).toUpperCase() + chart.ascendant.sign.slice(1)} ${chart.ascendant.degree}°`
+          ];
+          
+          if (chart.sun.house) chartContext.push(`Sun in ${chart.sun.house}${getOrdinalSuffix(chart.sun.house)} house`);
+          if (birthData.time) chartContext.push(`Birth time: ${birthData.time} (houses calculated)`);
+          if (birthData.location) chartContext.push(`Birth location: ${birthData.location}`);
+          
+          // Add major aspects
+          const majorAspects = chart.aspects.filter(a => ['conjunction', 'opposition', 'trine', 'square'].includes(a.aspect));
+          if (majorAspects.length > 0) {
+            chartContext.push(`Major aspects: ${majorAspects.map(a => `${a.planet1}-${a.planet2} ${a.aspect}`).join(', ')}`);
+          }
+          
+          enhancedMessage = `${message}
+
+COMPREHENSIVE BIRTH CHART ANALYSIS:
+${chartContext.join('\n')}
+
+CURRENTLY EXPLORING: ${selectedPlanet || 'general chart exploration'}
+
+ASTROLOGICAL ACCURACY NOTE: This reading is based on calculated planetary positions, houses, and aspects from the exact birth data provided. When discussing signs other than the user's Sun sign, explain how they appear in the chart through other planets, houses, or rising sign.
+
+Please provide detailed astrological insights based on this comprehensive chart data.`;
+
+        } catch (chartError) {
+          console.error("Chart calculation failed, using basic sun sign:", chartError);
+          
+          // Fallback to basic sun sign calculation
           const birthDate = new Date(birthData.date);
           const month = birthDate.getMonth() + 1;
           const day = birthDate.getDate();
           
-          let sunSign = '';
+          let sunSign = 'Unknown';
           if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = 'Aries';
           else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = 'Taurus';
           else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = 'Gemini';
@@ -769,21 +887,12 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
           else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = 'Aquarius';
           else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sunSign = 'Pisces';
           
-          if (sunSign) chartContext.push(`Sun in ${sunSign}`);
-        }
-        
-        if (birthData.time) chartContext.push(`Birth time: ${birthData.time}`);
-        if (birthData.location) chartContext.push(`Birth location: ${birthData.location}`);
-        
-        if (chartContext.length > 0) {
           enhancedMessage = `${message}
 
-BIRTH CHART CONTEXT: ${chartContext.join(', ')}
-CURRENTLY EXPLORING: ${selectedPlanet || 'general chart exploration'}
+BASIC BIRTH DATA: Sun in ${sunSign}, Born: ${birthData.date}, Location: ${birthData.location}
+NOTE: Limited accuracy due to missing birth time or location coordinates.
 
-IMPORTANT: When discussing other signs like Aries, explain how they might appear in OTHER parts of the chart (houses, rising sign, planets) while acknowledging the user's actual Sun sign. Do not confuse the user by suggesting they ARE the sign being explored if it's different from their Sun sign.
-
-Please provide accurate astrological insights based on this birth data.`;
+Please provide astrological insights based on available data.`;
         }
       }
 
@@ -795,6 +904,15 @@ Please provide accurate astrological insights based on this birth data.`;
       res.status(500).json({ error: error.message || "Failed to generate oracle response" });
     }
   });
+
+  function getOrdinalSuffix(num: number): string {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return "st";
+    if (j === 2 && k !== 12) return "nd";  
+    if (j === 3 && k !== 13) return "rd";
+    return "th";
+  }
 
   // Object storage routes for avatars
   app.post("/api/objects/upload", async (req, res) => {
