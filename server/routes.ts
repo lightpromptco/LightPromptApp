@@ -2850,7 +2850,7 @@ Please provide astrological insights based on available data.`;
         return res.status(400).json({ error: 'Missing required fields' });
       }
       
-      // Prepare email content
+      // Prepare email content for internal notification
       const emailContent = `
 New Enterprise Sales Inquiry
 
@@ -2869,17 +2869,41 @@ Sent from LightPrompt Contact Sales Form
 ${new Date().toLocaleString()}
       `.trim();
 
-      // Send email using SendGrid if available
+      // Send internal notification email
       if (process.env.SENDGRID_API_KEY) {
-        const msg = {
+        const internalMsg = {
           to: 'lightprompt.co@gmail.com',
-          from: 'noreply@lightprompt.co', // This should be your verified sender
-          subject: `Enterprise Sales Inquiry - ${company}`,
+          from: {
+            email: 'sales@lightprompt.co',
+            name: 'LightPrompt Sales System'
+          },
+          subject: `🚨 Enterprise Sales Inquiry - ${company}`,
           text: emailContent,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #7c3aed;">New Enterprise Inquiry</h2>
+              <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Company:</strong> ${company}</p>
+                <p><strong>Contact:</strong> ${name}</p>
+                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+                <p><strong>Plan Interest:</strong> ${plan || 'Enterprise'}</p>
+              </div>
+              <div style="background: white; padding: 20px; border-left: 4px solid #7c3aed; margin: 20px 0;">
+                <h3>Message:</h3>
+                <p style="line-height: 1.6;">${message}</p>
+              </div>
+              <p style="font-size: 12px; color: #6b7280;">Submitted: ${new Date().toLocaleString()}</p>
+            </div>
+          `
         };
         
-        await sgMail.send(msg);
-        console.log('✅ Enterprise sales inquiry sent via SendGrid');
+        await sgMail.send(internalMsg);
+        console.log('✅ Enterprise sales inquiry sent to admin');
+
+        // Also send auto-response to customer
+        const { EmailMarketing } = await import('./email-marketing');
+        await EmailMarketing.sendEnterpriseInquiryResponse({ name, email, company, phone, message });
       } else {
         console.log('⚠️ SendGrid not configured, would send:', emailContent);
       }
@@ -3273,6 +3297,62 @@ ${new Date().toLocaleString()}
     } catch (error: any) {
       console.error("Error fetching emotions:", error);
       res.status(500).json({ error: "Failed to fetch emotions" });
+    }
+  });
+
+  // Email marketing endpoints
+  app.post('/api/email/test-configuration', async (req, res) => {
+    try {
+      const { EmailMarketing } = await import('./email-marketing');
+      const result = await EmailMarketing.testEmailConfiguration();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.post('/api/email/welcome', async (req, res) => {
+    try {
+      const { email, name } = req.body;
+      if (!email || !name) {
+        return res.status(400).json({ error: 'Email and name required' });
+      }
+      
+      const { EmailMarketing } = await import('./email-marketing');
+      const success = await EmailMarketing.sendWelcomeEmail(email, name);
+      res.json({ success });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.post('/api/email/subscription-confirmation', async (req, res) => {
+    try {
+      const { email, planDetails } = req.body;
+      if (!email || !planDetails) {
+        return res.status(400).json({ error: 'Email and plan details required' });
+      }
+      
+      const { EmailMarketing } = await import('./email-marketing');
+      const success = await EmailMarketing.sendSubscriptionConfirmation(email, planDetails);
+      res.json({ success });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.post('/api/email/newsletter', async (req, res) => {
+    try {
+      const { subscribers, content } = req.body;
+      if (!subscribers || !content) {
+        return res.status(400).json({ error: 'Subscribers list and content required' });
+      }
+      
+      const { EmailMarketing } = await import('./email-marketing');
+      const success = await EmailMarketing.sendNewsletterToList(subscribers, content);
+      res.json({ success });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 

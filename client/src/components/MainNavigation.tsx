@@ -18,7 +18,8 @@ import {
   ChevronDown,
   ChevronRight,
   GraduationCap,
-  Package
+  Package,
+  Mail
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DevToolsMenu } from "./DevToolsMenu";
@@ -170,6 +171,15 @@ export function MainNavigation() {
                     <div className="text-left">
                       <div className="font-medium">Analytics & Reports</div>
                       <div className="text-xs opacity-70">User metrics & platform insights</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/admin/email-marketing" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-auto p-3">
+                    <Mail className="w-4 h-4 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Email Marketing</div>
+                      <div className="text-xs opacity-70">Campaign management & automation</div>
                     </div>
                   </Button>
                 </Link>

@@ -52,6 +52,7 @@ import SystemStatus from "@/pages/system-status";
 import PageEditor from "@/pages/admin/page-editor";
 import EnhancedPageEditor from "@/pages/admin/enhanced-page-editor";
 import AnalyticsPage from "@/pages/admin/analytics";
+import EmailMarketingAdmin from "@/pages/admin/email-marketing";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -222,6 +223,9 @@ function Router() {
       )} />
       <Route path="/admin/analytics" component={() => (
         <AnalyticsPage />
+      )} />
+      <Route path="/admin/email-marketing" component={() => (
+        <EmailMarketingAdmin />
       )} />
       <Route path="/admin/system" component={SystemStatus} />
       <Route path="/blog" component={() => (
