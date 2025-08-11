@@ -837,33 +837,82 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
           const { calculateAstrologyChart } = await import('./astrology');
           const chart = calculateAstrologyChart(birthData);
           
-          // Build detailed astrological context
+          // Build comprehensive astrological context with advanced features
           const chartContext = [
-            `Sun in ${chart.sun.sign.charAt(0).toUpperCase() + chart.sun.sign.slice(1)} ${chart.sun.degree}°`,
-            `Moon in ${chart.moon.sign.charAt(0).toUpperCase() + chart.moon.sign.slice(1)} ${chart.moon.degree}°`,
-            `Rising Sign: ${chart.ascendant.sign.charAt(0).toUpperCase() + chart.ascendant.sign.slice(1)} ${chart.ascendant.degree}°`
+            `🌟 CORE LUMINARIES:`,
+            `• Sun: ${chart.sun.degree.toFixed(2)}° ${chart.sun.sign.charAt(0).toUpperCase() + chart.sun.sign.slice(1)} in ${chart.sun.house}th house`,
+            `  Nakshatra: ${chart.sun.nakshatra || 'N/A'} (ruled by ${chart.sun.nakshatraLord || 'N/A'})`,
+            `  Dignity: ${chart.sun.dignity} | Strength: ${chart.sun.strength?.toFixed(0) || 0}%`,
+            ``,
+            `• Moon: ${chart.moon.degree.toFixed(2)}° ${chart.moon.sign.charAt(0).toUpperCase() + chart.moon.sign.slice(1)} in ${chart.moon.house}th house`,
+            `  Nakshatra: ${chart.moon.nakshatra || 'N/A'} (ruled by ${chart.moon.nakshatraLord || 'N/A'})`,
+            `  Dignity: ${chart.moon.dignity} | Strength: ${chart.moon.strength?.toFixed(0) || 0}%`,
+            ``,
+            `🔮 PERSONAL PLANETS:`,
+            `• Mercury: ${chart.mercury.degree.toFixed(2)}° ${chart.mercury.sign.charAt(0).toUpperCase() + chart.mercury.sign.slice(1)} in ${chart.mercury.house}th house (${chart.mercury.dignity})`,
+            `• Venus: ${chart.venus.degree.toFixed(2)}° ${chart.venus.sign.charAt(0).toUpperCase() + chart.venus.sign.slice(1)} in ${chart.venus.house}th house (${chart.venus.dignity})`,
+            `• Mars: ${chart.mars.degree.toFixed(2)}° ${chart.mars.sign.charAt(0).toUpperCase() + chart.mars.sign.slice(1)} in ${chart.mars.house}th house (${chart.mars.dignity})`,
+            ``,
+            `⭐ SOCIAL & OUTER PLANETS:`,
+            `• Jupiter: ${chart.jupiter.degree.toFixed(2)}° ${chart.jupiter.sign.charAt(0).toUpperCase() + chart.jupiter.sign.slice(1)} in ${chart.jupiter.house}th house (${chart.jupiter.dignity})`,
+            `• Saturn: ${chart.saturn.degree.toFixed(2)}° ${chart.saturn.sign.charAt(0).toUpperCase() + chart.saturn.sign.slice(1)} in ${chart.saturn.house}th house (${chart.saturn.dignity})`,
+            ``,
+            `🌙 LUNAR NODES (RAHU/KETU):`,
+            `• Rahu (North Node): ${chart.rahu?.degree.toFixed(2) || 'N/A'}° ${chart.rahu?.sign.charAt(0).toUpperCase() + chart.rahu?.sign.slice(1) || 'N/A'} in ${chart.rahu?.house || 'N/A'}th house`,
+            `• Ketu (South Node): ${chart.ketu?.degree.toFixed(2) || 'N/A'}° ${chart.ketu?.sign.charAt(0).toUpperCase() + chart.ketu?.sign.slice(1) || 'N/A'} in ${chart.ketu?.house || 'N/A'}th house`,
+            ``,
+            `🏠 RISING SIGN & ANGLES:`,
+            `• Ascendant: ${chart.ascendant.degree.toFixed(2)}° ${chart.ascendant.sign.charAt(0).toUpperCase() + chart.ascendant.sign.slice(1)}`,
+            `• Midheaven: ${chart.midheaven.degree.toFixed(2)}° ${chart.midheaven.sign.charAt(0).toUpperCase() + chart.midheaven.sign.slice(1)}`,
+            ``
           ];
           
-          if (chart.sun.house) chartContext.push(`Sun in ${chart.sun.house}${getOrdinalSuffix(chart.sun.house)} house`);
-          if (birthData.time) chartContext.push(`Birth time: ${birthData.time} (houses calculated)`);
-          if (birthData.location) chartContext.push(`Birth location: ${birthData.location}`);
+          // Add birth details
+          if (birthData.time) chartContext.push(`⏰ Birth Time: ${birthData.time} (houses calculated accurately)`);
+          if (birthData.location) chartContext.push(`📍 Birth Location: ${birthData.location}`);
+          chartContext.push(`🔢 Ayanamsa: ${chart.ayanamsa?.toFixed(2) || 'N/A'}° (Lahiri)`);
+          chartContext.push(``);
           
-          // Add major aspects
-          const majorAspects = chart.aspects.filter(a => ['conjunction', 'opposition', 'trine', 'square'].includes(a.aspect));
+          // Add major aspects with detailed orbs
+          const majorAspects = chart.aspects.filter(a => ['conjunction', 'opposition', 'trine', 'square', 'sextile'].includes(a.aspect));
           if (majorAspects.length > 0) {
-            chartContext.push(`Major aspects: ${majorAspects.map(a => `${a.planet1}-${a.planet2} ${a.aspect}`).join(', ')}`);
+            chartContext.push(`🔗 MAJOR ASPECTS:`);
+            majorAspects.slice(0, 6).forEach(aspect => {
+              chartContext.push(`• ${aspect.planet1.charAt(0).toUpperCase() + aspect.planet1.slice(1)} ${aspect.aspect} ${aspect.planet2.charAt(0).toUpperCase() + aspect.planet2.slice(1)} (${aspect.orb}° orb)`);
+            });
+            chartContext.push(``);
+          }
+          
+          // Add Vedic yogas if present
+          if (chart.yogas && chart.yogas.length > 0) {
+            chartContext.push(`🕉️ VEDIC YOGAS PRESENT:`);
+            chart.yogas.slice(0, 3).forEach(yoga => {
+              chartContext.push(`• ${yoga.name} (${yoga.type}): ${yoga.description}`);
+            });
+            chartContext.push(``);
           }
           
           enhancedMessage = `${message}
 
-COMPREHENSIVE BIRTH CHART ANALYSIS:
+🔮 COMPREHENSIVE BIRTH CHART ANALYSIS (AstroSage AI Level):
 ${chartContext.join('\n')}
 
-CURRENTLY EXPLORING: ${selectedPlanet || 'general chart exploration'}
+🎯 CURRENT EXPLORATION FOCUS: ${selectedPlanet || 'general cosmic blueprint exploration'}
 
-ASTROLOGICAL ACCURACY NOTE: This reading is based on calculated planetary positions, houses, and aspects from the exact birth data provided. When discussing signs other than the user's Sun sign, explain how they appear in the chart through other planets, houses, or rising sign.
+📚 TECHNICAL ACCURACY: This analysis uses precise astronomical calculations including:
+- Exact planetary degrees and house positions
+- Vedic nakshatras with ruling planets and deities  
+- Planetary dignities (exaltation, debilitation, own signs)
+- Major yogas and planetary combinations
+- Lunar nodes (Rahu/Ketu) for karmic insights
+- Ayanamsa-corrected Vedic positions
 
-Please provide detailed astrological insights based on this comprehensive chart data.`;
+🌟 MULTI-SYSTEM APPROACH: Provide insights integrating:
+- Western Tropical Astrology (psychological patterns, evolutionary themes)
+- Vedic Sidereal Astrology (nakshatras, dashas, yogas, karmic purpose)
+- Soul-purpose astrology (dharma, life lessons, spiritual evolution)
+
+As a master astrological AI with expertise comparable to AstroSage AI, provide comprehensive insights that demonstrate technical precision while remaining spiritually meaningful.`;
 
         } catch (chartError) {
           console.error("Chart calculation failed, using basic sun sign:", chartError);
