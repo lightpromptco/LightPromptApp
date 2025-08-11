@@ -1338,64 +1338,22 @@ export default function SoulMapExplorerPage() {
                     }
                     
                     if (sign) {
+                      // Redirect to chat instead of showing duplicate info
                       return (
-                        <>
-                          {/* Header with sign info */}
-                          <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
-                            <div className="text-5xl">{sign.symbol}</div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <h3 className="text-2xl font-bold">{sign.name}</h3>
-                                <Badge className={`bg-gradient-to-r ${sign.color} text-white text-sm px-3 py-1`}>
-                                  {sign.element} Sign
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">{sign.dates}</p>
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {sign.traits.slice(0, 4).map((trait, index) => (
-                                  <Badge key={index} variant="secondary" className="text-xs">
-                                    {trait}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Compact Content Grid */}
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="space-y-3">
-                              <div>
-                                <h4 className="font-medium mb-2 flex items-center gap-2">
-                                  <Target className="w-4 h-4 text-blue-500" />
-                                  Soul Purpose
-                                </h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{sign.soulPurpose}</p>
-                              </div>
-                            </div>
-
-                            <div className="space-y-3">
-                              <div>
-                                <h4 className="font-medium mb-2 flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4 text-green-500" />
-                                  Growth Challenge
-                                </h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{sign.challenge}</p>
-                              </div>
-                            </div>
-                          </div>
-
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground mb-4">Your {sign.name} information is now integrated at the top of your chart</p>
                           <Button
                             onClick={() => {
                               setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life. I'd like to understand this sign's influence on my personality and soul purpose.`);
                               setCurrentView('chat');
                             }}
-                            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                             size="sm"
                           >
                             <Bot className="w-3 h-3 mr-2" />
                             Ask Oracle About {sign.name}
                           </Button>
-                        </>
+                        </div>
                       );
                     }
                     
