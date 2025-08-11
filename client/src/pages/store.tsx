@@ -136,55 +136,233 @@ export default function Store() {
           </p>
         </div>
 
-        {/* Quick Pricing Overview */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 mb-12 max-w-lg mx-auto">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
-              <div className="flex items-center gap-3">
-                <GraduationCap className="h-5 w-5 text-purple-600" />
-                <span className="font-medium">Course</span>
-              </div>
-              <span className="text-xl font-bold text-purple-600">$120</span>
+        {/* Pricing Tiers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 max-w-7xl mx-auto">
+          {/* Explorer Plan */}
+          <div className="bg-white rounded-lg border-2 border-gray-200 p-6 relative">
+            <h3 className="text-xl font-bold mb-2">Explorer</h3>
+            <p className="text-sm text-gray-600 mb-4">Perfect for discovering your wellness journey</p>
+            <div className="mb-4">
+              <span className="text-3xl font-bold">$0</span>
+              <span className="text-gray-500">/mo</span>
+              <div className="text-sm text-gray-500">Forever free</div>
             </div>
             
-            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-                <span className="font-medium">Ebook</span>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>All Bots: LightPrompt, BodyMirror, WooWoo, GeoPrompt, VisionQuest (within token limits)</span>
               </div>
-              <span className="text-xl font-bold text-blue-600">$11</span>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>5 daily check-ins per month</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>3 custom habits tracking</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Basic WooWoo (astrology, metaphysical wisdom)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Community group access</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>2 wellness patterns per month</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Partner mode preview (1 connection)</span>
+              </div>
             </div>
             
-            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Package className="h-5 w-5 text-green-600" />
-                <span className="font-medium">Bundle</span>
-                <Badge className="bg-teal-500 text-white text-xs">Save $6</Badge>
-              </div>
-              <span className="text-xl font-bold text-green-600">$125</span>
+            <div className="mt-6 text-xs text-gray-500 space-y-1">
+              <div>Monthly tokens: 50</div>
+              <div>AI Bots: 2</div>
+              <div>Daily check-ins: 5/month</div>
+              <div>Habits tracking: 3</div>
+              <div>WooWoo readings: 2/month</div>
+              <div>GeoPrompts: 10/month</div>
             </div>
           </div>
 
-          <div className="mt-6">
-            <h3 className="font-semibold mb-3 text-center">What You Get:</h3>
-            <div className="space-y-1 text-sm text-gray-600">
+          {/* Growth Plan */}
+          <div className="bg-white rounded-lg border-2 border-teal-400 p-6 relative">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <Badge className="bg-teal-500">Popular</Badge>
+            </div>
+            <h3 className="text-xl font-bold mb-2">Growth</h3>
+            <p className="text-sm text-gray-600 mb-4">For those committed to personal transformation</p>
+            <div className="mb-4">
+              <span className="text-3xl font-bold">$29</span>
+              <span className="text-gray-500">/mo</span>
+            </div>
+            
+            <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                <span>7 AI Wellness Companions</span>
+                <span className="text-blue-500">✓</span>
+                <span>All Explorer features</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                <span>Soul Map & Birth Chart Analysis</span>
+                <span className="text-blue-500">✓</span>
+                <span>Access to all specialized bots</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                <span>Conscious AI Guidance</span>
+                <span className="text-blue-500">✓</span>
+                <span>Unlimited habit tracking</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                <span>Lifetime Access & Updates</span>
+                <span className="text-blue-500">✓</span>
+                <span>Advanced wellness patterns</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>VibeMatch community features</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Voice conversations</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Export wellness data</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Full WooWoo birth chart & resources</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Unlimited partner mode connections</span>
               </div>
             </div>
+            
+            <div className="mt-6 text-xs text-gray-500 space-y-1">
+              <div>Monthly tokens: 1,000</div>
+              <div>AI Bots: All</div>
+              <div>Daily check-ins: Unlimited/month</div>
+              <div>Habits tracking: Unlimited</div>
+              <div>WooWoo readings: Unlimited/month</div>
+              <div>GeoPrompts: Unlimited/month</div>
+            </div>
+            
+            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+              Upgrade Now
+            </Button>
+          </div>
+
+          {/* Resonance Plan */}
+          <div className="bg-white rounded-lg border-2 border-gray-200 p-6 relative">
+            <h3 className="text-xl font-bold mb-2">Resonance</h3>
+            <p className="text-sm text-gray-600 mb-4">Deep connection and partnership features</p>
+            <div className="mb-4">
+              <span className="text-3xl font-bold">$49</span>
+              <span className="text-gray-500">/mo</span>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>All Growth features</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Partner Mode (share with loved ones)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Couples wellness tracking</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Advanced AI personality customization</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Priority support</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Early access to new features</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Custom wellness goal setting</span>
+              </div>
+            </div>
+            
+            <div className="mt-6 text-xs text-gray-500 space-y-1">
+              <div>Monthly tokens: 2,500</div>
+              <div>AI Bots: All</div>
+              <div>Daily check-ins: 0/month</div>
+              <div>Habits tracking: 0</div>
+              <div>WooWoo readings: 0/month</div>
+              <div>GeoPrompts: 0/month</div>
+            </div>
+            
+            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+              Upgrade Now
+            </Button>
+          </div>
+
+          {/* Enterprise Plan */}
+          <div className="bg-white rounded-lg border-2 border-gray-200 p-6 relative">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <Badge className="bg-purple-500">Best Value</Badge>
+            </div>
+            <h3 className="text-xl font-bold mb-2">Enterprise</h3>
+            <p className="text-sm text-gray-600 mb-4">For organizations and wellness professionals</p>
+            <div className="mb-4">
+              <span className="text-3xl font-bold">$199</span>
+              <span className="text-gray-500">/mo</span>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>All Resonance features</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Team & organization management</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Custom AI training</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Advanced analytics dashboard</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>API access</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>White-label options</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Dedicated account manager</span>
+              </div>
+            </div>
+            
+            <div className="mt-6 text-xs text-gray-500 space-y-1">
+              <div>Monthly tokens: 10,000</div>
+              <div>AI Bots: All</div>
+              <div>Daily check-ins: 0/month</div>
+              <div>Habits tracking: 0</div>
+              <div>WooWoo readings: 0/month</div>
+              <div>GeoPrompts: 0/month</div>
+            </div>
+            
+            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+              Contact Sales
+            </Button>
           </div>
         </div>
 
