@@ -37,7 +37,8 @@ const NAV_ITEMS = [
     subItems: [
       { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
-      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" }
+      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" },
+      { path: "/dashboard", label: "Body Mirror", icon: Activity, description: "Wellness Overview & Analytics" }
     ]
   },
   { 
@@ -52,13 +53,7 @@ const NAV_ITEMS = [
       { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" }
     ]
   },
-  { 
-    path: "/dashboard", 
-    label: "Dashboard", 
-    icon: Activity, 
-    description: "Your Wellness Overview", 
-    glyph: "⟡"
-  },
+
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
   { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" }
 ];
