@@ -3926,5 +3926,22 @@ ${new Date().toLocaleString()}
     }
   });
 
+  // User profile route for compatibility
+  app.get("/api/users/:userId/profile", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const profile = await storage.getUserProfile(userId);
+      
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("Profile fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
   return httpServer;
 }

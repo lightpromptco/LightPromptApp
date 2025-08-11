@@ -404,10 +404,14 @@ export class SupabaseStorage implements IStorage {
       userId: supabaseProfile.user_id,
       currentMood: supabaseProfile.current_mood,
       moodDescription: supabaseProfile.mood_description,
-      preferences: supabaseProfile.preferences,
-      badges: supabaseProfile.badges,
+      preferences: supabaseProfile.preferences || {},
+      badges: supabaseProfile.badges || {},
       evolutionScore: supabaseProfile.evolution_score,
-      privacySettings: supabaseProfile.privacy_settings,
+      privacySettings: supabaseProfile.privacy_settings || {},
+      soulSyncEnabled: supabaseProfile.soul_sync_enabled,
+      soulSyncVisibility: supabaseProfile.soul_sync_visibility,
+      matchingPreferences: supabaseProfile.matching_preferences || {},
+      birthData: supabaseProfile.birth_data || {},
       updatedAt: new Date(supabaseProfile.updated_at)
     };
   }
@@ -421,6 +425,10 @@ export class SupabaseStorage implements IStorage {
       badges: profile.badges,
       evolution_score: profile.evolutionScore,
       privacy_settings: profile.privacySettings,
+      soul_sync_enabled: profile.soulSyncEnabled,
+      soul_sync_visibility: profile.soulSyncVisibility,
+      matching_preferences: profile.matchingPreferences,
+      birth_data: profile.birthData,
       updated_at: new Date().toISOString()
     };
   }

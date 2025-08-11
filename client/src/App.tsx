@@ -138,26 +138,6 @@ function Router() {
           <GeoPromptPage />
         </MainLayout>
       )} />
-      <Route path="/admin/blog" component={() => (
-        <MainLayout>
-          <AdminBlog />
-        </MainLayout>
-      )} />
-      <Route path="/admin/page-editor" component={() => (
-        <MainLayout>
-          <EnhancedPageEditor />
-        </MainLayout>
-      )} />
-      <Route path="/admin/page-editor-classic" component={() => (
-        <MainLayout>
-          <PageEditor />
-        </MainLayout>
-      )} />
-      <Route path="/admin/universal-editor" component={() => (
-        <MainLayout>
-          <UniversalEditor />
-        </MainLayout>
-      )} />
       <Route path="/blog" component={() => (
         <MainLayout>
           <BlogPage />
@@ -223,12 +203,6 @@ function Router() {
           <AccountSettingsWrapper />
         </MainLayout>
       )} />
-      <Route path="/admin/settings" component={() => (
-        <AdminSettings />
-      )} />
-      <Route path="/admin/knowledge" component={() => (
-        <KnowledgeAdminPage />
-      )} />
       <Route path="/woo-woo" component={() => (
         <MainLayout>
           <WooWooPage />
@@ -252,36 +226,6 @@ function Router() {
       <Route path="/vision-quest/stage/:stageId" component={() => (
         <MainLayout>
           <VisionQuestStagePage />
-        </MainLayout>
-      )} />
-      {/* Admin Routes */}
-      <Route path="/admin" component={() => (
-        <ContentManagement />
-      )} />
-      <Route path="/admin/content" component={() => (
-        <ContentManagement />
-      )} />
-      <Route path="/admin/page-editor" component={() => (
-        <PageEditor />
-      )} />
-      <Route path="/universal-editor" component={() => (
-        <PageEditor />
-      )} />
-      <Route path="/admin/analytics" component={() => (
-        <AnalyticsPage />
-      )} />
-      <Route path="/admin/email-marketing" component={() => (
-        <EmailMarketingAdmin />
-      )} />
-      <Route path="/admin/system" component={SystemStatus} />
-      <Route path="/blog" component={() => (
-        <MainLayout>
-          <BlogPage />
-        </MainLayout>
-      )} />
-      <Route path="/community" component={() => (
-        <MainLayout>
-          <CommunityPage />
         </MainLayout>
       )} />
       <Route path="/soul-sync" component={() => (
