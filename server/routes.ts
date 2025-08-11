@@ -59,6 +59,20 @@ function calculateSunSignCompatibility(sign1: string, sign2: string) {
   return { score: Math.min(100, score), description };
 }
 
+// Helper functions for current astrological data
+function getMoonPhase(date: Date): string {
+  const phases = ['🌑 New Moon', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full Moon', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
+  const dayOfMonth = date.getDate();
+  const phaseIndex = Math.floor((dayOfMonth / 30) * 8) % 8;
+  return phases[phaseIndex];
+}
+
+function getMayanDaySign(date: Date): string {
+  const mayanSigns = ['Imix', 'Ik', 'Akbal', 'Kan', 'Chicchan', 'Cimi', 'Manik', 'Lamat', 'Muluc', 'Oc', 'Chuen', 'Eb', 'Ben', 'Ix', 'Men', 'Cib', 'Caban', 'Etznab', 'Cauac', 'Ahau'];
+  const dayIndex = Math.floor((date.getTime() / (1000 * 60 * 60 * 24)) % 20);
+  return mayanSigns[dayIndex];
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create admin user on startup (only if doesn't exist)
@@ -951,6 +965,26 @@ Please provide astrological insights based on available data.`;
     } catch (error: any) {
       console.error("Oracle chat error:", error);
       res.status(500).json({ error: error.message || "Failed to generate oracle response" });
+    }
+  });
+
+  // Current astrological data endpoint for daily oracle
+  app.get("/api/astrology/current", async (req, res) => {
+    try {
+      const now = new Date();
+      const currentAstroData = {
+        date: now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        time: now.toLocaleTimeString('en-US'),
+        moonPhase: getMoonPhase(now),
+        mayanDaySign: getMayanDaySign(now),
+        dayOfYear: Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)),
+        weekday: now.getDay()
+      };
+
+      res.json(currentAstroData);
+    } catch (error) {
+      console.error('Current astrology data error:', error);
+      res.status(500).json({ error: "Failed to get current astrological data" });
     }
   });
 
