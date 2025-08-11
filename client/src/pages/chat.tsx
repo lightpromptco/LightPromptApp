@@ -9,6 +9,7 @@ import { useCircadian } from '@/hooks/useCircadian';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { LoginModal } from '@/components/LoginModal';
+import QuickDiscordAppleNav from '@/components/QuickDiscordAppleNav';
 import { Link } from 'wouter';
 
 export default function ChatPage() {
@@ -332,6 +333,8 @@ export default function ChatPage() {
           onAvatarUpdate={handleAvatarUpdate}
           onLogout={handleLogout}
         />
+        
+        <QuickDiscordAppleNav />
       </div>
 
 

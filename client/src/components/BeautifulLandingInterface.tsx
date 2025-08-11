@@ -129,21 +129,32 @@ export function BeautifulLandingInterface() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link href="/chat">
+            <Link href="/dev-tools">
               <Button 
                 size="lg" 
-                className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200 shadow-lg"
               >
-                Get started
+                <Terminal className="mr-2 h-5 w-5" />
+                Developer Tools
               </Button>
             </Link>
-            <Link href="/help">
+            <Link href="/community-hub">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-2 border-teal-500 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950 px-8 py-4 rounded-full text-lg font-medium"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Community Hub
+              </Button>
+            </Link>
+            <Link href="/chat">
               <Button 
                 variant="ghost" 
                 size="lg" 
                 className="text-teal-500 hover:text-teal-600 px-8 py-4 text-lg font-medium"
               >
-                Learn more <ChevronRight className="ml-1 h-5 w-5" />
+                Classic Chat <ChevronRight className="ml-1 h-5 w-5" />
               </Button>
             </Link>
           </div>
