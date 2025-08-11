@@ -370,6 +370,9 @@ export default function SoulMapExplorerPage() {
   const [chartData, setChartData] = useState<any>(null);
   const [chartAccuracy, setChartAccuracy] = useState<'high' | 'medium' | 'low'>('medium');
   const [chartRecommendations, setChartRecommendations] = useState<string[]>([]);
+  
+  // State for real astronomical data
+  const [astronomicalData, setAstronomicalData] = useState<any>(null);
 
   // Calculate comprehensive astrological chart
   useEffect(() => {
@@ -406,6 +409,25 @@ export default function SoulMapExplorerPage() {
       console.log(`Basic sun sign calculation: ${sunSign} for birth date: ${birthData.date}`);
     }
   }, [birthData.date, birthData.lat, birthData.lng, selectedPlanet]);
+
+  // Fetch real astronomical data
+  useEffect(() => {
+    const fetchAstronomicalData = async () => {
+      try {
+        const response = await apiRequest('GET', '/api/astro/now');
+        const data = await response.json();
+        setAstronomicalData(data);
+        console.log('🌙 Real astronomical data loaded:', data);
+      } catch (error) {
+        console.error('Failed to fetch astronomical data:', error);
+      }
+    };
+
+    fetchAstronomicalData();
+    // Update every 30 minutes
+    const interval = setInterval(fetchAstronomicalData, 30 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Save birth data to localStorage whenever it changes
   useEffect(() => {
@@ -1088,29 +1110,69 @@ export default function SoulMapExplorerPage() {
               Current Cosmic Weather
             </h3>
             
-            {/* Moon Phase */}
+            {/* Moon Phase - Real Astronomical Data */}
             <div className={`mb-6 p-4 rounded-lg ${zenMode ? 'bg-white/5' : 'bg-white'} border ${zenMode ? 'border-white/10' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{chartData.transits.moonPhase.phase.split(' ')[0]}</span>
+                  <span className="text-2xl">
+                    {astronomicalData?.moon?.emoji || '🌙'}
+                  </span>
                   <span className={`font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>
-                    {chartData.transits.moonPhase.phase.split(' ').slice(1).join(' ')}
+                    {astronomicalData?.moon?.phaseName || 'Loading...'}
                   </span>
                 </div>
                 <span className={`text-sm ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
-                  {chartData.transits.moonPhase.illumination}% illuminated
+                  {astronomicalData?.moon ? 
+                    `${Math.round(astronomicalData.moon.illumination * 100)}% illuminated` : 
+                    'Loading...'
+                  }
                 </span>
               </div>
               <div className={`w-full ${zenMode ? 'bg-white/20' : 'bg-gray-200'} rounded-full h-2`}>
                 <div 
                   className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                  style={{ width: `${chartData.transits.moonPhase.illumination}%` }}
+                  style={{ 
+                    width: astronomicalData?.moon ? 
+                      `${Math.round(astronomicalData.moon.illumination * 100)}%` : 
+                      '50%' 
+                  }}
                 />
               </div>
+              {astronomicalData?.moon && (
+                <div className={`mt-2 text-xs ${zenMode ? 'text-white/60' : 'text-gray-500'}`}>
+                  Moon in {astronomicalData.moon.signName} at {astronomicalData.moon.degree}°
+                </div>
+              )}
             </div>
 
-            {/* Active Transits */}
-            {chartData.transits.activeTransits.length > 0 && (
+            {/* Real Planetary Positions */}
+            {astronomicalData?.planets && (
+              <div>
+                <h4 className={`font-medium mb-3 ${zenMode ? 'text-white' : 'text-gray-800'}`}>
+                  Current Planetary Positions
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(astronomicalData.planets).slice(0, 6).map(([planet, data]: [string, any]) => (
+                    <div 
+                      key={planet} 
+                      className={`p-3 rounded-lg border ${zenMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`text-sm font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>
+                          {data.symbol} {planet.charAt(0).toUpperCase() + planet.slice(1)}
+                        </span>
+                      </div>
+                      <div className={`text-xs ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
+                        {data.signName} {Math.round(data.degree)}°
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback to chart data transits if astronomical data not available */}
+            {!astronomicalData?.planets && chartData?.transits?.activeTransits?.length > 0 && (
               <div>
                 <h4 className={`font-medium mb-3 ${zenMode ? 'text-white' : 'text-gray-800'}`}>
                   Active Planetary Influences
@@ -1152,11 +1214,13 @@ export default function SoulMapExplorerPage() {
               </div>
             )}
 
-            {/* Quick Transit Summary */}
+            {/* Real-time Astronomical Summary */}
             <div className="mt-4 pt-4 border-t border-gray-200/50">
               <p className={`text-sm ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
-                Updated in real-time • Next New Moon: {new Date(chartData.transits.moonPhase.nextNewMoon).toLocaleDateString()} • 
-                Next Full Moon: {new Date(chartData.transits.moonPhase.nextFullMoon).toLocaleDateString()}
+                {astronomicalData ? 
+                  `Live astronomical data • Updated ${new Date().toLocaleTimeString()}` :
+                  'Loading real-time cosmic data...'
+                }
               </p>
             </div>
           </div>

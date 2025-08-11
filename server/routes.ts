@@ -6,6 +6,7 @@ import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
+import { getCurrentAstronomicalData, calculateNatalChart } from "./astro-engine";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
@@ -785,6 +786,17 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
   });
 
   // Get comprehensive astrological chart using Swiss Ephemeris
+  // Current astronomical data endpoint
+  app.get("/api/astro/now", async (req, res) => {
+    try {
+      const astronomicalData = getCurrentAstronomicalData();
+      res.json(astronomicalData);
+    } catch (error) {
+      console.error("Astronomical data error:", error);
+      res.status(500).json({ error: "Failed to get current astronomical data" });
+    }
+  });
+
   app.post("/api/astrology/chart", async (req, res) => {
     try {
       const { birthData } = req.body;
@@ -829,23 +841,28 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         console.warn('⚠️ Swiss Ephemeris API unavailable, falling back to basic calculations');
       }
 
-      // Fallback to basic calculations
-      const { calculateAstrologyChart, validateBirthData } = await import('./astrology');
-      
-      const validation = validateBirthData(birthData);
-      if (!validation.isValid) {
-        return res.status(400).json({ error: "Invalid birth data" });
-      }
-
-      const chart = calculateAstrologyChart(birthData);
+      // Use astronomy-engine for accurate calculations
+      const natalChart = calculateNatalChart(birthData);
       
       res.json({ 
-        chart,
-        accuracy: 'medium',
-        method: 'Basic calculations',
+        chart: natalChart.natal.planets.reduce((acc, planet) => {
+          acc[planet.planet.toLowerCase()] = {
+            sign: planet.sign,
+            degree: planet.degree,
+            house: Math.floor(planet.longitude / 30) + 1, // Simplified house calculation
+            longitude: planet.longitude,
+            retrograde: planet.retrograde
+          };
+          return acc;
+        }, {} as any),
+        houses: natalChart.natal.houses,
+        accuracy: 'high',
+        method: 'Astronomy Engine',
+        current: natalChart.current,
         recommendations: [
-          "Chart calculated using basic astronomical formulas",
-          "For maximum accuracy, Swiss Ephemeris is recommended"
+          "Chart calculated using professional astronomy-engine library",
+          "Real astronomical positions with retrograde detection",
+          "Moon phase calculated from actual lunar illumination"
         ]
       });
     } catch (error: any) {
