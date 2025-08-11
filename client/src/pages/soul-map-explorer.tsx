@@ -1252,111 +1252,107 @@ export default function SoulMapExplorerPage() {
 
           {/* Planet/Sign Details */}
           <div className="space-y-6">
-            {selectedPlanet ? (
-              <Card className={`${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : ''}`}>
-                <CardHeader>
-                  <CardTitle className={`flex items-center gap-2 ${zenMode ? 'text-white' : ''}`}>
-                    {CHART_AREAS.find(p => p.id === selectedPlanet)?.icon && (
-                      <div className={CHART_AREAS.find(p => p.id === selectedPlanet)?.color}>
-                        {(() => {
-                          const Planet = CHART_AREAS.find(p => p.id === selectedPlanet)?.icon;
-                          return Planet ? <Planet className="w-5 h-5" /> : null;
-                        })()}
-                      </div>
-                    )}
-                    {CHART_AREAS.find(p => p.id === selectedPlanet)?.name || 
-                     ZODIAC_SIGNS.find(s => s.id === selectedPlanet)?.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {(() => {
-                    const planet = CHART_AREAS.find(p => p.id === selectedPlanet);
-                    const sign = ZODIAC_SIGNS.find(s => s.id === selectedPlanet);
-                    
-                    if (planet) {
-                      return (
-                        <>
-                          <div className="space-y-3">
-                            <p className="text-sm text-muted-foreground leading-relaxed">{planet.description}</p>
-                            <details className="group">
-                              <summary className="cursor-pointer text-sm font-medium text-purple-600 hover:text-purple-800">
-                                Deep Dive ↓
-                              </summary>
-                              <p className="text-sm text-muted-foreground mt-2 leading-relaxed border-l-2 border-purple-200 pl-3">
-                                {planet.deepDescription}
-                              </p>
-                            </details>
-                          </div>
+            {(() => {
+              // Check if it's a sign (zodiac sign) first, and don't render anything
+              const isSign = ZODIAC_SIGNS.find(s => s.id === selectedPlanet);
+              if (isSign) {
+                return null; // Don't render anything for signs
+              }
 
-                          <div>
-                            <h4 className="font-medium mb-2 flex items-center gap-2">
-                              <Gem className="w-4 h-4 text-purple-500" />
-                              Key Themes
-                            </h4>
-                            <div className="flex flex-wrap gap-1">
-                              {planet.keywords.map((keyword, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {keyword}
-                                </Badge>
-                              ))}
-                            </div>
+              // Only show planets
+              if (selectedPlanet) {
+                const planet = CHART_AREAS.find(p => p.id === selectedPlanet);
+                if (planet) {
+                  return (
+                    <Card className={`${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : ''}`}>
+                      <CardHeader>
+                        <CardTitle className={`flex items-center gap-2 ${zenMode ? 'text-white' : ''}`}>
+                          <div className={planet.color}>
+                            {(() => {
+                              const Planet = planet.icon;
+                              return Planet ? <Planet className="w-5 h-5" /> : null;
+                            })()}
                           </div>
+                          {planet.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-sm text-muted-foreground leading-relaxed">{planet.description}</p>
+                          <details className="group">
+                            <summary className="cursor-pointer text-sm font-medium text-purple-600 hover:text-purple-800">
+                              Deep Dive ↓
+                            </summary>
+                            <p className="text-sm text-muted-foreground mt-2 leading-relaxed border-l-2 border-purple-200 pl-3">
+                              {planet.deepDescription}
+                            </p>
+                          </details>
+                        </div>
 
-                          <div>
-                            <h4 className="font-medium mb-2 flex items-center gap-2">
-                              <BookOpen className="w-4 h-4 text-blue-500" />
-                              House Wisdom
-                            </h4>
-                            <p className="text-sm text-muted-foreground italic">{planet.house}</p>
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center gap-2">
+                            <Gem className="w-4 h-4 text-purple-500" />
+                            Key Themes
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {planet.keywords.map((keyword, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {keyword}
+                              </Badge>
+                            ))}
                           </div>
+                        </div>
 
-                          <div>
-                            <h4 className="font-medium mb-2 flex items-center gap-2">
-                              <Bot className="w-4 h-4 text-purple-500" />
-                              Ask the Oracle
-                            </h4>
-                            <div className="space-y-2">
-                              {planet.questions.map((question, index) => (
-                                <Button
-                                  key={index}
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-left h-auto p-3 justify-start hover:bg-purple-50 hover:border-purple-200"
-                                  onClick={() => {
-                                    setCurrentMessage(question);
-                                    setCurrentView('chat');
-                                  }}
-                                >
-                                  <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0 text-purple-500" />
-                                  <span className="text-xs">{question}</span>
-                                </Button>
-                              ))}
-                            </div>
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-blue-500" />
+                            House Wisdom
+                          </h4>
+                          <p className="text-sm text-muted-foreground italic">{planet.house}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center gap-2">
+                            <Bot className="w-4 h-4 text-purple-500" />
+                            Ask the Oracle
+                          </h4>
+                          <div className="space-y-2">
+                            {planet.questions.map((question, index) => (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                size="sm"
+                                className="w-full text-left h-auto p-3 justify-start hover:bg-purple-50 hover:border-purple-200"
+                                onClick={() => {
+                                  setCurrentMessage(question);
+                                  setCurrentView('chat');
+                                }}
+                              >
+                                <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0 text-purple-500" />
+                                <span className="text-xs">{question}</span>
+                              </Button>
+                            ))}
                           </div>
-                        </>
-                      );
-                    }
-                    
-                    if (sign) {
-                      // Don't show anything for signs - info is integrated at the top
-                      return null;
-                    }
-                    
-                    return null;
-                  })()}
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="text-center p-8">
-                  <Eye className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-semibold mb-2">Explore Your Chart</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Click on any planet or zodiac sign in your chart to discover its meaning in your life.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                }
+              }
+
+              // Default "Explore Your Chart" card when nothing is selected
+              return (
+                <Card>
+                  <CardContent className="text-center p-8">
+                    <Eye className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="font-semibold mb-2">Explore Your Chart</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Click on any planet in your chart to discover its meaning in your life.
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })()}
 
           </div>
         </div>
