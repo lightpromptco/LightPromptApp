@@ -1431,55 +1431,6 @@ export default function SoulMapExplorerPage() {
               </CardContent>
             </Card>
 
-            {/* Quick Oracle Access */}
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
-                  <Bot className="w-5 h-5 text-gray-700" />
-                  Quick Oracle
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
-                    onClick={() => {
-                      setCurrentMessage("What is my soul purpose based on my chart?");
-                      setCurrentView('chat');
-                    }}
-                  >
-                    <Target className="w-3 h-3 mr-2" />
-                    My Soul Purpose
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
-                    onClick={() => {
-                      setCurrentMessage("What are my greatest gifts and how can I use them?");
-                      setCurrentView('chat');
-                    }}
-                  >
-                    <Gem className="w-3 h-3 mr-2" />
-                    My Gifts & Talents
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
-                    onClick={() => {
-                      setCurrentMessage("What challenges am I here to overcome?");
-                      setCurrentView('chat');
-                    }}
-                  >
-                    <TrendingUp className="w-3 h-3 mr-2" />
-                    Growth Challenges
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
         </div>
