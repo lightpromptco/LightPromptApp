@@ -282,19 +282,24 @@ export default function SoulMapExplorerPage() {
     const saved = localStorage.getItem('lightprompt-birth-data');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const data = JSON.parse(saved);
+        console.log('Loaded birth data from localStorage:', data);
+        return data;
       } catch (e) {
         console.log('Failed to parse saved birth data');
       }
     }
-    return {
-      date: '',
+    // Use default test data for testing oracle functionality
+    const defaultData = {
+      date: '1992-02-17',
       time: '',
-      location: '',
+      location: 'Temple, TX, USA',
       name: '',
-      lat: null as number | null,
-      lng: null as number | null
+      lat: 31.0982 as number | null,
+      lng: -97.3428 as number | null
     };
+    console.log('Using default birth data for testing:', defaultData);
+    return defaultData;
   });
   
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{
@@ -942,8 +947,10 @@ export default function SoulMapExplorerPage() {
             <Button variant="outline" onClick={() => {
               console.log('Debug: Test button clicked');
               setSelectedPlanet('aries');
-              setCurrentMessage('Tell me about Aries in my birth chart');
+              setCurrentMessage('Tell me about Aries in my birth chart and how it influences my soul journey');
+              console.log('Setting view to chat, current view:', currentView);
               setCurrentView('chat');
+              console.log('View should now be chat');
             }}>
               Test Oracle
             </Button>
@@ -1186,6 +1193,8 @@ export default function SoulMapExplorerPage() {
   }
 
   if (currentView === 'chat') {
+    console.log('Rendering chat view, messages:', chatMessages);
+    console.log('Current message:', currentMessage);
     return (
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
