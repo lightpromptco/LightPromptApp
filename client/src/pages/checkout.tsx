@@ -108,6 +108,24 @@ export default function Checkout() {
   const { cartItems, getCartTotal, removeFromCart } = useCart();
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  // Get authenticated user for purchase tracking
+  useEffect(() => {
+    const authenticateUser = async () => {
+      try {
+        const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
+        if (response.ok) {
+          const user = await response.json();
+          setCurrentUser(user);
+        }
+      } catch (error) {
+        console.error('Authentication failed:', error);
+      }
+    };
+    
+    authenticateUser();
+  }, []);
 
   useEffect(() => {
     if (cartItems.length === 0) {

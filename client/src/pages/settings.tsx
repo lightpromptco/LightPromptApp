@@ -66,9 +66,43 @@ export default function Settings() {
     queryKey: ['/api/auth/profile', currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return null;
-      const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
-      if (!response.ok) {
-        // Create default profile if doesn't exist
+      try {
+        const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
+        if (!response.ok) {
+          // Create default profile if doesn't exist
+          const createResponse = await fetch('/api/auth/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser.id,
+              soulSyncEnabled: false,
+              soulSyncVisibility: 'private',
+              matchingPreferences: {},
+              privacySettings: {
+                dataSharing: 'private',
+                profileVisibility: 'friends',
+                locationSharing: false,
+                activityVisible: false
+              },
+              preferences: {
+                notifications: {
+                  email: true,
+                  push: true,
+                  soulSyncUpdates: true,
+                  weeklyReports: false
+                },
+                theme: 'auto'
+              }
+            })
+          });
+          if (createResponse.ok) {
+            return await createResponse.json();
+          }
+        }
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        // Return default profile structure
         return {
           userId: currentUser.id,
           soulSyncEnabled: false,

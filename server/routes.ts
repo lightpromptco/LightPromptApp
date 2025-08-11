@@ -86,6 +86,47 @@ function getMayanDaySign(date: Date): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Core user profile and settings endpoints
+  app.get('/api/auth/profile', async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+      
+      const profile = await storage.getUserProfile(userId);
+      res.json(profile);
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+      res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+  });
+
+  app.post('/api/auth/profile', async (req, res) => {
+    try {
+      const profileData = req.body;
+      const profile = await storage.createUserProfile(profileData);
+      res.json(profile);
+    } catch (error) {
+      console.error('Profile creation error:', error);
+      res.status(500).json({ error: 'Failed to create profile' });
+    }
+  });
+
+  app.put('/api/auth/soul-sync-settings', async (req, res) => {
+    try {
+      const { userId, settings } = req.body;
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+      
+      const updatedProfile = await storage.updateUserProfile(userId, settings);
+      res.json(updatedProfile);
+    } catch (error) {
+      console.error('Soul Sync settings update error:', error);
+      res.status(500).json({ error: 'Failed to update Soul Sync settings' });
+    }
+  });
   
   // Create admin user on startup (only if doesn't exist)
   (async () => {
