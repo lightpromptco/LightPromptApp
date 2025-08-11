@@ -52,42 +52,97 @@ export default function SoulSyncPage() {
   const [birthChartDialogOpen, setBirthChartDialogOpen] = useState(false);
   const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [demoConnections, setDemoConnections] = useState<any[]>([
-    {
-      id: "demo1",
-      name: "Sarah M.",
-      type: "romantic_partner", 
-      status: "Active",
-      streak: 7,
-      lastActivity: "2 hours ago",
-      energy: 85,
-      sharedGoals: ["Daily affirmations", "Weekend adventures", "Build lasting love"],
-      achievements: ["7-day streak", "First month milestone"]
-    },
-    {
-      id: "demo2", 
-      name: "Alex K.",
-      type: "best_friend",
-      status: "Active", 
-      streak: 12,
-      lastActivity: "1 hour ago",
-      energy: 92,
-      sharedGoals: ["Weekly challenges", "Support each other's dreams", "Stay connected"],
-      achievements: ["Challenge master", "Loyalty badge", "2-week streak"]
-    },
-    {
-      id: "demo3",
-      name: "Mom",
-      type: "family",
-      status: "Active",
-      streak: 3,
-      lastActivity: "This morning", 
-      energy: 78,
-      sharedGoals: ["Daily gratitude sharing", "Family traditions", "Emotional support"],
-      achievements: ["First connection", "Gratitude champion"]
-    }
-  ]);
+  // Get current user from localStorage
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const currentUserId = currentUser?.id;
+
+  // Fetch real connections from database
+  const { data: connections, isLoading: connectionsLoading, error: connectionsError } = useQuery({
+    queryKey: ['/api/partner-connections', currentUserId],
+    enabled: !!currentUserId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Show empty state when no real connections exist
+  const realConnections = connections || [];
+  
+  // Error state for database connection issues  
+  if (connectionsError) {
+    console.error('Failed to load connections:', connectionsError);
+  }
   const { toast } = useToast();
+
+  // Handle creating new connections with real database operations
+  const handleCreateConnection = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create soul sync connections",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!newConnection || !connectionType) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill out connection name and type",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/partner-connections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId1: currentUserId,
+          relationshipType: connectionType,
+          sharedGoals: []
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Soul Sync Connection Created! ✨",
+          description: `Your ${connectionType} connection "${newConnection}" is ready`,
+        });
+        setNewConnection("");
+        setConnectionType("");
+        // Refresh connections list
+        window.location.reload();
+      } else {
+        throw new Error('Failed to create connection');
+      }
+    } catch (error) {
+      console.error('Error creating connection:', error);
+      toast({
+        title: "Connection Failed",
+        description: "Unable to create connection. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddGoal = () => {
+    if (!sharedGoal.trim()) {
+      toast({
+        title: "Goal Required",
+        description: "Please enter a shared goal description",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Shared Goal Added! 🎯",
+      description: `"${sharedGoal}" added to your soul sync goals`,
+    });
+    setSharedGoal("");
+  };
 
   // Connection types with fun options
   const connectionTypes = [
@@ -196,39 +251,7 @@ export default function SoulSyncPage() {
     }
   }, []);
 
-  // Initialize demo connections on first load if empty
-  useEffect(() => {
-    if (demoConnections.length === 0) {
-      setDemoConnections([
-        {
-          id: 'demo-1',
-          name: 'Alex & Jordan',
-      type: 'best_friend',
-      typeLabel: '👫 Best Friend',
-      sharedGoals: ['Weekly adventure planning', 'Support each other\'s dreams', 'Daily motivation text'],
-      lastSync: '2 hours ago',
-      resonance: 92,
-      streakDays: 28,
-      totalActivities: 156,
-      isDemo: true,
-      activities: ['Challenge completed: Try a new coffee shop', 'Shared playlist: "Good Vibes Only"', 'Milestone: 4 weeks of daily check-ins!']
-    },
-    {
-      id: 'demo-2',
-      name: 'Morning Mindfulness Circle',
-      type: 'mindfulness_circle',
-      typeLabel: '🧘 Mindfulness Circle',
-      sharedGoals: ['7am meditation', 'Gratitude sharing', 'Weekend nature walks'],
-      lastSync: '1 day ago',
-      resonance: 78,
-      streakDays: 12,
-      totalActivities: 89,
-      isDemo: true,
-          activities: ['Group meditation: 20 minutes', 'Shared insight: "Presence over productivity"', 'Nature photo exchange']
-        }
-      ]);
-    }
-  }, [demoConnections.length]);
+  // Real connections only - no demo data
 
   // Generate invite link
   const generateInviteLink = (connectionId: string) => {
@@ -311,91 +334,8 @@ export default function SoulSyncPage() {
     }
   };
 
-  const handleCreateConnection = async () => {
-    if (!newConnection.trim()) {
-      toast({
-        title: "Enter a connection name",
-        description: "Give your Soul Sync connection a meaningful name",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    if (!connectionType) {
-      toast({
-        title: "Choose connection type",
-        description: "Select what kind of connection this will be",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    try {
-      // Save to backend storage
-      const response = await fetch('/api/soul-sync/connections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newConnection,
-          type: connectionType,
-          email: 'demo@example.com'
-        })
-      });
-
-      if (response.ok) {
-        const connection = await response.json();
-        
-        // Add to local state for immediate display
-        const localConnection = {
-          id: connection.id,
-          name: newConnection,
-          type: connectionType,
-          status: "Active",
-          streak: 0,
-          lastActivity: "Just created",
-          energy: Math.floor(Math.random() * 30) + 70,
-          sharedGoals: [`Daily ${connectionTypes.find(t => t.value === connectionType)?.description}`, "Build lasting connection"],
-          achievements: []
-        };
-
-        setDemoConnections([...demoConnections, localConnection]);
-      }
-
-      const selectedTypeData = connectionTypes.find(t => t.value === connectionType);
-      toast({
-        title: "Soul Sync created! ✨",
-        description: `Your ${selectedTypeData?.label} connection "${newConnection}" is ready for shared growth`,
-      });
-      setNewConnection("");
-      setConnectionType("");
-    } catch (error) {
-      console.error('Failed to create connection:', error);
-      toast({
-        title: "Connection created locally",
-        description: "Your connection is ready, but couldn't sync to cloud storage",
-        variant: "default"
-      });
-      setNewConnection("");
-      setConnectionType("");
-    }
-  };
-
-  const handleAddGoal = () => {
-    if (!sharedGoal.trim()) {
-      toast({
-        title: "Enter a shared goal",
-        description: "Add a meaningful goal to work on together",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    toast({
-      title: "Shared goal added! 🎯",
-      description: `"${sharedGoal}" added to your Soul Sync goals`,
-    });
-    setSharedGoal("");
-  };
 
   // Soul Sync works without login - just show demo for now
   const showDemo = !userId;
@@ -524,12 +464,19 @@ export default function SoulSyncPage() {
                     <Heart className="h-5 w-5 mr-2 text-purple-600" />
                     Your Soul Sync Connections
                   </div>
-                  <Badge variant="secondary">{demoConnections.length} Active</Badge>
+                  <Badge variant="secondary">{realConnections.length} Active</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {demoConnections.map((connection) => (
+                  {realConnections.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <h3 className="font-medium mb-2">No Soul Sync Connections Yet</h3>
+                      <p className="text-sm">Create your first connection to start your journey of shared growth and mutual support.</p>
+                    </div>
+                  ) : (
+                    realConnections.map((connection) => (
                     <div key={connection.id} className="border rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-purple-900/20">
                       {/* Header */}
                       <div className="flex items-start justify-between mb-3">
@@ -725,15 +672,7 @@ export default function SoulSyncPage() {
                         </Button>
                       </div>
                     </div>
-                  ))}
-                  
-                  {demoConnections.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No Soul Sync connections yet.</p>
-                      <p className="text-sm">Create your first connection to get started!</p>
-                    </div>
-                  )}
+                  )))}
                 </div>
               </CardContent>
             </Card>

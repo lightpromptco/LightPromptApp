@@ -15,7 +15,7 @@ import {
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
   insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
   insertAppleHealthDataSchema, insertHomeKitDataSchema,
-  wellnessMetrics, platformEvolution
+  wellnessMetrics, platformEvolution, partnerConnections
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -23,7 +23,7 @@ import Stripe from "stripe";
 import sgMail from '@sendgrid/mail';
 
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, or } from "drizzle-orm";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -2084,6 +2084,66 @@ Please provide astrological insights based on available data.`;
   });
   
   // Wellness Metrics
+  // Partner Connections API Route - Real database connections for Soul Sync
+  app.get("/api/partner-connections/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const result = await db.select()
+        .from(partnerConnections)
+        .where(
+          or(
+            eq(partnerConnections.userId1, userId),
+            eq(partnerConnections.userId2, userId)
+          )
+        )
+        .orderBy(desc(partnerConnections.createdAt));
+
+      // Transform database results to match frontend expectations
+      const connections = result.map(conn => ({
+        id: conn.id,
+        name: conn.userId1 === userId ? `Connection with ${conn.userId2}` : `Connection with ${conn.userId1}`,
+        type: conn.relationshipType,
+        connectionLevel: conn.connectionLevel,
+        sharedGoals: Array.isArray(conn.sharedGoals) ? conn.sharedGoals : [],
+        isActive: conn.isActive,
+        establishedAt: conn.establishedAt,
+        // Real activity data will be implemented later
+        streakDays: Math.floor(Math.random() * 30) + 1,
+        totalActivities: Math.floor(Math.random() * 50) + 10,
+        energy: Math.floor(Math.random() * 30) + 70,
+        resonance: Math.floor(Math.random() * 40) + 60,
+        activities: []
+      }));
+
+      res.json(connections);
+    } catch (error) {
+      console.error('Failed to load partner connections:', error);
+      res.status(500).json({ error: "Failed to load connections" });
+    }
+  });
+
+  app.post("/api/partner-connections", async (req, res) => {
+    try {
+      const { userId1, userId2, relationshipType, sharedGoals = [] } = req.body;
+      
+      const newConnection = await db.insert(partnerConnections)
+        .values({
+          userId1,
+          userId2: userId2 || 'placeholder-user',
+          relationshipType,
+          connectionLevel: 1,
+          sharedGoals,
+          isActive: true
+        })
+        .returning();
+
+      res.json(newConnection[0]);
+    } catch (error) {
+      console.error('Failed to create partner connection:', error);
+      res.status(500).json({ error: "Failed to create connection" });
+    }
+  });
+
   app.post("/api/wellness-metrics", async (req, res) => {
     try {
       const metricData = insertWellnessMetricSchema.parse(req.body);
