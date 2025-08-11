@@ -1128,16 +1128,17 @@ export default function SoulMapExplorerPage() {
             )}
 
             {/* Daily Oracle Link */}
-            <Card>
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
-                  <Sparkles className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Daily Oracle</h3>
-                <p className="text-gray-600 mb-4">Get your personalized cosmic guidance for today</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Daily Oracle</h3>
+                <p className="text-sm text-gray-600 mb-4">Get your personalized cosmic guidance for today</p>
                 <Button 
                   onClick={() => window.location.href = '/daily-oracle'}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2"
+                  size="sm"
                 >
                   Get Daily Guidance
                 </Button>
@@ -1145,10 +1146,10 @@ export default function SoulMapExplorerPage() {
             </Card>
 
             {/* Quick Oracle Access */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-amber-500" />
+            <Card className="bg-white border-gray-200 shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
+                  <Bot className="w-5 h-5 text-gray-700" />
                   Quick Oracle
                 </CardTitle>
               </CardHeader>
@@ -1157,7 +1158,7 @@ export default function SoulMapExplorerPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                       setCurrentMessage("What is my soul purpose based on my chart?");
                       setCurrentView('chat');
@@ -1169,7 +1170,7 @@ export default function SoulMapExplorerPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                       setCurrentMessage("What are my greatest gifts and how can I use them?");
                       setCurrentView('chat');
@@ -1181,7 +1182,7 @@ export default function SoulMapExplorerPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm border-gray-200 text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                       setCurrentMessage("What challenges am I here to overcome?");
                       setCurrentView('chat');

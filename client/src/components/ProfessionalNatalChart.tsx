@@ -365,7 +365,7 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
                       const totalDegree = (signIndex * 30) + (planet.degree % 30);
                       const angle = totalDegree - 90;
                       const radian = (angle * Math.PI) / 180;
-                      const radius = 155 - (i * 3); // Adjusted to stay within bounds, less staggering
+                      const radius = 150 - (i * 2); // Further adjusted to prevent cut-off
                       const x = 200 + Math.cos(radian) * radius;
                       const y = 200 + Math.sin(radian) * radius;
                       
@@ -386,7 +386,6 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
                             textAnchor="middle"
                             dominantBaseline="central"
                             className="text-base font-bold fill-indigo-600 select-none"
-                            title={`${planet.planet} in ${planet.sign} at ${formatDegree(planet.degree)} - House ${planet.house}`}
                           >
                             {planet.symbol}
                           </text>
