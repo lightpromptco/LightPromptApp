@@ -50,7 +50,8 @@ Domain transition: Moving to lightprompt.co as main landing page.
 ### UI/UX Decisions
 - Clean, minimalist aesthetic with Apple-style modern structure and teal accents.
 - Stripe-style navigation focusing on e-commerce.
-- The platform adopts a purple/blue gradient theme for a mystical, soul-tech aesthetic where applicable.
+- The platform now uses clean white/gray/amber color schemes for a professional, accessible aesthetic.
+- Daily Oracle redesigned with modern white/amber gradient design, accessible at `/daily-oracle` standalone page.
 - Admin panel at `/admin/content` for editing pages, images, and fonts.
 - `/admin/settings` provides a developer mode toggle for `lightprompt.co@gmail.com` for Wix.com-style editing capabilities.
 

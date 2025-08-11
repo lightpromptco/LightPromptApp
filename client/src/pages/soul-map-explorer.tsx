@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ModernDailyOracle } from "@/components/ModernDailyOracle";
+// Removed ModernDailyOracle import - now using standalone page
 
 // Soul-tech helper functions
 const getCurrentMoonPhase = () => {
@@ -1335,8 +1335,22 @@ export default function SoulMapExplorerPage() {
               </Card>
             )}
 
-            {/* Modern Daily Oracle */}
-            <ModernDailyOracle birthData={birthData} />
+            {/* Daily Oracle Link */}
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Daily Oracle</h3>
+                <p className="text-gray-600 mb-4">Get your personalized cosmic guidance for today</p>
+                <Button 
+                  onClick={() => window.location.href = '/daily-oracle'}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                >
+                  Get Daily Guidance
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Quick Oracle Access */}
             <Card>
