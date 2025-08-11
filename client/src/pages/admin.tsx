@@ -10,7 +10,7 @@ import {
   CheckCircle, Database, Bot, Crown, Home, LogOut, 
   BarChart3, Users, Settings, Code, Search, Eye, Terminal, Activity, 
   FileText, Map, Palette, Layout, Zap, TrendingUp, DollarSign, MessageSquare,
-  Cpu, HardDrive, Globe, Clock, UserCheck, Brain
+  Cpu, HardDrive, Globe, Clock, UserCheck, Brain, CreditCard
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -265,7 +265,7 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-                      <p className="text-3xl font-bold">{userMetrics?.totalUsers || 0}</p>
+                      <p className="text-3xl font-bold">{(userMetrics as any)?.totalUsers || 0}</p>
                     </div>
                     <Users className="w-8 h-8 text-blue-500" />
                   </div>
@@ -277,7 +277,7 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Sessions</p>
-                      <p className="text-3xl font-bold">{analyticsData?.activeSessions || 0}</p>
+                      <p className="text-3xl font-bold">{(analyticsData as any)?.activeSessions || 0}</p>
                     </div>
                     <Activity className="w-8 h-8 text-green-500" />
                   </div>
@@ -289,7 +289,7 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Messages Today</p>
-                      <p className="text-3xl font-bold">{analyticsData?.messagesTotal || 0}</p>
+                      <p className="text-3xl font-bold">{(analyticsData as any)?.messagesTotal || 0}</p>
                     </div>
                     <MessageSquare className="w-8 h-8 text-purple-500" />
                   </div>
@@ -301,7 +301,7 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">System Health</p>
-                      <p className="text-3xl font-bold">{systemHealth?.overallScore || 100}%</p>
+                      <p className="text-3xl font-bold">{(systemHealth as any)?.overallScore || 100}%</p>
                     </div>
                     <Cpu className="w-8 h-8 text-orange-500" />
                   </div>
@@ -319,14 +319,14 @@ export default function AdminPage() {
                     <div>
                       <div className="flex justify-between text-sm">
                         <span>New Users</span>
-                        <span>{userMetrics?.newUsers || 0}</span>
+                        <span>{(userMetrics as any)?.newUsers || 0}</span>
                       </div>
                       <Progress value={65} className="mt-2" />
                     </div>
                     <div>
                       <div className="flex justify-between text-sm">
                         <span>Returning Users</span>
-                        <span>{userMetrics?.returningUsers || 0}</span>
+                        <span>{(userMetrics as any)?.returningUsers || 0}</span>
                       </div>
                       <Progress value={78} className="mt-2" />
                     </div>
@@ -343,7 +343,7 @@ export default function AdminPage() {
                     <div>
                       <div className="flex justify-between text-sm">
                         <span>API Response Time</span>
-                        <span>{systemHealth?.apiResponseTime || 245}ms</span>
+                        <span>{(systemHealth as any)?.apiResponseTime || 245}ms</span>
                       </div>
                       <Progress value={82} className="mt-2" />
                     </div>
