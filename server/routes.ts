@@ -2869,7 +2869,16 @@ Sent from LightPrompt Contact Sales Form
 ${new Date().toLocaleString()}
       `.trim();
 
-      // Send internal notification email
+      // Add to ConvertKit enterprise sequence
+      try {
+        const { EmailMarketing } = await import('./convertkit');
+        const emailService = new EmailMarketing();
+        await emailService.handleEnterpriseInquiry(email, company, message);
+      } catch (emailError: any) {
+        console.error('ConvertKit enterprise inquiry error:', emailError);
+      }
+
+      // Send internal notification email (legacy SendGrid fallback)
       if (process.env.SENDGRID_API_KEY) {
         const internalMsg = {
           to: 'lightprompt.co@gmail.com',
