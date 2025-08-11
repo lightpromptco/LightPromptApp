@@ -50,19 +50,32 @@ export default function PageEditor() {
   const [previewMode, setPreviewMode] = useState(false);
   const { toast } = useToast();
 
-  // Check if user is admin
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const isAdmin = currentUser.email === 'lightprompt.co@gmail.com';
+  // Check if user is admin - support both admin mode and regular user login
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!isAdmin) {
-      toast({
-        title: "Access Denied",
-        description: "Universal Editor requires admin access.",
-        variant: "destructive"
-      });
-    }
-  }, [isAdmin, toast]);
+    const checkAdminAccess = () => {
+      // Check admin mode first
+      const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
+      const adminUser = JSON.parse(localStorage.getItem('lightprompt-admin-user') || 'null');
+      
+      if (isAdminMode && adminUser && adminUser.email === 'lightprompt.co@gmail.com') {
+        setIsAdmin(true);
+        return;
+      }
+      
+      // Fallback to regular user check
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (currentUser.email === 'lightprompt.co@gmail.com') {
+        setIsAdmin(true);
+        return;
+      }
+      
+      setIsAdmin(false);
+    };
+    
+    checkAdminAccess();
+  }, []);
 
   const addSection = (type: PageSection['type']) => {
     const newSection: PageSection = {
@@ -252,9 +265,15 @@ export default function PageEditor() {
           <CardContent className="p-8 text-center">
             <Settings className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-semibold mb-2">Access Restricted</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               The Universal Editor requires admin access. Please sign in as an administrator to continue.
             </p>
+            <Button 
+              onClick={() => window.location.href = '/admin'}
+              className="mt-2"
+            >
+              Go to Admin Login
+            </Button>
           </CardContent>
         </Card>
       </div>
