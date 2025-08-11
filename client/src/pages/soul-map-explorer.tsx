@@ -1338,23 +1338,8 @@ export default function SoulMapExplorerPage() {
                     }
                     
                     if (sign) {
-                      // Redirect to chat instead of showing duplicate info
-                      return (
-                        <div className="text-center py-8">
-                          <p className="text-muted-foreground mb-4">Your {sign.name} information is now integrated at the top of your chart</p>
-                          <Button
-                            onClick={() => {
-                              setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life. I'd like to understand this sign's influence on my personality and soul purpose.`);
-                              setCurrentView('chat');
-                            }}
-                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                            size="sm"
-                          >
-                            <Bot className="w-3 h-3 mr-2" />
-                            Ask Oracle About {sign.name}
-                          </Button>
-                        </div>
-                      );
+                      // Don't show anything for signs - info is integrated at the top
+                      return null;
                     }
                     
                     return null;
