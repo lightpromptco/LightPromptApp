@@ -41,6 +41,8 @@ Domain transition: Moving to lightprompt.co as main landing page.
 
 ### AI and Voice Processing
 - **Language Model**: OpenAI GPT-4o with multiple bot personalities and system prompts
+- **Soul Map Oracle**: Expert astrology AI with traditional Western astrology knowledge, psychological astrology, and soul-purpose readings
+- **Astrological Accuracy**: Precise sun sign calculation from birth dates, established astrological traditions (Ptolemy, Steven Forrest, Dane Rudhyar)
 - **Voice Features**: Browser-based voice recording with OpenAI Whisper transcription and text-to-speech
 - **Sentiment Analysis**: Real-time sentiment analysis for conversation tone
 - **Bot System**: Multiple specialized AI bots with distinct personalities
@@ -53,6 +55,8 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - `/admin/settings` provides a developer mode toggle for `lightprompt.co@gmail.com` for Wix.com-style editing capabilities.
 
 ### Feature Specifications
+- **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses
+- **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings
 - **Store Experience**: Redesigned for clear customer journey from "Learn More" to product information pages (`/product-info`).
 - **Vision Quest**: Rebuilt with white/black/teal color scheme, featuring interactive challenges with detailed steps and completion tracking.
 - **Soul Sync**: Free access, includes 10 connection types, invite link system, custom activities, streak tracking, and achievements.
