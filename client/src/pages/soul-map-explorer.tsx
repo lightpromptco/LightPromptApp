@@ -277,12 +277,34 @@ const CHART_AREAS = [
 export default function SoulMapExplorerPage() {
   const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('welcome');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
-  const [birthData, setBirthData] = useState({
-    date: '',
-    time: '',
-    location: '',
-    name: ''
+  const [birthData, setBirthData] = useState(() => {
+    // Load from localStorage if available
+    const saved = localStorage.getItem('lightprompt-birth-data');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.log('Failed to parse saved birth data');
+      }
+    }
+    return {
+      date: '',
+      time: '',
+      location: '',
+      name: '',
+      lat: null as number | null,
+      lng: null as number | null
+    };
   });
+  
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{
+    name: string;
+    lat: number;
+    lng: number;
+    country: string;
+  }>>([]);
+  
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     {
       role: 'assistant',
@@ -292,6 +314,72 @@ export default function SoulMapExplorerPage() {
   const [currentMessage, setCurrentMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+
+  // Save birth data to localStorage whenever it changes
+  useEffect(() => {
+    if (birthData.date || birthData.time || birthData.location || birthData.name) {
+      localStorage.setItem('lightprompt-birth-data', JSON.stringify(birthData));
+    }
+  }, [birthData]);
+
+  // Location search function
+  const searchLocations = async (query: string) => {
+    if (query.length < 3) {
+      setLocationSuggestions([]);
+      setShowLocationDropdown(false);
+      return;
+    }
+
+    try {
+      // Using a free geocoding service
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=demo&limit=5&pretty=1&no_annotations=1`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        const suggestions = data.results.map((result: any) => ({
+          name: result.formatted,
+          lat: result.geometry.lat,
+          lng: result.geometry.lng,
+          country: result.components.country || ''
+        }));
+        setLocationSuggestions(suggestions);
+        setShowLocationDropdown(true);
+      }
+    } catch (error) {
+      console.log('Location search failed, using fallback');
+      // Fallback to some common locations
+      const commonLocations = [
+        { name: 'New York, NY, USA', lat: 40.7128, lng: -74.0060, country: 'USA' },
+        { name: 'Los Angeles, CA, USA', lat: 34.0522, lng: -118.2437, country: 'USA' },
+        { name: 'London, UK', lat: 51.5074, lng: -0.1278, country: 'UK' },
+        { name: 'Tokyo, Japan', lat: 35.6762, lng: 139.6503, country: 'Japan' },
+        { name: 'Sydney, Australia', lat: -33.8688, lng: 151.2093, country: 'Australia' }
+      ].filter(loc => loc.name.toLowerCase().includes(query.toLowerCase()));
+      
+      setLocationSuggestions(commonLocations);
+      setShowLocationDropdown(commonLocations.length > 0);
+    }
+  };
+
+  // Handle location input change
+  const handleLocationChange = (value: string) => {
+    setBirthData((prev: typeof birthData) => ({ ...prev, location: value }));
+    searchLocations(value);
+  };
+
+  // Handle location selection
+  const selectLocation = (location: typeof locationSuggestions[0]) => {
+    setBirthData((prev: typeof birthData) => ({
+      ...prev,
+      location: location.name,
+      lat: location.lat,
+      lng: location.lng
+    }));
+    setShowLocationDropdown(false);
+    setLocationSuggestions([]);
+  };
 
   // Interactive chart component
   const InteractiveChart = () => (
@@ -434,7 +522,7 @@ export default function SoulMapExplorerPage() {
                 type="date"
                 placeholder="Birth Date"
                 value={birthData.date}
-                onChange={(e) => setBirthData(prev => ({ ...prev, date: e.target.value }))}
+                onChange={(e) => setBirthData((prev: typeof birthData) => ({ ...prev, date: e.target.value }))}
               />
             </div>
             <div>
@@ -442,15 +530,42 @@ export default function SoulMapExplorerPage() {
                 type="time"
                 placeholder="Birth Time (if known)"
                 value={birthData.time}
-                onChange={(e) => setBirthData(prev => ({ ...prev, time: e.target.value }))}
+                onChange={(e) => setBirthData((prev: typeof birthData) => ({ ...prev, time: e.target.value }))}
               />
             </div>
-            <div>
+            <div className="relative">
               <Input
                 placeholder="Birth Location (City, Country)"
                 value={birthData.location}
-                onChange={(e) => setBirthData(prev => ({ ...prev, location: e.target.value }))}
+                onChange={(e) => handleLocationChange(e.target.value)}
+                onFocus={() => {
+                  if (birthData.location.length >= 3) {
+                    searchLocations(birthData.location);
+                  }
+                }}
+                onBlur={() => {
+                  // Delay hiding dropdown to allow clicks
+                  setTimeout(() => setShowLocationDropdown(false), 200);
+                }}
               />
+              
+              {/* Location dropdown */}
+              {showLocationDropdown && locationSuggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  {locationSuggestions.map((location, index) => (
+                    <button
+                      key={index}
+                      className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none text-sm"
+                      onClick={() => selectLocation(location)}
+                    >
+                      <div className="font-medium">{location.name}</div>
+                      {location.country && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{location.country}</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <Button 
               onClick={() => setCurrentView('chart')} 
