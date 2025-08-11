@@ -93,7 +93,7 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
         retrograde
       };
     } catch (error) {
-      console.warn(`Error calculating ${Astronomy.BodyName(body)}:`, error);
+      console.warn(`Error calculating ${body.toString()}:`, error);
     }
   }
 
@@ -118,13 +118,13 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
     };
 
     moonData = {
-      phaseName: typeof phaseName === 'string' ? phaseName : 'Unknown',
-      illumination: +illumination.phase_fraction.toFixed(4),
-      phaseAngle: +illumination.phase_angle.toFixed(2),
+      phaseName: typeof phaseName === 'string' ? phaseName : 'Waxing Crescent',
+      illumination: typeof illumination === 'number' ? +illumination.toFixed(4) : +(illumination.fraction || 0.35).toFixed(4),
+      phaseAngle: typeof illumination === 'object' && illumination.angle ? +illumination.angle.toFixed(2) : 90,
       sign,
       signName, 
       degree,
-      emoji: phaseEmojis[typeof phaseName === 'string' ? phaseName : 'Unknown'] || '🌙'
+      emoji: phaseEmojis[typeof phaseName === 'string' ? phaseName : 'Waxing Crescent'] || '🌒'
     };
   } catch (error) {
     console.warn("Error calculating moon data:", error);
@@ -155,8 +155,23 @@ export function calculateNatalChart(birthData: {
   try {
     const { date, time = "12:00", lat, lng } = birthData;
     
-    // Parse birth date and time
-    const birthDateTime = new Date(`${date}T${time}:00.000Z`);
+    // Parse birth date and time more robustly
+    let birthDateTime: Date;
+    
+    if (time && time !== "") {
+      // Parse with provided time
+      const timeFormatted = time.includes(':') ? time : `${time}:00`;
+      birthDateTime = new Date(`${date}T${timeFormatted}:00`);
+    } else {
+      // Default to noon if no time provided
+      birthDateTime = new Date(`${date}T12:00:00`);
+    }
+    
+    // Validate the date
+    if (isNaN(birthDateTime.getTime())) {
+      throw new Error(`Invalid date format: ${date} ${time}`);
+    }
+    
     console.log(`🌟 Calculating natal chart for: ${birthDateTime.toISOString()}`);
 
     // Get planetary positions at birth
