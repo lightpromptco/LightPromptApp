@@ -38,7 +38,8 @@ import {
   Compass,
   Lightbulb,
   MessageSquare,
-  Activity
+  Activity,
+  Mail
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -63,14 +64,14 @@ export default function SoulSyncPage() {
   const currentUserId = currentUser?.id;
 
   // Fetch real connections from database
-  const { data: connections, isLoading: connectionsLoading, error: connectionsError } = useQuery({
+  const { data: connections, isLoading: connectionsLoading, error: connectionsError, refetch } = useQuery({
     queryKey: ['/api/partner-connections', currentUserId],
     enabled: !!currentUserId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Show empty state when no real connections exist
-  const realConnections = connections || [];
+  const realConnections = (connections as any[]) || [];
   
   // Error state for database connection issues  
   if (connectionsError) {
@@ -80,13 +81,30 @@ export default function SoulSyncPage() {
 
   // Handle creating new connections with real database operations
   const handleCreateConnection = async () => {
-    if (!currentUserId) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to create soul sync connections",
-        variant: "destructive",
-      });
-      return;
+    // Create anonymous user if none exists
+    let userId = currentUserId;
+    if (!userId) {
+      try {
+        const tempUser = {
+          id: `temp_${Date.now()}`,
+          email: `temp_${Date.now()}@lightprompt.co`,
+          name: `Soul Seeker ${Math.floor(Math.random() * 1000)}`,
+        };
+        localStorage.setItem('currentUser', JSON.stringify(tempUser));
+        userId = tempUser.id;
+        
+        toast({
+          title: "Welcome! 🌟",
+          description: "Created temporary profile for Soul Sync exploration",
+        });
+      } catch (error) {
+        toast({
+          title: "Setup Error",
+          description: "Unable to initialize Soul Sync. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (!newConnection || !connectionType) {
@@ -105,7 +123,7 @@ export default function SoulSyncPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId1: currentUserId,
+          userId1: userId,
           name: newConnection,
           relationshipType: connectionType,
           sharedGoals: []
@@ -120,7 +138,11 @@ export default function SoulSyncPage() {
         setNewConnection("");
         setConnectionType("");
         // Refresh connections list
-        window.location.reload();
+        refetch();
+        // Also update localStorage with the new user if it was temporary
+        if (!currentUserId) {
+          window.location.reload();
+        }
       } else {
         throw new Error('Failed to create connection');
       }
@@ -145,7 +167,7 @@ export default function SoulSyncPage() {
     }
 
     // Use the first connection if no specific connection provided
-    const targetConnectionId = connectionId || connections[0]?.id;
+    const targetConnectionId = connectionId || (connections as any[])?.[0]?.id;
     
     if (!targetConnectionId) {
       toast({
@@ -543,7 +565,7 @@ export default function SoulSyncPage() {
                     rows={3}
                   />
                 </div>
-                <Button onClick={handleAddGoal} className="w-full">
+                <Button onClick={() => handleAddGoal()} className="w-full">
                   <Target className="h-4 w-4 mr-2" />
                   Add Shared Goal
                 </Button>
