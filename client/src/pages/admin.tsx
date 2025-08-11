@@ -24,9 +24,19 @@ export default function AdminPage() {
 
   useEffect(() => {
     const isAdminMode = localStorage.getItem('lightprompt-admin-mode') === 'true';
-    if (isAdminMode) {
-      setIsLoggedIn(true);
-      loadAdminData();
+    const storedAdminData = localStorage.getItem('lightprompt-admin-user');
+    
+    if (isAdminMode && storedAdminData) {
+      try {
+        const adminUser = JSON.parse(storedAdminData);
+        setIsLoggedIn(true);
+        setAdminData(adminUser);
+        loadAdminData(); // Refresh data
+      } catch (error) {
+        console.error('Error parsing stored admin data:', error);
+        localStorage.removeItem('lightprompt-admin-mode');
+        localStorage.removeItem('lightprompt-admin-user');
+      }
     }
   }, []);
 
@@ -59,13 +69,17 @@ export default function AdminPage() {
   });
 
   const handleLogin = async () => {
-    if (email === 'lightprompt.co@gmail.com' && password === 'lightprompt2025') {
+    const validCodes = ['lightprompt2025', 'godmode', 'highest-self'];
+    
+    if (email === 'lightprompt.co@gmail.com' && validCodes.includes(password)) {
       try {
         const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
         if (response.ok) {
+          const adminUser = await response.json();
           localStorage.setItem('lightprompt-admin-mode', 'true');
+          localStorage.setItem('lightprompt-admin-user', JSON.stringify(adminUser));
           setIsLoggedIn(true);
-          loadAdminData();
+          setAdminData(adminUser);
           toast({
             title: "Admin Access Granted",
             description: "Welcome to LightPrompt Admin Portal",
@@ -73,21 +87,22 @@ export default function AdminPage() {
         } else {
           toast({
             title: "Admin Account Not Found",
-            description: "Make sure you've run the Supabase SQL script to create the admin account.",
+            description: "Admin account not found in database.",
             variant: "destructive",
           });
         }
       } catch (error) {
+        console.error('Admin login error:', error);
         toast({
           title: "Connection Error",
-          description: "Could not connect to the database. Check if Supabase is configured properly.",
+          description: "Could not connect to the database.",
           variant: "destructive",
         });
       }
     } else {
       toast({
         title: "Access Denied",
-        description: "Invalid email or password.",
+        description: "Invalid admin credentials.",
         variant: "destructive",
       });
     }
@@ -95,6 +110,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('lightprompt-admin-mode');
+    localStorage.removeItem('lightprompt-admin-user');
     setIsLoggedIn(false);
     setAdminData(null);
     setEmail('');
