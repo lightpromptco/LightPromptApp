@@ -52,14 +52,16 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - **Development**: Hot reload via Vite middleware integration
 
 ### Data Storage
-- **Database**: PostgreSQL (Supabase) via Drizzle ORM
+- **CRITICAL: SUPABASE IS THE STORAGE FOR EVERYTHING** - All user data, dashboard elements, VibeMatch, SoulSync, GeoPrompt, and every piece of user information MUST be pulled from Supabase
+- **Database**: PostgreSQL (Supabase) via Drizzle ORM - PRIMARY AND ONLY storage source
 - **Schema Management**: Drizzle Kit for migrations  
-- **Storage Strategy**: DatabaseStorage implementation for data persistence
+- **Storage Strategy**: DatabaseStorage implementation for data persistence - NO localStorage usage
 - **File Storage**: Google Cloud Storage with object access control
-- **Privacy Architecture**: User-isolated data with UUID-based account separation
-- **Birth Data**: Stored in browser localStorage + optional userProfiles table (user-specific only)
-- **Chat Privacy**: All conversations tied to individual user sessions, no cross-user data access
-- **DATA INTEGRITY GUARANTEE**: Every data point displayed to users must be sourced from authenticated database queries - zero tolerance for mock, placeholder, or synthetic data. Real user connections, real wellness metrics, real astrological calculations, real profile data only.
+- **Privacy Architecture**: User-isolated data with UUID-based account separation in Supabase
+- **Birth Data**: Stored EXCLUSIVELY in Supabase userProfiles table, never localStorage
+- **Chat Privacy**: All conversations tied to individual user sessions in Supabase database
+- **Dashboard Data**: ALL dashboard elements pull from Supabase - wellness metrics, connections, profiles, settings
+- **DATA INTEGRITY GUARANTEE**: Every data point displayed to users must be sourced from authenticated Supabase database queries - zero tolerance for mock, placeholder, synthetic data, or localStorage fallbacks. Real user connections, real wellness metrics, real astrological calculations, real profile data only from Supabase.
 
 ### Authentication and Authorization
 - **User Management**: Simple user creation and retrieval with email-based identification

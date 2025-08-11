@@ -115,7 +115,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   })();
 
   
-  // Register authentication routes for Supabase integration
+  // Import and register authentication routes for Supabase integration
+  const { registerAuthRoutes } = await import('./routes/auth');
   registerAuthRoutes(app);
   
   // Analytics and admin routes
