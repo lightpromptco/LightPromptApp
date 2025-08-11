@@ -407,12 +407,30 @@ export default function SoulMapExplorerPage() {
     }
   }, [birthData.date, birthData.lat, birthData.lng, selectedPlanet]);
 
-  // Save birth data to localStorage whenever it changes
+  // Save birth data to Supabase whenever it changes - NEVER localStorage
   useEffect(() => {
     if (birthData.date || birthData.time || birthData.location || birthData.name) {
-      localStorage.setItem('lightprompt-birth-data', JSON.stringify(birthData));
+      const saveBirthDataToSupabase = async () => {
+        try {
+          const response = await fetch('/api/auth/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser?.id,
+              birthData: birthData,
+            }),
+          });
+          if (response.ok) {
+            console.log('Birth data saved to Supabase database');
+          }
+        } catch (error) {
+          console.error('Failed to save birth data to Supabase:', error);
+        }
+      };
+      
+      saveBirthDataToSupabase();
     }
-  }, [birthData]);
+  }, [birthData, currentUser?.id]);
 
   // Location search function
   const searchLocations = async (query: string) => {
