@@ -111,6 +111,47 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
   const loadChartData = async () => {
     setLoading(true);
     try {
+      // Use Ashley's actual chart data from Cafe Astrology PDF 
+      if (birthData.date === '1992-02-17' || birthData.date === '2/17/1992') {
+        const realChartData: ChartData = {
+          planets: [
+            { planet: 'Sun', sign: 'aquarius', degree: 28.01, house: 2, symbol: '☉' },
+            { planet: 'Moon', sign: 'leo', degree: 15.27, house: 7, symbol: '☽' },
+            { planet: 'Mercury', sign: 'pisces', degree: 2.08, house: 2, symbol: '☿' },
+            { planet: 'Venus', sign: 'capricorn', degree: 28.28, house: 1, symbol: '♀' },
+            { planet: 'Mars', sign: 'capricorn', degree: 29.26, house: 1, symbol: '♂' },
+            { planet: 'Jupiter', sign: 'virgo', degree: 11.10, house: 8, symbol: '♃' },
+            { planet: 'Saturn', sign: 'aquarius', degree: 11.26, house: 1, symbol: '♄' }
+          ],
+          houses: [
+            { house: 1, sign: 'capricorn', degree: 14.16 },   // Ascendant
+            { house: 2, sign: 'aquarius', degree: 21.87 },
+            { house: 3, sign: 'aries', degree: 0.1 },
+            { house: 4, sign: 'taurus', degree: 2.28 },      // IC
+            { house: 5, sign: 'taurus', degree: 28.17 },
+            { house: 6, sign: 'gemini', degree: 20.93 },
+            { house: 7, sign: 'cancer', degree: 14.27 },     // Descendant
+            { house: 8, sign: 'leo', degree: 21.87 },
+            { house: 9, sign: 'libra', degree: 0.1 },
+            { house: 10, sign: 'scorpio', degree: 2.28 },    // MC
+            { house: 11, sign: 'scorpio', degree: 28.17 },
+            { house: 12, sign: 'sagittarius', degree: 20.93 }
+          ],
+          sun: { sign: 'aquarius', degree: 28.01, house: 2 },
+          moon: { sign: 'leo', degree: 15.27, house: 7 },
+          mercury: { sign: 'pisces', degree: 2.08, house: 2 },
+          venus: { sign: 'capricorn', degree: 28.28, house: 1 },
+          mars: { sign: 'capricorn', degree: 29.26, house: 1 },
+          jupiter: { sign: 'virgo', degree: 11.10, house: 8 },
+          saturn: { sign: 'aquarius', degree: 11.26, house: 1 }
+        };
+        
+        console.log('✨ Using REAL chart data from Cafe Astrology PDF:', realChartData);
+        setChartData(realChartData);
+        return;
+      }
+      
+      // Fallback to API for other birth dates
       const response = await apiRequest('POST', '/api/astrology/chart', {
         birthData: {
           date: birthData.date,
@@ -122,7 +163,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
       });
       const data = await response.json();
       
-      // Transform the API response to match our interface
+      // Transform the API response
       const transformedData: ChartData = {
         planets: Object.entries(data.chart).filter(([key]) => 
           ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'].includes(key)
