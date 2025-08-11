@@ -764,9 +764,9 @@ Guidelines:
 
 Remember: You are a mirror oracle helping them discover what they already know deep within.`;
 
-      const response = await generateBotResponse("oracle", message, [], oracleContext);
+      const response = await generateBotResponse("soulmap", message, []);
       
-      res.json({ response });
+      res.json({ response: response.content });
     } catch (error: any) {
       console.error("Oracle chat error:", error);
       res.status(500).json({ error: error.message || "Failed to generate oracle response" });

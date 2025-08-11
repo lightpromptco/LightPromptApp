@@ -678,7 +678,11 @@ export default function SoulMapExplorerPage() {
                 key={sign.id}
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                 style={{ left: `${x}%`, top: `${y}%` }}
-                onClick={() => setSelectedPlanet(sign.id)}
+                onClick={() => {
+                  setSelectedPlanet(sign.id);
+                  setCurrentMessage(`Tell me about ${sign.name} in my birth chart and how it influences my soul journey`);
+                  setCurrentView('chat');
+                }}
               >
                 <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${sign.color} shadow-2xl flex items-center justify-center text-white text-2xl font-bold transform transition-all duration-500 hover:scale-125 hover:rotate-12 border-2 border-teal-200/40 ${selectedPlanet === sign.id ? 'ring-4 ring-teal-400/80 scale-125 shadow-teal-400/50' : ''}`}>
                   {/* Glowing effect */}
@@ -702,7 +706,11 @@ export default function SoulMapExplorerPage() {
                 key={planet.id}
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                 style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
-                onClick={() => setSelectedPlanet(planet.id)}
+                onClick={() => {
+                  setSelectedPlanet(planet.id);
+                  setCurrentMessage(`Tell me about ${planet.name} in my birth chart and how it shapes my cosmic blueprint`);
+                  setCurrentView('chat');
+                }}
               >
                 <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl flex items-center justify-center transform transition-all duration-500 hover:scale-125 hover:-translate-y-1 border-2 border-teal-400/40 ${selectedPlanet === planet.id ? 'ring-4 ring-teal-400/80 scale-125 shadow-teal-400/50' : ''}`}>
                   {/* Planet glow effect */}
@@ -776,7 +784,7 @@ export default function SoulMapExplorerPage() {
     
     setIsGenerating(true);
     try {
-      const response = await apiRequest('POST', '/api/chat/soulmap', {
+      const response = await apiRequest('POST', '/api/chat/oracle', {
         message: userMessage,
         context: 'soul_map_exploration',
         birthData,
