@@ -18,54 +18,70 @@ interface PricingPlan {
 
 const pricingPlans: PricingPlan[] = [
   {
-    id: 'course',
-    name: 'Soul Map & Cosmos Course',
-    price: 120,
-    description: 'Complete astrological career guidance course with lifetime access',
+    id: 'explorer',
+    name: 'Explorer',
+    price: 0,
+    description: 'Perfect for discovering your wellness journey',
     features: [
-      'Complete career astrology curriculum',
-      'Interactive birth chart analysis',
-      'Personalized career path guidance',
-      'VibeMatch compatibility scoring',
-      'SoulSync alignment tools',
-      'Lifetime platform access',
-      'Premium Oracle consultations',
-      'Career timing insights'
+      '5 free SoulSync connections',
+      'All LightPrompt bots access',
+      'Basic astrology wisdom',
+      'Community group access',
+      '2 wellness patterns per month',
+      'Partner mode preview (1 connection)'
     ],
-    stripePriceId: 'price_course_120'
+    stripePriceId: 'price_explorer_free'
   },
   {
-    id: 'ebook',
-    name: 'Digital Guidebook',
-    price: 11,
-    description: 'Essential astrological career insights in digital format',
+    id: 'growth',
+    name: 'Growth',
+    price: 29,
+    description: 'For those committed to personal transformation',
     features: [
-      'Comprehensive career astrology guide',
-      'Downloadable PDF format',
-      'Quick reference charts',
-      'Basic compatibility insights',
-      'Self-guided exercises'
-    ],
-    stripePriceId: 'price_ebook_11'
-  },
-  {
-    id: 'bundle',
-    name: 'Complete Soul-Tech Bundle',
-    price: 125,
-    originalPrice: 224,
-    description: 'Everything you need for conscious career transformation',
-    features: [
-      'Full course access',
-      'Digital guidebook included',
-      'Premium Oracle unlimited access',
-      'Advanced VibeMatch scoring',
-      'Priority support',
-      'Bonus cosmic weather updates',
-      'Early access to new features',
-      'Lifetime updates'
+      'All Explorer features',
+      'Access to all specialized bots',
+      'Unlimited habit tracking',
+      'Advanced wellness patterns',
+      'VibeMatch community features',
+      'Voice conversations',
+      'Export wellness data',
+      'Full birth chart & resources',
+      'Unlimited partner mode connections'
     ],
     popular: true,
-    stripePriceId: 'price_bundle_125'
+    stripePriceId: 'price_growth_29'
+  },
+  {
+    id: 'resonance',
+    name: 'Resonance',
+    price: 49,
+    description: 'Deep connection and partnership features',
+    features: [
+      'All Growth features',
+      'Partner Mode (share with loved ones)',
+      'Couples wellness tracking',
+      'Advanced AI personality customization',
+      'Priority support',
+      'Early access to new features',
+      'Custom wellness goal setting'
+    ],
+    stripePriceId: 'price_resonance_49'
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 199,
+    description: 'For organizations and wellness professionals',
+    features: [
+      'All Resonance features',
+      'Team & organization management',
+      'Custom AI training',
+      'Advanced analytics dashboard',
+      'API access',
+      'White-label options',
+      'Dedicated account manager'
+    ],
+    stripePriceId: 'price_enterprise_199'
   }
 ];
 
@@ -74,22 +90,30 @@ export default function Store() {
   const { toast } = useToast();
 
   const handlePurchase = async (plan: PricingPlan) => {
+    if (plan.price === 0) {
+      // Handle free tier signup
+      toast({
+        title: 'Welcome to Explorer!',
+        description: 'You now have access to all Explorer features.',
+      });
+      return;
+    }
+
     setLoading(plan.id);
     try {
-      const response = await fetch('/api/create-payment-intent', {
+      const response = await fetch('/api/create-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: plan.price,
-          productName: plan.name,
-          priceId: plan.stripePriceId
+          priceId: plan.stripePriceId,
+          planName: plan.name
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Payment setup failed');
+        throw new Error('Subscription setup failed');
       }
 
       const { clientSecret } = await response.json();
@@ -151,6 +175,9 @@ export default function Store() {
                   <span className="text-4xl font-bold text-teal-600">
                     ${plan.price}
                   </span>
+                  {plan.price > 0 && (
+                    <span className="text-lg text-gray-500">/mo</span>
+                  )}
                   {plan.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">
                       ${plan.originalPrice}

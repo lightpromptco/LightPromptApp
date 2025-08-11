@@ -42,7 +42,7 @@ import CommunityPage from "@/pages/community";
 import SoulSyncPage from "@/pages/soul-sync";
 import StorePage from "@/pages/store";
 import CheckoutPage from "@/pages/checkout";
-import CheckoutSuccess from "@/pages/checkout/success";
+import PaymentSuccessPage from "@/pages/payment-success";
 import { SimpleOraclePage } from "@/pages/simple-oracle";
 import CleanOraclePage from "@/pages/clean-oracle";
 import NotFound from "@/pages/not-found";
@@ -229,17 +229,12 @@ function Router() {
           <ProductInfo />
         </MainLayout>
       )} />
-      <Route path="/checkout" component={() => (
+      <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/payment-success" component={() => (
         <MainLayout>
-          <CheckoutPage />
+          <PaymentSuccessPage />
         </MainLayout>
       )} />
-      <Route path="/checkout/success" component={() => (
-        <MainLayout>
-          <CheckoutSuccess />
-        </MainLayout>
-      )} />
-      <Route path="/checkout/success" component={() => <CheckoutSuccess />} />
       <Route component={NotFound} />
     </Switch>
   );

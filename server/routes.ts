@@ -3173,6 +3173,41 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Stripe subscription route
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      const { priceId, planName } = req.body;
+      
+      // Create a customer first
+      const customer = await stripe.customers.create({
+        metadata: {
+          planName: planName
+        }
+      });
+
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.payment_intent']
+      });
+
+      const invoice = subscription.latest_invoice as any;
+      const paymentIntent = invoice.payment_intent;
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        subscriptionId: subscription.id,
+        customerId: customer.id
+      });
+    } catch (error: any) {
+      console.error("Subscription creation error:", error);
+      res.status(500).json({ message: "Error creating subscription: " + error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

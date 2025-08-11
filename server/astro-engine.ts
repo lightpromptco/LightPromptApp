@@ -82,10 +82,9 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
     try {
       let longitude;
       if (body === Body.Sun) {
-        // For the Sun, calculate from Earth's perspective (geocentric)
-        const geoVector = GeoVector(Body.Sun, date, false);
-        longitude = Math.atan2(geoVector.y, geoVector.x) * (180 / Math.PI);
-        if (longitude < 0) longitude += 360;
+        // For the Sun, use a simpler geocentric calculation
+        const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 1).getTime()) / (24 * 60 * 60 * 1000));
+        longitude = (dayOfYear * 360 / 365.25 + 280) % 360;
       } else {
         longitude = EclipticLongitude(body, date);
       }
