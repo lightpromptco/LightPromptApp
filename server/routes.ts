@@ -227,20 +227,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const pagePath = req.params.path || '/';
       
-      // Mock page content - in real app this would come from database
-      const pageContent = {
-        id: `page-${pagePath.replace(/\//g, '-')}`,
-        pagePath,
-        pageTitle: pagePath === '/' ? 'Home Page' : pagePath.replace('/', '').replace('-', ' '),
-        sections: [],
-        metadata: {
-          description: `Edit ${pagePath} with the visual editor`,
-          keywords: ['lightprompt', 'conscious ai'],
-          ogImage: ''
-        }
-      };
+      // Fetch real page content from the pages database
+      const { default: pagesRoutes } = await import('./routes/pages');
       
-      res.json(pageContent);
+      // Get the real pages data
+      const response = await fetch(`http://localhost:${process.env.PORT || 5000}/api/pages`);
+      const pages = response.ok ? await response.json() : [];
+      
+      // Find the page that matches the path
+      const page = pages.find((p: any) => p.route === pagePath || p.id === pagePath.replace('/', ''));
+      
+      if (page) {
+        const pageContent = {
+          id: page.id,
+          pagePath: page.route,
+          pageTitle: page.title,
+          sections: page.sections || [],
+          metadata: {
+            description: page.description,
+            keywords: ['lightprompt', 'conscious ai'],
+            ogImage: ''
+          },
+          globalStyles: page.globalStyles || {}
+        };
+        res.json(pageContent);
+      } else {
+        res.status(404).json({ error: 'Page not found' });
+      }
     } catch (error) {
       console.error('Error loading page content:', error);
       res.status(500).json({ error: 'Failed to load page content' });
