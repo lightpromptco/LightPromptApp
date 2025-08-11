@@ -1329,6 +1329,7 @@ Please provide astrological insights based on available data.`;
         const paymentIntent = await stripe.paymentIntents.create({
           amount: plan.amount,
           currency: "usd",
+          payment_method_types: ['card'], // Only allow cards to avoid showing unconfigured payment methods
           metadata: {
             userId,
             planId,
@@ -1350,6 +1351,7 @@ Please provide astrological insights based on available data.`;
         const paymentIntent = await stripe.paymentIntents.create({
           amount: Math.round(amount * 100), // Convert to cents
           currency: "usd",
+          payment_method_types: ['card'], // Only allow cards to avoid showing unconfigured payment methods
           metadata: {
             items: JSON.stringify(items || [])
           }

@@ -67,7 +67,24 @@ function CheckoutForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+      <div className="space-y-4">
+        <PaymentElement options={{
+          fields: {
+            billingDetails: 'auto'
+          }
+        }} />
+        
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Lock className="h-3 w-3" />
+            <span>256-bit SSL encrypted</span>
+          </div>
+          <span>•</span>
+          <span>Powered by Stripe</span>
+          <span>•</span>
+          <span>PCI DSS compliant</span>
+        </div>
+      </div>
       
       <Button
         type="submit"
@@ -78,6 +95,11 @@ function CheckoutForm() {
         <Lock className="h-4 w-4 mr-2" />
         {isProcessing ? 'Processing...' : `Complete Purchase • $${getCartTotal()}`}
       </Button>
+      
+      <p className="text-xs text-center text-muted-foreground">
+        By completing your purchase, you agree to our terms of service and privacy policy.
+        You will receive immediate access to your digital products.
+      </p>
     </form>
   );
 }
@@ -225,11 +247,19 @@ export default function Checkout() {
               <CardHeader>
                 <CardTitle>Payment Details</CardTitle>
                 <CardDescription>
-                  Your payment information is secure and encrypted
+                  Your payment information is secure and encrypted. We accept all major credit and debit cards.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <Elements stripe={stripePromise} options={{ 
+                  clientSecret,
+                  appearance: {
+                    theme: 'stripe',
+                    variables: {
+                      colorPrimary: '#8b5cf6',
+                    }
+                  }
+                }}>
                   <CheckoutForm />
                 </Elements>
               </CardContent>
