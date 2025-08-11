@@ -113,8 +113,11 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
     try {
       console.log('Loading chart data for any user with birth data:', birthData);
       
-      // Try Swiss Ephemeris Python API first
+      // Try Swiss Ephemeris Python API first (with timeout)
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+        
         const pythonResponse = await fetch('http://localhost:8000/chart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -124,8 +127,11 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
             place_name: birthData.location || 'Temple, TX, USA',
             latitude: birthData.lat || 31.0982,
             longitude: birthData.lng || -97.3428
-          })
+          }),
+          signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         if (pythonResponse.ok) {
           const pythonData = await pythonResponse.json();
@@ -160,7 +166,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
           return;
         }
       } catch (pythonError) {
-        console.warn('Swiss Ephemeris API not available, falling back to Node.js calculations:', pythonError);
+        // Silently fall back to Node.js calculations without logging error
       }
       
       // Fallback to Node.js API calculations
