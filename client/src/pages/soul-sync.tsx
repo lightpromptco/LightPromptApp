@@ -354,8 +354,8 @@ export default function SoulSyncPage() {
                       <User className="w-6 h-6 text-teal-600 dark:text-teal-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{currentUser.name}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{currentUser.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user?.name || "Guest User"}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email || "Not signed in"}</p>
                     </div>
                   </div>
                   <div className="space-y-2">
