@@ -40,7 +40,4 @@ localPort = 5000
 externalPort = 80
 
 [agent]
-integrations = ["javascript_stripe==1.0.0", "javascript_log_in_with_replit==1.0.0", "javascript_openai==1.0.0", "javascript_paypal==1.0.0", "javascript_sendgrid==1.0.0", "javascript_anthropic==1.0.0", "javascript_websocket==1.0.0", "javascript_database==1.0.0", "javascript_object_storage==1.0.0", "javascript_supabase==1.0.0"]
-
-[objectStorage]
-defaultBucketID = "replit-objstore-49405359-1a1a-414d-a25f-f5a1b0aeef24"
+integrations = ["javascript_anthropic==1.0.0", "javascript_sendgrid==1.0.0", "javascript_stripe==1.0.0", "javascript_log_in_with_replit==1.0.0", "javascript_websocket==1.0.0", "javascript_object_storage==1.0.0", "javascript_supabase==1.0.0", "javascript_database==1.0.0", "javascript_openai==1.0.0"]

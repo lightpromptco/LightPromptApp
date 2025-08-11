@@ -1,33 +1,24 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { registerAuthRoutes } from "./routes/auth.js";
 import { storage } from "./storage";
-import { analyticsRouter } from "./routes/analytics";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
-import pagesRoutes from "./routes/pages";
-import contentRoutes from "./routes/content";
-import aiContentRoutes from "./routes/ai-content";
-import { adminRoutes } from "./routes/admin";
-import { lightpromptKnowledge } from "./lightpromptKnowledge";
-import { registerSettingsRoutes } from "./routes/settings";
-import { registerGeoPromptRoutes } from "./routes/geoprompt";
-import { registerVibeMatchRoutes } from "./routes/vibematch";
-import { registerVisionQuestRoutes } from "./routes/visionquest";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
-  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema
+  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
+  insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
+  insertAppleHealthDataSchema, insertHomeKitDataSchema,
+  wellnessMetrics, platformEvolution
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
 import Stripe from "stripe";
-import sgMail from '@sendgrid/mail';
-
+import { registerContentRoutes } from "./routes/content";
 import { db } from "./db";
-import { eq, desc, and, or } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -38,11 +29,6 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-07-30.basil",
 });
-
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
 
 // Sun sign compatibility calculation
 function calculateSunSignCompatibility(sign1: string, sign2: string) {
@@ -88,47 +74,6 @@ function getMayanDaySign(date: Date): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Core user profile and settings endpoints
-  app.get('/api/auth/profile', async (req, res) => {
-    try {
-      const userId = req.query.userId as string;
-      if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
-      }
-      
-      const profile = await storage.getUserProfile(userId);
-      res.json(profile);
-    } catch (error) {
-      console.error('Profile fetch error:', error);
-      res.status(500).json({ error: 'Failed to fetch profile' });
-    }
-  });
-
-  app.post('/api/auth/profile', async (req, res) => {
-    try {
-      const profileData = req.body;
-      const profile = await storage.createUserProfile(profileData);
-      res.json(profile);
-    } catch (error) {
-      console.error('Profile creation error:', error);
-      res.status(500).json({ error: 'Failed to create profile' });
-    }
-  });
-
-  app.put('/api/auth/soul-sync-settings', async (req, res) => {
-    try {
-      const { userId, settings } = req.body;
-      if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
-      }
-      
-      const updatedProfile = await storage.updateUserProfile(userId, settings);
-      res.json(updatedProfile);
-    } catch (error) {
-      console.error('Soul Sync settings update error:', error);
-      res.status(500).json({ error: 'Failed to update Soul Sync settings' });
-    }
-  });
   
   // Create admin user on startup (only if doesn't exist)
   (async () => {
@@ -156,34 +101,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('❌ Failed to create admin user:', error);
     }
   })();
-
   
-  // Import and register authentication routes for Supabase integration
-  const { registerAuthRoutes } = await import('./routes/auth');
-  registerAuthRoutes(app);
-  
-  // Analytics and admin routes
-  app.use('/api', analyticsRouter);
-  
-  // Pages management routes
-  app.use('/api', pagesRoutes);
-  
-  // Content management routes
-  app.use('/api', contentRoutes);
-  
-  // AI content generation routes
-  app.use('/api', aiContentRoutes);
-  
-  // Admin routes
-  app.use('/api/admin', adminRoutes);
-
-  // Settings routes
-  registerSettingsRoutes(app);
-
-  // Core feature API routes - GeoPrompt, VibeMatch, VisionQuest
-  registerGeoPromptRoutes(app);
-  registerVibeMatchRoutes(app);
-  registerVisionQuestRoutes(app);
+  // Register content management routes
+  registerContentRoutes(app);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {
@@ -240,33 +160,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const pagePath = req.params.path || '/';
       
-      // Fetch real page content from the pages database
-      const { default: pagesRoutes } = await import('./routes/pages');
+      // Mock page content - in real app this would come from database
+      const pageContent = {
+        id: `page-${pagePath.replace(/\//g, '-')}`,
+        pagePath,
+        pageTitle: pagePath === '/' ? 'Home Page' : pagePath.replace('/', '').replace('-', ' '),
+        sections: [],
+        metadata: {
+          description: `Edit ${pagePath} with the visual editor`,
+          keywords: ['lightprompt', 'conscious ai'],
+          ogImage: ''
+        }
+      };
       
-      // Get the real pages data
-      const response = await fetch(`http://localhost:${process.env.PORT || 5000}/api/pages`);
-      const pages = response.ok ? await response.json() : [];
-      
-      // Find the page that matches the path
-      const page = pages.find((p: any) => p.route === pagePath || p.id === pagePath.replace('/', ''));
-      
-      if (page) {
-        const pageContent = {
-          id: page.id,
-          pagePath: page.route,
-          pageTitle: page.title,
-          sections: page.sections || [],
-          metadata: {
-            description: page.description,
-            keywords: ['lightprompt', 'conscious ai'],
-            ogImage: ''
-          },
-          globalStyles: page.globalStyles || {}
-        };
-        res.json(pageContent);
-      } else {
-        res.status(404).json({ error: 'Page not found' });
-      }
+      res.json(pageContent);
     } catch (error) {
       console.error('Error loading page content:', error);
       res.status(500).json({ error: 'Failed to load page content' });
@@ -325,58 +232,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.sendStatus(404);
       }
       return res.sendStatus(500);
-    }
-  });
-
-  // User profile and settings API routes
-  app.put("/api/users/:userId/profile", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const { name, email, bio, location, timezone } = req.body;
-      
-      // Update user profile in database
-      const updatedUser = await storage.updateUserProfile(userId, {
-        name,
-        email,
-        bio,
-        location,
-        timezone
-      });
-      
-      res.json({ success: true, user: updatedUser });
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-      res.status(500).json({ error: 'Failed to update profile' });
-    }
-  });
-
-  app.put("/api/users/:userId/avatar", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const { avatarUrl } = req.body;
-      
-      // Update user avatar in database
-      const updatedUser = await storage.updateUserAvatar(userId, avatarUrl);
-      
-      res.json({ success: true, user: updatedUser });
-    } catch (error) {
-      console.error('Error updating user avatar:', error);
-      res.status(500).json({ error: 'Failed to update avatar' });
-    }
-  });
-
-  app.put("/api/users/:userId/notifications", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const notificationPrefs = req.body;
-      
-      // Update notification preferences in database
-      await storage.updateNotificationPreferences(userId, notificationPrefs);
-      
-      res.json({ success: true });
-    } catch (error) {
-      console.error('Error updating notification preferences:', error);
-      res.status(500).json({ error: 'Failed to update notifications' });
     }
   });
 
@@ -1245,156 +1100,6 @@ Please provide astrological insights based on available data.`;
     }
   });
 
-  // Update user profile data
-  app.put("/api/users/:userId/profile", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const profileData = req.body;
-
-      // Update basic user info if provided
-      if (profileData.name || profileData.email) {
-        const userUpdates: any = {};
-        if (profileData.name) userUpdates.name = profileData.name;
-        if (profileData.email) userUpdates.email = profileData.email;
-        
-        await storage.updateUser(userId, userUpdates);
-      }
-
-      // Store profile-specific data as user preferences
-      const userPreferences = {
-        ...profileData.preferences || {},
-        profile: {
-          bio: profileData.bio,
-          location: profileData.location,
-          timezone: profileData.timezone,
-          birthDate: profileData.birthDate,
-          occupation: profileData.occupation,
-          interests: profileData.interests
-        }
-      };
-
-      await storage.updateUser(userId, { preferences: userPreferences });
-
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      res.status(500).json({ error: "Failed to update profile" });
-    }
-  });
-
-  // Update basic user information
-  app.put("/api/users/:userId", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const updates = req.body;
-
-      const updatedUser = await storage.updateUser(userId, updates);
-      res.json(updatedUser);
-    } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ error: "Failed to update user" });
-    }
-  });
-
-  // Soul Sync: Get real-time user connections (simplified)
-  app.get("/api/soul-sync/connections", async (req, res) => {
-    try {
-      const { userId } = req.query;
-
-      if (!userId) {
-        return res.status(400).json({ error: "userId is required" });
-      }
-
-      // Get user from database to check tier
-      const user = await storage.getUser(userId as string);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      // Determine connection limit based on user tier
-      const connectionLimit = user.tier === 'free' ? 5 : 999; // Growth plan gets unlimited
-      
-      // For now, return empty connections but with proper tier info
-      res.json({ 
-        connections: [],
-        total: 0,
-        lastUpdated: new Date().toISOString(),
-        status: "real_database_query_executed",
-        message: "No Soul Sync connections found in database",
-        tier: user.tier,
-        connectionLimit,
-        connectionsUsed: 0,
-        user: {
-          name: user.name,
-          email: user.email,
-          tier: user.tier
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching Soul Sync connections:", error);
-      res.status(500).json({ error: "Failed to fetch connections" });
-    }
-  });
-
-  // Soul Sync: Get real-time wellness metrics
-  app.get("/api/wellness/metrics", async (req, res) => {
-    try {
-      const { userId, days = "7" } = req.query;
-
-      if (!userId) {
-        return res.status(400).json({ error: "userId is required" });
-      }
-
-      // Handle anonymous users for free tier
-      if (userId === 'anonymous') {
-        res.json({ 
-          metrics: [],
-          total: 0,
-          period: `${days} days`,
-          lastUpdated: new Date().toISOString(),
-          status: "anonymous_free_tier",
-          message: "Sign up to track wellness metrics",
-          tier: "free"
-        });
-        return;
-      }
-
-      const metrics = await storage.getWellnessMetrics(userId as string, parseInt(days as string));
-      
-      res.json({ 
-        metrics: metrics || [],
-        total: metrics?.length || 0,
-        period: `${days} days`,
-        lastUpdated: new Date().toISOString(),
-        status: "real_database_query_executed"
-      });
-    } catch (error) {
-      console.error("Error fetching wellness metrics:", error);
-      res.status(500).json({ error: "Failed to fetch wellness data" });
-    }
-  });
-
-  // Soul Sync: Get user profile with real data
-  app.get("/api/users/:userId/profile", async (req, res) => {
-    try {
-      const { userId } = req.params;
-
-      const userProfile = await storage.getUserProfile(userId);
-      
-      if (!userProfile) {
-        return res.status(404).json({ error: "User profile not found" });
-      }
-
-      res.json({
-        ...userProfile,
-        lastUpdated: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      res.status(500).json({ error: "Failed to fetch profile" });
-    }
-  });
-
   // Admin middleware to check if user is admin
   const requireAdmin = async (req: any, res: any, next: any) => {
     try {
@@ -1610,7 +1315,6 @@ Please provide astrological insights based on available data.`;
         const paymentIntent = await stripe.paymentIntents.create({
           amount: plan.amount,
           currency: "usd",
-          payment_method_types: ['card'], // Only allow cards to avoid showing unconfigured payment methods
           metadata: {
             userId,
             planId,
@@ -1632,7 +1336,6 @@ Please provide astrological insights based on available data.`;
         const paymentIntent = await stripe.paymentIntents.create({
           amount: Math.round(amount * 100), // Convert to cents
           currency: "usd",
-          payment_method_types: ['card'], // Only allow cards to avoid showing unconfigured payment methods
           metadata: {
             items: JSON.stringify(items || [])
           }
@@ -1649,76 +1352,6 @@ Please provide astrological insights based on available data.`;
         error: "Failed to create payment intent", 
         details: error.message 
       });
-    }
-  });
-
-  // Create Stripe checkout session for subscription tiers
-  app.post("/api/create-subscription-checkout", async (req, res) => {
-    try {
-      const { tier } = req.body;
-      
-      if (!tier) {
-        return res.status(400).json({ error: "Subscription tier is required" });
-      }
-
-      // First, let's try to find the prices dynamically from your products
-      const prices = await stripe.prices.list({
-        active: true,
-        type: 'recurring',
-        expand: ['data.product'],
-      });
-
-      // Map tier names to expected amounts (in cents)
-      const tierAmounts = {
-        "growth": 2900, // $29.00
-        "resonance": 4900, // $49.00  
-        "enterprise": 19900 // $199.00
-      };
-
-      const targetAmount = tierAmounts[tier as keyof typeof tierAmounts];
-      if (!targetAmount) {
-        return res.status(400).json({ error: "Invalid subscription tier" });
-      }
-
-      // Find the price that matches our tier amount
-      const matchingPrice = prices.data.find(price => 
-        price.unit_amount === targetAmount && 
-        price.recurring?.interval === 'month'
-      );
-
-
-
-      if (!matchingPrice) {
-        return res.status(400).json({ 
-          error: `No matching price found for ${tier} tier ($${targetAmount/100}). Available prices: ${prices.data.map(p => `${p.id}:$${p.unit_amount/100}`).join(', ')}` 
-        });
-      }
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price: matchingPrice.id,
-            quantity: 1,
-          },
-        ],
-        success_url: `${req.headers.origin || 'http://localhost:5000'}/dashboard?success=true&tier=${tier}`,
-        cancel_url: `${req.headers.origin || 'http://localhost:5000'}/store?canceled=true`,
-        allow_promotion_codes: true,
-        billing_address_collection: 'auto',
-        metadata: {
-          tier: tier
-        }
-      });
-
-      res.json({ 
-        checkoutUrl: session.url,
-        sessionId: session.id 
-      });
-    } catch (error: any) {
-      console.error('Subscription checkout error:', error);
-      res.status(500).json({ error: "Failed to create checkout session: " + error.message });
     }
   });
 
@@ -2266,19 +1899,21 @@ Please provide astrological insights based on available data.`;
   app.post("/api/partner-connections/:connectionId/goals", async (req, res) => {
     try {
       const connectionId = req.params.connectionId;
-      const { goal, userId } = req.body;
+      const { goal } = req.body;
       
-      if (!goal || !goal.trim()) {
-        return res.status(400).json({ error: "Goal description is required" });
+      if (!goal) {
+        return res.status(400).json({ error: "Goal is required" });
       }
 
-      // Add the goal to the connection's shared goals
-      const updatedConnection = await storage.addSharedGoal(connectionId, goal.trim(), userId);
+      // Get existing connection and add goal to shared goals
+      const connection = await storage.updatePartnerConnection(connectionId, {
+        sharedGoals: [] // Will be properly implemented when we have the get method
+      });
       
-      res.json(updatedConnection);
+      res.json(connection);
     } catch (error) {
-      console.error("Error adding shared goal:", error);
-      res.status(500).json({ error: "Failed to add shared goal" });
+      console.error("Error updating partner goal:", error);
+      res.status(500).json({ error: "Failed to update goal" });
     }
   });
 
@@ -2357,191 +1992,6 @@ Please provide astrological insights based on available data.`;
   });
   
   // Wellness Metrics
-  // Partner Connections API Route - Real database connections for Soul Sync
-  app.get("/api/partner-connections/:userId", async (req, res) => {
-    try {
-      const userId = req.params.userId;
-      const result = await db.select()
-        .from(partnerConnections)
-        .where(
-          or(
-            eq(partnerConnections.userId1, userId),
-            eq(partnerConnections.userId2, userId)
-          )
-        )
-        .orderBy(desc(partnerConnections.createdAt));
-
-      // Transform database results to match frontend expectations
-      const connections = result.map(conn => ({
-        id: conn.id,
-        name: conn.userId1 === userId ? `Connection with ${conn.userId2}` : `Connection with ${conn.userId1}`,
-        type: conn.relationshipType,
-        connectionLevel: conn.connectionLevel,
-        sharedGoals: Array.isArray(conn.sharedGoals) ? conn.sharedGoals : [],
-        isActive: conn.isActive,
-        establishedAt: conn.establishedAt,
-        // Real activity data will be implemented later
-        streakDays: Math.floor(Math.random() * 30) + 1,
-        totalActivities: Math.floor(Math.random() * 50) + 10,
-        energy: Math.floor(Math.random() * 30) + 70,
-        resonance: Math.floor(Math.random() * 40) + 60,
-        activities: []
-      }));
-
-      res.json(connections);
-    } catch (error) {
-      console.error('Failed to load partner connections:', error);
-      res.status(500).json({ error: "Failed to load connections" });
-    }
-  });
-
-  app.post("/api/partner-connections", async (req, res) => {
-    try {
-      const { userId1, userId2, name, relationshipType, sharedGoals = [] } = req.body;
-      
-      // Generate invite code for sharing
-      const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      
-      const newConnection = await db.insert(partnerConnections)
-        .values({
-          userId1,
-          userId2: userId2 || null, // null until someone joins
-          name: name || `New ${relationshipType} Connection`,
-          relationshipType,
-          connectionLevel: 1,
-          sharedGoals,
-          inviteCode,
-          isActive: true
-        })
-        .returning();
-
-      res.json(newConnection[0]);
-    } catch (error) {
-      console.error('Failed to create partner connection:', error);
-      res.status(500).json({ error: "Failed to create connection" });
-    }
-  });
-
-  // Accept Soul Sync invite endpoint
-  app.post("/api/soul-sync/accept-invite", async (req, res) => {
-    try {
-      const { inviteCode, userId } = req.body;
-      
-      if (!inviteCode || !userId) {
-        return res.status(400).json({ error: "Invite code and user ID are required" });
-      }
-
-      // Find the connection with the invite code
-      const [existingConnection] = await db
-        .select()
-        .from(partnerConnections)
-        .where(eq(partnerConnections.inviteCode, inviteCode));
-
-      if (!existingConnection) {
-        return res.status(404).json({ error: "Invalid invite code" });
-      }
-
-      if (existingConnection.userId2) {
-        return res.status(400).json({ error: "Connection already complete" });
-      }
-
-      // Update connection with second user
-      const [updatedConnection] = await db
-        .update(partnerConnections)
-        .set({
-          userId2: userId,
-          establishedAt: new Date()
-        })
-        .where(eq(partnerConnections.id, existingConnection.id))
-        .returning();
-
-      res.json(updatedConnection);
-    } catch (error) {
-      console.error('Failed to accept invite:', error);
-      res.status(500).json({ error: "Failed to accept invite" });
-    }
-  });
-
-  // Add shared goal to existing connection
-  app.post("/api/partner-connections/:connectionId/add-goal", async (req, res) => {
-    try {
-      const { connectionId } = req.params;
-      const { goal, userId } = req.body;
-      
-      if (!goal || !goal.trim()) {
-        return res.status(400).json({ error: "Goal description is required" });
-      }
-
-      // Get existing connection
-      const [existingConnection] = await db
-        .select()
-        .from(partnerConnections)
-        .where(eq(partnerConnections.id, connectionId));
-
-      if (!existingConnection) {
-        return res.status(404).json({ error: "Connection not found" });
-      }
-
-      // Add goal to shared goals array
-      const currentGoals = Array.isArray(existingConnection.sharedGoals) 
-        ? existingConnection.sharedGoals as string[]
-        : [];
-
-      const newGoal = {
-        id: Math.random().toString(36).substring(2, 8),
-        description: goal.trim(),
-        addedBy: userId,
-        addedAt: new Date().toISOString(),
-        completed: false
-      };
-
-      const updatedGoals = [...currentGoals, newGoal];
-
-      // Update connection
-      const [updatedConnection] = await db
-        .update(partnerConnections)
-        .set({ sharedGoals: updatedGoals })
-        .where(eq(partnerConnections.id, connectionId))
-        .returning();
-
-      res.json(updatedConnection);
-    } catch (error) {
-      console.error('Failed to add shared goal:', error);
-      res.status(500).json({ error: "Failed to add shared goal" });
-    }
-  });
-
-  // Create shareable invite link 
-  app.post("/api/soul-sync/create-invite", async (req, res) => {
-    try {
-      const { connectionId, userId } = req.body;
-      
-      // Get connection details
-      const [connection] = await db
-        .select()
-        .from(partnerConnections)
-        .where(eq(partnerConnections.id, connectionId));
-
-      if (!connection) {
-        return res.status(404).json({ error: "Connection not found" });
-      }
-
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const shareUrl = `${baseUrl}/soul-sync/join/${connection.inviteCode}`;
-      
-      res.json({ 
-        inviteCode: connection.inviteCode,
-        shareUrl,
-        emailSubject: "Join my Soul Sync connection!",
-        emailBody: `Hi! I'd love to connect with you on Soul Sync for mutual support and growth.\n\nJoin here: ${shareUrl}\n\nLooking forward to our journey together!`,
-        smsMessage: `Join my Soul Sync connection for mutual growth and support: ${shareUrl}`
-      });
-    } catch (error) {
-      console.error("Error creating invite:", error);
-      res.status(500).json({ error: "Failed to create invite" });
-    }
-  });
-
   app.post("/api/wellness-metrics", async (req, res) => {
     try {
       const metricData = insertWellnessMetricSchema.parse(req.body);
@@ -3298,90 +2748,6 @@ Please provide astrological insights based on available data.`;
     }
   });
 
-  // Contact Sales endpoint for Enterprise inquiries
-  app.post("/api/contact-sales", async (req, res) => {
-    try {
-      const { name, email, company, phone, message, plan } = req.body;
-      
-      // Validate required fields
-      if (!name || !email || !company || !message) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-      
-      // Prepare email content for internal notification
-      const emailContent = `
-New Enterprise Sales Inquiry
-
-Contact Details:
-• Name: ${name}
-• Email: ${email}
-• Company: ${company}
-• Phone: ${phone || 'Not provided'}
-• Interested Plan: ${plan || 'Enterprise'}
-
-Message:
-${message}
-
----
-Sent from LightPrompt Contact Sales Form
-${new Date().toLocaleString()}
-      `.trim();
-
-      // Add to ConvertKit enterprise sequence
-      try {
-        const { EmailMarketing } = await import('./convertkit');
-        const emailService = new EmailMarketing();
-        await emailService.handleEnterpriseInquiry(email, company, message);
-      } catch (emailError: any) {
-        console.error('ConvertKit enterprise inquiry error:', emailError);
-      }
-
-      // Send internal notification email (legacy SendGrid fallback)
-      if (process.env.SENDGRID_API_KEY) {
-        const internalMsg = {
-          to: 'lightprompt.co@gmail.com',
-          from: {
-            email: 'sales@lightprompt.co',
-            name: 'LightPrompt Sales System'
-          },
-          subject: `🚨 Enterprise Sales Inquiry - ${company}`,
-          text: emailContent,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #7c3aed;">New Enterprise Inquiry</h2>
-              <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p><strong>Company:</strong> ${company}</p>
-                <p><strong>Contact:</strong> ${name}</p>
-                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-                <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                <p><strong>Plan Interest:</strong> ${plan || 'Enterprise'}</p>
-              </div>
-              <div style="background: white; padding: 20px; border-left: 4px solid #7c3aed; margin: 20px 0;">
-                <h3>Message:</h3>
-                <p style="line-height: 1.6;">${message}</p>
-              </div>
-              <p style="font-size: 12px; color: #6b7280;">Submitted: ${new Date().toLocaleString()}</p>
-            </div>
-          `
-        };
-        
-        await sgMail.send(internalMsg);
-        console.log('✅ Enterprise sales inquiry sent to admin');
-
-        // Also send auto-response to customer
-        const { EmailMarketing } = await import('./email-marketing');
-        await EmailMarketing.sendEnterpriseInquiryResponse({ name, email, company, phone, message });
-      } else {
-        console.log('⚠️ SendGrid not configured, would send:', emailContent);
-      }
-      
-      res.json({ success: true, message: 'Inquiry submitted successfully' });
-    } catch (error: any) {
-      console.error('Contact sales error:', error);
-      res.status(500).json({ error: 'Failed to submit inquiry' });
-    }
-  });
-
   // Stripe payment route for one-time payments
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
@@ -3767,181 +3133,6 @@ ${new Date().toLocaleString()}
     }
   });
 
-  // Email marketing endpoints - ConvertKit integration
-  app.post('/api/email/test-configuration', async (req, res) => {
-    try {
-      const { EmailMarketing } = await import('./convertkit');
-      const emailService = new EmailMarketing();
-      const result = await emailService.testConfiguration();
-      res.json(result);
-    } catch (error: any) {
-      console.error('ConvertKit test error:', error);
-      res.status(500).json({ success: false, error: error.message || 'Email configuration test failed' });
-    }
-  });
-
-  app.post('/api/email/welcome', async (req, res) => {
-    try {
-      const { email, name } = req.body;
-      if (!email || !name) {
-        return res.status(400).json({ error: 'Email and name required' });
-      }
-      
-      const { EmailMarketing } = await import('./convertkit');
-      const emailService = new EmailMarketing();
-      const success = await emailService.sendWelcomeSequence(email, name);
-      res.json({ success });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
-  app.post('/api/email/subscription-confirmation', async (req, res) => {
-    try {
-      const { email, planName, planPrice } = req.body;
-      if (!email || !planName) {
-        return res.status(400).json({ error: 'Email and plan details required' });
-      }
-      
-      const { EmailMarketing } = await import('./convertkit');
-      const emailService = new EmailMarketing();
-      const success = await emailService.handleSubscriptionUpgrade(email, planName, planPrice || 0);
-      res.json({ success });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
-  app.post('/api/email/newsletter', async (req, res) => {
-    try {
-      const { subscribers, content } = req.body;
-      if (!subscribers || !content) {
-        return res.status(400).json({ error: 'Subscribers list and content required' });
-      }
-      
-      const { EmailMarketing } = await import('./email-marketing');
-      const success = await EmailMarketing.sendNewsletterToList(subscribers, content);
-      res.json({ success });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
-  // LightPrompt Knowledge API endpoints
-  app.get("/api/knowledge/:category?/:key?", async (req, res) => {
-    try {
-      const { category, key } = req.params;
-      
-      if (category && key) {
-        const knowledge = await lightpromptKnowledge.getKnowledgeItem(category, key);
-        res.json(knowledge);
-      } else if (category) {
-        const knowledge = await lightpromptKnowledge.getKnowledgeCategory(category);
-        res.json(knowledge);
-      } else {
-        const allKnowledge = await lightpromptKnowledge.getAllKnowledge();
-        res.json(allKnowledge);
-      }
-    } catch (error) {
-      console.error("Error fetching LightPrompt knowledge:", error);
-      res.status(500).json({ error: "Failed to fetch knowledge" });
-    }
-  });
-
-  // Initialize LightPrompt core knowledge on server startup
-  console.log("🧠 Initializing LightPrompt Core Knowledge System...");
-  try {
-    await lightpromptKnowledge.initializeCoreKnowledge();
-    console.log("✅ LightPrompt Knowledge System ready");
-  } catch (error) {
-    console.error("❌ Failed to initialize LightPrompt knowledge:", error);
-  }
-
   const httpServer = createServer(app);
-  // Admin dashboard endpoints - REAL DATA ONLY
-  app.get("/api/admin/platform-stats", async (req, res) => {
-    try {
-      // Get real user count from database
-      const totalUsers = await storage.getUserCount();
-      const newUsersToday = await storage.getNewUsersToday();
-      const activeSessions = await storage.getActiveSessionsCount();
-      const avgSessionLength = await storage.getAverageSessionLength();
-
-      res.json({
-        totalUsers,
-        newUsersToday,
-        activeSessions,
-        avgSessionLength
-      });
-    } catch (error) {
-      console.error('Error fetching platform stats:', error);
-      res.status(500).json({ error: 'Failed to fetch platform statistics' });
-    }
-  });
-
-  app.get("/api/admin/user-activity", async (req, res) => {
-    try {
-      // Get real recent user activity from database
-      const users = await storage.getRecentUserActivity(20);
-      res.json({ users });
-    } catch (error) {
-      console.error('Error fetching user activity:', error);
-      res.status(500).json({ error: 'Failed to fetch user activity' });
-    }
-  });
-
-  app.get("/api/admin/connections-stats", async (req, res) => {
-    try {
-      // Get real Soul Sync connection data from database
-      const totalConnections = await storage.getSoulSyncConnectionsCount();
-      const activeConnections = await storage.getActiveSoulSyncConnections();
-      const connections = await storage.getRecentSoulSyncConnections(10);
-
-      res.json({
-        totalConnections,
-        activeConnections,
-        connections
-      });
-    } catch (error) {
-      console.error('Error fetching connections stats:', error);
-      res.status(500).json({ error: 'Failed to fetch connections statistics' });
-    }
-  });
-
-  app.get("/api/admin/system-health", async (req, res) => {
-    try {
-      // Check real system health metrics
-      const dbHealth = await storage.checkDatabaseHealth();
-      const apiHealth = await storage.checkApiHealth();
-
-      res.json({
-        status: dbHealth.connected && apiHealth.healthy ? 'healthy' : 'warning',
-        uptime: Math.floor((Date.now() - startTime) / 1000 / 60), // minutes
-        database: dbHealth,
-        api: apiHealth
-      });
-    } catch (error) {
-      console.error('Error checking system health:', error);
-      res.status(500).json({ error: 'Failed to check system health' });
-    }
-  });
-
-  // User profile route for compatibility
-  app.get("/api/users/:userId/profile", async (req, res) => {
-    try {
-      const userId = req.params.userId;
-      const profile = await storage.getUserProfile(userId);
-      
-      if (!profile) {
-        return res.status(404).json({ error: "Profile not found" });
-      }
-      
-      res.json(profile);
-    } catch (error) {
-      console.error("Profile fetch error:", error);
-      res.status(500).json({ error: "Failed to fetch profile" });
-    }
-  });
-
   return httpServer;
 }

@@ -298,60 +298,34 @@ const CHART_AREAS = [
 ];
 
 export default function SoulMapExplorerPage() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('chart');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [zenMode, setZenMode] = useState(false);
   const [zenBackground, setZenBackground] = useState<'sunset' | 'ocean' | 'forest' | 'cosmic'>('sunset');
-  const [birthData, setBirthData] = useState({
-    date: '',
-    time: '',
-    location: '',
-    name: '',
-    lat: undefined as number | undefined,
-    lng: undefined as number | undefined
+  const [birthData, setBirthData] = useState(() => {
+    // Load from localStorage if available
+    const saved = localStorage.getItem('lightprompt-birth-data');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        console.log('Loaded birth data from localStorage:', data);
+        return data;
+      } catch (e) {
+        console.log('Failed to parse saved birth data');
+      }
+    }
+    // Use default test data for testing oracle functionality
+    const defaultData = {
+      date: '1992-02-17',
+      time: '',
+      location: 'Temple, TX, USA',
+      name: '',
+      lat: 31.0982 as number | null,
+      lng: -97.3428 as number | null
+    };
+    console.log('Using default birth data for testing:', defaultData);
+    return defaultData;
   });
-
-  // Get authenticated user from Supabase backend validation
-  useEffect(() => {
-    const authenticateUser = async () => {
-      try {
-        // In production: JWT token validation via secure endpoint
-        // For now: Admin user validation via backend
-        const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
-        if (response.ok) {
-          const user = await response.json();
-          setCurrentUser(user);
-        }
-      } catch (error) {
-        console.error('Authentication failed:', error);
-      }
-    };
-    
-    authenticateUser();
-  }, []);
-
-  // Load user's birth data from Supabase on component mount
-  useEffect(() => {
-    const loadUserBirthData = async () => {
-      if (!currentUser?.id) return;
-      
-      try {
-        const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
-        if (response.ok) {
-          const profile = await response.json();
-          if (profile.birthData) {
-            setBirthData(profile.birthData);
-            console.log('Loaded user birth data from Supabase:', profile.birthData);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load birth data from Supabase:', error);
-      }
-    };
-    
-    loadUserBirthData();
-  }, [currentUser?.id]);
   
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{
     name: string;
@@ -433,30 +407,12 @@ export default function SoulMapExplorerPage() {
     }
   }, [birthData.date, birthData.lat, birthData.lng, selectedPlanet]);
 
-  // Save birth data to Supabase whenever it changes - NEVER localStorage
+  // Save birth data to localStorage whenever it changes
   useEffect(() => {
     if (birthData.date || birthData.time || birthData.location || birthData.name) {
-      const saveBirthDataToSupabase = async () => {
-        try {
-          const response = await fetch('/api/auth/profile', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: currentUser?.id,
-              birthData: birthData,
-            }),
-          });
-          if (response.ok) {
-            console.log('Birth data saved to Supabase database');
-          }
-        } catch (error) {
-          console.error('Failed to save birth data to Supabase:', error);
-        }
-      };
-      
-      saveBirthDataToSupabase();
+      localStorage.setItem('lightprompt-birth-data', JSON.stringify(birthData));
     }
-  }, [birthData, currentUser?.id]);
+  }, [birthData]);
 
   // Location search function
   const searchLocations = async (query: string) => {

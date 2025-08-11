@@ -1,190 +1,204 @@
-import { Router } from 'express';
+import type { Express } from "express";
+import { z } from "zod";
 
-const router = Router();
+// Simple in-memory content storage for now (replace with database when connection is fixed)
+const contentPages = new Map();
+const mediaAssets = new Map();
 
-// Content database - This represents all the actual content from your site
-const CONTENT_DATABASE = {
-  metadata: {
-    siteName: 'LightPrompt',
-    tagline: 'Conscious AI for Human Reflection & Soul-Tech Wellness',
-    primaryColor: '#667eea',
-    secondaryColor: '#764ba2',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  },
-  
-  navigation: {
-    mainMenu: [
-      { label: 'Home', path: '/', active: true },
-      { label: 'Chat', path: '/chat', active: true },
-      { label: 'Soul Map', path: '/soul-map-explorer', active: true },
-      { label: 'Vision Quest', path: '/vision-quest', active: true },
-      { label: 'Store', path: '/store', active: true },
-      { label: 'Community', path: '/community', active: true },
-      { label: 'Dashboard', path: '/dashboard', active: true }
-    ],
-    footerLinks: [
-      { label: 'Privacy', path: '/privacy' },
-      { label: 'Help', path: '/help' },
-      { label: 'Admin', path: '/admin' }
-    ]
-  },
-
-  bots: [
-    {
-      id: 'cosmosbot',
-      name: 'CosmosBot',
-      description: 'Your cosmic guide for astrological insights and universal wisdom',
-      systemPrompt: 'You are CosmosBot, a wise astrological guide with deep knowledge of cosmic patterns...',
-      active: true
-    },
-    {
-      id: 'soul-oracle',
-      name: 'Soul Map Oracle', 
-      description: 'Expert astrologer specializing in birth chart analysis and soul purpose',
-      systemPrompt: 'You are the Soul Map Oracle, a master astrologer with expertise in Western astrology...',
-      active: true
-    },
-    {
-      id: 'vision-guide',
-      name: 'Vision Quest Guide',
-      description: 'Guide for personal transformation and self-discovery journeys',
-      systemPrompt: 'You are a Vision Quest Guide, helping users navigate transformative journeys...',
-      active: true
-    }
-  ],
-
-  products: [
-    {
-      id: 'soul-map-course',
-      name: 'Soul Map & Cosmos',
-      price: 120,
-      description: 'Comprehensive course in astrological self-discovery and cosmic alignment',
-      features: ['Full birth chart analysis', 'Planetary transit guidance', 'Career path insights', 'Relationship compatibility'],
-      type: 'course',
-      active: true
-    },
-    {
-      id: 'lightprompt-ebook',
-      name: 'LightPrompted: The Human Guide to Conscious AI & Soul Tech',
-      price: 11,
-      description: 'Essential guide to conscious AI integration and soul-tech wellness',
-      features: ['AI consciousness framework', 'Soul-tech practices', 'Ethical AI guidelines', 'Personal integration tools'],
-      type: 'ebook', 
-      active: true
-    },
-    {
-      id: 'bundle',
-      name: 'Complete Soul-Tech Bundle',
-      price: 125,
-      originalPrice: 131,
-      description: 'Everything you need for conscious AI and soul-tech mastery',
-      features: ['Soul Map & Cosmos course', 'LightPrompted ebook', 'Bonus meditation guides', 'Community access'],
-      type: 'bundle',
-      active: true
-    }
-  ],
-
-  features: {
-    'soul-map': {
-      title: 'Soul Map Explorer',
-      description: 'Professional-grade astrological birth chart analysis with career guidance',
-      benefits: ['Accurate planetary positions', 'Traditional astrological wisdom', 'Career path recommendations', 'VibeMatch compatibility scoring']
-    },
-    'vision-quest': {
-      title: 'Vision Quest Journey',
-      description: 'Transformative self-discovery through ancient wisdom and modern psychology',
-      stages: ['Preparation', 'Solitude', 'Integration', 'Return'],
-      benefits: ['Personal growth tracking', 'Guided meditation practices', 'Reflection exercises', 'Community support']
-    },
-    'geoprompt': {
-      title: 'GeoPrompt Check-ins',
-      description: 'Location-based mindfulness and environmental connection',
-      benefits: ['Google Maps integration', 'Location-aware reflections', 'Environmental mindfulness', 'Geographic insights']
-    }
-  },
-
-  settings: {
-    ai: {
-      model: 'gpt-4o',
-      temperature: 0.7,
-      maxTokens: 2000,
-      systemInstructions: 'You are a conscious AI assistant focused on human reflection and growth'
-    },
-    privacy: {
-      dataRetention: '90 days',
-      analyticsEnabled: false,
-      voiceDataStorage: true,
-      conversationHistory: true
-    },
-    ui: {
-      theme: 'auto', // light, dark, auto
-      circadianMode: true,
-      animationsEnabled: true,
-      compactMode: false
-    }
-  }
-};
-
-// Get all content
-router.get('/content', (req, res) => {
-  res.json(CONTENT_DATABASE);
+const contentPageSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().optional(),
+  content: z.object({
+    body: z.string(),
+    fontFamily: z.string().default("default"),
+    customCss: z.string().optional(),
+  }),
+  template: z.string().default("standard"),
+  isPublished: z.boolean().default(false),
+  seoTitle: z.string().optional(),
+  seoKeywords: z.array(z.string()).default([]),
+  featuredImage: z.string().optional(),
 });
 
-// Get specific content section
-router.get('/content/:section', (req, res) => {
-  const section = CONTENT_DATABASE[req.params.section];
-  if (!section) {
-    return res.status(404).json({ error: 'Content section not found' });
-  }
-  res.json(section);
-});
+export function registerContentRoutes(app: Express) {
+  // Initialize some sample pages
+  if (contentPages.size === 0) {
+    contentPages.set("about", {
+      id: "about",
+      title: "About LightPrompt",
+      slug: "about", 
+      description: "Learn about LightPrompt's mission and approach to conscious AI",
+      content: {
+        body: `# About LightPrompt
 
-// Update content section
-router.put('/content/:section', (req, res) => {
-  if (!CONTENT_DATABASE[req.params.section]) {
-    return res.status(404).json({ error: 'Content section not found' });
-  }
-  
-  CONTENT_DATABASE[req.params.section] = {
-    ...CONTENT_DATABASE[req.params.section],
-    ...req.body
-  };
-  
-  res.json(CONTENT_DATABASE[req.params.section]);
-});
+LightPrompt is a privacy-first, soul-tech wellness platform that uses AI as a conscious tool for human reflection and self-connection.
 
-// Update specific content item
-router.put('/content/:section/:itemId', (req, res) => {
-  const section = CONTENT_DATABASE[req.params.section];
-  if (!section) {
-    return res.status(404).json({ error: 'Content section not found' });
+## Our Philosophy
+
+AI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection. We believe technology should enhance human consciousness, not replace it.
+
+## Features
+
+- **Conscious AI Conversations**: Chat with specialized bots designed for emotional reflection
+- **GeoPrompt**: Location-based mindfulness check-ins
+- **VibeMatch**: Connect with others through energetic resonance
+- **Wellness Tracking**: Monitor your emotional and spiritual growth
+
+Ready to begin your journey of self-discovery?`,
+        fontFamily: "default",
+        customCss: ""
+      },
+      template: "standard",
+      isPublished: true,
+      seoTitle: "About LightPrompt - Conscious AI for Self-Reflection",
+      seoKeywords: ["conscious AI", "self-reflection", "wellness", "mindfulness"],
+      featuredImage: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    contentPages.set("course", {
+      id: "course",
+      title: "LightPrompt:ed Course",
+      slug: "course",
+      description: "Transform your relationship with AI and consciousness through our comprehensive course",
+      content: {
+        body: `# LightPrompt:ed - The Human Guide to Conscious AI & Soul Tech
+
+## Course Overview
+
+This comprehensive course teaches you how to use AI as a conscious tool for self-reflection and personal growth.
+
+### What You'll Learn
+
+- **Module 1**: Understanding Conscious AI
+- **Module 2**: Creating Sacred Digital Spaces
+- **Module 3**: AI-Assisted Self-Reflection Techniques
+- **Module 4**: Digital Wellness & Boundaries
+- **Module 5**: Building Authentic Connection with Technology
+
+### Course Features
+
+- 5 comprehensive modules
+- Interactive exercises and reflections
+- Private community access
+- Lifetime updates
+- 30-day money-back guarantee
+
+**Price**: $120 (Bundle with ebook: $125 - Save $99!)
+
+[Get Started Today →](/products)`,
+        fontFamily: "default",
+        customCss: ""
+      },
+      template: "landing",
+      isPublished: true,
+      seoTitle: "LightPrompt:ed Course - Master Conscious AI",
+      seoKeywords: ["AI course", "conscious technology", "digital wellness", "self-reflection"],
+      featuredImage: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
   }
-  
-  if (Array.isArray(section)) {
-    const itemIndex = section.findIndex(item => item.id === req.params.itemId);
-    if (itemIndex === -1) {
-      return res.status(404).json({ error: 'Content item not found' });
+
+  // Get all content pages
+  app.get("/api/content/pages", async (req, res) => {
+    try {
+      const pages = Array.from(contentPages.values());
+      res.json(pages);
+    } catch (error) {
+      console.error("Error fetching content pages:", error);
+      res.status(500).json({ message: "Failed to fetch pages" });
     }
-    
-    section[itemIndex] = {
-      ...section[itemIndex],
-      ...req.body,
-      id: req.params.itemId // Preserve ID
-    };
-    
-    res.json(section[itemIndex]);
-  } else {
-    // Handle object-based sections
-    if (section[req.params.itemId]) {
-      section[req.params.itemId] = {
-        ...section[req.params.itemId],
-        ...req.body
+  });
+
+  // Get single page
+  app.get("/api/content/pages/:id", async (req, res) => {
+    try {
+      const page = contentPages.get(req.params.id);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json(page);
+    } catch (error) {
+      console.error("Error fetching page:", error);
+      res.status(500).json({ message: "Failed to fetch page" });
+    }
+  });
+
+  // Create page
+  app.post("/api/content/pages", async (req, res) => {
+    try {
+      const validatedData = contentPageSchema.parse(req.body);
+      const id = validatedData.slug || Date.now().toString();
+      
+      const page = {
+        id,
+        ...validatedData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
-      res.json(section[req.params.itemId]);
-    } else {
-      res.status(404).json({ error: 'Content item not found' });
-    }
-  }
-});
 
-export default router;
+      contentPages.set(id, page);
+      res.status(201).json(page);
+    } catch (error) {
+      console.error("Error creating page:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create page" });
+    }
+  });
+
+  // Update page
+  app.put("/api/content/pages/:id", async (req, res) => {
+    try {
+      const page = contentPages.get(req.params.id);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+
+      const validatedData = contentPageSchema.parse(req.body);
+      const updatedPage = {
+        ...page,
+        ...validatedData,
+        updatedAt: new Date().toISOString(),
+      };
+
+      contentPages.set(req.params.id, updatedPage);
+      res.json(updatedPage);
+    } catch (error) {
+      console.error("Error updating page:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update page" });
+    }
+  });
+
+  // Delete page
+  app.delete("/api/content/pages/:id", async (req, res) => {
+    try {
+      const deleted = contentPages.delete(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json({ message: "Page deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting page:", error);
+      res.status(500).json({ message: "Failed to delete page" });
+    }
+  });
+
+  // Get media assets
+  app.get("/api/content/media", async (req, res) => {
+    try {
+      const assets = Array.from(mediaAssets.values());
+      res.json(assets);
+    } catch (error) {
+      console.error("Error fetching media:", error);
+      res.status(500).json({ message: "Failed to fetch media" });
+    }
+  });
+}

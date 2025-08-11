@@ -1,349 +1,375 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Users, 
-  MessageSquare, 
-  Mic, 
-  MicOff, 
+  MessageCircle, 
+  Heart, 
+  Star, 
+  Calendar, 
+  MapPin, 
   Video, 
-  VideoOff,
-  Hash,
-  Crown,
-  Star,
-  Heart,
+  BookOpen,
+  HelpCircle,
+  Send,
+  ExternalLink,
+  ArrowRight,
+  Github,
+  Coffee,
+  Clock,
   Globe,
-  Lock,
-  Sparkles
-} from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+  Code,
+  Lightbulb
+} from "lucide-react";
+import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
-interface CommunityMember {
-  id: string;
-  name: string;
-  avatar: string;
-  status: 'online' | 'away' | 'busy' | 'offline';
-  role: 'member' | 'moderator' | 'admin';
-  soulMapVisible: boolean;
-}
+const COMMUNITY_TABS = [
+  {
+    title: 'General Discussion',
+    description: 'Share ideas, ask questions, and connect with the community',
+    icon: MessageCircle,
+    posts: 24,
+    lastActivity: '2 minutes ago',
+    color: 'bg-blue-50 text-blue-700'
+  },
+  {
+    title: 'Conscious AI',
+    description: 'Explore ethical AI practices and mindful technology use',
+    icon: Lightbulb,
+    posts: 18,
+    lastActivity: '15 minutes ago',
+    color: 'bg-purple-50 text-purple-700'
+  },
+  {
+    title: 'Show & Tell',
+    description: 'Share your projects, insights, and discoveries',
+    icon: Star,
+    posts: 12,
+    lastActivity: '1 hour ago',
+    color: 'bg-yellow-50 text-yellow-700'
+  },
+  {
+    title: 'Course Q&A',
+    description: 'Get help with course content and exercises',
+    icon: BookOpen,
+    posts: 8,
+    lastActivity: '3 hours ago',
+    color: 'bg-green-50 text-green-700'
+  },
+  {
+    title: 'Feature Requests',
+    description: 'Suggest new features and improvements',
+    icon: Code,
+    posts: 15,
+    lastActivity: '5 hours ago',
+    color: 'bg-teal-50 text-teal-700'
+  }
+];
 
-interface CommunityChannel {
-  id: string;
-  name: string;
-  type: 'text' | 'voice' | 'soul-sync';
-  description: string;
-  memberCount: number;
-  isPrivate: boolean;
-}
+const RECENT_POSTS = [
+  {
+    title: 'How do you practice mindful AI interactions?',
+    author: 'Sarah M.',
+    replies: 12,
+    time: '2 minutes ago',
+    category: 'Conscious AI'
+  },
+  {
+    title: 'Soul Map insights - birth chart accuracy',
+    author: 'Alex K.',
+    replies: 8,
+    time: '15 minutes ago',
+    category: 'Course Q&A'
+  },
+  {
+    title: 'Built a meditation reminder using the platform',
+    author: 'Jordan L.',
+    replies: 6,
+    time: '1 hour ago',
+    category: 'Show & Tell'
+  },
+  {
+    title: 'Request: Integration with Apple Health',
+    author: 'Maya P.',
+    replies: 4,
+    time: '3 hours ago',
+    category: 'Feature Requests'
+  }
+];
+
+const SUPPORT_OPTIONS = [
+  {
+    title: 'Course Support',
+    description: 'Get help with course content, exercises, and technical issues',
+    icon: HelpCircle,
+    type: 'immediate',
+    action: 'Contact Support'
+  },
+  {
+    title: 'Technical Help',
+    description: 'Issues with platform access, billing, or account management',
+    icon: Video,
+    type: 'immediate',
+    action: 'Technical Support'
+  },
+  {
+    title: 'Community Guidelines',
+    description: 'Learn about our community values and interaction principles',
+    icon: Users,
+    type: 'resource',
+    action: 'Read Guidelines'
+  }
+];
 
 export default function CommunityPage() {
-  const [discordConnected, setDiscordConnected] = useState(false);
-  const [currentChannel, setCurrentChannel] = useState<string>('general');
-  const [isVoiceConnected, setIsVoiceConnected] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('General Discussion');
+  const { toast } = useToast();
 
-  // Mock data - replace with real Discord integration
-  const channels: CommunityChannel[] = [
-    {
-      id: 'general',
-      name: 'general',
-      type: 'text',
-      description: 'General soul-tech discussions',
-      memberCount: 247,
-      isPrivate: false
-    },
-    {
-      id: 'soul-map-sharing',
-      name: 'soul-map-sharing',
-      type: 'text',
-      description: 'Share your astrological insights',
-      memberCount: 156,
-      isPrivate: false
-    },
-    {
-      id: 'vision-quest',
-      name: 'vision-quest',
-      type: 'text',
-      description: 'Support for your personal journey',
-      memberCount: 89,
-      isPrivate: false
-    },
-    {
-      id: 'conscious-lounge',
-      name: 'conscious-lounge',
-      type: 'voice',
-      description: 'Voice chat for deeper connections',
-      memberCount: 12,
-      isPrivate: false
-    },
-    {
-      id: 'soul-sync-circle',
-      name: 'soul-sync-circle',
-      type: 'soul-sync',
-      description: 'Private authentic sharing space',
-      memberCount: 23,
-      isPrivate: true
+  const handleCreatePost = () => {
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
+      toast({
+        title: "Please fill in all fields",
+        description: "Both title and content are required",
+        variant: "destructive"
+      });
+      return;
     }
-  ];
 
-  const members: CommunityMember[] = [
-    {
-      id: '1',
-      name: 'Luna Starweaver',
-      avatar: '🌙',
-      status: 'online',
-      role: 'moderator',
-      soulMapVisible: true
-    },
-    {
-      id: '2',
-      name: 'Cosmic Sage',
-      avatar: '⭐',
-      status: 'online',
-      role: 'member',
-      soulMapVisible: true
-    },
-    {
-      id: '3',
-      name: 'River of Light',
-      avatar: '🌊',
-      status: 'away',
-      role: 'member',
-      soulMapVisible: false
-    }
-  ];
-
-  const connectDiscord = async () => {
-    // Discord OAuth flow
-    const discordClientId = 'YOUR_DISCORD_CLIENT_ID';
-    const redirectUri = encodeURIComponent(`${window.location.origin}/community/discord-callback`);
-    const scope = encodeURIComponent('identify guilds');
-    
-    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
-    
-    window.location.href = discordAuthUrl;
+    toast({
+      title: "Post created!",
+      description: "Your post has been shared with the community",
+    });
+    setNewPostTitle('');
+    setNewPostContent('');
   };
 
-  const getChannelIcon = (channel: CommunityChannel) => {
-    switch (channel.type) {
-      case 'voice':
-        return <Mic className="w-4 h-4" />;
-      case 'soul-sync':
-        return <Heart className="w-4 h-4" />;
-      default:
-        return <Hash className="w-4 h-4" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'online': return 'bg-green-500';
-      case 'away': return 'bg-yellow-500';
-      case 'busy': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
+  const joinDiscord = () => {
+    window.open('https://discord.gg/lightprompt', '_blank');
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-light text-gray-900 dark:text-white mb-4">
-            LightPrompt Community
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            Connect with fellow consciousness explorers in authentic, vulnerable spaces
-          </p>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                LightPrompt Community
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Connect, share, and grow together in conscious AI exploration
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={joinDiscord} className="bg-[#5865F2] hover:bg-[#4752C4] text-white">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Join Discord
+              </Button>
+              <Link href="/store">
+                <Button variant="outline">
+                  <Users className="w-4 h-4 mr-2" />
+                  Join Course
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="flex gap-6 text-sm text-gray-600 dark:text-gray-400">
+            <span className="flex items-center">
+              <Users className="w-4 h-4 mr-1" />
+              247 members
+            </span>
+            <span className="flex items-center">
+              <MessageCircle className="w-4 h-4 mr-1" />
+              1,203 posts
+            </span>
+            <span className="flex items-center">
+              <Clock className="w-4 h-4 mr-1" />
+              Active today
+            </span>
+          </div>
         </div>
 
-        {!discordConnected ? (
-          /* Discord Connection */
-          <div className="max-w-md mx-auto">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Category Tabs */}
             <Card>
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-indigo-600" />
-                </div>
-                <CardTitle>Connect with Discord</CardTitle>
-                <CardDescription>
-                  Join our soul-tech community powered by Discord for real-time conversations and connections
-                </CardDescription>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Globe className="w-5 h-5 mr-2" />
+                  Discussion Categories
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <Button 
-                  onClick={connectDiscord}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                  size="lg"
-                >
-                  <Users className="mr-2 h-5 w-5" />
-                  Connect Discord Account
-                </Button>
-                <div className="mt-4 text-sm text-gray-500 text-center">
-                  <p>Safe • Private • Soul-tech focused community</p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {COMMUNITY_TABS.map((tab, index) => (
+                    <div key={index} className={`p-4 rounded-lg border cursor-pointer hover:shadow-md transition-all ${tab.color}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <tab.icon className="w-5 h-5 mr-2" />
+                          <h3 className="font-semibold">{tab.title}</h3>
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {tab.posts} posts
+                        </Badge>
+                      </div>
+                      <p className="text-sm opacity-80 mb-2">{tab.description}</p>
+                      <p className="text-xs opacity-60">Last activity: {tab.lastActivity}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Posts */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Discussions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {RECENT_POSTS.map((post, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                          <span>by {post.author}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {post.category}
+                          </Badge>
+                          <span>{post.time}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        {post.replies}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
-        ) : (
-          /* Community Interface */
-          <div className="grid grid-cols-12 gap-6 h-[calc(100vh-200px)]">
-            {/* Channels Sidebar */}
-            <div className="col-span-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center">
-                  <Sparkles className="w-4 h-4 mr-2 text-teal-500" />
-                  Soul-Tech Channels
-                </h3>
-              </div>
-              
-              <div className="p-2 space-y-1">
-                {channels.map((channel) => (
-                  <button
-                    key={channel.id}
-                    onClick={() => setCurrentChannel(channel.id)}
-                    className={`w-full flex items-center gap-2 p-2 rounded text-left transition-colors ${
-                      currentChannel === channel.id
-                        ? 'bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    {getChannelIcon(channel)}
-                    <span className="text-sm">{channel.name}</span>
-                    {channel.isPrivate && <Lock className="w-3 h-3 ml-auto" />}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Main Chat Area */}
-            <div className="col-span-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col">
-              {/* Channel Header */}
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getChannelIcon(channels.find(c => c.id === currentChannel)!)}
-                    <h2 className="font-semibold text-gray-900 dark:text-white">
-                      {channels.find(c => c.id === currentChannel)?.name}
-                    </h2>
-                    <Badge variant="secondary">
-                      {channels.find(c => c.id === currentChannel)?.memberCount} members
-                    </Badge>
-                  </div>
-                  
-                  {channels.find(c => c.id === currentChannel)?.type === 'voice' && (
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant={isMuted ? "destructive" : "outline"}
-                        size="sm"
-                        onClick={() => setIsMuted(!isMuted)}
-                      >
-                        {isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                      </Button>
-                      <Button
-                        variant={isVoiceConnected ? "destructive" : "default"}
-                        size="sm"
-                        onClick={() => setIsVoiceConnected(!isVoiceConnected)}
-                      >
-                        {isVoiceConnected ? 'Disconnect' : 'Join Voice'}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  {channels.find(c => c.id === currentChannel)?.description}
-                </p>
-              </div>
-
-              {/* Messages Area */}
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
-                      🌙
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 dark:text-white">Luna Starweaver</span>
-                        <Badge className="bg-purple-100 text-purple-700">Moderator</Badge>
-                        <span className="text-xs text-gray-500">Today at 2:30 PM</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 mt-1">
-                        Welcome to our conscious community! 🌟 This is a space for authentic sharing and soul-level connections.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                      ⭐
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 dark:text-white">Cosmic Sage</span>
-                        <span className="text-xs text-gray-500">Today at 2:45 PM</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 mt-1">
-                        Just completed my Soul Map reading and I'm amazed! The career insights were spot on 🎯
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Message Input */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder={`Message #${channels.find(c => c.id === currentChannel)?.name}`}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Create Post */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Send className="w-5 h-5 mr-2" />
+                  Start a Discussion
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Title</label>
+                  <Input
+                    placeholder="What's on your mind?"
+                    value={newPostTitle}
+                    onChange={(e) => setNewPostTitle(e.target.value)}
                   />
-                  <Button>Send</Button>
                 </div>
-              </div>
-            </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Content</label>
+                  <Textarea
+                    placeholder="Share your thoughts, questions, or insights..."
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <Button onClick={handleCreatePost} className="w-full">
+                  Create Post
+                </Button>
+                <p className="text-xs text-gray-500 text-center">
+                  Join our Discord for real-time conversations!
+                </p>
+              </CardContent>
+            </Card>
 
-            {/* Members Sidebar */}
-            <div className="col-span-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white">
-                  Online Members ({members.filter(m => m.status === 'online').length})
-                </h3>
-              </div>
-              
-              <div className="p-2 space-y-2">
-                {members.map((member) => (
-                  <div key={member.id} className="flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <div className="relative">
-                      <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                        {member.avatar}
-                      </div>
-                      <div className={`absolute -bottom-1 -right-1 w-3 h-3 ${getStatusColor(member.status)} rounded-full border-2 border-white dark:border-gray-800`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {member.name}
-                        </span>
-                        {member.role === 'moderator' && <Crown className="w-3 h-3 text-purple-500" />}
-                        {member.role === 'admin' && <Crown className="w-3 h-3 text-yellow-500" />}
-                      </div>
-                      {member.soulMapVisible && (
-                        <div className="flex items-center gap-1 mt-1">
-                          <Star className="w-3 h-3 text-teal-500" />
-                          <span className="text-xs text-teal-600 dark:text-teal-400">Soul Map visible</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Community Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Community Highlights</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-teal-50 dark:from-purple-950/20 dark:to-teal-950/20 rounded-lg">
+                  <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+                  <h3 className="font-semibold mb-1">Most Helpful</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Sarah M. - 15 helpful answers this month
+                  </p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg">
+                  <Heart className="w-8 h-8 mx-auto mb-2 text-red-500" />
+                  <h3 className="font-semibold mb-1">Community Love</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    98% positive interaction rating
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Guidelines */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Community Guidelines</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li className="flex items-start">
+                    <Heart className="w-4 h-4 mr-2 mt-0.5 text-red-500 flex-shrink-0" />
+                    Be kind and respectful to all members
+                  </li>
+                  <li className="flex items-start">
+                    <Lightbulb className="w-4 h-4 mr-2 mt-0.5 text-yellow-500 flex-shrink-0" />
+                    Share insights and ask thoughtful questions
+                  </li>
+                  <li className="flex items-start">
+                    <Star className="w-4 h-4 mr-2 mt-0.5 text-purple-500 flex-shrink-0" />
+                    Celebrate others' achievements and growth
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
-        )}
+        </div>
+
+        {/* Join CTA */}
+        <div className="mt-16 text-center">
+          <Card className="bg-gradient-to-r from-purple-50 to-teal-50 dark:from-purple-950/20 dark:to-teal-950/20 border-purple-200">
+            <CardContent className="py-8">
+              <h3 className="text-2xl font-bold mb-4">Ready to Join Our Community?</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+                Get access to our private community groups and live sessions when you join the LightPrompt:ed course
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Link href="/store">
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    Join Course + Community
+                  </Button>
+                </Link>
+                <Link href="/blog">
+                  <Button variant="outline">
+                    Read Our Blog
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

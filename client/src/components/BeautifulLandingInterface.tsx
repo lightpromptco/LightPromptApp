@@ -10,41 +10,11 @@ import {
   Gem,
   ArrowRight,
   Play,
-  ChevronRight,
-  Terminal,
-  Code
+  ChevronRight
 } from 'lucide-react';
 import { Link } from 'wouter';
 
 const FEATURES = [
-  {
-    title: 'Soul Map Explorer',
-    description: 'Professional-grade astrological birth chart with career path guidance and cosmic insights',
-    icon: Sparkles,
-    href: '/soul-map-explorer',
-    status: 'active'
-  },
-  {
-    title: 'Soul Sync Connections',
-    description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
-    icon: Users,
-    href: '/soul-sync',
-    status: 'active'
-  },
-  {
-    title: 'Vision Quest',
-    description: 'Interactive self-discovery journey with challenges and personal growth tracking',
-    icon: Target,
-    href: '/vision-quest',
-    status: 'active'
-  },
-  {
-    title: 'Community Hub',
-    description: 'Real-time community with Discord-style functionality for soul-tech enthusiasts',
-    icon: Users,
-    href: '/community',
-    status: 'active'
-  },
   {
     title: 'Reflective Conversations',
     description: 'AI that mirrors back your wisdom—like having Socrates as a reflection partner who never judges',
@@ -53,17 +23,17 @@ const FEATURES = [
     status: 'active'
   },
   {
-    title: 'Vibe Matching',
-    description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
-    icon: Heart,
-    href: '/vibe-match',
+    title: 'Vision Quest',
+    description: 'Interactive self-discovery journey with challenges and cosmic insights',
+    icon: Target,
+    href: '/vision-quest',
     status: 'active'
   },
   {
-    title: 'GeoPrompt',
-    description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
-    icon: MapPin,
-    href: '/geoprompt',
+    title: 'Soul Map Navigator',
+    description: 'Explore your astrological profile and cosmic patterns for deeper self-understanding',
+    icon: Sparkles,
+    href: '/soul-map-explorer',
     status: 'active'
   },
   {
@@ -72,6 +42,34 @@ const FEATURES = [
     icon: Heart,
     href: '/dashboard',
     status: 'beta'
+  },
+  {
+    title: 'Soul Sync Connections',
+    description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
+    icon: Users,
+    href: '/soul-sync',
+    status: 'beta'
+  },
+  {
+    title: 'Vibe Matching',
+    description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
+    icon: Sparkles,
+    href: '/vibe-match',
+    status: 'coming-soon'
+  },
+  {
+    title: 'GeoPrompt',
+    description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
+    icon: MapPin,
+    href: '/geoprompt',
+    status: 'beta'
+  },
+  {
+    title: 'Prism Points',
+    description: 'Track your growth journey with conscious gamification that honors genuine transformation',
+    icon: Gem,
+    href: '/prism-points',
+    status: 'coming-soon'
   }
 ];
 
@@ -115,22 +113,21 @@ export function BeautifulLandingInterface() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link href="/soul-map-explorer">
+            <Link href="/chat">
               <Button 
                 size="lg" 
                 className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200"
               >
-                <Sparkles className="mr-2 h-5 w-5" />
-                Explore Your Soul Map
+                Get started
               </Button>
             </Link>
-            <Link href="/chat">
+            <Link href="/help">
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="lg" 
-                className="border-2 border-teal-500 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950 px-8 py-4 rounded-full text-lg font-medium"
+                className="text-teal-500 hover:text-teal-600 px-8 py-4 text-lg font-medium"
               >
-                Start Reflecting <ChevronRight className="ml-1 h-5 w-5" />
+                Learn more <ChevronRight className="ml-1 h-5 w-5" />
               </Button>
             </Link>
           </div>

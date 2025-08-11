@@ -67,24 +67,7 @@ function CheckoutForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <PaymentElement options={{
-          fields: {
-            billingDetails: 'auto'
-          }
-        }} />
-        
-        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Lock className="h-3 w-3" />
-            <span>256-bit SSL encrypted</span>
-          </div>
-          <span>•</span>
-          <span>Powered by Stripe</span>
-          <span>•</span>
-          <span>PCI DSS compliant</span>
-        </div>
-      </div>
+      <PaymentElement />
       
       <Button
         type="submit"
@@ -95,11 +78,6 @@ function CheckoutForm() {
         <Lock className="h-4 w-4 mr-2" />
         {isProcessing ? 'Processing...' : `Complete Purchase • $${getCartTotal()}`}
       </Button>
-      
-      <p className="text-xs text-center text-muted-foreground">
-        By completing your purchase, you agree to our terms of service and privacy policy.
-        You will receive immediate access to your digital products.
-      </p>
     </form>
   );
 }
@@ -108,24 +86,6 @@ export default function Checkout() {
   const { cartItems, getCartTotal, removeFromCart } = useCart();
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  
-  // Get authenticated user for purchase tracking
-  useEffect(() => {
-    const authenticateUser = async () => {
-      try {
-        const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
-        if (response.ok) {
-          const user = await response.json();
-          setCurrentUser(user);
-        }
-      } catch (error) {
-        console.error('Authentication failed:', error);
-      }
-    };
-    
-    authenticateUser();
-  }, []);
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -265,19 +225,11 @@ export default function Checkout() {
               <CardHeader>
                 <CardTitle>Payment Details</CardTitle>
                 <CardDescription>
-                  Your payment information is secure and encrypted. We accept all major credit and debit cards.
+                  Your payment information is secure and encrypted
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Elements stripe={stripePromise} options={{ 
-                  clientSecret,
-                  appearance: {
-                    theme: 'stripe',
-                    variables: {
-                      colorPrimary: '#8b5cf6',
-                    }
-                  }
-                }}>
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
                   <CheckoutForm />
                 </Elements>
               </CardContent>

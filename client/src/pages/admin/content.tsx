@@ -44,16 +44,23 @@ export default function ContentManagement() {
   const queryClient = useQueryClient();
 
   // Get all content pages
-  // Fetch real page data from the pages database
+  // Mock data for content management since API endpoints don't exist yet
   const { data: pages = [], isLoading, error } = useQuery({
-    queryKey: ['/api/pages'],
-    queryFn: async () => {
-      const response = await fetch('/api/pages');
-      if (!response.ok) {
-        throw new Error('Failed to fetch pages');
+    queryKey: ['/api/content/pages'],
+    queryFn: () => Promise.resolve([
+      {
+        id: '1',
+        title: 'Home Page',
+        slug: 'home',
+        description: 'Main landing page',
+        content: { body: 'Welcome to LightPrompt', fontFamily: 'default', customCss: '' },
+        template: 'landing',
+        isPublished: true,
+        seoTitle: 'LightPrompt - Soul Tech Wellness',
+        seoKeywords: ['ai', 'wellness', 'consciousness'],
+        featuredImage: ''
       }
-      return response.json();
-    },
+    ]),
     refetchInterval: 30000,
     retry: 1,
   });
@@ -107,9 +114,8 @@ export default function ContentManagement() {
   });
 
   const filteredPages = pages.filter((page: any) =>
-    page.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.route?.toLowerCase().includes(searchTerm.toLowerCase())
+    page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    page.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSavePage = (formData: FormData) => {
@@ -218,18 +224,21 @@ export default function ContentManagement() {
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
                       <h3 className="font-medium">{page.title}</h3>
-                      <p className="text-xs text-muted-foreground">{page.route || `/${page.id}`}</p>
-                      <p className="text-xs text-gray-600">{page.description}</p>
+                      <p className="text-xs text-muted-foreground">/{page.slug}</p>
                       <div className="flex items-center gap-2">
-                        <Badge variant="default" className="text-xs bg-green-100 text-green-800">
-                          <Eye className="h-3 w-3 mr-1" />
-                          Real Data
-                        </Badge>
+                        {page.isPublished ? (
+                          <Badge variant="default" className="text-xs">
+                            <Eye className="h-3 w-3 mr-1" />
+                            Published
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs">
+                            <EyeOff className="h-3 w-3 mr-1" />
+                            Draft
+                          </Badge>
+                        )}
                         <Badge variant="outline" className="text-xs">
-                          {page.sections?.length || 0} sections
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          ID: {page.id}
+                          {page.template}
                         </Badge>
                       </div>
                     </div>

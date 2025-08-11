@@ -5,8 +5,7 @@ import {
   Habit, InsertHabit, HabitEntry, InsertHabitEntry,
   AppleHealthData, InsertAppleHealthData, HomeKitData, InsertHomeKitData,
   WellnessPattern, Recommendation, InsertRecommendation,
-  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration,
-  UserSettings, InsertUserSettings, UpdateUserSettings
+  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { 
@@ -30,8 +29,6 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User>;
-  updateUserAvatar(userId: string, avatarUrl: string): Promise<User>;
-  updateNotificationPreferences(userId: string, preferences: any): Promise<void>;
   
   // Chat Sessions
   getChatSession(id: string): Promise<ChatSession | undefined>;
@@ -222,12 +219,6 @@ export interface IStorage {
   createSoulMap(soulMapData: any): Promise<any>;
   getVisionQuest(userId: string): Promise<any | undefined>;
   createVisionQuest(questData: any): Promise<any>;
-
-  // User Settings
-  getUserSettings(userId: string): Promise<UserSettings | undefined>;
-  createOrUpdateUserSettings(settings: InsertUserSettings): Promise<UserSettings>;
-  updateUserSettings(userId: string, updates: UpdateUserSettings): Promise<UserSettings | undefined>;
-  deleteUserSettings(userId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -2608,32 +2599,6 @@ export class MemStorage implements IStorage {
     };
     this.visionQuests.set(id, quest);
     return quest;
-  }
-
-  // User Settings methods
-  async getUserSettings(userId: string): Promise<UserSettings | undefined> {
-    // In MemStorage, we'll just return default settings or undefined
-    return undefined;
-  }
-
-  async createOrUpdateUserSettings(settings: InsertUserSettings): Promise<UserSettings> {
-    // In MemStorage, just return a mock settings object
-    const id = randomUUID();
-    return {
-      id,
-      ...settings,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    } as UserSettings;
-  }
-
-  async updateUserSettings(userId: string, updates: UpdateUserSettings): Promise<UserSettings | undefined> {
-    // In MemStorage, just return undefined
-    return undefined;
-  }
-
-  async deleteUserSettings(userId: string): Promise<void> {
-    // In MemStorage, do nothing
   }
 }
 

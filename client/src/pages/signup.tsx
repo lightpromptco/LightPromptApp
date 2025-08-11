@@ -6,12 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import { Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,7 +17,7 @@ export default function SignupPage() {
     agreeToTerms: false,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -41,43 +38,14 @@ export default function SignupPage() {
       return;
     }
 
-    setLoading(true);
+    // TODO: Implement actual signup logic
+    toast({
+      title: "Welcome to LightPrompt! 🌟",
+      description: "Your account has been created successfully.",
+    });
     
-    try {
-      // Create user account using REAL authentication system
-      const response = await apiRequest('POST', '/api/auth/signup', {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (response.ok) {
-        const user = await response.json();
-        
-        // Store user in localStorage for session management
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        toast({
-          title: "Welcome to LightPrompt!",
-          description: "Your account has been created successfully.",
-        });
-        
-        // Redirect to chat page after successful signup
-        window.location.href = '/chat';
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create account');
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      toast({
-        title: "Signup failed",
-        description: error instanceof Error ? error.message : "Failed to create account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Redirect to dashboard or login
+    window.location.href = '/dashboard';
   };
 
   return (
@@ -175,26 +143,17 @@ export default function SignupPage() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                disabled={loading || !formData.name || !formData.email || !formData.password || !formData.confirmPassword}
+                disabled={!formData.name || !formData.email || !formData.password || !formData.confirmPassword}
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-user-plus mr-2"></i>
-                    Create Account
-                  </>
-                )}
+                <i className="fas fa-user-plus mr-2"></i>
+                Create Account
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Already have an account?{' '}
-                <Link href="/chat" className="text-purple-600 hover:underline font-medium">
+                <Link href="/login" className="text-purple-600 hover:underline font-medium">
                   Sign in here
                 </Link>
               </p>

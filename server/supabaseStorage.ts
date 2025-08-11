@@ -14,8 +14,7 @@ import {
   CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
   HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
   AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock,
-  GeoPromptCheckIn, InsertGeoPromptCheckIn,
-  UserSettings, InsertUserSettings, UpdateUserSettings
+  GeoPromptCheckIn, InsertGeoPromptCheckIn
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import {
@@ -85,20 +84,6 @@ export class SupabaseStorage implements IStorage {
       return this.formatUser(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
-      throw error;
-    }
-  }
-
-  async updateUserAvatar(userId: string, avatarUrl: string): Promise<User> {
-    return this.updateUser(userId, { avatarUrl });
-  }
-
-  async updateNotificationPreferences(userId: string, preferences: any): Promise<void> {
-    try {
-      // Store notification preferences in user_profiles table or a separate table
-      await this.updateUserProfile(userId, { notificationPreferences: preferences });
-    } catch (error) {
-      console.error('Error updating notification preferences:', error);
       throw error;
     }
   }
@@ -404,14 +389,10 @@ export class SupabaseStorage implements IStorage {
       userId: supabaseProfile.user_id,
       currentMood: supabaseProfile.current_mood,
       moodDescription: supabaseProfile.mood_description,
-      preferences: supabaseProfile.preferences || {},
-      badges: supabaseProfile.badges || {},
+      preferences: supabaseProfile.preferences,
+      badges: supabaseProfile.badges,
       evolutionScore: supabaseProfile.evolution_score,
-      privacySettings: supabaseProfile.privacy_settings || {},
-      soulSyncEnabled: supabaseProfile.soul_sync_enabled,
-      soulSyncVisibility: supabaseProfile.soul_sync_visibility,
-      matchingPreferences: supabaseProfile.matching_preferences || {},
-      birthData: supabaseProfile.birth_data || {},
+      privacySettings: supabaseProfile.privacy_settings,
       updatedAt: new Date(supabaseProfile.updated_at)
     };
   }
@@ -425,10 +406,6 @@ export class SupabaseStorage implements IStorage {
       badges: profile.badges,
       evolution_score: profile.evolutionScore,
       privacy_settings: profile.privacySettings,
-      soul_sync_enabled: profile.soulSyncEnabled,
-      soul_sync_visibility: profile.soulSyncVisibility,
-      matching_preferences: profile.matchingPreferences,
-      birth_data: profile.birthData,
       updated_at: new Date().toISOString()
     };
   }
@@ -1293,97 +1270,5 @@ export class SupabaseStorage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
-
-  // User Settings methods
-  async getUserSettings(userId: string): Promise<UserSettings | undefined> {
-    try {
-      const { data, error } = await supabase
-        .from('userSettings')
-        .select('*')
-        .eq('userId', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error getting user settings:', error);
-        return undefined;
-      }
-
-      return data || undefined;
-    } catch (error) {
-      console.error('Error getting user settings:', error);
-      return undefined;
-    }
-  }
-
-  async createOrUpdateUserSettings(settings: InsertUserSettings): Promise<UserSettings> {
-    try {
-      const { data, error } = await supabase
-        .from('userSettings')
-        .upsert(settings, { onConflict: 'userId' })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error creating/updating user settings:', error);
-      throw error;
-    }
-  }
-
-  async updateUserSettings(userId: string, updates: UpdateUserSettings): Promise<UserSettings | undefined> {
-    try {
-      const { data, error } = await supabase
-        .from('userSettings')
-        .update(updates)
-        .eq('userId', userId)
-        .select()
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error updating user settings:', error);
-        return undefined;
-      }
-
-      return data || undefined;
-    } catch (error) {
-      console.error('Error updating user settings:', error);
-      return undefined;
-    }
-  }
-
-  async deleteUserSettings(userId: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('userSettings')
-        .delete()
-        .eq('userId', userId);
-
-      if (error) {
-        console.error('Error deleting user settings:', error);
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error deleting user settings:', error);
-      throw error;
-    }
-  }
-
-  // Soul Map and Vision Quest (placeholder methods)
-  async getSoulMap(userId: string): Promise<any | undefined> {
-    return undefined;
-  }
-
-  async createSoulMap(soulMapData: any): Promise<any> {
-    return soulMapData;
-  }
-
-  async getVisionQuest(userId: string): Promise<any | undefined> {
-    return undefined;
-  }
-
-  async createVisionQuest(questData: any): Promise<any> {
-    return questData;
   }
 }
