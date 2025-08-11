@@ -187,60 +187,48 @@ export default function SoulSyncPage() {
     { value: 'other', label: 'Other', icon: Users }
   ];
 
-  if (!soulMapData?.hasData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4">
-              Soul Sync
-            </h1>
-            <p className="text-xl text-purple-200 mb-6">
-              Share Your Wellness Journey Like Apple Health
-            </p>
-          </div>
-
-          <Card className="border-purple-500/20 bg-slate-800/50 backdrop-blur">
-            <CardContent className="p-8 text-center">
-              <Wifi className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold text-white mb-4">
-                Create Your Soul Map First
-              </h2>
-              <p className="text-slate-300 mb-6">
-                Soul Sync works like Apple Health - it shares your existing wellness data with friends, 
-                family, and colleagues. Create your soul map to unlock data sharing.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="p-4 bg-purple-900/30 rounded-lg">
-                  <Stars className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                  <h3 className="font-semibold text-white">Birth Chart</h3>
-                  <p className="text-sm text-purple-200">Astrological insights</p>
-                </div>
-                <div className="p-4 bg-purple-900/30 rounded-lg">
-                  <Activity className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                  <h3 className="font-semibold text-white">Wellness Data</h3>
-                  <p className="text-sm text-purple-200">Mood, goals, habits</p>
-                </div>
-                <div className="p-4 bg-purple-900/30 rounded-lg">
-                  <Share2 className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                  <h3 className="font-semibold text-white">Share Safely</h3>
-                  <p className="text-sm text-purple-200">Control what you share</p>
-                </div>
-              </div>
-              <Button 
-                onClick={() => window.location.href = '/soul-map'} 
-                size="lg"
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Stars className="w-5 h-5 mr-2" />
-                Create Your Soul Map
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+  // Mock connected users for now - this would come from real database connections
+  const mockConnections = [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      type: 'Best Friend',
+      avatar: '/api/avatar/sarah',
+      connectionLevel: 8,
+      streakDays: 21,
+      lastActive: '2 hours ago',
+      sharedData: ['birth_chart', 'wellness_metrics', 'goals'],
+      currentMood: 'Energized',
+      recentActivity: 'Completed morning meditation',
+      vibeMatch: 87
+    },
+    {
+      id: '2', 
+      name: 'Mike Chen',
+      type: 'Workout Buddy',
+      avatar: '/api/avatar/mike',
+      connectionLevel: 6,
+      streakDays: 12,
+      lastActive: '1 day ago',
+      sharedData: ['habits', 'wellness_metrics'],
+      currentMood: 'Focused',
+      recentActivity: 'Hit new PR at gym!',
+      vibeMatch: 92
+    },
+    {
+      id: '3',
+      name: 'Mom',
+      type: 'Family',
+      avatar: '/api/avatar/mom',
+      connectionLevel: 10,
+      streakDays: 45,
+      lastActive: '30 minutes ago',
+      sharedData: ['wellness_metrics', 'goals', 'insights'],
+      currentMood: 'Peaceful',
+      recentActivity: 'Morning gratitude practice',
+      vibeMatch: 95
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
@@ -259,131 +247,142 @@ export default function SoulSyncPage() {
           </p>
         </div>
 
-        {/* Your Soul Map Data Overview */}
+        {/* Connected Users Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+          {mockConnections.map((connection) => (
+            <Card key={connection.id} className="border-purple-500/20 bg-slate-800/50 backdrop-blur hover:bg-slate-800/70 transition-all">
+              <CardHeader className="pb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-semibold">
+                    {connection.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-white text-lg">{connection.name}</CardTitle>
+                    <p className="text-purple-200 text-sm">{connection.type}</p>
+                  </div>
+                  <Badge className="bg-green-600 text-white text-xs">
+                    {connection.vibeMatch}% Match
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  {/* Connection Stats */}
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="bg-purple-900/30 p-2 rounded-lg">
+                      <div className="text-purple-300 text-xs">Streak</div>
+                      <div className="text-white font-semibold">{connection.streakDays} days</div>
+                    </div>
+                    <div className="bg-purple-900/30 p-2 rounded-lg">
+                      <div className="text-purple-300 text-xs">Connection</div>
+                      <div className="text-white font-semibold">Level {connection.connectionLevel}</div>
+                    </div>
+                  </div>
+
+                  {/* Current Status */}
+                  <div className="bg-slate-700/50 p-3 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Activity className="w-4 h-4 text-purple-400" />
+                      <span className="text-white text-sm font-medium">Current Vibe</span>
+                    </div>
+                    <p className="text-purple-200 text-sm">{connection.currentMood}</p>
+                    <p className="text-slate-400 text-xs mt-1">{connection.recentActivity}</p>
+                  </div>
+
+                  {/* Shared Data Types */}
+                  <div>
+                    <div className="text-white text-sm font-medium mb-2">Shared Data</div>
+                    <div className="flex flex-wrap gap-1">
+                      {connection.sharedData.map((dataType) => {
+                        const type = dataTypes.find(t => t.id === dataType);
+                        return (
+                          <Badge key={dataType} variant="outline" className="text-xs border-purple-400 text-purple-200">
+                            {type?.name || dataType}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Last Active */}
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <span>Last active: {connection.lastActive}</span>
+                    <Button size="sm" variant="ghost" className="text-purple-400 hover:text-purple-300">
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Add New Connection */}
         <Card className="border-purple-500/20 bg-slate-800/50 backdrop-blur mb-6">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
-              <Database className="w-5 h-5 mr-2 text-purple-400" />
-              Your Shareable Data
+              <UserPlus className="w-5 h-5 mr-2 text-purple-400" />
+              Invite Someone to Soul Sync
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dataTypes.map((dataType) => {
-                const hasData = 
-                  (dataType.id === 'birth_chart' && soulMapData.birthChart?.birthDate) ||
-                  (dataType.id === 'wellness_metrics' && soulMapData.metrics?.mood) ||
-                  (dataType.id === 'goals' && soulMapData.profile?.goals) ||
-                  (dataType.id === 'habits' && soulMapData.profile?.habits) ||
-                  (dataType.id === 'insights' && soulMapData.profile?.insights) ||
-                  (dataType.id === 'activities' && soulMapData.profile?.activities);
-                
-                return (
-                  <div key={dataType.id} className={`p-4 rounded-lg ${hasData ? 'bg-green-900/20 border border-green-500/30' : 'bg-slate-700/50 border border-slate-600/30'}`}>
-                    <dataType.icon className={`w-6 h-6 mb-2 ${hasData ? 'text-green-400' : 'text-slate-400'}`} />
-                    <h3 className="font-semibold text-white text-sm">{dataType.name}</h3>
-                    <p className="text-xs text-slate-400 mb-2">{dataType.description}</p>
-                    <Badge variant={hasData ? "default" : "secondary"} className="text-xs">
-                      {hasData ? "Available" : "No data"}
-                    </Badge>
+            <p className="text-slate-300 mb-4">
+              Share your wellness journey! Generate an invite link to connect with friends, family, or colleagues on LightPrompt.
+            </p>
+            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Create Invite Link
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-purple-500/20">
+                <DialogHeader>
+                  <DialogTitle className="text-white">Create Soul Sync Invitation</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-white">Connection Name</label>
+                    <Input 
+                      value={connectionName}
+                      onChange={(e) => setConnectionName(e.target.value)}
+                      placeholder="e.g., My Best Friend, Mom, Workout Partner"
+                      className="mt-1 bg-slate-700 border-slate-600"
+                    />
                   </div>
-                );
-              })}
-            </div>
+                  <div>
+                    <label className="text-sm font-medium text-white">Relationship Type</label>
+                    <Select value={connectionType} onValueChange={setConnectionType}>
+                      <SelectTrigger className="mt-1 bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select relationship type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800">
+                        {connectionTypes.map(type => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="bg-slate-700/50 p-3 rounded-lg">
+                    <h4 className="text-white text-sm font-medium mb-2">What happens next:</h4>
+                    <ol className="text-slate-300 text-sm space-y-1">
+                      <li>1. Link is copied to your clipboard</li>
+                      <li>2. Share with your connection via text, email, etc.</li>
+                      <li>3. They join LightPrompt and create their soul map</li>
+                      <li>4. You both start sharing wellness data!</li>
+                    </ol>
+                  </div>
+                  <Button onClick={generateShareLink} className="w-full bg-purple-600 hover:bg-purple-700">
+                    <Copy className="w-4 h-4 mr-2" />
+                    Generate & Copy Link
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Share Invite */}
-          <Card className="border-purple-500/20 bg-slate-800/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Share2 className="w-5 h-5 mr-2 text-purple-400" />
-                Invite Someone
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-300 mb-4">
-                Share a link to invite friends, family, or colleagues to join LightPrompt and sync with your wellness journey.
-              </p>
-              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Generate Invite Link
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-slate-800 border-purple-500/20">
-                  <DialogHeader>
-                    <DialogTitle className="text-white">Create Soul Sync Invite</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-white">Connection Name</label>
-                      <Input 
-                        value={connectionName}
-                        onChange={(e) => setConnectionName(e.target.value)}
-                        placeholder="e.g., Best Friend Connection"
-                        className="mt-1 bg-slate-700 border-slate-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-white">Relationship Type</label>
-                      <Select value={connectionType} onValueChange={setConnectionType}>
-                        <SelectTrigger className="mt-1 bg-slate-700 border-slate-600">
-                          <SelectValue placeholder="Select relationship type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800">
-                          {connectionTypes.map(type => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button onClick={generateShareLink} className="w-full bg-purple-600 hover:bg-purple-700">
-                      <Link className="w-4 h-4 mr-2" />
-                      Generate & Copy Link
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </CardContent>
-          </Card>
-
-          {/* Current Connections */}
-          <Card className="border-purple-500/20 bg-slate-800/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Users className="w-5 h-5 mr-2 text-purple-400" />
-                Active Connections
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {sharedConnections.length === 0 ? (
-                <div className="text-center py-4">
-                  <Users className="w-12 h-12 text-slate-500 mx-auto mb-2" />
-                  <p className="text-slate-400 text-sm">No active connections yet</p>
-                  <p className="text-slate-500 text-xs">Invite someone to start sharing!</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {sharedConnections.map((connection, idx) => (
-                    <div key={idx} className="p-3 bg-slate-700/50 rounded-lg flex items-center justify-between">
-                      <div>
-                        <p className="text-white font-medium">{connection.name}</p>
-                        <p className="text-slate-400 text-sm">{connection.type}</p>
-                      </div>
-                      <Badge className="bg-green-600 text-white">Active</Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Authentication Dialog for Invite Recipients */}
         <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>

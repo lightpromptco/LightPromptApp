@@ -11,6 +11,7 @@ Core philosophy: AI as conscious tool for human reflection and self-connection -
 Navigation: Clean "Store" section only, hates "Products" terminology, prefers professional simplicity.
 Pricing: Course $120, Ebook $11, Bundle $125 (saves $99) - no "WooWoo" terminology, now called "CosmosBot" and "Soul Map & Cosmos".
 Domain transition: Moving to lightprompt.co as main landing page.
+Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NOT requiring authentication for basic functionality. Spotify-style authentication ONLY for invite recipients. Soul Sync is its own dedicated page with connected user cards, separate from Soul Map page.
 
 ## System Architecture
 
