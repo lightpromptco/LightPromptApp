@@ -16,13 +16,16 @@ import {
   Compass,
   Settings,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
+  { path: "/dashboard", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview", glyph: "⟡" },
+  { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
   { 
     path: "/wellness-tools", 
     label: "Wellness Tools", 
@@ -32,8 +35,7 @@ const NAV_ITEMS = [
     subItems: [
       { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
-      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" },
-      { path: "/dashboard", label: "Body Mirror", icon: Activity, description: "Wellness Overview & Analytics" }
+      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" }
     ]
   },
   { 
@@ -47,7 +49,25 @@ const NAV_ITEMS = [
       { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" },
       { path: "/vibe-match", label: "VibeMatch", icon: Heart, description: "Soul-level Compatibility" }
     ]
-  }
+  },
+  { 
+    path: "/features", 
+    label: "Features", 
+    icon: Sparkles, 
+    description: "Platform Features", 
+    glyph: "✧",
+    subItems: [
+      { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
+      { path: "/integrations", label: "Integrations", icon: Settings, description: "Third-party Connections" }
+    ]
+  },
+  { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
+  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" },
+  { path: "/privacy", label: "Privacy", icon: Shield, description: "Privacy Policy", glyph: "⟨" }
+];
+
+const PRODUCTS_SECTION = [
+  { path: "/business", label: "For Business", icon: Users, description: "Enterprise Solutions", glyph: "⟫" }
 ];
 
 export function MainNavigation() {
@@ -198,6 +218,37 @@ export function MainNavigation() {
                 )}
               </div>
             ))}
+            
+            {/* Products Section */}
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 px-2">
+                Products
+              </div>
+              {PRODUCTS_SECTION.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <Link key={item.path} href={item.path} onClick={() => setIsOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start h-auto p-3 ${
+                        isActive(item.path) ? 'bg-accent text-accent-foreground' : ''
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <IconComponent className="h-5 w-5 text-muted-foreground" />
+                        <div className="text-left">
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs text-muted-foreground">{item.description}</div>
+                        </div>
+                      </div>
+                      {item.glyph && (
+                        <span className="text-lg text-muted-foreground">{item.glyph}</span>
+                      )}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
         </div>
       </div>

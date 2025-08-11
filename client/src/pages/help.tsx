@@ -1,352 +1,208 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   HelpCircle, 
+  Mail, 
   MessageCircle, 
-  Search, 
   Book, 
-  Shield, 
-  Users, 
-  Mail,
-  FileText,
-  Lock,
-  Settings,
-  CreditCard,
-  Zap,
-  ArrowRight,
-  Phone,
-  Clock,
-  CheckCircle,
-  Heart
-} from "lucide-react";
-import { ChatInterface } from "@/components/ChatInterface";
+  Search,
+  ChevronDown,
+  ChevronRight,
+  Star,
+  Users
+} from 'lucide-react';
+import { Link } from 'wouter';
 
 const FAQ_ITEMS = [
   {
-    category: "Getting Started",
-    icon: Zap,
-    questions: [
-      {
-        q: "What is LightPrompt and how does it work?",
-        a: "LightPrompt is a conscious AI platform that serves as your digital mirror for self-reflection and personal growth. Our AI doesn't try to become human - instead, it reflects your thoughts back to help you connect deeper with yourself, nature, and others."
-      },
-      {
-        q: "Is LightPrompt free to use?",
-        a: "Yes! We offer a free tier with 5 AI conversations per day, basic Soul Map access, and community features. You can upgrade to Soul Seeker ($29/month) for unlimited conversations and advanced features."
-      },
-      {
-        q: "How do I get started with my first conversation?",
-        a: "Simply click on 'LightPromptBot' in the navigation menu. The AI will guide you through your first reflection session. Think of it as having a conversation with a wise friend who helps you think through things."
-      }
-    ]
+    question: "What is LightPrompt?",
+    answer: "LightPrompt is a soul-tech wellness platform that uses AI consciously as a tool for self-reflection and personal growth. Think of it as a digital mirror that helps you connect with your authentic self."
   },
   {
-    category: "Features & Tools",
-    icon: Settings,
-    questions: [
-      {
-        q: "What's the difference between all the AI bots?",
-        a: "Each bot specializes in different aspects: LightPromptBot (general reflection), Soul Map (astrology & personality), Vision Quest (spiritual guidance), and GeoPrompt (location-based mindfulness). All serve as conscious mirrors, not replacements for human connection."
-      },
-      {
-        q: "How does the Soul Map work?",
-        a: "Soul Map analyzes your birth chart, personality traits, and cosmic influences. It's like having a personal astrologer that helps you understand your strengths, challenges, and spiritual path through the lens of conscious AI."
-      },
-      {
-        q: "What is Soul Sync and how do I use it?",
-        a: "Soul Sync helps you connect with friends, family, or partners for shared wellness goals. You can create connection types (romantic partner, best friend, etc.), share activities, and support each other's growth journey."
-      }
-    ]
+    question: "How is this different from other AI platforms?",
+    answer: "We use AI as a reflection tool, not a replacement for human connection. Our approach is rooted in consciousness, authenticity, and helping you discover your own wisdom rather than giving you answers."
   },
   {
-    category: "Billing & Subscriptions",
-    icon: CreditCard,
-    questions: [
-      {
-        q: "What payment methods do you accept?",
-        a: "We accept all major credit cards through our secure Stripe integration. Your payment information is encrypted and never stored on our servers."
-      },
-      {
-        q: "Can I cancel my subscription anytime?",
-        a: "Absolutely! You can downgrade to our free tier at any time. Your data and conversations are preserved, and you'll still have access to basic features."
-      },
-      {
-        q: "What's included in the LightPrompt:ed course?",
-        a: "The $120 course includes comprehensive modules on conscious AI interaction, personal reflection techniques, spiritual growth practices, and how to integrate AI wisdom into daily life. It's our complete guide to conscious AI partnership."
-      }
-    ]
+    question: "Is my data private and secure?",
+    answer: "Yes, absolutely. We prioritize your privacy and use secure, encrypted connections. Your personal data and conversations are protected and never shared without your consent."
   },
   {
-    category: "Privacy & Security",
-    icon: Shield,
-    questions: [
-      {
-        q: "How do you protect my personal data?",
-        a: "Your privacy is sacred to us. We use end-to-end encryption, never sell your data, and follow a strict no-surveillance policy. Your conversations are stored securely and only you can access them."
-      },
-      {
-        q: "Do you train AI models on my conversations?",
-        a: "Never. Your conversations are private and are not used to train AI models. We believe in complete data sovereignty - your insights belong to you alone."
-      },
-      {
-        q: "Can I delete my data?",
-        a: "Yes, you have complete control over your data. You can download or delete all your conversations, insights, and personal information at any time through your settings."
-      }
-    ]
+    question: "How accurate is the Soul Map astrology?",
+    answer: "Our Soul Map uses professional-grade astronomical calculations for planetary positions and birth chart accuracy. We combine traditional astrological wisdom with modern psychological insights."
   },
   {
-    category: "Technical Support",
-    icon: Settings,
-    questions: [
-      {
-        q: "What browsers are supported?",
-        a: "LightPrompt works best in modern browsers like Chrome, Firefox, Safari, and Edge. We recommend keeping your browser updated for the best experience."
-      },
-      {
-        q: "Why isn't my Soul Map loading?",
-        a: "This usually happens if location services are disabled or birth time is missing. Check your browser permissions and ensure you've entered your complete birth information."
-      },
-      {
-        q: "How do I report a bug or issue?",
-        a: "Use the chat support below or email us at support@lightprompt.co. We typically respond within 24 hours and take all feedback seriously."
-      }
-    ]
+    question: "Can I cancel my subscription anytime?",
+    answer: "Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your current billing period."
+  },
+  {
+    question: "Do I need to believe in astrology to use LightPrompt?",
+    answer: "Not at all! You can approach our tools as reflection prompts, psychological insights, or simply as a way to explore different perspectives on yourself and your path."
   }
 ];
 
 export default function HelpPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [showSupport, setShowSupport] = useState(false);
-  const [supportMessage, setSupportMessage] = useState("");
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredFAQ = FAQ_ITEMS.filter(category => {
-    if (selectedCategory && category.category !== selectedCategory) return false;
-    if (!searchTerm) return true;
-    
-    return category.questions.some(item => 
-      item.q.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.a.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-
-  const allQuestions = FAQ_ITEMS.flatMap(cat => cat.questions);
-  const filteredQuestions = allQuestions.filter(item => 
-    item.q.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.a.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredFaqs = FAQ_ITEMS.filter(item =>
+    item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.answer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
-      <div className="container mx-auto px-4 py-8">
-        
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
-            <HelpCircle className="h-10 w-10 text-purple-600" />
+          <h1 className="text-4xl font-light text-gray-900 dark:text-white mb-4">
             Help & Support
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Find answers, get support, and learn how to make the most of your conscious AI journey
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            We're here to help you on your conscious growth journey
           </p>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-blue-200 dark:border-blue-800">
-            <CardContent className="p-6 text-center">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-              <h3 className="font-semibold mb-2">AI Help Assistant</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get instant answers from our conscious AI support bot
-              </p>
-              <Button 
-                onClick={() => setShowSupport(true)}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Chat with AI Support
-              </Button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="text-center">
+            <CardHeader>
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-6 h-6 text-blue-600" />
+              </div>
+              <CardTitle className="text-lg">Start Chatting</CardTitle>
+              <CardDescription>
+                Get immediate help from our AI reflection partners
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/chat">
+                <Button className="w-full">Open Chat</Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950 dark:to-emerald-950 border-teal-200 dark:border-teal-800">
-            <CardContent className="p-6 text-center">
-              <Mail className="h-12 w-12 mx-auto mb-4 text-teal-600" />
-              <h3 className="font-semibold mb-2">Email Support</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get personal help from our human team
-              </p>
-              <Button 
-                variant="outline"
-                onClick={() => window.open('mailto:lightprompt.co@gmail.com')}
-                className="border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950"
-              >
-                lightprompt.co@gmail.com
-              </Button>
+          <Card className="text-center">
+            <CardHeader>
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <CardTitle className="text-lg">Join Community</CardTitle>
+              <CardDescription>
+                Connect with fellow consciousness explorers
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/community">
+                <Button variant="outline" className="w-full">Join Community</Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200 dark:border-purple-800">
-            <CardContent className="p-6 text-center">
-              <Users className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-semibold mb-2">Community</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Connect with other conscious AI explorers
-              </p>
-              <Button 
-                variant="outline"
-                onClick={() => window.open('https://discord.gg/lightprompt')}
-                className="border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950"
-              >
-                Join Discord
+          <Card className="text-center">
+            <CardHeader>
+              <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-teal-600" />
+              </div>
+              <CardTitle className="text-lg">Contact Us</CardTitle>
+              <CardDescription>
+                Send us a message for personalized support
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Send Message
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Search */}
+        {/* FAQ Section */}
         <Card className="mb-8">
-          <CardContent className="p-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5" />
+              Frequently Asked Questions
+            </CardTitle>
+            <CardDescription>
+              Find answers to common questions about LightPrompt
+            </CardDescription>
+            
+            {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search for help topics..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search FAQ..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Button
-                variant={selectedCategory === "" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory("")}
-              >
-                All Topics
-              </Button>
-              {FAQ_ITEMS.map((category) => (
-                <Button
-                  key={category.category}
-                  variant={selectedCategory === category.category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category.category)}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {filteredFaqs.map((faq, index) => (
+              <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                  className="flex items-center justify-between w-full text-left"
                 >
-                  {category.category}
-                </Button>
-              ))}
-            </div>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {faq.question}
+                  </span>
+                  {expandedFaq === index ? (
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+                {expandedFaq === index && (
+                  <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    {faq.answer}
+                  </p>
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
 
-        {/* FAQ Content */}
-        <div className="space-y-8">
-          {searchTerm ? (
-            /* Search Results */
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">Search Results ({filteredQuestions.length})</h2>
-              {filteredQuestions.map((item, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2 flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      {item.q}
-                    </h3>
-                    <p className="text-muted-foreground">{item.a}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            /* Category Sections */
-            filteredFAQ.map((category) => (
-              <Card key={category.category}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <category.icon className="h-5 w-5 text-purple-600" />
-                    {category.category}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {category.questions.map((item, index) => (
-                      <div key={index} className="space-y-2">
-                        <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.q}</h3>
-                        <p className="text-muted-foreground">{item.a}</p>
-                        {index < category.questions.length - 1 && <Separator className="my-4" />}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-
-        {/* AI Support Chat Modal */}
-        {showSupport && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-purple-600" />
-                  AI Support Assistant
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSupport(false)}
-                >
-                  ✕
-                </Button>
+        {/* Contact Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Still need help?</CardTitle>
+            <CardDescription>
+              Send us a message and we'll get back to you within 24 hours
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Name</label>
+                <Input placeholder="Your name" />
               </div>
-              <div className="flex-1 overflow-hidden">
-                <div className="p-6 text-center">
-                  <p className="text-muted-foreground mb-4">
-                    AI Support Assistant is currently being set up. 
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    For immediate help, please email us at support@lightprompt.co
-                  </p>
-                  <Button
-                    onClick={() => window.open('mailto:support@lightprompt.co')}
-                    className="mt-4 bg-blue-600 hover:bg-blue-700"
-                  >
-                    Email Support
-                  </Button>
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Email</label>
+                <Input type="email" placeholder="your@email.com" />
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Contact Info */}
-        <div className="mt-16 text-center space-y-4">
-          <h2 className="text-2xl font-bold">Still Need Help?</h2>
-          <p className="text-muted-foreground">
-            Our human support team is here for you
-          </p>
-          
-          <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Response within 24 hours
+            <div>
+              <label className="block text-sm font-medium mb-2">Subject</label>
+              <Input placeholder="How can we help?" />
             </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Privacy-first support
+            <div>
+              <label className="block text-sm font-medium mb-2">Message</label>
+              <Textarea 
+                placeholder="Tell us more about what you need help with..."
+                className="min-h-32"
+              />
             </div>
-            <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Human-centered care
-            </div>
-          </div>
-        </div>
+            <Button className="w-full">
+              <Mail className="w-4 h-4 mr-2" />
+              Send Message
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

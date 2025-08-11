@@ -16,6 +16,14 @@ import CommunityPage from "@/pages/community";
 import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import DashboardPage from "@/pages/dashboard";
+import StorePage from "@/pages/store";
+import HelpPage from "@/pages/help";
+import SettingsPage from "@/pages/settings";
+import BlogPage from "@/pages/blog";
+import PrivacyPage from "@/pages/privacy";
+import FeaturesPage from "@/pages/features";
+import IntegrationsPage from "@/pages/integrations";
+import BusinessPage from "@/pages/business";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -61,6 +69,46 @@ function Router() {
       <Route path="/dashboard" component={() => (
         <MainLayout>
           <DashboardPage />
+        </MainLayout>
+      )} />
+      <Route path="/store" component={() => (
+        <MainLayout>
+          <StorePage />
+        </MainLayout>
+      )} />
+      <Route path="/help" component={() => (
+        <MainLayout>
+          <HelpPage />
+        </MainLayout>
+      )} />
+      <Route path="/settings" component={() => (
+        <MainLayout>
+          <SettingsPage />
+        </MainLayout>
+      )} />
+      <Route path="/blog" component={() => (
+        <MainLayout>
+          <BlogPage />
+        </MainLayout>
+      )} />
+      <Route path="/privacy" component={() => (
+        <MainLayout>
+          <PrivacyPage />
+        </MainLayout>
+      )} />
+      <Route path="/features" component={() => (
+        <MainLayout>
+          <FeaturesPage />
+        </MainLayout>
+      )} />
+      <Route path="/integrations" component={() => (
+        <MainLayout>
+          <IntegrationsPage />
+        </MainLayout>
+      )} />
+      <Route path="/business" component={() => (
+        <MainLayout>
+          <BusinessPage />
         </MainLayout>
       )} />
       <Route component={NotFound} />
