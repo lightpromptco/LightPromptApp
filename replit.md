@@ -13,6 +13,26 @@ Pricing: Course $120, Ebook $11, Bundle $125 (saves $99) - no "WooWoo" terminolo
 Domain transition: Moving to lightprompt.co as main landing page.
 Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NOT requiring authentication for basic functionality. Spotify-style authentication ONLY for invite recipients. Soul Sync is its own dedicated page with connected user cards, separate from Soul Map page.
 
+## CRITICAL: CORE DATA PROTECTION POLICY
+**NEVER modify, delete, or alter any of the following core LightPrompt systems without explicit user permission:**
+- User authentication system and user data (users table, sessions, messages)
+- Payment/billing system (Stripe integration, user tiers, access codes)
+- Course content and access controls (course materials, user profiles)
+- Astrology/Soul Map core functionality and calculations
+- Bot personalities and system prompts (LightPromptBot, SoulMap Oracle, etc.)
+- Database schema for existing production tables
+- Admin access controls and security settings
+- Email marketing integrations (SendGrid, ConvertKit)
+- Existing API routes that power core functionality
+
+**Only work on:**
+- New features explicitly requested by user
+- UI/styling improvements that don't change functionality
+- Bug fixes that restore intended behavior
+- Performance optimizations that don't change core logic
+
+**Before making ANY changes to core systems, ALWAYS ask for explicit permission.**
+
 ## System Architecture
 
 ### Frontend
