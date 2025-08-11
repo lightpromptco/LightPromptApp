@@ -59,11 +59,11 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - `/admin/settings` provides a developer mode toggle for `lightprompt.co@gmail.com` for Wix.com-style editing capabilities.
 
 ### Feature Specifications
-- **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses
+- **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses. Streamlined interface with Aquarius Soul Summary integrated at top, eliminating duplicate information throughout sidebar and redundant sections.
 - **Career Path Guidance**: Integrated VibeMatch and SoulSync systems providing personalized career direction based on astrological analysis, including ideal careers, natural talents, work styles, and professional timing insights
 - **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings, enhanced with career-focused guidance
 - **Enhanced Birth Chart Report**: Updated with actual birth chart data from Cafe Astrology PDF for accurate planetary positions - Capricorn Rising 14°16', Sun Aquarius 28°01' in 2nd House, Moon Leo 15°27' in 7th House
-- **Redesigned Oracle Widgets**: Professional gradient-based Daily Oracle, Quick Oracle, Moon Wisdom, and Career Path interface with improved UX and visual hierarchy
+- **Clean UI Design**: Completely removed Daily Oracle from all interface sections, consolidated sun sign information into single cosmic blueprint display, eliminated all duplicate content for streamlined user experience.
 - **VibeMatch Score**: Algorithmic compatibility assessment between current path and astrological potential (1-100 scale) based on planetary alignments
 - **SoulSync Areas**: Deep alignment guidance connecting personal values with professional fulfillment through astrological insights
 - **Store Experience**: Redesigned for clear customer journey from "Learn More" to product information pages (`/product-info`).
