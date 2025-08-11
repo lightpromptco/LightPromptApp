@@ -16,7 +16,76 @@ interface PricingPlan {
   stripePriceId?: string;
 }
 
-const pricingPlans: PricingPlan[] = [
+const subscriptionPlans: PricingPlan[] = [
+  {
+    id: 'explorer',
+    name: 'Explorer',
+    price: 0,
+    description: 'Perfect for discovering your wellness journey',
+    features: [
+      '5 free SoulSync connections',
+      'All LightPrompt bots access',
+      'Basic astrology wisdom',
+      'Community group access',
+      '2 wellness patterns per month',
+      'Partner mode preview (1 connection)'
+    ],
+    stripePriceId: 'price_explorer_free'
+  },
+  {
+    id: 'growth',
+    name: 'Growth',
+    price: 29,
+    description: 'For those committed to personal transformation',
+    features: [
+      'All Explorer features',
+      'Access to all specialized bots',
+      'Unlimited habit tracking',
+      'Advanced wellness patterns',
+      'VibeMatch community features',
+      'Voice conversations',
+      'Export wellness data',
+      'Full birth chart & resources',
+      'Unlimited partner mode connections'
+    ],
+    popular: true,
+    stripePriceId: 'price_growth_29'
+  },
+  {
+    id: 'resonance',
+    name: 'Resonance',
+    price: 49,
+    description: 'Deep connection and partnership features',
+    features: [
+      'All Growth features',
+      'Partner Mode (share with loved ones)',
+      'Couples wellness tracking',
+      'Advanced AI personality customization',
+      'Priority support',
+      'Early access to new features',
+      'Custom wellness goal setting'
+    ],
+    stripePriceId: 'price_resonance_49'
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 199,
+    description: 'For organizations and wellness professionals',
+    features: [
+      'All Resonance features',
+      'Team & organization management',
+      'Custom AI training',
+      'Advanced analytics dashboard',
+      'API access',
+      'White-label options',
+      'Dedicated account manager'
+    ],
+    stripePriceId: 'price_enterprise_199'
+  }
+];
+
+const productPlans: PricingPlan[] = [
   {
     id: 'course',
     name: 'Soul Map & Cosmos Course',
@@ -24,7 +93,7 @@ const pricingPlans: PricingPlan[] = [
     description: 'Complete astrological career guidance course with lifetime access',
     features: [
       'Complete career astrology curriculum',
-      'Interactive birth chart analysis',
+      'Interactive birth chart analysis', 
       'Personalized career path guidance',
       'VibeMatch compatibility scoring',
       'SoulSync alignment tools',
@@ -36,15 +105,16 @@ const pricingPlans: PricingPlan[] = [
   },
   {
     id: 'ebook',
-    name: 'Digital Guidebook',
+    name: 'LightPrompt:Ed Digital Guide',
     price: 11,
-    description: 'Essential astrological career insights in digital format',
+    description: 'The Human Guide to Conscious AI & Soul Tech',
     features: [
-      'Comprehensive career astrology guide',
-      'Downloadable PDF format',
-      'Quick reference charts',
-      'Basic compatibility insights',
-      'Self-guided exercises'
+      'Complete 12-module curriculum',
+      'Learn prompt crafting for self-reflection',
+      'Healing work + shadow prompts',
+      'Soul dialogue + higher self integration',
+      'Creative expression techniques',
+      'Building healthy AI practice'
     ],
     stripePriceId: 'price_ebook_11'
   },
@@ -71,9 +141,18 @@ const pricingPlans: PricingPlan[] = [
 
 export default function Store() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'subscriptions' | 'products'>('subscriptions');
   const { toast } = useToast();
 
   const handlePurchase = async (plan: PricingPlan) => {
+    if (plan.price === 0) {
+      toast({
+        title: 'Welcome to Explorer!',
+        description: 'You now have access to all Explorer features including 5 free SoulSync connections.',
+      });
+      return;
+    }
+
     setLoading(plan.id);
     try {
       // For one-time purchases (course, ebook, bundle)
@@ -133,6 +212,8 @@ export default function Store() {
     }
   };
 
+  const currentPlans = activeTab === 'subscriptions' ? subscriptionPlans : productPlans;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-16">
@@ -147,9 +228,35 @@ export default function Store() {
           </p>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+            <button
+              onClick={() => setActiveTab('subscriptions')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                activeTab === 'subscriptions'
+                  ? 'bg-white dark:bg-gray-700 text-teal-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              Subscription Plans
+            </button>
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                activeTab === 'products'
+                  ? 'bg-white dark:bg-gray-700 text-teal-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              Digital Products
+            </button>
+          </div>
+        </div>
+
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {pricingPlans.map((plan) => (
+          {currentPlans.map((plan) => (
             <Card
               key={plan.id}
               className={`relative h-full transition-all duration-300 hover:shadow-2xl ${
