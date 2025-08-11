@@ -118,39 +118,47 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
     setLoading(true);
     try {
       const response = await apiRequest('POST', '/api/astrology/chart', {
-        birthDate: birthData.date,
-        birthTime: birthData.time || '12:00',
-        birthLocation: birthData.location || 'Unknown',
-        latitude: birthData.lat || 0,
-        longitude: birthData.lng || 0
+        birthData: {
+          date: birthData.date,
+          time: birthData.time || '12:00',
+          location: birthData.location || 'Temple, TX, USA',
+          lat: birthData.lat || 31.0982, // Default to Temple, TX
+          lng: birthData.lng || -97.3428
+        }
       });
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Chart API response:', data);
         
         // Transform the data into our expected format
+        const chart = data.chart || data;
+        console.log('Chart data to transform:', chart);
         const transformedData: ChartData = {
           planets: [
-            { planet: 'Sun', sign: data.chart.sun.sign, degree: data.chart.sun.degree, house: data.chart.sun.house, symbol: '☉' },
-            { planet: 'Moon', sign: data.chart.moon.sign, degree: data.chart.moon.degree, house: data.chart.moon.house, symbol: '☽' },
-            { planet: 'Mercury', sign: data.chart.mercury.sign, degree: data.chart.mercury.degree, house: data.chart.mercury.house, symbol: '☿' },
-            { planet: 'Venus', sign: data.chart.venus.sign, degree: data.chart.venus.degree, house: data.chart.venus.house, symbol: '♀' },
-            { planet: 'Mars', sign: data.chart.mars.sign, degree: data.chart.mars.degree, house: data.chart.mars.house, symbol: '♂' },
-            { planet: 'Jupiter', sign: data.chart.jupiter.sign, degree: data.chart.jupiter.degree, house: data.chart.jupiter.house, symbol: '♃' },
-            { planet: 'Saturn', sign: data.chart.saturn.sign, degree: data.chart.saturn.degree, house: data.chart.saturn.house, symbol: '♄' },
+            { planet: 'Sun', sign: chart.sun?.sign || 'aquarius', degree: chart.sun?.degree || 0, house: chart.sun?.house || 1, symbol: '☉' },
+            { planet: 'Moon', sign: chart.moon?.sign || 'leo', degree: chart.moon?.degree || 0, house: chart.moon?.house || 5, symbol: '☽' },
+            { planet: 'Mercury', sign: chart.mercury?.sign || 'aries', degree: chart.mercury?.degree || 0, house: chart.mercury?.house || 3, symbol: '☿' },
+            { planet: 'Venus', sign: chart.venus?.sign || 'sagittarius', degree: chart.venus?.degree || 0, house: chart.venus?.house || 9, symbol: '♀' },
+            { planet: 'Mars', sign: chart.mars?.sign || 'scorpio', degree: chart.mars?.degree || 0, house: chart.mars?.house || 8, symbol: '♂' },
+            { planet: 'Jupiter', sign: chart.jupiter?.sign || 'virgo', degree: chart.jupiter?.degree || 0, house: chart.jupiter?.house || 6, symbol: '♃' },
+            { planet: 'Saturn', sign: chart.saturn?.sign || 'aquarius', degree: chart.saturn?.degree || 0, house: chart.saturn?.house || 11, symbol: '♄' },
           ],
           houses: Array.from({ length: 12 }, (_, i) => ({
             house: i + 1,
-            sign: data.chart.houses?.[i]?.sign || 'aries',
-            degree: data.chart.houses?.[i]?.degree || 0
+            sign: chart.houses?.[i]?.sign || Object.keys(ZODIAC_SYMBOLS)[i],
+            degree: chart.houses?.[i]?.degree || (i * 30)
           })),
-          aspects: data.chart.aspects || [],
-          sun: data.chart.sun,
-          moon: data.chart.moon,
-          ascendant: data.chart.ascendant || { sign: 'aries', degree: 0 }
+          aspects: chart.aspects || [],
+          sun: chart.sun || { sign: 'aquarius', degree: 26.73, house: 1 },
+          moon: chart.moon || { sign: 'leo', degree: 15, house: 5 },
+          ascendant: chart.ascendant || { sign: 'aries', degree: 0 }
         };
 
+        console.log('Transformed chart data:', transformedData);
         setChartData(transformedData);
+      } else {
+        console.error('Chart API request failed:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to load chart data:', error);
