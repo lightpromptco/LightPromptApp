@@ -18,7 +18,6 @@ import PlansPage from "@/pages/plans";
 import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
 import AdminBlog from "@/pages/admin/blog";
-import PageEditor from "@/pages/admin/page-editor";
 import UniversalEditor from "@/pages/admin/universal-editor";
 import BlogPage from "@/pages/blog";
 import PrismPointsPage from "@/pages/prism-points";
@@ -49,6 +48,8 @@ import CosmicDebugConsole from "@/pages/cosmic-debug";
 import ApiExplorer from "@/pages/api-explorer";
 import DataViewer from "@/pages/data-viewer";
 import SystemStatus from "@/pages/system-status";
+import PageEditor from "@/pages/admin/page-editor";
+import AnalyticsPage from "@/pages/admin/analytics";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -199,9 +200,23 @@ function Router() {
           <VisionQuestStagePage />
         </MainLayout>
       )} />
+      {/* Admin Routes */}
+      <Route path="/admin" component={() => (
+        <ContentManagement />
+      )} />
       <Route path="/admin/content" component={() => (
         <ContentManagement />
       )} />
+      <Route path="/admin/page-editor" component={() => (
+        <PageEditor />
+      )} />
+      <Route path="/universal-editor" component={() => (
+        <PageEditor />
+      )} />
+      <Route path="/admin/analytics" component={() => (
+        <AnalyticsPage />
+      )} />
+      <Route path="/admin/system" component={SystemStatus} />
       <Route path="/blog" component={() => (
         <MainLayout>
           <BlogPage />

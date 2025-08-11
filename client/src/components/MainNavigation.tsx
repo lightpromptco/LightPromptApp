@@ -33,36 +33,31 @@ const NAV_ITEMS = [
     subItems: [
       { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
-      { path: "/geoprompt", label: "GeoPrompt (Beta)", icon: Map, description: "Location-Based Mindfulness" }
+      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" },
+      { path: "/daily-oracle", label: "Daily Oracle", icon: Sparkles, description: "Daily Guidance" }
     ]
   },
   { 
-    path: "/soul-sync", 
+    path: "/connect", 
     label: "Connect", 
     icon: Users, 
     description: "Community & Relationships", 
     glyph: "◇",
     subItems: [
-      { path: "/soul-sync", label: "Soul Sync (Beta)", icon: Heart, description: "Find Your Connection" },
-      { path: "/vibe-match", label: "VibeMatch (Coming Soon)", icon: Sparkles, description: "AI-Powered Compatibility" },
-      { path: "/community", label: "Community (Coming Soon)", icon: Users, description: "Join Our Discord" }
+      { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Find Your Connection" },
+      { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" },
+      { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" }
     ]
   },
   { 
-    path: "/features", 
-    label: "Features", 
-    icon: Sparkles, 
-    description: "Platform Features", 
-    glyph: "⟡",
-    subItems: [
-      { path: "/dashboard", label: "BodyMirror (Beta)", icon: Activity, description: "Your Wellness Overview" },
-      { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
-      { path: "/prism-points", label: "Prism Points (Coming Soon)", icon: Sparkles, description: "Reward System" }
-    ]
+    path: "/dashboard", 
+    label: "Dashboard", 
+    icon: Activity, 
+    description: "Your Wellness Overview", 
+    glyph: "⟡"
   },
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
-  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" },
-  { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy", glyph: "⟤" },
+  { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" }
 ];
 
 const PRODUCT_ITEMS = [
@@ -151,6 +146,53 @@ export function MainNavigation() {
         </div>
 
         <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-screen">
+          {/* Admin Navigation - Only show for admin users */}
+          {isAdmin && (
+            <div className="border-b pb-4 mb-4">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                Admin & Developer Tools
+              </h3>
+              <div className="space-y-1">
+                <Link href="/admin" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-auto p-3">
+                    <Settings className="w-4 h-4 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Admin Dashboard</div>
+                      <div className="text-xs opacity-70">Content & System Management</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/admin/analytics" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-auto p-3">
+                    <Activity className="w-4 h-4 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Analytics & Reports</div>
+                      <div className="text-xs opacity-70">User metrics & platform insights</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/universal-editor" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-auto p-3">
+                    <Settings className="w-4 h-4 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Universal Editor</div>
+                      <div className="text-xs opacity-70">Visual page editor & CMS</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/system-status" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-auto p-3">
+                    <Activity className="w-4 h-4 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">System Status</div>
+                      <div className="text-xs opacity-70">Real-time health monitoring</div>
+                    </div>
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Main Navigation */}
           <div className="space-y-2">
             {NAV_ITEMS.map((item) => {

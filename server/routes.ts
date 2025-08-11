@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { analyticsRouter } from "./routes/analytics";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
@@ -104,6 +105,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register content management routes
   registerContentRoutes(app);
+  
+  // Analytics and admin routes
+  app.use('/api', analyticsRouter);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {
