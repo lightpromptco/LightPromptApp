@@ -11,15 +11,15 @@ import aiContentRoutes from "./routes/ai-content";
 import { adminRoutes } from "./routes/admin";
 import { lightpromptKnowledge } from "./lightpromptKnowledge";
 import { registerSettingsRoutes } from "./routes/settings";
+import { registerGeoPromptRoutes } from "./routes/geoprompt";
+import { registerVibeMatchRoutes } from "./routes/vibematch";
+import { registerVisionQuestRoutes } from "./routes/visionquest";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
-  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
-  insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
-  insertAppleHealthDataSchema, insertHomeKitDataSchema,
-  wellnessMetrics, platformEvolution, partnerConnections
+  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -179,6 +179,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Settings routes
   registerSettingsRoutes(app);
+
+  // Core feature API routes - GeoPrompt, VibeMatch, VisionQuest
+  registerGeoPromptRoutes(app);
+  registerVibeMatchRoutes(app);
+  registerVisionQuestRoutes(app);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {

@@ -47,6 +47,7 @@ import CheckoutPage from "@/pages/checkout";
 import CheckoutSuccess from "@/pages/checkout/success";
 import ContactSalesPage from "@/pages/contact-sales";
 import { SimpleOraclePage } from "@/pages/simple-oracle";
+import Features from "@/pages/Features";
 
 import CosmicDebugConsole from "@/pages/cosmic-debug";
 import ApiExplorer from "@/pages/api-explorer";
@@ -125,6 +126,11 @@ function Router() {
       <Route path="/vibe-match" component={() => (
         <MainLayout>
           <VibeMatchPage />
+        </MainLayout>
+      )} />
+      <Route path="/features" component={() => (
+        <MainLayout>
+          <Features />
         </MainLayout>
       )} />
       <Route path="/geoprompt" component={() => (
