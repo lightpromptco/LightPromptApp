@@ -645,80 +645,124 @@ export default function SoulMapExplorerPage() {
 
   // Interactive chart component
   const InteractiveChart = () => (
-    <div className="relative w-96 h-96 mx-auto">
-      {/* Outer circle - chart wheel */}
-      <div className="absolute inset-0 border-4 border-purple-300 rounded-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
-        
-        {/* Zodiac wheel segments with enhanced interaction */}
-        {ZODIAC_SIGNS.map((sign, index) => {
-          const angle = (index * 30) - 90; // 30 degrees per sign, starting at top
-          const x = 50 + 40 * Math.cos(angle * Math.PI / 180);
-          const y = 50 + 40 * Math.sin(angle * Math.PI / 180);
-          
-          return (
+    <div className="relative w-[500px] h-[500px] mx-auto">
+      {/* Cosmic background with animated starfield */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-black overflow-hidden shadow-2xl border-4 border-gradient-to-r from-yellow-400 via-purple-500 to-cyan-400">
+        {/* Animated cosmic dust */}
+        <div className="absolute inset-0 opacity-30">
+          {[...Array(30)].map((_, i) => (
             <div
-              key={sign.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group hover:scale-125 transition-all duration-300"
-              style={{ left: `${x}%`, top: `${y}%` }}
-              onClick={() => setSelectedPlanet(sign.id)}
-            >
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${sign.color} shadow-lg flex items-center justify-center text-white text-lg hover:shadow-xl transition-all duration-300 border-2 border-white ${selectedPlanet === sign.id ? 'ring-4 ring-purple-400 scale-125' : ''}`}>
-                {sign.emoji}
-              </div>
-              
-              {/* Sign name tooltip */}
-              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/80 text-white px-2 py-1 rounded-md">
-                {sign.name}
-                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
-              </div>
-
-              {/* Selected indicator */}
-              {selectedPlanet === sign.id && (
-                <div className="absolute inset-0 rounded-full border-2 border-purple-400 animate-pulse"></div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Planet positions with enhanced styling */}
-        {CHART_AREAS.map((planet) => (
-          <div
-            key={planet.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
-            style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
-            onClick={() => setSelectedPlanet(planet.id)}
-          >
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-xl flex items-center justify-center hover:scale-125 transition-all duration-300 group-hover:shadow-2xl border-2 border-gray-100 ${selectedPlanet === planet.id ? 'ring-4 ring-purple-400 scale-125 shadow-purple-200' : ''}`}>
-              <planet.icon className={`w-6 h-6 ${planet.color} drop-shadow-sm`} />
-            </div>
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 3}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Zodiac outer ring */}
+        <div className="absolute inset-8 border-2 border-yellow-400/50 rounded-full bg-gradient-to-br from-purple-800/20 to-blue-800/20 backdrop-blur-sm">
+          {/* Zodiac wheel segments with enhanced interaction */}
+          {ZODIAC_SIGNS.map((sign, index) => {
+            const angle = (index * 30) - 90; // 30 degrees per sign, starting at top
+            const radius = 42; // Adjusted for larger cosmic design
+            const x = 50 + radius * Math.cos(angle * Math.PI / 180);
+            const y = 50 + radius * Math.sin(angle * Math.PI / 180);
             
-            {/* Planet name tooltip */}
-            <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/80 text-white px-2 py-1 rounded-md">
-              {planet.name}
-              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
-            </div>
+            return (
+              <div
+                key={sign.id}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
+                style={{ left: `${x}%`, top: `${y}%` }}
+                onClick={() => setSelectedPlanet(sign.id)}
+              >
+                <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${sign.color} shadow-2xl flex items-center justify-center text-white text-2xl font-bold transform transition-all duration-500 hover:scale-125 hover:rotate-12 border-2 border-white/30 ${selectedPlanet === sign.id ? 'ring-4 ring-yellow-400/60 scale-125 shadow-yellow-400/50' : ''}`}>
+                  {/* Glowing effect */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                  <span className="relative z-10 drop-shadow-lg">{sign.emoji}</span>
+                </div>
+                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-2 rounded-lg shadow-lg">
+                  <div className="font-bold">{sign.name}</div>
+                  <div className="text-xs opacity-80">{sign.dates}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-            {/* Pulsing animation for selected planet */}
-            {selectedPlanet === planet.id && (
-              <div className="absolute inset-0 rounded-full border-2 border-purple-400 animate-ping"></div>
-            )}
-          </div>
-        ))}
+        {/* Inner planetary system */}
+        <div className="absolute inset-16 rounded-full bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-white/20">
+          {CHART_AREAS.map((planet) => {
+            return (
+              <div
+                key={planet.id}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
+                style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
+                onClick={() => setSelectedPlanet(planet.id)}
+              >
+                <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl flex items-center justify-center transform transition-all duration-500 hover:scale-125 hover:-translate-y-1 border-2 border-white/40 ${selectedPlanet === planet.id ? 'ring-4 ring-cyan-400/60 scale-125 shadow-cyan-400/50' : ''}`}>
+                  {/* Planet glow effect */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                  <planet.icon className={`w-6 h-6 ${planet.color} relative z-10 drop-shadow-lg`} />
+                </div>
+                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-2 rounded-lg shadow-lg border border-white/20">
+                  <div className="font-bold">{planet.name}</div>
+                  <div className="text-xs opacity-80">{planet.description.split(' ').slice(0, 3).join(' ')}...</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-        {/* Center - soul essence with interactive core */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        {/* Central cosmic sun/soul core */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div 
-            className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 via-orange-500 to-yellow-600 flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 transition-all duration-300 border-4 border-white/30"
+            className="relative w-24 h-24 rounded-full bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500 shadow-2xl flex items-center justify-center cursor-pointer transform transition-all duration-700 hover:scale-110 hover:rotate-45 border-4 border-white/30"
             onClick={() => {
               setCurrentMessage("Tell me about my soul essence and core purpose based on my complete birth chart");
               setCurrentView('chat');
             }}
           >
-            <Sparkles className="w-10 w-10 text-white animate-pulse" />
+            {/* Multi-layered glow effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-200/50 via-orange-300/50 to-red-400/50 animate-spin" style={{ animationDuration: '8s' }}></div>
+            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/40 to-transparent animate-pulse"></div>
+            <Sun className="w-12 h-12 text-white relative z-10 animate-pulse drop-shadow-2xl" />
+            
+            {/* Radiating energy lines */}
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-0.5 h-8 bg-gradient-to-t from-transparent to-yellow-300 origin-bottom opacity-60"
+                style={{
+                  transform: `rotate(${i * 45}deg) translateY(-40px)`,
+                  animationDelay: `${i * 0.2}s`
+                }}
+              />
+            ))}
           </div>
-          {/* Subtle rotating ring around center */}
-          <div className="absolute w-32 h-32 border-2 border-purple-300/30 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
         </div>
+        
+        {/* Mystical corner elements */}
+        <div className="absolute top-8 left-8 transform -rotate-12">
+          <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse drop-shadow-lg" />
+        </div>
+        <div className="absolute bottom-8 right-8 transform rotate-12">
+          <Stars className="w-8 h-8 text-blue-400 animate-pulse drop-shadow-lg" />
+        </div>
+        <div className="absolute top-8 right-8 transform rotate-12">
+          <Moon className="w-8 h-8 text-indigo-300 animate-bounce drop-shadow-lg" />
+        </div>
+        <div className="absolute bottom-8 left-8 transform -rotate-12">
+          <Eye className="w-8 h-8 text-teal-400 animate-pulse drop-shadow-lg" />
+        </div>
+        
+        {/* Cosmic energy rings */}
+        <div className="absolute inset-12 border border-white/10 rounded-full animate-spin" style={{ animationDuration: '30s' }}></div>
+        <div className="absolute inset-20 border border-purple-400/20 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}></div>
       </div>
     </div>
   );
