@@ -3300,15 +3300,15 @@ ${new Date().toLocaleString()}
     }
   });
 
-  // Email marketing endpoints
+  // Email marketing endpoints - ConvertKit integration
   app.post('/api/email/test-configuration', async (req, res) => {
     try {
-      // Use isolated test function to avoid template issues
-      const { testSendGridConnection } = await import('./email-test');
-      const result = await testSendGridConnection();
+      const { EmailMarketing } = await import('./convertkit');
+      const emailService = new EmailMarketing();
+      const result = await emailService.testConfiguration();
       res.json(result);
     } catch (error: any) {
-      console.error('Email test configuration error:', error);
+      console.error('ConvertKit test error:', error);
       res.status(500).json({ success: false, error: error.message || 'Email configuration test failed' });
     }
   });
@@ -3320,8 +3320,9 @@ ${new Date().toLocaleString()}
         return res.status(400).json({ error: 'Email and name required' });
       }
       
-      const { EmailMarketing } = await import('./email-marketing');
-      const success = await EmailMarketing.sendWelcomeEmail(email, name);
+      const { EmailMarketing } = await import('./convertkit');
+      const emailService = new EmailMarketing();
+      const success = await emailService.sendWelcomeSequence(email, name);
       res.json({ success });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
@@ -3330,13 +3331,14 @@ ${new Date().toLocaleString()}
 
   app.post('/api/email/subscription-confirmation', async (req, res) => {
     try {
-      const { email, planDetails } = req.body;
-      if (!email || !planDetails) {
+      const { email, planName, planPrice } = req.body;
+      if (!email || !planName) {
         return res.status(400).json({ error: 'Email and plan details required' });
       }
       
-      const { EmailMarketing } = await import('./email-marketing');
-      const success = await EmailMarketing.sendSubscriptionConfirmation(email, planDetails);
+      const { EmailMarketing } = await import('./convertkit');
+      const emailService = new EmailMarketing();
+      const success = await emailService.handleSubscriptionUpgrade(email, planName, planPrice || 0);
       res.json({ success });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
