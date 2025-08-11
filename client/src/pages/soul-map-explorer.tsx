@@ -40,7 +40,8 @@ import {
   Maximize2,
   Play,
   Send,
-  User
+  User,
+  Mountain
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -133,61 +134,143 @@ const ZODIAC_SIGNS = [
   }
 ];
 
-// Interactive chart exploration areas
+// Interactive chart exploration areas with rich astrological data
 const CHART_AREAS = [
   {
     id: 'sun',
-    name: 'Sun Sign',
+    name: 'Sun ☉',
     icon: Sun,
     color: 'text-yellow-500',
-    description: 'Your core essence and life force',
-    questions: ['What is my soul purpose?', 'How do I shine my light?', 'What drives my ego?'],
-    coordinates: { x: 50, y: 50 }
+    description: 'Your core essence, life force, and soul purpose',
+    deepDescription: 'The Sun represents your fundamental identity, the core of who you are. It shows your life purpose, creative power, and how you express your authentic self. This is your conscious ego, your will to live, and the hero\'s journey of your soul.',
+    questions: [
+      'What is my soul purpose and life mission?', 
+      'How do I shine my authentic light?', 
+      'What does healthy ego expression look like for me?',
+      'How can I step into my personal power?'
+    ],
+    coordinates: { x: 50, y: 50 },
+    keywords: ['Identity', 'Purpose', 'Vitality', 'Leadership', 'Creative Power', 'Consciousness'],
+    house: 'The house your Sun is in shows WHERE you shine brightest in life'
   },
   {
     id: 'moon',
-    name: 'Moon Sign', 
+    name: 'Moon ☽', 
     icon: Moon,
     color: 'text-blue-400',
-    description: 'Your emotional world and inner needs',
-    questions: ['How do I process emotions?', 'What do I need to feel secure?', 'What are my hidden patterns?'],
-    coordinates: { x: 30, y: 30 }
+    description: 'Your emotional world, inner needs, and subconscious patterns',
+    deepDescription: 'The Moon represents your inner emotional landscape, your instinctive reactions, and what you need to feel secure and nurtured. It shows your subconscious patterns, your relationship with the feminine/receptive principle, and your intuitive wisdom.',
+    questions: [
+      'What do I need to feel emotionally secure?', 
+      'How do I process and express emotions?', 
+      'What are my deep subconscious patterns?',
+      'How do I connect with my intuition?'
+    ],
+    coordinates: { x: 25, y: 25 },
+    keywords: ['Emotions', 'Intuition', 'Security', 'Nurturing', 'Subconscious', 'Memory'],
+    house: 'Your Moon\'s house shows WHERE you seek emotional fulfillment'
   },
   {
     id: 'rising',
-    name: 'Rising Sign',
+    name: 'Rising ↗',
     icon: Eye,
     color: 'text-purple-500', 
-    description: 'How you appear to the world',
-    questions: ['How do others see me?', 'What mask do I wear?', 'How do I approach life?'],
-    coordinates: { x: 70, y: 20 }
+    description: 'Your outer personality and first impressions',
+    deepDescription: 'Your Rising sign (Ascendant) is the mask you wear in the world, your immediate reaction to new situations, and how others first perceive you. It\'s your approach to life, your physical appearance tendencies, and the lens through which you view the world.',
+    questions: [
+      'How do others see me when we first meet?', 
+      'What persona do I naturally project?', 
+      'How do I approach new situations?',
+      'What is my instinctive survival strategy?'
+    ],
+    coordinates: { x: 85, y: 50 },
+    keywords: ['First Impressions', 'Appearance', 'Approach', 'Mask', 'Physical Body', 'New Beginnings'],
+    house: 'Rising sign determines your entire house system and life path'
   },
   {
     id: 'venus',
-    name: 'Venus',
+    name: 'Venus ♀',
     icon: Heart,
     color: 'text-pink-500',
-    description: 'How you love and what you value',
-    questions: ['How do I express love?', 'What do I find beautiful?', 'How do I attract abundance?'],
-    coordinates: { x: 40, y: 60 }
+    description: 'How you love, attract, and what you value',
+    deepDescription: 'Venus governs love, beauty, values, and attraction. It shows how you express affection, what you find beautiful, your aesthetic sense, and how you attract abundance. This planet reveals your feminine principle and relationship to pleasure.',
+    questions: [
+      'How do I express and receive love?', 
+      'What do I find truly beautiful?', 
+      'How do I attract what I desire?',
+      'What are my core values around relationships?'
+    ],
+    coordinates: { x: 35, y: 65 },
+    keywords: ['Love', 'Beauty', 'Values', 'Attraction', 'Harmony', 'Pleasure'],
+    house: 'Venus\' house shows WHERE you find beauty and seek harmonious relationships'
   },
   {
     id: 'mars',
-    name: 'Mars',
+    name: 'Mars ♂',
     icon: Zap,
     color: 'text-red-500',
-    description: 'Your drive, passion and how you take action',
-    questions: ['How do I pursue goals?', 'What makes me angry?', 'Where is my passion?'],
-    coordinates: { x: 60, y: 40 }
+    description: 'Your drive, passion, and how you take action',
+    deepDescription: 'Mars represents your warrior energy, how you assert yourself, pursue goals, and express anger. It shows your sexual energy, competitive nature, and the masculine principle within you. This is your inner fire and how you fight for what you want.',
+    questions: [
+      'How do I pursue my goals and desires?', 
+      'What ignites my passion and anger?', 
+      'How do I assert myself in the world?',
+      'Where do I need to be more courageous?'
+    ],
+    coordinates: { x: 65, y: 35 },
+    keywords: ['Action', 'Passion', 'Anger', 'Courage', 'Competition', 'Sexuality'],
+    house: 'Mars\' house shows WHERE you direct your energy and take action'
   },
   {
     id: 'mercury',
-    name: 'Mercury',
+    name: 'Mercury ☿',
     icon: MessageCircle,
     color: 'text-green-500',
-    description: 'How you think and communicate',
-    questions: ['How do I learn best?', 'How do I communicate?', 'What is my mental style?'],
-    coordinates: { x: 45, y: 35 }
+    description: 'How you think, communicate, and process information',
+    deepDescription: 'Mercury governs communication, thinking patterns, learning style, and how you process information. It shows your intellectual approach, writing abilities, and how you connect ideas. This planet rules your nervous system and daily interactions.',
+    questions: [
+      'How do I learn and process information best?', 
+      'What is my natural communication style?', 
+      'How do I connect with others mentally?',
+      'What topics fascinate my mind?'
+    ],
+    coordinates: { x: 42, y: 28 },
+    keywords: ['Communication', 'Learning', 'Logic', 'Curiosity', 'Adaptability', 'Information'],
+    house: 'Mercury\'s house shows WHERE you focus your mental energy and communication'
+  },
+  {
+    id: 'jupiter',
+    name: 'Jupiter ♃',
+    icon: Target,
+    color: 'text-blue-600',
+    description: 'Your wisdom, expansion, and areas of abundance',
+    deepDescription: 'Jupiter represents expansion, wisdom, higher learning, and where you experience good fortune. It shows your philosophical beliefs, teaching abilities, and areas where you naturally grow and prosper. This is your inner sage and optimistic vision.',
+    questions: [
+      'Where do I experience natural abundance?',
+      'What wisdom do I have to share?',
+      'How do I expand my consciousness?',
+      'What are my philosophical beliefs?'
+    ],
+    coordinates: { x: 75, y: 65 },
+    keywords: ['Wisdom', 'Expansion', 'Teaching', 'Philosophy', 'Abundance', 'Optimism'],
+    house: 'Jupiter\'s house shows WHERE you experience growth and good fortune'
+  },
+  {
+    id: 'saturn',
+    name: 'Saturn ♄',
+    icon: Mountain,
+    color: 'text-gray-600',
+    description: 'Your lessons, discipline, and where you build mastery',
+    deepDescription: 'Saturn represents structure, discipline, karma, and the lessons you came here to learn. It shows where you face challenges that ultimately lead to mastery, your relationship with authority, and how you build lasting foundations in life.',
+    questions: [
+      'What life lessons am I here to master?',
+      'Where do I need more discipline?',
+      'How do I build lasting foundations?',
+      'What fears must I transform into wisdom?'
+    ],
+    coordinates: { x: 20, y: 75 },
+    keywords: ['Discipline', 'Mastery', 'Responsibility', 'Structure', 'Karma', 'Authority'],
+    house: 'Saturn\'s house shows WHERE you face challenges that lead to mastery'
   }
 ];
 
@@ -216,7 +299,7 @@ export default function SoulMapExplorerPage() {
       {/* Outer circle - chart wheel */}
       <div className="absolute inset-0 border-4 border-purple-300 rounded-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
         
-        {/* Zodiac wheel segments */}
+        {/* Zodiac wheel segments with enhanced interaction */}
         {ZODIAC_SIGNS.map((sign, index) => {
           const angle = (index * 30) - 90; // 30 degrees per sign, starting at top
           const x = 50 + 40 * Math.cos(angle * Math.PI / 180);
@@ -225,18 +308,29 @@ export default function SoulMapExplorerPage() {
           return (
             <div
               key={sign.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform"
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group hover:scale-125 transition-all duration-300"
               style={{ left: `${x}%`, top: `${y}%` }}
               onClick={() => setSelectedPlanet(sign.id)}
             >
-              <div className="w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-lg hover:shadow-xl transition-shadow">
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${sign.color} shadow-lg flex items-center justify-center text-white text-lg hover:shadow-xl transition-all duration-300 border-2 border-white ${selectedPlanet === sign.id ? 'ring-4 ring-purple-400 scale-125' : ''}`}>
                 {sign.emoji}
               </div>
+              
+              {/* Sign name tooltip */}
+              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/80 text-white px-2 py-1 rounded-md">
+                {sign.name}
+                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
+              </div>
+
+              {/* Selected indicator */}
+              {selectedPlanet === sign.id && (
+                <div className="absolute inset-0 rounded-full border-2 border-purple-400 animate-pulse"></div>
+              )}
             </div>
           );
         })}
 
-        {/* Planet positions */}
+        {/* Planet positions with enhanced styling */}
         {CHART_AREAS.map((planet) => (
           <div
             key={planet.id}
@@ -244,20 +338,36 @@ export default function SoulMapExplorerPage() {
             style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
             onClick={() => setSelectedPlanet(planet.id)}
           >
-            <div className={`w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 transition-all group-hover:shadow-2xl ${selectedPlanet === planet.id ? 'ring-4 ring-purple-400 scale-110' : ''}`}>
-              <planet.icon className={`w-5 h-5 ${planet.color}`} />
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-xl flex items-center justify-center hover:scale-125 transition-all duration-300 group-hover:shadow-2xl border-2 border-gray-100 ${selectedPlanet === planet.id ? 'ring-4 ring-purple-400 scale-125 shadow-purple-200' : ''}`}>
+              <planet.icon className={`w-6 h-6 ${planet.color} drop-shadow-sm`} />
             </div>
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+            
+            {/* Planet name tooltip */}
+            <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/80 text-white px-2 py-1 rounded-md">
               {planet.name}
+              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
             </div>
+
+            {/* Pulsing animation for selected planet */}
+            {selectedPlanet === planet.id && (
+              <div className="absolute inset-0 rounded-full border-2 border-purple-400 animate-ping"></div>
+            )}
           </div>
         ))}
 
-        {/* Center - soul essence */}
+        {/* Center - soul essence with interactive core */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div 
+            className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 via-orange-500 to-yellow-600 flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 transition-all duration-300 border-4 border-white/30"
+            onClick={() => {
+              setCurrentMessage("Tell me about my soul essence and core purpose based on my complete birth chart");
+              setCurrentView('chat');
+            }}
+          >
+            <Sparkles className="w-10 w-10 text-white animate-pulse" />
           </div>
+          {/* Subtle rotating ring around center */}
+          <div className="absolute w-32 h-32 border-2 border-purple-300/30 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
         </div>
       </div>
     </div>
@@ -430,7 +540,7 @@ export default function SoulMapExplorerPage() {
                      ZODIAC_SIGNS.find(s => s.id === selectedPlanet)?.name}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   {(() => {
                     const planet = CHART_AREAS.find(p => p.id === selectedPlanet);
                     const sign = ZODIAC_SIGNS.find(s => s.id === selectedPlanet);
@@ -438,22 +548,58 @@ export default function SoulMapExplorerPage() {
                     if (planet) {
                       return (
                         <>
-                          <p className="text-sm text-muted-foreground">{planet.description}</p>
+                          <div className="space-y-3">
+                            <p className="text-sm text-muted-foreground leading-relaxed">{planet.description}</p>
+                            <details className="group">
+                              <summary className="cursor-pointer text-sm font-medium text-purple-600 hover:text-purple-800">
+                                Deep Dive ↓
+                              </summary>
+                              <p className="text-sm text-muted-foreground mt-2 leading-relaxed border-l-2 border-purple-200 pl-3">
+                                {planet.deepDescription}
+                              </p>
+                            </details>
+                          </div>
+
                           <div>
-                            <h4 className="font-medium mb-2">Ask the Oracle:</h4>
+                            <h4 className="font-medium mb-2 flex items-center gap-2">
+                              <Gem className="w-4 h-4 text-purple-500" />
+                              Key Themes
+                            </h4>
+                            <div className="flex flex-wrap gap-1">
+                              {planet.keywords.map((keyword, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {keyword}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <h4 className="font-medium mb-2 flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-blue-500" />
+                              House Wisdom
+                            </h4>
+                            <p className="text-sm text-muted-foreground italic">{planet.house}</p>
+                          </div>
+
+                          <div>
+                            <h4 className="font-medium mb-2 flex items-center gap-2">
+                              <Bot className="w-4 h-4 text-purple-500" />
+                              Ask the Oracle
+                            </h4>
                             <div className="space-y-2">
                               {planet.questions.map((question, index) => (
                                 <Button
                                   key={index}
                                   variant="outline"
                                   size="sm"
-                                  className="w-full text-left h-auto p-3 justify-start"
+                                  className="w-full text-left h-auto p-3 justify-start hover:bg-purple-50 hover:border-purple-200"
                                   onClick={() => {
                                     setCurrentMessage(question);
                                     setCurrentView('chat');
                                   }}
                                 >
-                                  <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                                  <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0 text-purple-500" />
                                   <span className="text-xs">{question}</span>
                                 </Button>
                               ))}
@@ -466,41 +612,60 @@ export default function SoulMapExplorerPage() {
                     if (sign) {
                       return (
                         <>
-                          <div className="text-center">
-                            <div className="text-4xl mb-2">{sign.symbol}</div>
-                            <Badge className={`bg-gradient-to-r ${sign.color} text-white`}>
+                          <div className="text-center space-y-3">
+                            <div className="text-6xl mb-2">{sign.symbol}</div>
+                            <div>
+                              <h3 className="text-xl font-bold">{sign.name}</h3>
+                              <p className="text-sm text-muted-foreground">{sign.dates}</p>
+                            </div>
+                            <Badge className={`bg-gradient-to-r ${sign.color} text-white text-sm px-3 py-1`}>
                               {sign.element} Sign
                             </Badge>
                           </div>
-                          <div>
-                            <h4 className="font-medium mb-2">Core Traits</h4>
-                            <div className="flex flex-wrap gap-1">
-                              {sign.traits.map((trait, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {trait}
-                                </Badge>
-                              ))}
+
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-2 flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-yellow-500" />
+                                Core Traits
+                              </h4>
+                              <div className="flex flex-wrap gap-1">
+                                {sign.traits.map((trait, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {trait}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
+
+                            <div>
+                              <h4 className="font-medium mb-2 flex items-center gap-2">
+                                <Target className="w-4 h-4 text-blue-500" />
+                                Soul Purpose
+                              </h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{sign.soulPurpose}</p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-2 flex items-center gap-2">
+                                <TrendingUp className="w-4 h-4 text-green-500" />
+                                Growth Challenge
+                              </h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{sign.challenge}</p>
+                            </div>
+
+                            <Button
+                              onClick={() => {
+                                setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life. I'd like to understand this sign's influence on my personality and soul purpose.`);
+                                setCurrentView('chat');
+                              }}
+                              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                              size="sm"
+                            >
+                              <Bot className="w-3 h-3 mr-2" />
+                              Ask Oracle About {sign.name}
+                            </Button>
                           </div>
-                          <div>
-                            <h4 className="font-medium mb-1">Soul Purpose</h4>
-                            <p className="text-sm text-muted-foreground">{sign.soulPurpose}</p>
-                          </div>
-                          <div>
-                            <h4 className="font-medium mb-1">Growth Challenge</h4>
-                            <p className="text-sm text-muted-foreground">{sign.challenge}</p>
-                          </div>
-                          <Button
-                            onClick={() => {
-                              setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life`);
-                              setCurrentView('chat');
-                            }}
-                            className="w-full"
-                            size="sm"
-                          >
-                            <Bot className="w-3 h-3 mr-2" />
-                            Ask Oracle About {sign.name}
-                          </Button>
                         </>
                       );
                     }
