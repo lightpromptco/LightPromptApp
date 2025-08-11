@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Sun, Moon, Calendar } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sparkles, Sun, Moon, Calendar, BookOpen } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
 interface DailyOracleProps {
@@ -19,6 +20,7 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
   const [loading, setLoading] = useState(false);
   const [todayDate, setTodayDate] = useState('');
   const [cosmicHighlight, setCosmicHighlight] = useState('');
+  const [showFullOracle, setShowFullOracle] = useState(false);
 
   useEffect(() => {
     // Set today's date
@@ -74,21 +76,21 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
 
   if (!birthData) {
     return (
-      <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800">
+      <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
-            <Sparkles className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
+            <Sparkles className="w-5 h-5 text-amber-500" />
             Daily Oracle
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-purple-600 dark:text-purple-300 mb-3">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
             Connect your birth chart to receive personalized daily cosmic guidance
           </p>
           <Button 
             variant="outline" 
             size="sm"
-            className="border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:text-purple-300"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300"
             onClick={() => window.location.href = '/soul-map-explorer'}
           >
             Set Birth Data
@@ -99,13 +101,13 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800">
+    <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200 text-base">
-          <Sparkles className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200 text-base">
+          <Sparkles className="w-5 h-5 text-amber-500" />
           Daily Oracle
         </CardTitle>
-        <div className="flex items-center gap-2 text-xs text-purple-600 dark:text-purple-300">
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <Calendar className="w-3 h-3" />
           {todayDate}
         </div>
@@ -113,9 +115,9 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
       
       <CardContent className="space-y-3">
         {cosmicHighlight && (
-          <div className="flex items-start gap-2 p-3 bg-white/50 dark:bg-purple-900/30 rounded-lg border border-purple-200 dark:border-purple-700">
-            <Sun className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-purple-700 dark:text-purple-200 font-medium leading-relaxed">
+          <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+            <Sun className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
               {cosmicHighlight}
             </p>
           </div>
@@ -123,26 +125,42 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
 
         {loading ? (
           <div className="flex items-center justify-center py-6">
-            <div className="animate-spin w-5 h-5 border-2 border-purple-300 border-t-purple-600 rounded-full"></div>
-            <span className="ml-2 text-sm text-purple-600 dark:text-purple-300">
+            <div className="animate-spin w-5 h-5 border-2 border-gray-300 border-t-amber-500 rounded-full"></div>
+            <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
               Consulting the stars...
             </span>
           </div>
         ) : dailyGuidance ? (
           <div className="space-y-3">
-            <div className="bg-white/70 dark:bg-purple-900/40 rounded-lg p-3 border border-purple-100 dark:border-purple-700">
-              <div className="text-sm text-purple-700 dark:text-purple-200 leading-relaxed">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+              <div className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
                 {dailyGuidance.length > 200 ? (
                   <>
                     {dailyGuidance.substring(0, 200)}...
-                    <Button 
-                      variant="link" 
-                      size="sm" 
-                      className="p-0 h-auto text-purple-600 dark:text-purple-400 ml-1"
-                      onClick={() => window.location.href = '/soul-map-explorer'}
-                    >
-                      Read Full Oracle
-                    </Button>
+                    <Dialog open={showFullOracle} onOpenChange={setShowFullOracle}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          className="p-0 h-auto text-amber-600 dark:text-amber-400 ml-1"
+                        >
+                          Read Full Oracle
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-amber-500" />
+                            Your Daily Oracle - {todayDate}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            {dailyGuidance}
+                          </p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </>
                 ) : (
                   dailyGuidance
@@ -154,7 +172,7 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex-1 border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:text-purple-300"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300"
                 onClick={loadDailyGuidance}
                 disabled={loading}
               >
@@ -164,9 +182,10 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
               <Button 
                 variant="outline" 
                 size="sm"
-                className="border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:text-purple-300"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300"
                 onClick={() => window.location.href = '/soul-map-explorer'}
               >
+                <BookOpen className="w-3 h-3 mr-1" />
                 Full Chart
               </Button>
             </div>
@@ -175,7 +194,7 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
           <div className="text-center py-4">
             <Button 
               onClick={loadDailyGuidance}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-amber-600 hover:bg-amber-700 text-white"
               disabled={loading}
             >
               <Sparkles className="w-4 h-4 mr-2" />
