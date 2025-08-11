@@ -781,6 +781,8 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
 BIRTH CHART CONTEXT: ${chartContext.join(', ')}
 CURRENTLY EXPLORING: ${selectedPlanet || 'general chart exploration'}
 
+IMPORTANT: When discussing other signs like Aries, explain how they might appear in OTHER parts of the chart (houses, rising sign, planets) while acknowledging the user's actual Sun sign. Do not confuse the user by suggesting they ARE the sign being explored if it's different from their Sun sign.
+
 Please provide accurate astrological insights based on this birth data.`;
         }
       }
