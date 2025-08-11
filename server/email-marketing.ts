@@ -2,7 +2,18 @@ import sgMail from '@sendgrid/mail';
 
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  let apiKey = process.env.SENDGRID_API_KEY;
+  
+  // Handle case where API key doesn't start with SG.
+  if (!apiKey.startsWith('SG.')) {
+    console.log('⚠️ API key format detected, prefixing with SG.');
+    apiKey = `SG.${apiKey}`;
+  }
+  
+  sgMail.setApiKey(apiKey);
+  console.log('✅ SendGrid initialized with API key');
+} else {
+  console.log('⚠️ SENDGRID_API_KEY not found in environment');
 }
 
 // Email templates for different marketing scenarios
@@ -222,7 +233,7 @@ export class EmailMarketing {
           .replace('{{PLAN_NAME}}', planDetails.name),
         html: EMAIL_TEMPLATES.SUBSCRIPTION_CONFIRMATION.html
           .replace(/{{PLAN_NAME}}/g, planDetails.name)
-          .replace('{{PLAN_PRICE}}', planDetails.price)
+          .replace('{{PLAN_PRICE}}', planDetails.price.toString())
           .replace('{{PLAN_FEATURES}}', planFeatures),
       };
 
@@ -272,18 +283,36 @@ export class EmailMarketing {
     }
 
     try {
-      // Test with a simple email to verify configuration
+      // Test with a simple email to verify configuration - don't use template variables
       const testMsg = {
         to: 'lightprompt.co@gmail.com',
         from: 'lightprompt.co@gmail.com', // Use verified sender email
-        subject: 'Email Marketing Test - Configuration Successful',
+        subject: 'LightPrompt Email System - Test Successful',
         text: 'This is a test email to verify SendGrid integration is working properly.',
         html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #0f766e;">Email Marketing Test</h2>
-            <p>This test email confirms that your SendGrid integration is working properly!</p>
-            <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
-            <p><strong>Status:</strong> ✅ Email system operational</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #0f766e; margin-bottom: 10px;">✅ Email System Test</h1>
+              <p style="color: #4b5563; font-size: 18px;">SendGrid integration successful!</p>
+            </div>
+            
+            <div style="background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #1f2937; margin-bottom: 20px;">Test Results</h2>
+              <div style="space-y: 10px;">
+                <p style="color: #4b5563;"><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+                <p style="color: #4b5563;"><strong>Status:</strong> Email delivery operational</p>
+                <p style="color: #4b5563;"><strong>System:</strong> LightPrompt Email Marketing</p>
+                <p style="color: #4b5563;"><strong>API Status:</strong> Authenticated and ready</p>
+              </div>
+              
+              <div style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center;">
+                <strong>🚀 Email marketing system is ready for production!</strong>
+              </div>
+            </div>
+            
+            <div style="text-align: center; color: #6b7280; font-size: 14px;">
+              <p>LightPrompt Email Marketing System | Powered by SendGrid</p>
+            </div>
           </div>
         `
       };
@@ -291,12 +320,29 @@ export class EmailMarketing {
       await sgMail.send(testMsg);
       return { 
         success: true, 
-        message: 'Email configuration test successful! Check lightprompt.co@gmail.com for confirmation.' 
+        message: 'Email configuration test successful! Check lightprompt.co@gmail.com for the test email confirmation.' 
       };
     } catch (error: any) {
+      console.error('SendGrid test error:', error);
+      
+      // Provide specific error guidance
+      if (error.code === 401) {
+        return { 
+          success: false, 
+          error: 'SendGrid authentication failed. The API key format may be incorrect. Please get a new API key from SendGrid dashboard that starts with "SG."' 
+        };
+      }
+      
+      if (error.code === 403) {
+        return { 
+          success: false, 
+          error: 'SendGrid sender not verified. Please verify lightprompt.co@gmail.com in SendGrid Settings > Sender Authentication.' 
+        };
+      }
+      
       return { 
         success: false, 
-        error: error.message || 'Unknown error occurred' 
+        error: `SendGrid error (${error.code || 'unknown'}): ${error.message || 'Connection or authentication issue'}. The provided API key may not be valid.` 
       };
     }
   }

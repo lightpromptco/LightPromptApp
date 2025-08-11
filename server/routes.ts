@@ -3303,11 +3303,13 @@ ${new Date().toLocaleString()}
   // Email marketing endpoints
   app.post('/api/email/test-configuration', async (req, res) => {
     try {
-      const { EmailMarketing } = await import('./email-marketing');
-      const result = await EmailMarketing.testEmailConfiguration();
+      // Use isolated test function to avoid template issues
+      const { testSendGridConnection } = await import('./email-test');
+      const result = await testSendGridConnection();
       res.json(result);
     } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
+      console.error('Email test configuration error:', error);
+      res.status(500).json({ success: false, error: error.message || 'Email configuration test failed' });
     }
   });
 
