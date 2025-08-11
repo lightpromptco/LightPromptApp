@@ -801,8 +801,9 @@ export default function SoulMapExplorerPage() {
         selectedPlanet
       });
       
-      console.log('Oracle response:', response);
-      setChatMessages(prev => [...prev, { role: 'assistant', content: response.response }]);
+      const data = await response.json();
+      console.log('Oracle response:', data);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
     } catch (error) {
       console.error('Oracle error:', error);
       toast({
