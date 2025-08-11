@@ -99,6 +99,37 @@ const ASPECT_SYMBOLS: Record<string, string> = {
   'quincunx': '⚻'
 };
 
+// Helper function for house meanings
+const getHouseMeaning = (houseNum: number): string => {
+  const meanings: Record<number, string> = {
+    1: "Self and Identity",
+    2: "Values and Resources", 
+    3: "Communication and Siblings",
+    4: "Home and Family",
+    5: "Creativity and Romance",
+    6: "Work and Health",
+    7: "Partnerships and Marriage",
+    8: "Transformation and Shared Resources",
+    9: "Philosophy and Higher Learning",
+    10: "Career and Public Image",
+    11: "Friends and Aspirations",
+    12: "Spirituality and Subconscious"
+  };
+  return meanings[houseNum] || "Unknown House";
+};
+
+// Helper function for planet meanings
+const getPlanetMeaning = (planet: string, sign: string, house: number): string => {
+  const planetMeanings: Record<string, string> = {
+    'Mercury': `Your communication style and thinking patterns are influenced by ${sign} energy, particularly active in matters of ${getHouseMeaning(house).toLowerCase()}.`,
+    'Venus': `Your approach to love, beauty, and values expresses through ${sign} qualities, most evident in your ${getHouseMeaning(house).toLowerCase()}.`,
+    'Mars': `Your drive, ambition, and action-taking energy operates through ${sign} characteristics, directing focus toward ${getHouseMeaning(house).toLowerCase()}.`,
+    'Jupiter': `Your growth, expansion, and opportunities manifest through ${sign} energy, bringing abundance to ${getHouseMeaning(house).toLowerCase()}.`,
+    'Saturn': `Your discipline, structure, and life lessons are guided by ${sign} principles, creating foundations in ${getHouseMeaning(house).toLowerCase()}.`
+  };
+  return planetMeanings[planet] || `${planet} in ${sign} influences your ${getHouseMeaning(house).toLowerCase()}.`;
+};
+
 interface ProfessionalNatalChartProps {
   birthData: BirthData;
 }
@@ -240,7 +271,7 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
             <TabsTrigger value="chart">Chart Wheel</TabsTrigger>
             <TabsTrigger value="planets">Planets</TabsTrigger>
             <TabsTrigger value="houses">Houses</TabsTrigger>
-            <TabsTrigger value="aspects">Aspects</TabsTrigger>
+            <TabsTrigger value="report">Birth Chart Report</TabsTrigger>
           </TabsList>
 
           {/* Chart Wheel */}
@@ -334,7 +365,7 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
                       const totalDegree = (signIndex * 30) + (planet.degree % 30);
                       const angle = totalDegree - 90;
                       const radian = (angle * Math.PI) / 180;
-                      const radius = 140 - (i * 4); // Stagger planets more for visibility
+                      const radius = 155 - (i * 3); // Adjusted to stay within bounds, less staggering
                       const x = 200 + Math.cos(radian) * radius;
                       const y = 200 + Math.sin(radian) * radius;
                       
@@ -438,47 +469,92 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
             </Card>
           </TabsContent>
 
-          {/* Aspects */}
-          <TabsContent value="aspects" className="space-y-4">
+          {/* Birth Chart Report */}
+          <TabsContent value="report" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5" />
-                  Planetary Aspects
+                  <Crown className="w-5 h-5" />
+                  Complete Birth Chart Analysis
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {chartData.aspects && chartData.aspects.length > 0 ? (
-                  <div className="space-y-3">
-                    {chartData.aspects.map((aspect, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="text-lg">
-                            {ASPECT_SYMBOLS[aspect.type] || '○'}
+              <CardContent className="prose prose-gray max-w-none">
+                <div className="space-y-6">
+                  {/* Core Identity */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Sun className="w-5 h-5 text-orange-500" />
+                      Core Identity & Life Purpose
+                    </h3>
+                    <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                      <p className="text-gray-700">
+                        <strong>Sun in {chartData.sun.sign.charAt(0).toUpperCase() + chartData.sun.sign.slice(1)} (House {chartData.sun.house})</strong> at {formatDegree(chartData.sun.degree)}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-600">
+                        Your core identity and life purpose are expressed through {chartData.sun.sign} energy, 
+                        manifesting in the {getHouseMeaning(chartData.sun.house)} area of life.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Emotional Nature */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Moon className="w-5 h-5 text-blue-500" />
+                      Emotional Nature & Inner World
+                    </h3>
+                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                      <p className="text-gray-700">
+                        <strong>Moon in {chartData.moon.sign.charAt(0).toUpperCase() + chartData.moon.sign.slice(1)} (House {chartData.moon.house})</strong> at {formatDegree(chartData.moon.degree)}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-600">
+                        Your emotional responses and subconscious patterns operate through {chartData.moon.sign} energy, 
+                        most active in matters related to {getHouseMeaning(chartData.moon.house).toLowerCase()}.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Planetary Placements Summary */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-purple-500" />
+                      Key Planetary Influences
+                    </h3>
+                    <div className="grid gap-3">
+                      {chartData.planets.filter(p => ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'].includes(p.planet)).map((planet) => (
+                        <div key={planet.planet} className="bg-gray-50 p-3 rounded-lg">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">{planet.symbol}</span>
+                            <strong className="text-gray-900">{planet.planet}</strong>
+                            <span className="text-sm text-gray-600">
+                              in {planet.sign.charAt(0).toUpperCase() + planet.sign.slice(1)} (House {planet.house})
+                            </span>
                           </div>
-                          <div>
-                            <div className="font-semibold text-gray-900">
-                              {aspect.planet1} {aspect.type} {aspect.planet2}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              Orb: {aspect.orb.toFixed(1)}°
-                            </div>
-                          </div>
+                          <p className="text-sm text-gray-600">
+                            {getPlanetMeaning(planet.planet, planet.sign, planet.house)}
+                          </p>
                         </div>
-                        {aspect.exact && (
-                          <Badge className="bg-green-100 text-green-800">
-                            Exact
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-600">
-                    <Sparkles className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p>Aspect calculations will be available in the next update</p>
+
+                  {/* Houses Summary */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-green-500" />
+                      Life Areas & Focus
+                    </h3>
+                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                      <p className="text-gray-700 mb-2">
+                        <strong>Ascendant (Rising Sign):</strong> {chartData.ascendant.sign.charAt(0).toUpperCase() + chartData.ascendant.sign.slice(1)} at {formatDegree(chartData.ascendant.degree)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Your outward personality and approach to life is colored by {chartData.ascendant.sign} energy. 
+                        This influences how others perceive you and how you initiate new experiences.
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
