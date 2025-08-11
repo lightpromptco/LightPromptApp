@@ -28,7 +28,7 @@ export function UserSettings({ user, userProfile, onClose, onLogout }: UserSetti
     switch (tier) {
       case 'free': return 'bg-gray-100 text-gray-800';
       case 'tier_29': return 'bg-amber-100 text-amber-800';
-      case 'tier_49': return 'bg-purple-100 text-purple-800';
+      case 'tier_49': return 'bg-indigo-100 text-indigo-800';
       case 'admin': return 'bg-teal-100 text-teal-800';
       default: return 'bg-gray-100 text-gray-800';
     }

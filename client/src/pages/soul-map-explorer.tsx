@@ -1356,7 +1356,7 @@ export default function SoulMapExplorerPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-purple-500" />
+                  <Bot className="w-5 h-5 text-amber-500" />
                   Quick Oracle
                 </CardTitle>
               </CardHeader>
