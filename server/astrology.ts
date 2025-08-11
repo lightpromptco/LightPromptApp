@@ -462,268 +462,55 @@ export function calculateAstrologyChart(birthData: BirthData): AstrologyChart {
   
   chartData.rahu = { sign: rahuSign.sign, degree: rahuSign.degree, house: getHouseForPosition(rahuLon, houseCusps) };
   chartData.ketu = { sign: ketuSign.sign, degree: ketuSign.degree, house: getHouseForPosition(ketuLon, houseCusps) };
-      houses: [
-        14.16,   // 1st House - Capricorn 14°16'
-        51.87,   // 2nd House - Aquarius 21°52'  
-        90.1,    // 3rd House - Aries 0°06'
-        122.28,  // 4th House - Taurus 2°17'
-        148.17,  // 5th House - Taurus 28°10'
-        200.93,  // 6th House - Gemini 20°56'
-        194.27,  // 7th House - Cancer 14°16'
-        231.87,  // 8th House - Leo 21°52'
-        270.1,   // 9th House - Libra 0°06'
-        302.28,  // 10th House - Scorpio 2°17'
-        328.17,  // 11th House - Scorpio 28°10'
-        20.93    // 12th House - Sagittarius 20°56'
-      ],
-      aspects: [
-        { planet1: 'sun', planet2: 'mercury', aspect: 'conjunction', orb: 4.06, applying: false },
-        { planet1: 'sun', planet2: 'pluto', aspect: 'square', orb: 5.04, applying: false },
-        { planet1: 'moon', planet2: 'saturn', aspect: 'opposition', orb: 4.01, applying: false },
-        { planet1: 'venus', planet2: 'mars', aspect: 'conjunction', orb: 0.98, applying: false },
-        { planet1: 'uranus', planet2: 'neptune', aspect: 'conjunction', orb: 1.35, applying: false }
-      ],
-      yogas: [
-        {
-          name: 'Venus-Mars Conjunction in 1st House',
-          type: 'raja',
-          description: 'Powerful combination of love and action creates magnetic personal presence and leadership qualities',
-          planets: ['venus', 'mars']
-        },
-        {
-          name: 'Capricorn Stellium',
-          type: 'dhana',
-          description: 'Six planets in Capricorn create extraordinary focus on achievement, structure, and material success',
-          planets: ['venus', 'mars', 'uranus', 'neptune', 'rahu', 'ascendant']
-        },
-        {
-          name: 'Sun-Mercury Conjunction in 2nd House',
-          type: 'spiritual',
-          description: 'Communication skills and intellectual power focused on values and resources',
-          planets: ['sun', 'mercury']
-        }
-      ]
-    };
-  }
   
-  // Fallback to calculated positions for other birth dates
-  const birthDate = new Date(birthData.date);
+  // Add house cusps
+  chartData.houses = houseCusps;
   
-  // Add time if provided
-  if (birthData.time) {
-    const [hours, minutes] = birthData.time.split(':').map(Number);
-    birthDate.setHours(hours, minutes, 0, 0);
-  } else {
-    birthDate.setHours(12, 0, 0, 0);
-  }
-  
-  const jd = getJulianDay(birthDate);
-  const lst = getLocalSiderealTime(jd, birthData.lng);
-  const obliquity = 23.4367;
-  
-  const planets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
-  const positions: { [key: string]: PlanetPosition } = {};
-  
-  for (const planet of planets) {
-    const pos = calculatePlanetPosition(planet, jd);
-    const signDegree = getSignAndDegree(pos.longitude);
-    const nakshatra = calculateNakshatra(pos.longitude);
-    const dignity = calculateDignity(planet, signDegree.sign, signDegree.degree);
-    
-    positions[planet] = {
-      sign: signDegree.sign,
-      degree: signDegree.degree,
-      nakshatra: nakshatra.name,
-      nakshatraLord: nakshatra.lord,
-      dignity: dignity,
-      strength: Math.random() * 100
-    };
-  }
-  
-  const ascendantLongitude = (lst + 90) % 360;
-  const ascendantSignDegree = getSignAndDegree(ascendantLongitude);
-  positions.ascendant = {
-    sign: ascendantSignDegree.sign,
-    degree: ascendantSignDegree.degree
-  };
-  
-  const midheavenSignDegree = getSignAndDegree(lst);
-  positions.midheaven = {
-    sign: midheavenSignDegree.sign,
-    degree: midheavenSignDegree.degree
-  };
-  
-  const houses = calculateHouses(lst, birthData.lat, obliquity);
-  
-  for (const planet of Object.keys(positions)) {
-    const planetLongitude = ZODIAC_SIGNS.indexOf(positions[planet].sign) * 30 + positions[planet].degree;
-    
-    for (let i = 0; i < 12; i++) {
-      const houseStart = houses[i];
-      const houseEnd = houses[(i + 1) % 12];
-      
-      let isInHouse = false;
-      if (houseStart <= houseEnd) {
-        isInHouse = planetLongitude >= houseStart && planetLongitude < houseEnd;
-      } else {
-        isInHouse = planetLongitude >= houseStart || planetLongitude < houseEnd;
-      }
-      
-      if (isInHouse) {
-        positions[planet].house = i + 1;
-        break;
-      }
+  // Calculate aspects between planets
+  const planetPositions: { [key: string]: { sign: string; degree: number } } = {};
+  for (const [planet, data] of Object.entries(chartData)) {
+    if (typeof data === 'object' && 'sign' in data && 'degree' in data) {
+      planetPositions[planet] = { sign: data.sign, degree: data.degree };
     }
   }
   
-  const meanNode = 125.0 - 1934.1 * ((jd - 2451545.0) / 365.25);
-  const rahuLongitude = meanNode % 360;
-  const ketuLongitude = (rahuLongitude + 180) % 360;
+  chartData.aspects = calculateAspects(planetPositions);
   
-  const rahuSignDegree = getSignAndDegree(rahuLongitude);
-  const ketuSignDegree = getSignAndDegree(ketuLongitude);
+  // Calculate yogas (simplified)
+  chartData.yogas = calculateYogas(planetPositions);
   
-  positions.rahu = {
-    sign: rahuSignDegree.sign,
-    degree: rahuSignDegree.degree,
-    nakshatra: calculateNakshatra(rahuLongitude).name,
-    nakshatraLord: calculateNakshatra(rahuLongitude).lord,
-    dignity: 'neutral',
-    strength: 50
-  };
-  
-  positions.ketu = {
-    sign: ketuSignDegree.sign,
-    degree: ketuSignDegree.degree,
-    nakshatra: calculateNakshatra(ketuLongitude).name,
-    nakshatraLord: calculateNakshatra(ketuLongitude).lord,
-    dignity: 'neutral',
-    strength: 50
-  };
-  
-  // Calculate aspects
-  const aspects = calculateAspects(positions);
-  
-  // Identify yogas
-  const yogas = identifyYogas(positions);
-  
-  // Calculate Ayanamsa (Lahiri)
-  const ayanamsa = 24.0 - (jd - 2451545.0) / 365.25 * 0.014;
-  
-  return {
-    sun: positions.sun,
-    moon: positions.moon,
-    mercury: positions.mercury,
-    venus: positions.venus,
-    mars: positions.mars,
-    jupiter: positions.jupiter,
-    saturn: positions.saturn,
-    uranus: positions.uranus,
-    neptune: positions.neptune,
-    pluto: positions.pluto,
-    rahu: positions.rahu,
-    ketu: positions.ketu,
-    ascendant: positions.ascendant,
-    midheaven: positions.midheaven,
-    houses,
-    aspects,
-    yogas,
-    ayanamsa
-  };
+  return chartData;
 }
 
-// Get detailed interpretation for a planet in a sign and house
-export function getPlanetInterpretation(planet: string, sign: string, house?: number): {
-  title: string;
+// Calculate yogas (simplified implementation)
+function calculateYogas(positions: { [key: string]: { sign: string; degree: number } }): Array<{
+  name: string;
+  type: string;
   description: string;
-  keywords: string[];
-  soulPurpose: string;
-  challenges: string;
-} {
-  // Traditional astrological interpretations
-  const interpretations: { [key: string]: { [key: string]: any } } = {
-    sun: {
-      aries: {
-        title: "Sun in Aries",
-        description: "Your core identity is pioneering, bold, and independent. You're here to lead and initiate new beginnings.",
-        keywords: ["Leadership", "Initiative", "Courage", "Independence", "Action"],
-        soulPurpose: "To courageously forge new paths and inspire others to take action",
-        challenges: "Learning patience and considering the needs of others"
-      },
-      aquarius: {
-        title: "Sun in Aquarius",
-        description: "Your core identity is innovative, humanitarian, and forward-thinking. You're here to bring revolutionary ideas and serve humanity.",
-        keywords: ["Innovation", "Humanity", "Independence", "Vision", "Progress"],
-        soulPurpose: "To bring progressive ideas that benefit humanity and create positive change",
-        challenges: "Balancing your need for independence with emotional intimacy"
+  planets: string[];
+}> {
+  const yogas = [];
+  
+  // Simple conjunction yoga detection
+  const planets = Object.keys(positions);
+  for (let i = 0; i < planets.length; i++) {
+    for (let j = i + 1; j < planets.length; j++) {
+      const planet1 = planets[i];
+      const planet2 = planets[j];
+      
+      if (positions[planet1].sign === positions[planet2].sign) {
+        const degreesDiff = Math.abs(positions[planet1].degree - positions[planet2].degree);
+        if (degreesDiff < 10) { // Close conjunction
+          yogas.push({
+            name: `${planet1}-${planet2} Conjunction`,
+            type: 'conjunction',
+            description: `Close alignment between ${planet1} and ${planet2} in ${positions[planet1].sign}`,
+            planets: [planet1, planet2]
+          });
+        }
       }
-      // Add more sign interpretations...
     }
-    // Add more planets...
-  };
-  
-  const planetData = interpretations[planet];
-  if (!planetData || !planetData[sign]) {
-    return {
-      title: `${planet.charAt(0).toUpperCase() + planet.slice(1)} in ${sign.charAt(0).toUpperCase() + sign.slice(1)}`,
-      description: `This placement brings the energy of ${planet} through the lens of ${sign}.`,
-      keywords: ["Growth", "Learning", "Exploration"],
-      soulPurpose: "To integrate these energies for personal growth",
-      challenges: "Understanding how to best express this combination"
-    };
   }
   
-  const interpretation = planetData[sign];
-  
-  // Add house interpretation if provided
-  if (house) {
-    const houseKeywords = [
-      "Identity", "Values", "Communication", "Home", "Creativity", "Service",
-      "Relationships", "Transformation", "Philosophy", "Career", "Community", "Spirituality"
-    ];
-    
-    interpretation.description += ` In the ${house}${getOrdinalSuffix(house)} house, this energy focuses on ${houseKeywords[house - 1].toLowerCase()}.`;
-  }
-  
-  return interpretation;
-}
-
-export function getOrdinalSuffix(num: number): string {
-  const j = num % 10;
-  const k = num % 100;
-  if (j === 1 && k !== 11) return "st";
-  if (j === 2 && k !== 12) return "nd";  
-  if (j === 3 && k !== 13) return "rd";
-  return "th";
-}
-
-// Validate birth data and provide recommendations
-export function validateBirthData(birthData: BirthData): {
-  isValid: boolean;
-  accuracy: 'high' | 'medium' | 'low';
-  recommendations: string[];
-} {
-  const recommendations: string[] = [];
-  let accuracy: 'high' | 'medium' | 'low' = 'high';
-  
-  if (!birthData.time) {
-    accuracy = 'medium';
-    recommendations.push("Birth time is unknown. Ascendant and house positions are approximated using noon.");
-    recommendations.push("For most accurate readings, try to find your exact birth time from birth certificate or hospital records.");
-  }
-  
-  if (!birthData.lat || !birthData.lng) {
-    accuracy = 'low';
-    recommendations.push("Birth location coordinates are missing. Chart calculations may be inaccurate.");
-  }
-  
-  if (accuracy === 'high') {
-    recommendations.push("Birth data is complete! Chart calculations are highly accurate.");
-  }
-  
-  return {
-    isValid: Boolean(birthData.date && birthData.location),
-    accuracy,
-    recommendations
-  };
+  return yogas;
 }
