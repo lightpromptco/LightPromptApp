@@ -1180,28 +1180,30 @@ Please provide astrological insights based on available data.`;
         return res.status(400).json({ error: "userId is required" });
       }
 
-      // Handle anonymous users for free tier
-      if (userId === 'anonymous') {
-        res.json({ 
-          connections: [],
-          total: 0,
-          lastUpdated: new Date().toISOString(),
-          status: "anonymous_free_tier",
-          message: "Free tier: 5 connections available",
-          tier: "free",
-          connectionLimit: 5,
-          connectionsUsed: 0
-        });
-        return;
+      // Get user from database to check tier
+      const user = await storage.getUser(userId as string);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
       }
 
-      // For registered users, query the database
+      // Determine connection limit based on user tier
+      const connectionLimit = user.tier === 'free' ? 5 : 999; // Growth plan gets unlimited
+      
+      // For now, return empty connections but with proper tier info
       res.json({ 
         connections: [],
         total: 0,
         lastUpdated: new Date().toISOString(),
         status: "real_database_query_executed",
-        message: "No Soul Sync connections found in database"
+        message: "No Soul Sync connections found in database",
+        tier: user.tier,
+        connectionLimit,
+        connectionsUsed: 0,
+        user: {
+          name: user.name,
+          email: user.email,
+          tier: user.tier
+        }
       });
     } catch (error) {
       console.error("Error fetching Soul Sync connections:", error);
