@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { GraduationCap, BookOpen, Package } from 'lucide-react';
 import { useState, useRef } from 'react';
 
 interface HomeInterfaceProps {
@@ -68,6 +69,67 @@ export function HomeInterface({ userId }: HomeInterfaceProps) {
               Plans & Features
             </Button>
           </a>
+        </div>
+      </div>
+
+      {/* Store & Pricing Section */}
+      <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-8">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">STORE & PRICING</h2>
+        
+        <div className="space-y-4 max-w-lg mx-auto">
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <GraduationCap className="h-6 w-6 text-purple-600" />
+              <span className="text-lg font-medium">Course</span>
+            </div>
+            <span className="text-2xl font-bold text-purple-600">$120</span>
+          </div>
+          
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <BookOpen className="h-6 w-6 text-blue-600" />
+              <span className="text-lg font-medium">Ebook</span>
+            </div>
+            <span className="text-2xl font-bold text-blue-600">$11</span>
+          </div>
+          
+          <div className="flex items-center justify-between bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Package className="h-6 w-6 text-green-600" />
+              <span className="text-lg font-medium">Bundle</span>
+              <Badge className="bg-teal-500 text-white text-sm">Save $6</Badge>
+            </div>
+            <span className="text-2xl font-bold text-green-600">$125</span>
+          </div>
+        </div>
+
+        <Button 
+          className="w-full max-w-lg mx-auto mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg py-4 rounded-full block"
+          onClick={() => window.location.href = '/store'}
+        >
+          View Store
+        </Button>
+
+        <div className="mt-8 max-w-md mx-auto">
+          <h3 className="text-xl font-semibold mb-4 text-gray-700 text-center">What You Get:</h3>
+          <div className="space-y-2 text-gray-600">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+              <span>7 AI Wellness Companions</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+              <span>Soul Map & Birth Chart Analysis</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+              <span>Conscious AI Guidance</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+              <span>Lifetime Access & Updates</span>
+            </div>
+          </div>
         </div>
       </div>
 

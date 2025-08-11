@@ -26,7 +26,7 @@ import { DevToolsMenu } from "./DevToolsMenu";
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
-  { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
+  { path: "/store", label: "Store & Pricing", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
   { 
     path: "/wellness-tools", 
     label: "Wellness Tools", 
@@ -336,73 +336,11 @@ export function MainNavigation() {
             </div>
           )}
 
-          {/* Pricing & Products Section */}
-          <div className="space-y-3 border-t pt-4">
+          {/* Products Section */}
+          <div className="space-y-2 border-t pt-4">
             <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Store & Pricing
+              Products
             </div>
-            
-            {/* Quick Pricing Overview */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-3 rounded-lg">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-purple-600" />
-                    <span>Course</span>
-                  </span>
-                  <span className="font-bold text-purple-600">$120</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-blue-600" />
-                    <span>Ebook</span>
-                  </span>
-                  <span className="font-bold text-blue-600">$11</span>
-                </div>
-                <div className="flex items-center justify-between text-sm border-t pt-2">
-                  <span className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-green-600" />
-                    <span>Bundle</span>
-                    <Badge variant="secondary" className="text-xs">Save $6</Badge>
-                  </span>
-                  <span className="font-bold text-green-600">$125</span>
-                </div>
-              </div>
-              <Link href="/store">
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  className="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-sm"
-                  size="sm"
-                >
-                  View Store
-                </Button>
-              </Link>
-            </div>
-
-            {/* Key Features */}
-            <div className="bg-gradient-to-r from-teal-50 to-green-50 dark:from-teal-900/20 dark:to-green-900/20 p-3 rounded-lg">
-              <h4 className="text-sm font-semibold mb-2 text-teal-700 dark:text-teal-300">What You Get:</h4>
-              <div className="space-y-1 text-xs text-gray-600 dark:text-gray-300">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-teal-500 rounded-full"></div>
-                  <span>7 AI Wellness Companions</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-teal-500 rounded-full"></div>
-                  <span>Soul Map & Birth Chart Analysis</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-teal-500 rounded-full"></div>
-                  <span>Conscious AI Guidance</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-teal-500 rounded-full"></div>
-                  <span>Lifetime Access & Updates</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Product Links */}
             {PRODUCT_ITEMS.map((item) => {
               const active = isActive(item.path);
               return (
