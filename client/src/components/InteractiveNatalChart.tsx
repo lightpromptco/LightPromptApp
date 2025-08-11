@@ -158,13 +158,18 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
 
   const formatBirthDate = (dateStr: string) => {
     try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { 
+      console.log('Formatting birth date:', dateStr);
+      const date = new Date(dateStr + 'T12:00:00'); // Add time to prevent timezone issues
+      const formatted = date.toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'long', 
-        day: 'numeric' 
+        day: 'numeric',
+        timeZone: 'UTC' 
       });
-    } catch {
+      console.log('Formatted birth date:', formatted);
+      return formatted;
+    } catch (error) {
+      console.error('Date formatting error:', error);
       return dateStr;
     }
   };

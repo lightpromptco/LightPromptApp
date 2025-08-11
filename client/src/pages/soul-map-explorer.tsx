@@ -973,16 +973,13 @@ export default function SoulMapExplorerPage() {
               <Button 
                 variant="outline" 
                 onClick={() => {
-                  console.log('Debug: Test button clicked');
-                  setSelectedPlanet('aries');
-                  setCurrentMessage('Tell me about Aries in my birth chart and how it influences my soul journey');
-                  console.log('Setting view to chat, current view:', currentView);
+                  setSelectedPlanet('aquarius');
+                  setCurrentMessage(`Tell me about my Sun in Aquarius and how it influences my soul journey and personality. I was born on February 17th, 1992.`);
                   setCurrentView('chat');
-                  console.log('View should now be chat');
                 }}
                 className={zenMode ? "bg-white/20 text-white border-white/30 hover:bg-white/30" : ""}
               >
-                Test Oracle
+                Ask About My Sun Sign
               </Button>
           </div>
         </div>
