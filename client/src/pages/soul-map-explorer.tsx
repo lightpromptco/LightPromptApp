@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-// Removed ModernDailyOracle import - now using standalone page
+import { ProfessionalNatalChart } from "@/components/ProfessionalNatalChart";
 
 // Soul-tech helper functions
 const getCurrentMoonPhase = () => {
@@ -1094,6 +1094,9 @@ export default function SoulMapExplorerPage() {
             </Button>
           </div>
         </div>
+
+        {/* Professional Natal Chart Widget - DivineAPI Style */}
+        <ProfessionalNatalChart birthData={birthData} />
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Interactive Chart */}
