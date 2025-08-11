@@ -1,0 +1,138 @@
+Here’s how to make Soul Map actually accurate without bloating the client:
+
+What to fix (fast)
+Moon phase — calculate from astronomy, not a timer.
+
+Planetary positions — compute real ecliptic longitudes (and retrograde flags).
+
+Houses/ASC (if birth time is known) — compute server-side; otherwise hide houses.
+
+Schumann — either label “experimental” or omit. There’s no reliable, global real-time API; most charts online are site-specific and not open data.
+
+Minimal accurate backend (Next.js API)
+Add this dependency:
+
+bash
+Copy
+Edit
+npm i astronomy-engine
+app/api/astro/now/route.ts – current sky + moon phase
+
+ts
+Copy
+Edit
+import { NextResponse } from "next/server";
+import { Astronomy, Body, EclipticLongitude, Illumination, MoonPhase } from "astronomy-engine";
+
+const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+
+function signFromLon(lonDeg: number) {
+  const idx = Math.floor(((lonDeg % 360)+360)%360 / 30);
+  const deg = ((lonDeg % 30) + 30) % 30;
+  return { sign: SIGNS[idx], degree: +deg.toFixed(2) };
+}
+
+export async function GET() {
+  const now = new Date();
+
+  // Planets + sun + moon ecliptic longitudes (geocentric)
+  const bodies = [Body.Sun, Body.Moon, Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune, Body.Pluto];
+  const planets = Object.fromEntries(
+    bodies.map(b => {
+      const lon = EclipticLongitude(b, now); // degrees
+      const { sign, degree } = signFromLon(lon);
+      // retrograde flag
+      const lon2 = EclipticLongitude(b, new Date(now.getTime()+6*3600*1000));
+      const retrograde = lon2 < lon; // crude but effective over a few hours
+      return [Astronomy.BodyName(b), { lon, sign, degree, retrograde }];
+    })
+  );
+
+  // Moon illumination + named phase
+  const illum = Illumination(Body.Moon, now);
+  const phaseAngle = illum.phaseAngle; // degrees
+  const illumFrac = illum.phaseFraction; // 0..1
+  const namedPhase = MoonPhase(now); // returns e.g. "First Quarter", "Full Moon", etc.
+
+  return NextResponse.json({
+    timestamp: now.toISOString(),
+    planets,
+    moon: {
+      phaseName: namedPhase,
+      illumination: +illumFrac.toFixed(4),
+      phaseAngle: +phaseAngle.toFixed(2)
+    }
+  });
+}
+Optional natal endpoint (when you have birth data): use the same lib for transits; for houses/ASC you can start with Equal House or Whole Sign (straightforward from ASC). If you want Placidus/other systems, we’ll swap in Swiss Ephemeris later.
+
+Update your component (replace the simulated bits)
+Fetch from /api/astro/now in useEffect.
+
+Drive moon emoji/name + planetary cards from that response.
+
+Hide houses unless you have a real server calc.
+
+tsx
+Copy
+Edit
+const [astroNow, setAstroNow] = useState<null | {
+  moon: { phaseName: string; illumination: number; phaseAngle: number };
+  planets: Record<string, { sign: string; degree: number; retrograde: boolean }>;
+}>(null);
+
+useEffect(() => {
+  (async () => {
+    const r = await fetch('/api/astro/now', { cache: 'no-store' });
+    const j = await r.json();
+    setAstroNow(j);
+  })();
+}, []);
+Then swap:
+
+tsx
+Copy
+Edit
+// instead of simulated moon phase:
+const phase = astroNow?.moon?.phaseName ?? '—';
+const moonEmoji = ({
+  'New Moon':'🌑','Waxing Crescent':'🌒','First Quarter':'🌓','Waxing Gibbous':'🌔',
+  'Full Moon':'🌕','Waning Gibbous':'🌖','Last Quarter':'🌗','Waning Crescent':'🌘'
+}[phase] ?? '🌙');
+And for planets:
+
+tsx
+Copy
+Edit
+{astroNow && Object.entries(astroNow.planets).map(([name, p]) => (
+  <div key={name} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
+    <span className="font-medium capitalize">
+      {name}{p.retrograde ? ' (℞)' : ''}
+    </span>
+    <Badge variant="outline">{p.sign} {p.degree}°</Badge>
+  </div>
+))}
+Houses & ASC (accurate path)
+If birth time is known: create app/api/astro/natal/route.ts that accepts { date, time, lat, lon }, calculates Ascendant and MC and returns Whole Sign or Equal House (robust + easy).
+
+Later, if you really need Placidus/Koch: add Swiss Ephemeris via a tiny Python microservice or Node swisseph and call it from your API.
+
+Schumann resonance (truth time)
+There’s no stable, public, global real-time API. Most “SR dashboards” are site-specific instruments. If you keep it:
+
+Label it Experimental.
+
+Add a toggle to hide it.
+
+Or compute a “vibe” proxy from Kp index / solar wind (NOAA APIs) instead, and call it Space Weather (that’s real data).
+
+UI copy idea under the card:
+“Note: This reading is experimental and may not reflect a global consensus. Treat it as a reflection prompt, not a biomarker.”
+
+Accuracy guardrails in the UI
+Add little “i” tooltips: How we calculate this (library + method).
+
+Show timestamps + time zone.
+
+If birth time is missing: show a banner “Houses disabled (need birth time).”
+
