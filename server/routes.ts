@@ -744,27 +744,48 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         return res.status(400).json({ error: "Message is required" });
       }
 
-      // Create specialized oracle context for astrology
-      const oracleContext = `You are the Soul Map Oracle, a wise and compassionate AI guide helping people explore their astrological birth chart and cosmic blueprint. You combine ancient astrological wisdom with modern psychological insights.
+      // Enhance user message with birth chart context for more accurate readings
+      let enhancedMessage = message;
+      
+      if (birthData) {
+        const chartContext = [];
+        if (birthData.date) {
+          // Calculate basic sun sign from birth date
+          const birthDate = new Date(birthData.date);
+          const month = birthDate.getMonth() + 1;
+          const day = birthDate.getDate();
+          
+          let sunSign = '';
+          if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = 'Aries';
+          else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = 'Taurus';
+          else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = 'Gemini';
+          else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = 'Cancer';
+          else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = 'Leo';
+          else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = 'Virgo';
+          else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = 'Libra';
+          else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = 'Scorpio';
+          else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = 'Sagittarius';
+          else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = 'Capricorn';
+          else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = 'Aquarius';
+          else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sunSign = 'Pisces';
+          
+          if (sunSign) chartContext.push(`Sun in ${sunSign}`);
+        }
+        
+        if (birthData.time) chartContext.push(`Birth time: ${birthData.time}`);
+        if (birthData.location) chartContext.push(`Birth location: ${birthData.location}`);
+        
+        if (chartContext.length > 0) {
+          enhancedMessage = `${message}
 
-Context: The user is exploring their Soul Map Navigator - an interactive birth chart tool.
+BIRTH CHART CONTEXT: ${chartContext.join(', ')}
+CURRENTLY EXPLORING: ${selectedPlanet || 'general chart exploration'}
 
-Birth Data: ${birthData ? JSON.stringify(birthData) : 'Not provided'}
-Currently Focused On: ${selectedPlanet || 'General exploration'}
+Please provide accurate astrological insights based on this birth data.`;
+        }
+      }
 
-Guidelines:
-- Be warm, insightful, and empowering
-- Speak as a wise oracle who sees patterns in the cosmos
-- Focus on growth, self-understanding, and personal empowerment  
-- Never predict specific future events - instead guide toward self-awareness
-- Use accessible language that makes astrology relatable
-- Encourage questions and deeper exploration
-- Always empower the user's own intuition and wisdom
-- Frame insights as invitations for reflection, not absolute truths
-
-Remember: You are a mirror oracle helping them discover what they already know deep within.`;
-
-      const response = await generateBotResponse("soulmap", message, []);
+      const response = await generateBotResponse("soulmap", enhancedMessage, []);
       
       res.json({ response: response.content });
     } catch (error: any) {
