@@ -37,79 +37,48 @@ interface ApiEndpoint {
   example?: any;
 }
 
-const API_ENDPOINTS: ApiEndpoint[] = [
-  {
-    path: '/api/astrology/chart',
-    method: 'POST',
-    description: 'Calculate complete birth chart with planets, houses, and aspects',
-    parameters: [
-      { name: 'date', type: 'string', required: true, description: 'Birth date (YYYY-MM-DD)' },
-      { name: 'time', type: 'string', required: false, description: 'Birth time (HH:MM)' },
-      { name: 'location', type: 'string', required: true, description: 'Birth location' },
-      { name: 'lat', type: 'number', required: true, description: 'Latitude coordinate' },
-      { name: 'lng', type: 'number', required: true, description: 'Longitude coordinate' }
-    ],
-    example: {
-      date: '1992-02-17',
-      time: '12:00',
-      location: 'Temple, TX, USA',
-      lat: 31.0982,
-      lng: -97.3428
-    }
-  },
-  {
-    path: '/api/astrology/transits',
-    method: 'POST',
-    description: 'Get current planetary transits for birth chart',
-    parameters: [
-      { name: 'birthData', type: 'object', required: true, description: 'Birth chart data' }
-    ]
-  },
-  {
-    path: '/api/astrology/vibe-match',
-    method: 'POST',
-    description: 'Calculate VibeMatch compatibility score',
-    parameters: [
-      { name: 'chartData', type: 'object', required: true, description: 'Birth chart data' },
-      { name: 'currentTransits', type: 'object', required: false, description: 'Current planetary transits' }
-    ]
-  },
-  {
-    path: '/api/chat/completions',
-    method: 'POST',
-    description: 'AI chat completion with specialized astrological knowledge',
-    parameters: [
-      { name: 'messages', type: 'array', required: true, description: 'Chat message history' },
-      { name: 'botType', type: 'string', required: false, description: 'AI bot personality' },
-      { name: 'context', type: 'object', required: false, description: 'Additional context data' }
-    ]
-  },
-  {
-    path: '/api/users/profile',
-    method: 'GET',
-    description: 'Get user profile and birth chart data'
-  },
-  {
-    path: '/api/users/profile',
-    method: 'POST',
-    description: 'Update user profile information',
-    parameters: [
-      { name: 'birthData', type: 'object', required: false, description: 'Birth information' },
-      { name: 'preferences', type: 'object', required: false, description: 'User preferences' }
-    ]
-  }
-];
-
 export default function ApiExplorer() {
-  const [selectedEndpoint, setSelectedEndpoint] = useState<ApiEndpoint>(API_ENDPOINTS[0]);
+  const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([]);
+  const [selectedEndpoint, setSelectedEndpoint] = useState<ApiEndpoint | null>(null);
   const [requestBody, setRequestBody] = useState<string>('');
   const [response, setResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [headers, setHeaders] = useState<string>('{"Content-Type": "application/json"}');
   const { toast } = useToast();
 
+  // Fetch real API endpoints from the backend
   useEffect(() => {
-    if (selectedEndpoint.example) {
+    const fetchApiEndpoints = async () => {
+      try {
+        const response = await fetch('/api/admin/api-endpoints');
+        if (response.ok) {
+          const realEndpoints = await response.json();
+          setApiEndpoints(realEndpoints);
+          if (realEndpoints.length > 0) {
+            setSelectedEndpoint(realEndpoints[0]);
+          }
+        } else {
+          setApiEndpoints([]);
+          toast({
+            title: "API Documentation Loading",
+            description: "Connect to backend to discover available endpoints",
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch API endpoints:', error);
+        setApiEndpoints([]);
+        toast({
+          title: "Backend Connection Needed",
+          description: "Configure API endpoint discovery to show real endpoints",
+        });
+      }
+    };
+    
+    fetchApiEndpoints();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEndpoint?.example) {
       setRequestBody(JSON.stringify(selectedEndpoint.example, null, 2));
     } else {
       setRequestBody('{}');
@@ -124,13 +93,13 @@ export default function ApiExplorer() {
       const parsedHeaders = JSON.parse(headers);
       let body = undefined;
 
-      if (selectedEndpoint.method !== 'GET') {
+      if (selectedEndpoint?.method !== 'GET') {
         body = requestBody;
       }
 
       const startTime = Date.now();
-      const result = await fetch(selectedEndpoint.path, {
-        method: selectedEndpoint.method,
+      const result = await fetch(selectedEndpoint?.path || '', {
+        method: selectedEndpoint?.method || 'GET',
         headers: parsedHeaders,
         body: body
       });
@@ -152,7 +121,7 @@ export default function ApiExplorer() {
       if (result.ok) {
         toast({
           title: "Request Successful",
-          description: `${selectedEndpoint.method} ${selectedEndpoint.path} - ${responseTime}ms`,
+          description: `${selectedEndpoint?.method || 'GET'} ${selectedEndpoint?.path || ''} - ${responseTime}ms`,
         });
       }
     } catch (error) {
@@ -182,6 +151,8 @@ export default function ApiExplorer() {
   };
 
   const generateCurlCommand = () => {
+    if (!selectedEndpoint) return 'curl -X GET "/"';
+    
     const parsedHeaders = JSON.parse(headers);
     let curl = `curl -X ${selectedEndpoint.method} "${window.location.origin}${selectedEndpoint.path}"`;
     
@@ -189,7 +160,7 @@ export default function ApiExplorer() {
       curl += ` \\\n  -H "${key}: ${value}"`;
     });
 
-    if (selectedEndpoint.method !== 'GET' && requestBody) {
+    if (selectedEndpoint?.method !== 'GET' && requestBody) {
       curl += ` \\\n  -d '${requestBody}'`;
     }
 
@@ -225,10 +196,10 @@ export default function ApiExplorer() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {API_ENDPOINTS.map((endpoint, index) => (
+                {apiEndpoints.map((endpoint, index) => (
                   <Button
                     key={index}
-                    variant={selectedEndpoint.path === endpoint.path ? "default" : "ghost"}
+                    variant={selectedEndpoint?.path === endpoint.path ? "default" : "ghost"}
                     className="w-full justify-start h-auto p-3"
                     onClick={() => setSelectedEndpoint(endpoint)}
                   >
@@ -320,7 +291,7 @@ export default function ApiExplorer() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2">
                         <Terminal className="w-5 h-5" />
-                        {selectedEndpoint.method} {selectedEndpoint.path}
+                        {selectedEndpoint?.method || 'GET'} {selectedEndpoint?.path || 'No endpoint selected'}
                       </CardTitle>
                       <Button onClick={executeRequest} disabled={isLoading}>
                         {isLoading ? (
@@ -345,7 +316,7 @@ export default function ApiExplorer() {
                     </div>
 
                     {/* Request Body */}
-                    {selectedEndpoint.method !== 'GET' && (
+                    {selectedEndpoint?.method !== 'GET' && (
                       <div>
                         <label className="text-sm font-medium mb-2 block">Request Body</label>
                         <Textarea
@@ -453,10 +424,10 @@ export default function ApiExplorer() {
                   <CardContent>
                     <div className="space-y-4">
                       <p className="text-gray-600 dark:text-gray-400">
-                        {selectedEndpoint.description}
+                        {selectedEndpoint?.description || 'No description available'}
                       </p>
 
-                      {selectedEndpoint.parameters && (
+                      {selectedEndpoint?.parameters && (
                         <div>
                           <h3 className="font-semibold mb-2">Parameters</h3>
                           <div className="space-y-2">

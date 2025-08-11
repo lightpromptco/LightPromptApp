@@ -48,6 +48,7 @@ import CleanOraclePage from "@/pages/clean-oracle";
 import CosmicDebugConsole from "@/pages/cosmic-debug";
 import ApiExplorer from "@/pages/api-explorer";
 import DataViewer from "@/pages/data-viewer";
+import SystemStatus from "@/pages/system-status";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -225,6 +226,7 @@ function Router() {
       <Route path="/cosmic-debug" component={CosmicDebugConsole} />
       <Route path="/api-explorer" component={ApiExplorer} />
       <Route path="/data-viewer" component={DataViewer} />
+      <Route path="/system-status" component={SystemStatus} />
       <Route path="/store" component={() => (
         <MainLayout>
           <StorePage />

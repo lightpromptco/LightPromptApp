@@ -60,6 +60,14 @@ export function DevToolsMenu() {
       color: 'text-amber-400'
     },
     {
+      name: 'System Status',
+      description: 'Real-time system health monitoring',
+      href: '/system-status',
+      icon: Activity,
+      badge: 'STATUS',
+      color: 'text-red-400'
+    },
+    {
       name: 'Admin Content',
       description: 'Visual page editor & CMS',
       href: '/admin/content',

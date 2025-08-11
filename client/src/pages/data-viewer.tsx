@@ -42,77 +42,25 @@ export default function DataViewer() {
   const fetchDatabaseSchema = async () => {
     try {
       setIsLoading(true);
-      // Mock data - in production, this would fetch from your actual database
-      const mockTables: TableData[] = [
-        {
-          name: 'users',
-          count: 1247,
-          columns: ['id', 'email', 'username', 'created_at', 'is_admin', 'subscription_tier'],
-          sampleData: [
-            { id: '1', email: 'user@example.com', username: 'cosmic_user', created_at: '2024-01-15T10:30:00Z', is_admin: false, subscription_tier: 'free' },
-            { id: '2', email: 'premium@example.com', username: 'soul_seeker', created_at: '2024-01-16T14:20:00Z', is_admin: false, subscription_tier: 'premium' },
-            { id: '3', email: 'admin@lightprompt.co', username: 'cosmic_admin', created_at: '2024-01-10T09:00:00Z', is_admin: true, subscription_tier: 'admin' }
-          ]
-        },
-        {
-          name: 'chat_sessions',
-          count: 5832,
-          columns: ['id', 'user_id', 'bot_type', 'created_at', 'message_count', 'last_activity'],
-          sampleData: [
-            { id: '1', user_id: '1', bot_type: 'lightpromptbot', created_at: '2024-02-01T12:00:00Z', message_count: 25, last_activity: '2024-02-01T15:30:00Z' },
-            { id: '2', user_id: '1', bot_type: 'soulmapexplorer', created_at: '2024-02-02T09:15:00Z', message_count: 12, last_activity: '2024-02-02T10:45:00Z' },
-            { id: '3', user_id: '2', bot_type: 'lightpromptbot', created_at: '2024-02-03T16:20:00Z', message_count: 8, last_activity: '2024-02-03T17:00:00Z' }
-          ]
-        },
-        {
-          name: 'messages',
-          count: 28947,
-          columns: ['id', 'session_id', 'role', 'content', 'tokens', 'created_at', 'sentiment_score'],
-          sampleData: [
-            { id: '1', session_id: '1', role: 'user', content: 'What does my Aquarius sun mean?', tokens: 8, created_at: '2024-02-01T12:05:00Z', sentiment_score: 0.7 },
-            { id: '2', session_id: '1', role: 'assistant', content: 'Your Aquarius sun represents innovation and humanitarian spirit...', tokens: 45, created_at: '2024-02-01T12:05:15Z', sentiment_score: 0.9 },
-            { id: '3', session_id: '2', role: 'user', content: 'Show me my birth chart', tokens: 6, created_at: '2024-02-02T09:20:00Z', sentiment_score: 0.8 }
-          ]
-        },
-        {
-          name: 'birth_charts',
-          count: 892,
-          columns: ['id', 'user_id', 'birth_date', 'birth_time', 'location', 'chart_data', 'created_at'],
-          sampleData: [
-            { id: '1', user_id: '1', birth_date: '1992-02-17', birth_time: '12:00:00', location: 'Temple, TX, USA', chart_data: '[Chart Data JSON]', created_at: '2024-01-20T11:00:00Z' },
-            { id: '2', user_id: '2', birth_date: '1985-08-23', birth_time: '18:30:00', location: 'Los Angeles, CA, USA', chart_data: '[Chart Data JSON]', created_at: '2024-01-25T16:45:00Z' }
-          ]
-        },
-        {
-          name: 'vibe_match_scores',
-          count: 1156,
-          columns: ['id', 'user_id', 'score', 'factors', 'calculated_at', 'chart_version'],
-          sampleData: [
-            { id: '1', user_id: '1', score: 78, factors: '{"sun_mars": 0.85, "moon_venus": 0.72}', calculated_at: '2024-02-01T14:00:00Z', chart_version: '1.2' },
-            { id: '2', user_id: '2', score: 84, factors: '{"sun_mars": 0.91, "moon_venus": 0.68}', calculated_at: '2024-02-02T10:30:00Z', chart_version: '1.2' }
-          ]
-        },
-        {
-          name: 'api_usage',
-          count: 45623,
-          columns: ['id', 'user_id', 'endpoint', 'method', 'status_code', 'response_time', 'created_at'],
-          sampleData: [
-            { id: '1', user_id: '1', endpoint: '/api/astrology/chart', method: 'POST', status_code: 200, response_time: 245, created_at: '2024-02-03T10:15:00Z' },
-            { id: '2', user_id: '2', endpoint: '/api/chat/completions', method: 'POST', status_code: 200, response_time: 1532, created_at: '2024-02-03T10:16:00Z' },
-            { id: '3', user_id: '1', endpoint: '/api/users/profile', method: 'GET', status_code: 200, response_time: 87, created_at: '2024-02-03T10:17:00Z' }
-          ]
-        }
-      ];
+      // Fetch real database schema from the backend
+      const response = await fetch('/api/admin/database-schema');
+      if (!response.ok) {
+        throw new Error('Failed to fetch database schema');
+      }
+      const realTables: TableData[] = await response.json();
       
-      setTables(mockTables);
-      setSelectedTable(mockTables[0]);
+      setTables(realTables);
+      if (realTables.length > 0) {
+        setSelectedTable(realTables[0]);
+      }
     } catch (error) {
       console.error('Error fetching database schema:', error);
       toast({
-        title: "Error",
-        description: "Failed to load database schema",
-        variant: "destructive",
+        title: "Database Connection Required",
+        description: "Connect to your database to view real table structure and data",
+        variant: "default",
       });
+      setTables([]);
     } finally {
       setIsLoading(false);
     }
