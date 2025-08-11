@@ -65,8 +65,8 @@ export default function SoulSyncPage() {
 
   // Fetch real connections from database
   const { data: connections, isLoading: connectionsLoading, error: connectionsError, refetch } = useQuery({
-    queryKey: ['/api/partner-connections', currentUserId],
-    enabled: !!currentUserId,
+    queryKey: ['/api/partner-connections', currentUserId || 'guest'],
+    enabled: true, // Always enabled to allow guest usage
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -90,8 +90,30 @@ export default function SoulSyncPage() {
           email: `temp_${Date.now()}@lightprompt.co`,
           name: `Soul Seeker ${Math.floor(Math.random() * 1000)}`,
         };
-        localStorage.setItem('currentUser', JSON.stringify(tempUser));
-        userId = tempUser.id;
+        
+        // Create user in database first
+        const userResponse = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: tempUser.email,
+            name: tempUser.name
+          }),
+        });
+        
+        if (!userResponse.ok) {
+          throw new Error('Failed to create user');
+        }
+        
+        const createdUser = await userResponse.json();
+        const actualUser = {
+          ...tempUser,
+          id: createdUser.id // Use the database-generated ID
+        };
+        localStorage.setItem('currentUser', JSON.stringify(actualUser));
+        userId = createdUser.id;
         
         toast({
           title: "Welcome! 🌟",

@@ -677,7 +677,7 @@ export const chatSafetyLogs = pgTable("chat_safety_logs", {
 export const partnerConnections = pgTable("partner_connections", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
-  userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId2: varchar("user_id_2").references(() => users.id, { onDelete: "cascade" }), // nullable for pending invitations
   name: text("name").notNull(), // connection display name
   relationshipType: text("relationship_type").notNull(), // romantic, friendship, family, growth_partner
   connectionLevel: integer("connection_level").default(1), // 1-10 depth level
