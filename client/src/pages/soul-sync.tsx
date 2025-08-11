@@ -50,19 +50,38 @@ export default function SoulSyncPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
-  // Initialize user from localStorage
+  // Initialize user from localStorage and check for returning from login
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
+        
+        // Clear any return URL since we're now authenticated
+        localStorage.removeItem('returnUrl');
       } catch (error) {
         console.error('Failed to parse stored user:', error);
       }
     }
     setLoading(false);
   }, []);
+
+  // Check for returning users after login
+  useEffect(() => {
+    const checkReturnUrl = () => {
+      const returnUrl = localStorage.getItem('returnUrl');
+      if (returnUrl === '/soul-sync' && user) {
+        localStorage.removeItem('returnUrl');
+        // Force refresh to show dashboard instead of landing page
+        setRefreshKey(prev => prev + 1);
+      }
+    };
+    
+    if (user) {
+      checkReturnUrl();
+    }
+  }, [user]);
 
   // Fetch real-time user connections data (only for authenticated users)
   const { data: connectionsData, isLoading: connectionsLoading } = useQuery({
@@ -137,10 +156,14 @@ export default function SoulSyncPage() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.location.href = '/store'}
+                  onClick={() => {
+                    // Store return URL so we can redirect back to Soul Sync after login
+                    localStorage.setItem('returnUrl', '/soul-sync');
+                    window.location.href = '/chat';
+                  }}
                   className="border-teal-600 text-teal-600 hover:bg-teal-50 px-8 py-3 text-lg"
                 >
-                  View Pricing
+                  Sign In
                 </Button>
               </div>
             </div>

@@ -112,6 +112,18 @@ export default function ChatPage() {
 
       setCurrentUser(user);
       setLastUsageCheck(user?.tokensUsed || 0);
+      
+      // Check if user should be redirected after login
+      if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        const returnUrl = localStorage.getItem('returnUrl');
+        if (returnUrl && returnUrl !== '/chat') {
+          localStorage.removeItem('returnUrl');
+          setTimeout(() => {
+            window.location.href = returnUrl;
+          }, 1000); // Small delay to ensure user data is saved
+        }
+      }
     } catch (error) {
       console.error('Failed to initialize user:', error);
       toast({
