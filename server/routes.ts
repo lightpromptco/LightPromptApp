@@ -6,6 +6,7 @@ import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import knowledgeRoutes from "./routes/knowledge";
 import pagesRoutes from "./routes/pages";
 import contentRoutes from "./routes/content";
+import aiContentRoutes from "./routes/ai-content";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
@@ -114,6 +115,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Content management routes
   app.use('/api', contentRoutes);
+  
+  // AI content generation routes
+  app.use('/api', aiContentRoutes);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {

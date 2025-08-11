@@ -49,6 +49,7 @@ import ApiExplorer from "@/pages/api-explorer";
 import DataViewer from "@/pages/data-viewer";
 import SystemStatus from "@/pages/system-status";
 import PageEditor from "@/pages/admin/page-editor";
+import EnhancedPageEditor from "@/pages/admin/enhanced-page-editor";
 import AnalyticsPage from "@/pages/admin/analytics";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
@@ -118,6 +119,11 @@ function Router() {
         </MainLayout>
       )} />
       <Route path="/admin/page-editor" component={() => (
+        <MainLayout>
+          <EnhancedPageEditor />
+        </MainLayout>
+      )} />
+      <Route path="/admin/page-editor-classic" component={() => (
         <MainLayout>
           <PageEditor />
         </MainLayout>
