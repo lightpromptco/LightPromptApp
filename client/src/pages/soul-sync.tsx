@@ -368,7 +368,7 @@ export default function SoulSyncPage() {
                     <Progress value={profileData ? 85 : 25} className="h-2" />
                   </div>
                   <Button 
-                    onClick={() => window.location.href = '/account-settings'}
+                    onClick={() => window.location.href = '/settings'}
                     className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                     size="sm"
                   >

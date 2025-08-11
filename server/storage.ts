@@ -29,6 +29,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User>;
+  updateUserAvatar(userId: string, avatarUrl: string): Promise<User>;
+  updateNotificationPreferences(userId: string, preferences: any): Promise<void>;
   
   // Chat Sessions
   getChatSession(id: string): Promise<ChatSession | undefined>;

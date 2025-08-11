@@ -88,6 +88,20 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async updateUserAvatar(userId: string, avatarUrl: string): Promise<User> {
+    return this.updateUser(userId, { avatarUrl });
+  }
+
+  async updateNotificationPreferences(userId: string, preferences: any): Promise<void> {
+    try {
+      // Store notification preferences in user_profiles table or a separate table
+      await this.updateUserProfile(userId, { notificationPreferences: preferences });
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      throw error;
+    }
+  }
+
   // Chat Sessions
   async getChatSession(id: string): Promise<ChatSession | undefined> {
     try {

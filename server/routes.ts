@@ -256,6 +256,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User profile and settings API routes
+  app.put("/api/users/:userId/profile", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { name, email, bio, location, timezone } = req.body;
+      
+      // Update user profile in database
+      const updatedUser = await storage.updateUserProfile(userId, {
+        name,
+        email,
+        bio,
+        location,
+        timezone
+      });
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+
+  app.put("/api/users/:userId/avatar", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { avatarUrl } = req.body;
+      
+      // Update user avatar in database
+      const updatedUser = await storage.updateUserAvatar(userId, avatarUrl);
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error('Error updating user avatar:', error);
+      res.status(500).json({ error: 'Failed to update avatar' });
+    }
+  });
+
+  app.put("/api/users/:userId/notifications", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const notificationPrefs = req.body;
+      
+      // Update notification preferences in database
+      await storage.updateNotificationPreferences(userId, notificationPrefs);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      res.status(500).json({ error: 'Failed to update notifications' });
+    }
+  });
+
   // Soul Sync connection storage
   app.post("/api/soul-sync/connections", async (req, res) => {
     try {
