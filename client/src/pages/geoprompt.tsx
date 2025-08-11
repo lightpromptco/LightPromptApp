@@ -23,13 +23,13 @@ export default function GeoPromptPage() {
         </div>
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            GeoPrompt
+            GeoPrompt <Badge variant="outline">Beta</Badge>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
             Discover mindful moments through location-based reflections and QR code experiences
           </p>
           <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-            Interactive Maps
+            Interactive Maps (Limited Features)
           </Badge>
         </div>
       </div>

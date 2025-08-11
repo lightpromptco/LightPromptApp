@@ -56,6 +56,50 @@ const INTERESTS = [
 
 export default function VibeMatchPage() {
   const [currentView, setCurrentView] = useState<'intro' | 'profile' | 'discovery' | 'matches' | 'prism'>('intro');
+  
+  // Show Coming Soon notice
+  if (currentView === 'intro') {
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center space-y-8">
+        <div className="space-y-4">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+            <Sparkles className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold">VibeMatch <Badge variant="outline">Coming Soon</Badge></h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            AI-powered conscious compatibility matching for deep soul connections
+          </p>
+        </div>
+        
+        <Card className="p-8">
+          <CardContent>
+            <h3 className="text-xl font-semibold mb-4">What's Coming</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-left">
+              <div className="space-y-2">
+                <h4 className="font-medium">✨ Conscious Matching</h4>
+                <p className="text-sm text-muted-foreground">AI that understands your soul's frequency</p>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium">🔮 Vibe Profiling</h4>
+                <p className="text-sm text-muted-foreground">Deep personality and energy mapping</p>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium">🤝 Connection Types</h4>
+                <p className="text-sm text-muted-foreground">From friendship to romance to collaboration</p>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium">🛡️ Privacy First</h4>
+                <p className="text-sm text-muted-foreground">Complete control over your data</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Badge variant="secondary">We're building this thoughtfully - stay tuned!</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   const [profileStep, setProfileStep] = useState(1);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [vibeProfile, setVibeProfile] = useState({

@@ -32,7 +32,7 @@ const NAV_ITEMS = [
     subItems: [
       { path: "/woo-woo", label: "Soul Map Navigator", icon: Compass, description: "Cosmic Alignment & Insights" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
-      { path: "/geoprompt", label: "GeoPrompt", icon: Map, description: "Location-Based Mindfulness" }
+      { path: "/geoprompt", label: "GeoPrompt (Beta)", icon: Map, description: "Location-Based Mindfulness" }
     ]
   },
   { 
@@ -42,9 +42,9 @@ const NAV_ITEMS = [
     description: "Community & Relationships", 
     glyph: "◇",
     subItems: [
-      { path: "/soul-sync", label: "Soul Sync", icon: Heart, description: "Find Your Connection" },
-      { path: "/vibe-match", label: "VibeMatch", icon: Sparkles, description: "AI-Powered Compatibility" },
-      { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" }
+      { path: "/soul-sync", label: "Soul Sync (Beta)", icon: Heart, description: "Find Your Connection" },
+      { path: "/vibe-match", label: "VibeMatch (Coming Soon)", icon: Sparkles, description: "AI-Powered Compatibility" },
+      { path: "/community", label: "Community (Coming Soon)", icon: Users, description: "Join Our Discord" }
     ]
   },
   { 
@@ -54,9 +54,9 @@ const NAV_ITEMS = [
     description: "Platform Features", 
     glyph: "⟡",
     subItems: [
-      { path: "/dashboard", label: "BodyMirror", icon: Activity, description: "Your Wellness Overview" },
+      { path: "/dashboard", label: "BodyMirror (Beta)", icon: Activity, description: "Your Wellness Overview" },
       { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
-      { path: "/prism-points", label: "Prism Points", icon: Sparkles, description: "Reward System" }
+      { path: "/prism-points", label: "Prism Points (Coming Soon)", icon: Sparkles, description: "Reward System" }
     ]
   },
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },

@@ -149,32 +149,42 @@ export default function SoulSyncPage() {
   // Fun activities for different connection types
   const connectionActivities = {
     romantic_partner: [
-      { icon: Heart, name: "Love Notes", description: "Daily affirmations for each other" },
-      { icon: Stars, name: "Birth Chart Match", description: "Explore your astrological compatibility" },
-      { icon: Calendar, name: "Date Planning", description: "Plan surprise dates together" },
-      { icon: Camera, name: "Memory Jar", description: "Collect special moments" }
+      { icon: Heart, name: "Love Notes (Beta)", description: "Daily affirmations for each other" },
+      { icon: Stars, name: "Birth Chart Match (Coming Soon)", description: "Explore your astrological compatibility" },
+      { icon: Calendar, name: "Date Planning (Beta)", description: "Plan surprise dates together" },
+      { icon: Camera, name: "Memory Jar (Coming Soon)", description: "Collect special moments" }
     ],
     best_friend: [
-      { icon: Gamepad2, name: "Challenge Mode", description: "Fun dares & challenges" },
-      { icon: Music, name: "Playlist Swap", description: "Share your current vibes" },
-      { icon: Stars, name: "Friendship Compatibility", description: "Discover your cosmic connection" },
-      { icon: Trophy, name: "Achievement Hunt", description: "Unlock life milestones" }
+      { icon: Gamepad2, name: "Challenge Mode (Beta)", description: "Fun dares & challenges" },
+      { icon: Music, name: "Playlist Swap (Coming Soon)", description: "Share your current vibes" },
+      { icon: Stars, name: "Friendship Compatibility (Coming Soon)", description: "Discover your cosmic connection" },
+      { icon: Trophy, name: "Achievement Hunt (Coming Soon)", description: "Unlock life milestones" }
     ],
     family: [
-      { icon: Book, name: "Story Sharing", description: "Family memories & wisdom" },
-      { icon: Calendar, name: "Tradition Tracker", description: "Keep family traditions alive" },
-      { icon: Moon, name: "Family Astrology", description: "Understand family dynamics" },
-      { icon: Heart, name: "Gratitude Circle", description: "Daily family appreciation" }
+      { icon: Book, name: "Story Sharing (Beta)", description: "Family memories & wisdom" },
+      { icon: Calendar, name: "Tradition Tracker (Coming Soon)", description: "Keep family traditions alive" },
+      { icon: Moon, name: "Family Astrology (Coming Soon)", description: "Understand family dynamics" },
+      { icon: Heart, name: "Gratitude Circle (Beta)", description: "Daily family appreciation" }
     ],
     workout_buddy: [
-      { icon: Zap, name: "Workout Streaks", description: "Track exercise together" },
-      { icon: Trophy, name: "Fitness Challenges", description: "Compete & celebrate" },
-      { icon: Target, name: "Goal Crushing", description: "Achieve fitness milestones" }
+      { icon: Zap, name: "Workout Streaks (Coming Soon)", description: "Track exercise together" },
+      { icon: Trophy, name: "Fitness Challenges (Coming Soon)", description: "Compete & celebrate" },
+      { icon: Target, name: "Goal Crushing (Coming Soon)", description: "Achieve fitness milestones" }
+    ],
+    study_group: [
+      { icon: Star, name: "Daily Check-ins (Beta)", description: "Share your highlights" },
+      { icon: Target, name: "Goal Support (Beta)", description: "Encourage each other" },
+      { icon: Heart, name: "Appreciation (Beta)", description: "Express gratitude" }
+    ],
+    travel_crew: [
+      { icon: Star, name: "Daily Check-ins (Beta)", description: "Share your highlights" },
+      { icon: Target, name: "Goal Support (Beta)", description: "Encourage each other" },
+      { icon: Heart, name: "Appreciation (Beta)", description: "Express gratitude" }
     ],
     default: [
-      { icon: Star, name: "Daily Check-ins", description: "Share your highlights" },
-      { icon: Target, name: "Goal Support", description: "Encourage each other" },
-      { icon: Heart, name: "Appreciation", description: "Express gratitude" }
+      { icon: Star, name: "Daily Check-ins (Beta)", description: "Share your highlights" },
+      { icon: Target, name: "Goal Support (Beta)", description: "Encourage each other" },
+      { icon: Heart, name: "Appreciation (Beta)", description: "Express gratitude" }
     ]
   };
 
@@ -748,7 +758,14 @@ export default function SoulSyncPage() {
                         <div key={index} className="flex items-center space-x-3 p-2 rounded-lg bg-purple-50/50 dark:bg-purple-900/20">
                           <activity.icon className="h-5 w-5 text-purple-600" />
                           <div>
-                            <div className="font-medium text-sm">{activity.name}</div>
+                            <div className="font-medium text-sm">
+                              {activity.name}
+                              {(activity.name.includes('Coming Soon') || activity.name.includes('Beta')) && 
+                                <Badge variant="secondary" className="ml-2 text-xs">
+                                  {activity.name.includes('Coming Soon') ? 'Coming Soon' : 'Beta'}
+                                </Badge>
+                              }
+                            </div>
                             <div className="text-xs text-muted-foreground">{activity.description}</div>
                           </div>
                         </div>
@@ -813,10 +830,13 @@ export default function SoulSyncPage() {
             <CardContent className="py-8">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-purple-600" />
               <h3 className="text-2xl font-bold mb-4">Want Premium Soul Sync Features?</h3>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Upgrade for unlimited connections, detailed wellness data sharing, custom relationship types, 
-                and advanced privacy controls.
-              </p>
+              <div className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+                <Badge variant="outline" className="mb-2">Beta Platform - Not Final</Badge>
+                <p className="mt-2">
+                  We're actively building these features! Many activities are in beta or coming soon. 
+                  This honest preview shows our roadmap as we develop the full platform.
+                </p>
+              </div>
               <div className="flex gap-4 justify-center">
                 <Button className="bg-purple-600 hover:bg-purple-700">
                   Get Premium Features

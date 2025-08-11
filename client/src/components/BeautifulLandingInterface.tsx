@@ -19,37 +19,57 @@ const FEATURES = [
     title: 'Reflective Conversations',
     description: 'AI that mirrors back your wisdom—like having Socrates as a reflection partner who never judges',
     icon: Brain,
-    href: '/chat'
+    href: '/chat',
+    status: 'active'
+  },
+  {
+    title: 'Vision Quest',
+    description: 'Interactive self-discovery journey with challenges and cosmic insights',
+    icon: Target,
+    href: '/vision-quest',
+    status: 'active'
+  },
+  {
+    title: 'Soul Map Navigator',
+    description: 'Explore your astrological profile and cosmic patterns for deeper self-understanding',
+    icon: Sparkles,
+    href: '/woo-woo',
+    status: 'active'
   },
   {
     title: 'Wellness Dashboard',
     description: 'See patterns in your inner world—because self-awareness loves good data visualization',
     icon: Heart,
-    href: '/dashboard'
+    href: '/dashboard',
+    status: 'beta'
   },
   {
-    title: 'Community',
+    title: 'Soul Sync Connections',
     description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
     icon: Users,
-    href: '/community'
+    href: '/soul-sync',
+    status: 'beta'
   },
   {
     title: 'Vibe Matching',
     description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
     icon: Sparkles,
-    href: '/vibe-match'
+    href: '/vibe-match',
+    status: 'coming-soon'
   },
   {
     title: 'GeoPrompt',
     description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
     icon: MapPin,
-    href: '/geoprompt'
+    href: '/geoprompt',
+    status: 'beta'
   },
   {
     title: 'Prism Points',
     description: 'Track your growth journey with conscious gamification that honors genuine transformation',
     icon: Gem,
-    href: '/prism-points'
+    href: '/prism-points',
+    status: 'coming-soon'
   }
 ];
 
@@ -122,7 +142,7 @@ export function BeautifulLandingInterface() {
               The art of conscious reflection.
             </h3>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-light">
-              Six research-backed tools for deeper self-connection that would make both Alan Watts and your favorite neuroscientist geek out.
+              Eight research-backed tools for deeper self-connection. We're building thoughtfully—some features are live, others in beta or coming soon.
             </p>
           </div>
 
