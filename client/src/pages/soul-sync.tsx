@@ -47,6 +47,12 @@ export default function SoulSyncPage() {
   const [newConnection, setNewConnection] = useState("");
   const [connectionType, setConnectionType] = useState("");
   const [sharedGoal, setSharedGoal] = useState("");
+  const [inviteData, setInviteData] = useState<{
+    shareUrl: string;
+    emailSubject: string;
+    emailBody: string;
+    smsMessage: string;
+  } | null>(null);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<any>(null);
   const [birthChartDialogOpen, setBirthChartDialogOpen] = useState(false);
@@ -100,6 +106,7 @@ export default function SoulSyncPage() {
         },
         body: JSON.stringify({
           userId1: currentUserId,
+          name: newConnection,
           relationshipType: connectionType,
           sharedGoals: []
         }),
@@ -127,7 +134,7 @@ export default function SoulSyncPage() {
     }
   };
 
-  const handleAddGoal = () => {
+  const handleAddGoal = async (connectionId?: string) => {
     if (!sharedGoal.trim()) {
       toast({
         title: "Goal Required",
@@ -137,11 +144,100 @@ export default function SoulSyncPage() {
       return;
     }
 
+    // Use the first connection if no specific connection provided
+    const targetConnectionId = connectionId || connections[0]?.id;
+    
+    if (!targetConnectionId) {
+      toast({
+        title: "Connection Required",
+        description: "Please create a connection first before adding goals",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/partner-connections/${targetConnectionId}/add-goal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          goal: sharedGoal.trim(),
+          userId: currentUserId,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Shared Goal Added! 🎯",
+          description: `"${sharedGoal}" added to your soul sync goals`,
+        });
+        setSharedGoal("");
+        // Refresh connections to show updated goals
+        window.location.reload();
+      } else {
+        throw new Error('Failed to add goal');
+      }
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      toast({
+        title: "Failed to Add Goal",
+        description: "Unable to save your goal. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleShareConnection = async (connectionId: string) => {
+    try {
+      const response = await fetch('/api/soul-sync/create-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          connectionId,
+          userId: currentUserId,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setInviteData(data);
+        toast({
+          title: "Invite Link Created! 🔗",
+          description: "Share this link to invite someone to join your Soul Sync",
+        });
+      } else {
+        throw new Error('Failed to create invite');
+      }
+    } catch (error) {
+      console.error('Error creating invite:', error);
+      toast({
+        title: "Failed to Create Invite",
+        description: "Unable to create shareable link. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
     toast({
-      title: "Shared Goal Added! 🎯",
-      description: `"${sharedGoal}" added to your soul sync goals`,
+      title: "Copied!",
+      description: "Link copied to clipboard",
     });
-    setSharedGoal("");
+  };
+
+  const shareViaEmail = (emailBody: string, subject: string) => {
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    window.open(mailtoUrl);
+  };
+
+  const shareViaSMS = (message: string) => {
+    const smsUrl = `sms:?body=${encodeURIComponent(message)}`;
+    window.open(smsUrl);
   };
 
   // Connection types with fun options
@@ -602,7 +698,12 @@ export default function SoulSyncPage() {
                           if (open) setSelectedConnection(connection);
                         }}>
                           <DialogTrigger asChild>
-                            <Button size="sm" variant="outline" className="flex-1">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="flex-1" 
+                              onClick={() => handleShareConnection(connection.id)}
+                            >
                               <Link className="h-3 w-3 mr-1" />
                               Invite Link
                             </Button>
@@ -617,11 +718,14 @@ export default function SoulSyncPage() {
                               </p>
                               <div className="flex gap-2">
                                 <Input 
-                                  value={generateInviteLink(connection.id)} 
+                                  value={inviteData?.shareUrl || "Click 'Invite Link' to generate"} 
                                   readOnly 
                                   className="flex-1"
                                 />
-                                <Button onClick={() => copyInviteLink(connection.id)}>
+                                <Button 
+                                  onClick={() => inviteData?.shareUrl && copyToClipboard(inviteData.shareUrl)}
+                                  disabled={!inviteData?.shareUrl}
+                                >
                                   <Copy className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -629,28 +733,20 @@ export default function SoulSyncPage() {
                                 <Button 
                                   variant="outline" 
                                   className="w-full"
-                                  onClick={() => {
-                                    toast({
-                                      title: "QR Code Generated! 📱",
-                                      description: "QR code ready for easy sharing",
-                                    });
-                                  }}
+                                  onClick={() => inviteData?.smsMessage && shareViaSMS(inviteData.smsMessage)}
+                                  disabled={!inviteData?.smsMessage}
                                 >
-                                  <QrCode className="h-4 w-4 mr-2" />
-                                  QR Code
+                                  <MessageSquare className="h-4 w-4 mr-2" />
+                                  SMS
                                 </Button>
                                 <Button 
-                                  variant="outline" 
+                                  variant="outline"
                                   className="w-full"
-                                  onClick={() => {
-                                    toast({
-                                      title: "Text Message Ready! 📲",
-                                      description: "Invite link copied to send via text",
-                                    });
-                                  }}
+                                  onClick={() => inviteData?.emailBody && shareViaEmail(inviteData.emailBody, inviteData.emailSubject)}
+                                  disabled={!inviteData?.emailBody}
                                 >
-                                  <Send className="h-4 w-4 mr-2" />
-                                  Send via Text
+                                  <Mail className="h-4 w-4 mr-2" />
+                                  Email
                                 </Button>
                               </div>
                             </div>

@@ -678,12 +678,27 @@ export const partnerConnections = pgTable("partner_connections", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
   userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // connection display name
   relationshipType: text("relationship_type").notNull(), // romantic, friendship, family, growth_partner
   connectionLevel: integer("connection_level").default(1), // 1-10 depth level
   dataSharing: jsonb("data_sharing").default({}), // what wellness data they share
   sharedGoals: jsonb("shared_goals").default([]), // mutual growth goals
+  inviteCode: varchar("invite_code").unique(), // for sharing invitations
   isActive: boolean("is_active").default(true),
   establishedAt: timestamp("established_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Soul Sync Invitations
+export const soulSyncInvites = pgTable("soul_sync_invites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  inviteCode: varchar("invite_code").notNull().unique(),
+  connectionId: varchar("connection_id").notNull().references(() => partnerConnections.id, { onDelete: "cascade" }),
+  invitedBy: varchar("invited_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  invitedEmail: text("invited_email"),
+  status: text("status").notNull().default("pending"), // pending, accepted, expired
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

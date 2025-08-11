@@ -1991,21 +1991,19 @@ Please provide astrological insights based on available data.`;
   app.post("/api/partner-connections/:connectionId/goals", async (req, res) => {
     try {
       const connectionId = req.params.connectionId;
-      const { goal } = req.body;
+      const { goal, userId } = req.body;
       
-      if (!goal) {
-        return res.status(400).json({ error: "Goal is required" });
+      if (!goal || !goal.trim()) {
+        return res.status(400).json({ error: "Goal description is required" });
       }
 
-      // Get existing connection and add goal to shared goals
-      const connection = await storage.updatePartnerConnection(connectionId, {
-        sharedGoals: [] // Will be properly implemented when we have the get method
-      });
+      // Add the goal to the connection's shared goals
+      const updatedConnection = await storage.addSharedGoal(connectionId, goal.trim(), userId);
       
-      res.json(connection);
+      res.json(updatedConnection);
     } catch (error) {
-      console.error("Error updating partner goal:", error);
-      res.status(500).json({ error: "Failed to update goal" });
+      console.error("Error adding shared goal:", error);
+      res.status(500).json({ error: "Failed to add shared goal" });
     }
   });
 
@@ -2124,15 +2122,20 @@ Please provide astrological insights based on available data.`;
 
   app.post("/api/partner-connections", async (req, res) => {
     try {
-      const { userId1, userId2, relationshipType, sharedGoals = [] } = req.body;
+      const { userId1, userId2, name, relationshipType, sharedGoals = [] } = req.body;
+      
+      // Generate invite code for sharing
+      const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       
       const newConnection = await db.insert(partnerConnections)
         .values({
           userId1,
-          userId2: userId2 || 'placeholder-user',
+          userId2: userId2 || null, // null until someone joins
+          name: name || `New ${relationshipType} Connection`,
           relationshipType,
           connectionLevel: 1,
           sharedGoals,
+          inviteCode,
           isActive: true
         })
         .returning();
@@ -2141,6 +2144,86 @@ Please provide astrological insights based on available data.`;
     } catch (error) {
       console.error('Failed to create partner connection:', error);
       res.status(500).json({ error: "Failed to create connection" });
+    }
+  });
+
+  // Add shared goal to existing connection
+  app.post("/api/partner-connections/:connectionId/add-goal", async (req, res) => {
+    try {
+      const { connectionId } = req.params;
+      const { goal, userId } = req.body;
+      
+      if (!goal || !goal.trim()) {
+        return res.status(400).json({ error: "Goal description is required" });
+      }
+
+      // Get existing connection
+      const [existingConnection] = await db
+        .select()
+        .from(partnerConnections)
+        .where(eq(partnerConnections.id, connectionId));
+
+      if (!existingConnection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+
+      // Add goal to shared goals array
+      const currentGoals = Array.isArray(existingConnection.sharedGoals) 
+        ? existingConnection.sharedGoals as string[]
+        : [];
+
+      const newGoal = {
+        id: Math.random().toString(36).substring(2, 8),
+        description: goal.trim(),
+        addedBy: userId,
+        addedAt: new Date().toISOString(),
+        completed: false
+      };
+
+      const updatedGoals = [...currentGoals, newGoal];
+
+      // Update connection
+      const [updatedConnection] = await db
+        .update(partnerConnections)
+        .set({ sharedGoals: updatedGoals })
+        .where(eq(partnerConnections.id, connectionId))
+        .returning();
+
+      res.json(updatedConnection);
+    } catch (error) {
+      console.error('Failed to add shared goal:', error);
+      res.status(500).json({ error: "Failed to add shared goal" });
+    }
+  });
+
+  // Create shareable invite link 
+  app.post("/api/soul-sync/create-invite", async (req, res) => {
+    try {
+      const { connectionId, userId } = req.body;
+      
+      // Get connection details
+      const [connection] = await db
+        .select()
+        .from(partnerConnections)
+        .where(eq(partnerConnections.id, connectionId));
+
+      if (!connection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const shareUrl = `${baseUrl}/soul-sync/join/${connection.inviteCode}`;
+      
+      res.json({ 
+        inviteCode: connection.inviteCode,
+        shareUrl,
+        emailSubject: "Join my Soul Sync connection!",
+        emailBody: `Hi! I'd love to connect with you on Soul Sync for mutual support and growth.\n\nJoin here: ${shareUrl}\n\nLooking forward to our journey together!`,
+        smsMessage: `Join my Soul Sync connection for mutual growth and support: ${shareUrl}`
+      });
+    } catch (error) {
+      console.error("Error creating invite:", error);
+      res.status(500).json({ error: "Failed to create invite" });
     }
   });
 
