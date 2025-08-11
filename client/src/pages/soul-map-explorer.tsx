@@ -43,6 +43,7 @@ import {
   User,
   Mountain,
   Minimize2,
+  Briefcase,
   Palette,
   CloudRain,
   Sunset,
@@ -993,6 +994,91 @@ export default function SoulMapExplorerPage() {
             setCurrentView('chat');
           }}
         />
+
+        {/* Career Path Insights Dashboard */}
+        {chartData?.careerGuidance && (
+          <div className={`mt-8 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-gradient-to-br from-slate-50 to-gray-100 border-slate-200'} rounded-xl border p-6`}>
+            <h3 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>
+              <Target className="h-5 w-5 text-teal-600" />
+              Your Cosmic Career Blueprint
+            </h3>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* VibeMatch Score */}
+              <div className={`p-4 rounded-lg ${zenMode ? 'bg-white/5' : 'bg-white'} border ${zenMode ? 'border-white/10' : 'border-gray-200'}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-teal-500 to-blue-500 flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">VM</span>
+                  </div>
+                  <h4 className={`font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>VibeMatch Score</h4>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`flex-1 ${zenMode ? 'bg-white/20' : 'bg-gray-200'} rounded-full h-3`}>
+                    <div 
+                      className="h-3 rounded-full bg-gradient-to-r from-teal-500 to-blue-500"
+                      style={{ width: `${chartData.careerGuidance.vibeMatchScore}%` }}
+                    />
+                  </div>
+                  <span className={`text-lg font-bold ${zenMode ? 'text-white' : 'text-gray-700'}`}>{chartData.careerGuidance.vibeMatchScore}%</span>
+                </div>
+                <p className={`text-xs ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
+                  Career-path compatibility with your cosmic blueprint
+                </p>
+              </div>
+
+              {/* Soul Purpose */}
+              <div className={`p-4 rounded-lg ${zenMode ? 'bg-white/5' : 'bg-white'} border ${zenMode ? 'border-white/10' : 'border-gray-200'}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className={`font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>Soul Purpose</h4>
+                </div>
+                <p className={`text-sm ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
+                  {chartData.careerGuidance.soulPurpose}
+                </p>
+              </div>
+
+              {/* Top Career Paths */}
+              <div className={`p-4 rounded-lg ${zenMode ? 'bg-white/5' : 'bg-white'} border ${zenMode ? 'border-white/10' : 'border-gray-200'}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className={`font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>Ideal Careers</h4>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {chartData.careerGuidance.idealCareers.slice(0, 4).map((career, index) => (
+                    <span key={index} className="px-2 py-1 bg-teal-100 text-teal-800 rounded-md text-xs">
+                      {career}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Insights */}
+            <div className="mt-6 grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className={`font-medium mb-2 ${zenMode ? 'text-white' : 'text-gray-800'}`}>Natural Talents</h4>
+                <div className="flex flex-wrap gap-2">
+                  {chartData.careerGuidance.naturalTalents.map((talent, index) => (
+                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs">
+                      {talent}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className={`font-medium mb-2 ${zenMode ? 'text-white' : 'text-gray-800'}`}>Work Style</h4>
+                <p className={`text-sm ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
+                  {chartData.careerGuidance.workStyle}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Enhanced Oracle Interface */}
