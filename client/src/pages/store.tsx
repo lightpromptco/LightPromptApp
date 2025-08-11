@@ -129,11 +129,63 @@ export default function Store() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            LightPrompt Store
+            STORE & PRICING
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Conscious AI tools for your wellness journey. Start with what feels right for you.
           </p>
+        </div>
+
+        {/* Quick Pricing Overview */}
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 mb-12 max-w-lg mx-auto">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <GraduationCap className="h-5 w-5 text-purple-600" />
+                <span className="font-medium">Course</span>
+              </div>
+              <span className="text-xl font-bold text-purple-600">$120</span>
+            </div>
+            
+            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+                <span className="font-medium">Ebook</span>
+              </div>
+              <span className="text-xl font-bold text-blue-600">$11</span>
+            </div>
+            
+            <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Package className="h-5 w-5 text-green-600" />
+                <span className="font-medium">Bundle</span>
+                <Badge className="bg-teal-500 text-white text-xs">Save $6</Badge>
+              </div>
+              <span className="text-xl font-bold text-green-600">$125</span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="font-semibold mb-3 text-center">What You Get:</h3>
+            <div className="space-y-1 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                <span>7 AI Wellness Companions</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                <span>Soul Map & Birth Chart Analysis</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                <span>Conscious AI Guidance</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                <span>Lifetime Access & Updates</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Cart Summary */}
