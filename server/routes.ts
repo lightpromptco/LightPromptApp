@@ -2147,6 +2147,46 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Accept Soul Sync invite endpoint
+  app.post("/api/soul-sync/accept-invite", async (req, res) => {
+    try {
+      const { inviteCode, userId } = req.body;
+      
+      if (!inviteCode || !userId) {
+        return res.status(400).json({ error: "Invite code and user ID are required" });
+      }
+
+      // Find the connection with the invite code
+      const [existingConnection] = await db
+        .select()
+        .from(partnerConnections)
+        .where(eq(partnerConnections.inviteCode, inviteCode));
+
+      if (!existingConnection) {
+        return res.status(404).json({ error: "Invalid invite code" });
+      }
+
+      if (existingConnection.userId2) {
+        return res.status(400).json({ error: "Connection already complete" });
+      }
+
+      // Update connection with second user
+      const [updatedConnection] = await db
+        .update(partnerConnections)
+        .set({
+          userId2: userId,
+          establishedAt: new Date()
+        })
+        .where(eq(partnerConnections.id, existingConnection.id))
+        .returning();
+
+      res.json(updatedConnection);
+    } catch (error) {
+      console.error('Failed to accept invite:', error);
+      res.status(500).json({ error: "Failed to accept invite" });
+    }
+  });
+
   // Add shared goal to existing connection
   app.post("/api/partner-connections/:connectionId/add-goal", async (req, res) => {
     try {

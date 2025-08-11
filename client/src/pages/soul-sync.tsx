@@ -59,14 +59,132 @@ export default function SoulSyncPage() {
   const [birthChartDialogOpen, setBirthChartDialogOpen] = useState(false);
   const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [authForm, setAuthForm] = useState({ email: '', name: '' });
+  const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(null);
+
   // Get current user from localStorage
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const currentUserId = currentUser?.id;
 
-  // Fetch real connections from database
+  // Check authentication status and invite codes on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const inviteCode = urlParams.get('invite');
+    
+    if (inviteCode) {
+      setPendingInviteCode(inviteCode);
+      // Clear the URL parameter
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Check if user is authenticated
+    if (currentUserId && currentUser.email) {
+      setIsAuthenticated(true);
+      // If we have a pending invite and user is authenticated, process it
+      if (inviteCode) {
+        handleInviteAccept(inviteCode);
+      }
+    } else if (inviteCode) {
+      // User clicked an invite link but isn't authenticated
+      setShowAuthDialog(true);
+    }
+  }, [currentUserId]);
+
+  const handleInviteAccept = async (inviteCode: string) => {
+    if (!currentUserId) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
+    try {
+      const response = await fetch('/api/soul-sync/accept-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inviteCode,
+          userId: currentUserId
+        }),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Soul Sync Connected!",
+          description: "Your souls are now synchronized",
+        });
+        refetch(); // Refresh connections
+        setPendingInviteCode(null);
+      } else {
+        throw new Error('Failed to accept invite');
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: "Unable to connect souls. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAuthentication = async () => {
+    if (!authForm.email || !authForm.name) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both email and name",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      // Create or get user
+      const userResponse = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: authForm.email,
+          name: authForm.name
+        }),
+      });
+      
+      if (userResponse.ok) {
+        const user = await userResponse.json();
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        setIsAuthenticated(true);
+        setShowAuthDialog(false);
+        
+        // Process pending invite if exists
+        if (pendingInviteCode) {
+          handleInviteAccept(pendingInviteCode);
+        }
+        
+        toast({
+          title: "Welcome to Soul Sync!",
+          description: "Your account is ready",
+        });
+      } else {
+        throw new Error('Authentication failed');
+      }
+    } catch (error) {
+      toast({
+        title: "Authentication Failed",
+        description: "Unable to create account. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const { toast } = useToast();
+  
+  // Fetch real connections from database - only if authenticated
   const { data: connections, isLoading: connectionsLoading, error: connectionsError, refetch } = useQuery({
-    queryKey: ['/api/partner-connections', currentUserId || 'guest'],
-    enabled: true, // Always enabled to allow guest usage
+    queryKey: ['/api/partner-connections', currentUserId],
+    enabled: isAuthenticated && !!currentUserId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -77,56 +195,12 @@ export default function SoulSyncPage() {
   if (connectionsError) {
     console.error('Failed to load connections:', connectionsError);
   }
-  const { toast } = useToast();
 
-  // Handle creating new connections with real database operations
+  // Handle creating new connections - requires authentication
   const handleCreateConnection = async () => {
-    // Create anonymous user if none exists
-    let userId = currentUserId;
-    if (!userId) {
-      try {
-        const tempUser = {
-          id: `temp_${Date.now()}`,
-          email: `temp_${Date.now()}@lightprompt.co`,
-          name: `Soul Seeker ${Math.floor(Math.random() * 1000)}`,
-        };
-        
-        // Create user in database first
-        const userResponse = await fetch('/api/users', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: tempUser.email,
-            name: tempUser.name
-          }),
-        });
-        
-        if (!userResponse.ok) {
-          throw new Error('Failed to create user');
-        }
-        
-        const createdUser = await userResponse.json();
-        const actualUser = {
-          ...tempUser,
-          id: createdUser.id // Use the database-generated ID
-        };
-        localStorage.setItem('currentUser', JSON.stringify(actualUser));
-        userId = createdUser.id;
-        
-        toast({
-          title: "Welcome! 🌟",
-          description: "Created temporary profile for Soul Sync exploration",
-        });
-      } catch (error) {
-        toast({
-          title: "Setup Error",
-          description: "Unable to initialize Soul Sync. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!isAuthenticated || !currentUserId) {
+      setShowAuthDialog(true);
+      return;
     }
 
     if (!newConnection || !connectionType) {
@@ -145,7 +219,7 @@ export default function SoulSyncPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId1: userId,
+          userId1: currentUserId,
           name: newConnection,
           relationshipType: connectionType,
           sharedGoals: []
@@ -233,37 +307,32 @@ export default function SoulSyncPage() {
     }
   };
 
-  const handleShareConnection = async (connectionId: string) => {
-    try {
-      const response = await fetch('/api/soul-sync/create-invite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          connectionId,
-          userId: currentUserId,
-        }),
-      });
+  const handleShareConnection = (connection: any) => {
+    // Use the existing invite code from the connection
+    const inviteCode = connection.inviteCode;
+    const inviteUrl = `${window.location.origin}/soul-sync?invite=${inviteCode}`;
+    
+    const inviteMessages = {
+      shareUrl: inviteUrl,
+      emailSubject: `Join me on Soul Sync - ${connection.name}`,
+      emailBody: `Hey! I'd love to start our wellness journey together on Soul Sync. 
 
-      if (response.ok) {
-        const data = await response.json();
-        setInviteData(data);
-        toast({
-          title: "Invite Link Created! 🔗",
-          description: "Share this link to invite someone to join your Soul Sync",
-        });
-      } else {
-        throw new Error('Failed to create invite');
-      }
-    } catch (error) {
-      console.error('Error creating invite:', error);
-      toast({
-        title: "Failed to Create Invite",
-        description: "Unable to create shareable link. Please try again.",
-        variant: "destructive",
-      });
-    }
+${connection.name} sounds perfect for us - we can set shared goals, track our progress, and support each other.
+
+Join me here: ${inviteUrl}
+
+Looking forward to growing together! 💙`,
+      smsMessage: `Hey! Want to sync our wellness journeys? I created "${connection.name}" on Soul Sync. Join me: ${inviteUrl} 🌟`
+    };
+
+    setInviteData(inviteMessages);
+    setSelectedConnection(connection);
+    setInviteDialogOpen(true);
+    
+    toast({
+      title: "Invite Link Ready! 🔗",
+      description: "Share this link to invite someone to join your Soul Sync",
+    });
   };
 
   const copyToClipboard = (text: string) => {
@@ -1058,6 +1127,57 @@ export default function SoulSyncPage() {
                 <p>Click "Astro Match" to analyze your birth chart compatibility</p>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Authentication Dialog */}
+        <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <UserPlus className="h-5 w-5 mr-2 text-purple-600" />
+                {pendingInviteCode ? "Join Soul Sync Connection" : "Create Your Account"}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {pendingInviteCode && (
+                <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg">
+                  <p className="text-sm text-center text-muted-foreground">
+                    Someone invited you to join their Soul Sync connection! 
+                    Create your account to connect.
+                  </p>
+                </div>
+              )}
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Your Email</label>
+                <Input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Your Name</label>
+                <Input
+                  placeholder="Your full name"
+                  value={authForm.name}
+                  onChange={(e) => setAuthForm(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              
+              <Button onClick={handleAuthentication} className="w-full">
+                <UserPlus className="h-4 w-4 mr-2" />
+                {pendingInviteCode ? "Join Connection" : "Create Account"}
+              </Button>
+              
+              <p className="text-xs text-center text-muted-foreground">
+                By creating an account, you agree to our terms and can start syncing souls with others.
+              </p>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
