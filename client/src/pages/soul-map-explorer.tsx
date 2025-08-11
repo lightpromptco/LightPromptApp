@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { DailyOracleWidget } from "@/components/DailyOracleWidget";
+import { CleanDailyOracle } from "@/components/CleanDailyOracle";
 
 // Soul-tech helper functions
 const getCurrentMoonPhase = () => {
@@ -1336,7 +1336,7 @@ export default function SoulMapExplorerPage() {
             )}
 
             {/* Daily Oracle Widget */}
-            <DailyOracleWidget birthData={birthData} />
+            <CleanDailyOracle birthData={birthData} />
 
             {/* Quick Oracle Access */}
             <Card>
