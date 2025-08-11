@@ -43,6 +43,8 @@ import SoulSyncPage from "@/pages/soul-sync";
 import StorePage from "@/pages/store";
 import CheckoutPage from "@/pages/checkout";
 import CheckoutSuccess from "@/pages/checkout/success";
+import { SimpleOraclePage } from "@/pages/simple-oracle";
+import CleanOraclePage from "@/pages/clean-oracle";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -211,6 +213,12 @@ function Router() {
           <SoulSyncPage />
         </MainLayout>
       )} />
+      <Route path="/oracle" component={() => (
+        <MainLayout>
+          <SimpleOraclePage />
+        </MainLayout>
+      )} />
+      <Route path="/daily-oracle" component={CleanOraclePage} />
       <Route path="/store" component={() => (
         <MainLayout>
           <StorePage />
