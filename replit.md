@@ -30,9 +30,12 @@ Domain transition: Moving to lightprompt.co as main landing page.
 
 ### Data Storage
 - **Database**: PostgreSQL (Supabase) via Drizzle ORM
-- **Schema Management**: Drizzle Kit for migrations
+- **Schema Management**: Drizzle Kit for migrations  
 - **Storage Strategy**: DatabaseStorage implementation for data persistence
 - **File Storage**: Google Cloud Storage with object access control
+- **Privacy Architecture**: User-isolated data with UUID-based account separation
+- **Birth Data**: Stored in browser localStorage + optional userProfiles table (user-specific only)
+- **Chat Privacy**: All conversations tied to individual user sessions, no cross-user data access
 
 ### Authentication and Authorization
 - **User Management**: Simple user creation and retrieval with email-based identification

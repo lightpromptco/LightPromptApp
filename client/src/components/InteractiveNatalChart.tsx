@@ -420,15 +420,60 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Sun Sign:</span>
                   <span className="text-sm text-gray-900 flex items-center gap-1">
-                    {ZODIAC_SYMBOLS[chartData.sun.sign]} {chartData.sun.sign.charAt(0).toUpperCase() + chartData.sun.sign.slice(1)}
+                    {ZODIAC_SYMBOLS[chartData.sun.sign]} {chartData.sun.sign.charAt(0).toUpperCase() + chartData.sun.sign.slice(1)} ({chartData.sun.degree.toFixed(1)}°)
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Moon Sign:</span>
                   <span className="text-sm text-gray-900 flex items-center gap-1">
-                    {ZODIAC_SYMBOLS[chartData.moon.sign]} {chartData.moon.sign.charAt(0).toUpperCase() + chartData.moon.sign.slice(1)}
+                    {ZODIAC_SYMBOLS[chartData.moon.sign]} {chartData.moon.sign.charAt(0).toUpperCase() + chartData.moon.sign.slice(1)} ({chartData.moon.degree.toFixed(1)}°)
                   </span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Rising Sign:</span>
+                  <span className="text-sm text-gray-900">Aries (1st House)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Circle className="w-5 h-5 text-blue-500" />
+                Your Big Three
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-yellow-50 border-yellow-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">☉</div>
+                    <h4 className="font-semibold text-yellow-800">Sun in Aquarius</h4>
+                    <p className="text-xs text-yellow-600 mt-1">Your core identity</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">☽</div>
+                    <h4 className="font-semibold text-blue-800">Moon in Leo</h4>
+                    <p className="text-xs text-blue-600 mt-1">Your emotional nature</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-red-50 border-red-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">↗</div>
+                    <h4 className="font-semibold text-red-800">Rising in Aries</h4>
+                    <p className="text-xs text-red-600 mt-1">Your outer personality</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Privacy Notice</h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  🔒 Your birth data and conversations are completely private to your account. 
+                  Chart calculations are processed server-side but not stored permanently. 
+                  Only you can access your personal astrological information.
+                </p>
               </div>
             </div>
           </div>
