@@ -69,7 +69,10 @@ def house_system_placidus(chart):
 def build_chart(bd: BirthData):
     """Build accurate natal chart using Swiss Ephemeris."""
     utc_dt = to_utc_iso(bd.date, bd.time, bd.latitude, bd.longitude)
-    fdt = Datetime(utc_dt.strftime("%Y/%m/%d"), utc_dt.strftime("%H:%M"), 0)
+    # Convert to proper format for flatlib
+    year, month, day = utc_dt.year, utc_dt.month, utc_dt.day
+    hour, minute = utc_dt.hour, utc_dt.minute
+    fdt = Datetime(f"{year}/{month:02d}/{day:02d}", f"{hour:02d}:{minute:02d}", 0)
     pos = GeoPos(bd.latitude, bd.longitude)
     
     # Create chart with all major objects

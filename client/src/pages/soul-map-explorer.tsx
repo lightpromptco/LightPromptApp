@@ -1011,70 +1011,87 @@ export default function SoulMapExplorerPage() {
               </CardHeader>
               
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <Button
-                      onClick={() => {
-                        setCurrentMessage("What does the current moon phase mean for my spiritual journey and how does it interact with my birth chart?");
-                        setCurrentView('chat');
-                      }}
-                      variant="outline"
-                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-300 transition-all duration-200"
-                    >
-                      <div className="text-2xl">🌙</div>
-                      <div className="text-center">
-                        <div className="font-medium text-blue-800">Moon Wisdom</div>
-                        <div className="text-xs text-blue-600">Current lunar energy</div>
+                {/* Modern 2x2 Oracle Grid - Professional Design */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Daily Oracle */}
+                  <Button
+                    onClick={() => {
+                      setCurrentMessage("What cosmic guidance does my chart offer for today's energy and how can I align with my highest self?");
+                      setCurrentView('chat');
+                    }}
+                    variant="ghost"
+                    className="h-32 p-4 bg-gradient-to-br from-white to-amber-50 border-2 border-amber-200 hover:border-amber-300 hover:from-amber-50 hover:to-amber-100 transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full space-y-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
+                        <Sun className="w-4 h-4 text-white" />
                       </div>
-                    </Button>
-                    
-                    <Button
-                      onClick={() => {
-                        setCurrentMessage("Show me the cosmic aspects and planetary connections active in my chart right now and their spiritual significance");
-                        setCurrentView('chat');
-                      }}
-                      variant="outline"
-                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 hover:from-amber-100 hover:to-orange-100 hover:border-amber-300 transition-all duration-200"
-                    >
-                      <div className="text-2xl">⚡</div>
                       <div className="text-center">
-                        <div className="font-medium text-amber-800">Live Aspects</div>
-                        <div className="text-xs text-amber-600">Active planetary energy</div>
+                        <div className="font-semibold text-amber-900">Daily Oracle</div>
+                        <div className="text-xs text-amber-700 opacity-80">Today's cosmic guidance</div>
                       </div>
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <Button
-                      onClick={() => {
-                        setCurrentMessage(`How does today's Mayan day sign "${getMayanDaySign()}" align with my astrological chart and soul purpose?`);
-                        setCurrentView('chat');
-                      }}
-                      variant="outline"
-                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100 hover:border-purple-300 transition-all duration-200"
-                    >
-                      <div className="text-2xl">🔮</div>
+                    </div>
+                  </Button>
+
+                  {/* Quick Oracle */}
+                  <Button
+                    onClick={() => {
+                      setCurrentMessage("Give me a quick cosmic insight about my current energy and what I should focus on right now.");
+                      setCurrentView('chat');
+                    }}
+                    variant="ghost"
+                    className="h-32 p-4 bg-gradient-to-br from-white to-blue-50 border-2 border-blue-200 hover:border-blue-300 hover:from-blue-50 hover:to-blue-100 transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full space-y-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-white" />
+                      </div>
                       <div className="text-center">
-                        <div className="font-medium text-purple-800">Mayan Sync</div>
-                        <div className="text-xs text-purple-600">Ancient wisdom alignment</div>
+                        <div className="font-semibold text-blue-900">Quick Oracle</div>
+                        <div className="text-xs text-blue-700 opacity-80">Instant cosmic insight</div>
                       </div>
-                    </Button>
-                    
-                    <Button
-                      onClick={() => {
-                        setCurrentMessage("What cosmic guidance does my chart offer for today's energy and how can I align with my highest self?");
-                        setCurrentView('chat');
-                      }}
-                      variant="outline"
-                      className="w-full h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100 hover:border-green-300 transition-all duration-200"
-                    >
-                      <div className="text-2xl">✨</div>
+                    </div>
+                  </Button>
+
+                  {/* Moon Wisdom */}
+                  <Button
+                    onClick={() => {
+                      setCurrentMessage(`What does the current moon phase "${getCurrentMoonPhase()}" mean for my spiritual journey and how does it interact with my birth chart?`);
+                      setCurrentView('chat');
+                    }}
+                    variant="ghost"
+                    className="h-32 p-4 bg-gradient-to-br from-white to-purple-50 border-2 border-purple-200 hover:border-purple-300 hover:from-purple-50 hover:to-purple-100 transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full space-y-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
+                        <Moon className="w-4 h-4 text-white" />
+                      </div>
                       <div className="text-center">
-                        <div className="font-medium text-green-800">Daily Guidance</div>
-                        <div className="text-xs text-green-600">Align with highest self</div>
+                        <div className="font-semibold text-purple-900">Moon Wisdom</div>
+                        <div className="text-xs text-purple-700 opacity-80">Lunar cycle guidance</div>
                       </div>
-                    </Button>
-                  </div>
+                    </div>
+                  </Button>
+
+                  {/* Soul Sync */}
+                  <Button
+                    onClick={() => {
+                      setCurrentMessage("How can I align with my soul's highest purpose today? What does my chart reveal about my spiritual path and next steps?");
+                      setCurrentView('chat');
+                    }}
+                    variant="ghost"
+                    className="h-32 p-4 bg-gradient-to-br from-white to-emerald-50 border-2 border-emerald-200 hover:border-emerald-300 hover:from-emerald-50 hover:to-emerald-100 transition-all duration-300 rounded-lg"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full space-y-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
+                        <Heart className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-emerald-900">Soul Sync</div>
+                        <div className="text-xs text-emerald-700 opacity-80">Purpose alignment</div>
+                      </div>
+                    </div>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

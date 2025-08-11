@@ -111,47 +111,59 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
   const loadChartData = async () => {
     setLoading(true);
     try {
-      // Use Ashley's actual chart data from Cafe Astrology PDF 
-      if (birthData.date === '1992-02-17' || birthData.date === '2/17/1992') {
-        const realChartData: ChartData = {
-          planets: [
-            { planet: 'Sun', sign: 'aquarius', degree: 28.01, house: 2, symbol: '☉' },
-            { planet: 'Moon', sign: 'leo', degree: 15.27, house: 7, symbol: '☽' },
-            { planet: 'Mercury', sign: 'pisces', degree: 2.08, house: 2, symbol: '☿' },
-            { planet: 'Venus', sign: 'capricorn', degree: 28.28, house: 1, symbol: '♀' },
-            { planet: 'Mars', sign: 'capricorn', degree: 29.26, house: 1, symbol: '♂' },
-            { planet: 'Jupiter', sign: 'virgo', degree: 11.10, house: 8, symbol: '♃' },
-            { planet: 'Saturn', sign: 'aquarius', degree: 11.26, house: 1, symbol: '♄' }
-          ],
-          houses: [
-            { house: 1, sign: 'capricorn', degree: 14.16 },   // Ascendant
-            { house: 2, sign: 'aquarius', degree: 21.87 },
-            { house: 3, sign: 'aries', degree: 0.1 },
-            { house: 4, sign: 'taurus', degree: 2.28 },      // IC
-            { house: 5, sign: 'taurus', degree: 28.17 },
-            { house: 6, sign: 'gemini', degree: 20.93 },
-            { house: 7, sign: 'cancer', degree: 14.27 },     // Descendant
-            { house: 8, sign: 'leo', degree: 21.87 },
-            { house: 9, sign: 'libra', degree: 0.1 },
-            { house: 10, sign: 'scorpio', degree: 2.28 },    // MC
-            { house: 11, sign: 'scorpio', degree: 28.17 },
-            { house: 12, sign: 'sagittarius', degree: 20.93 }
-          ],
-          sun: { sign: 'aquarius', degree: 28.01, house: 2 },
-          moon: { sign: 'leo', degree: 15.27, house: 7 },
-          mercury: { sign: 'pisces', degree: 2.08, house: 2 },
-          venus: { sign: 'capricorn', degree: 28.28, house: 1 },
-          mars: { sign: 'capricorn', degree: 29.26, house: 1 },
-          jupiter: { sign: 'virgo', degree: 11.10, house: 8 },
-          saturn: { sign: 'aquarius', degree: 11.26, house: 1 }
-        };
+      console.log('Loading chart data for any user with birth data:', birthData);
+      
+      // Try Swiss Ephemeris Python API first
+      try {
+        const pythonResponse = await fetch('http://localhost:8000/chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: birthData.date,
+            time: birthData.time || '12:00',
+            place_name: birthData.location || 'Temple, TX, USA',
+            latitude: birthData.lat || 31.0982,
+            longitude: birthData.lng || -97.3428
+          })
+        });
         
-        console.log('✨ Using REAL chart data from Cafe Astrology PDF:', realChartData);
-        setChartData(realChartData);
-        return;
+        if (pythonResponse.ok) {
+          const pythonData = await pythonResponse.json();
+          console.log('✅ Using Swiss Ephemeris calculations:', pythonData);
+          
+          // Transform Python API response to match our interface
+          const transformedData: ChartData = {
+            planets: Object.entries(pythonData.chart).filter(([key]) => 
+              ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'].includes(key)
+            ).map(([key, planet]: [string, any]) => ({
+              planet: key.charAt(0).toUpperCase() + key.slice(1),
+              sign: planet.sign,
+              degree: planet.degree,
+              house: planet.house,
+              symbol: PLANET_SYMBOLS[key.charAt(0).toUpperCase() + key.slice(1)] || '?'
+            })),
+            houses: pythonData.houses || Array.from({ length: 12 }, (_, i) => ({
+              house: i + 1,
+              sign: ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'][i],
+              degree: i * 30
+            })),
+            sun: pythonData.chart.sun,
+            moon: pythonData.chart.moon,
+            mercury: pythonData.chart.mercury,
+            venus: pythonData.chart.venus,
+            mars: pythonData.chart.mars,
+            jupiter: pythonData.chart.jupiter,
+            saturn: pythonData.chart.saturn
+          };
+          
+          setChartData(transformedData);
+          return;
+        }
+      } catch (pythonError) {
+        console.warn('Swiss Ephemeris API not available, falling back to Node.js calculations:', pythonError);
       }
       
-      // Fallback to API for other birth dates
+      // Fallback to Node.js API calculations
       const response = await apiRequest('POST', '/api/astrology/chart', {
         birthData: {
           date: birthData.date,
@@ -163,7 +175,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
       });
       const data = await response.json();
       
-      // Transform the API response
+      // Transform the Node.js API response
       const transformedData: ChartData = {
         planets: Object.entries(data.chart).filter(([key]) => 
           ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'].includes(key)
@@ -174,7 +186,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
           house: planet.house,
           symbol: PLANET_SYMBOLS[key.charAt(0).toUpperCase() + key.slice(1)] || '?'
         })),
-        houses: Array.from({ length: 12 }, (_, i) => ({
+        houses: data.houses || Array.from({ length: 12 }, (_, i) => ({
           house: i + 1,
           sign: ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'][i],
           degree: i * 30
@@ -188,7 +200,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
         saturn: data.chart.saturn
       };
       
-      console.log('Interactive chart data loaded:', transformedData);
+      console.log('Using Node.js fallback chart data:', transformedData);
       setChartData(transformedData);
     } catch (error) {
       console.error('Error loading chart data:', error);
