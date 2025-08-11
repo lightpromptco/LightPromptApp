@@ -1097,8 +1097,8 @@ export default function SoulMapExplorerPage() {
               </CardHeader>
               
               <CardContent className="p-6">
-                {/* Modern 2x2 Oracle Grid - Professional Design */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* Modern Oracle Grid - Professional Design */}
+                <div className="grid grid-cols-3 gap-4">
                   {/* Daily Oracle */}
                   <Button
                     onClick={() => {
@@ -1119,25 +1119,7 @@ export default function SoulMapExplorerPage() {
                     </div>
                   </Button>
 
-                  {/* Quick Oracle */}
-                  <Button
-                    onClick={() => {
-                      setCurrentMessage("Give me a quick cosmic insight about my current energy and what I should focus on right now.");
-                      setCurrentView('chat');
-                    }}
-                    variant="ghost"
-                    className="h-32 p-4 bg-gradient-to-br from-white to-blue-50 border-2 border-blue-200 hover:border-blue-300 hover:from-blue-50 hover:to-blue-100 transition-all duration-300 rounded-lg"
-                  >
-                    <div className="flex flex-col items-center justify-center h-full space-y-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-blue-900">Quick Oracle</div>
-                        <div className="text-xs text-blue-700 opacity-80">Instant cosmic insight</div>
-                      </div>
-                    </div>
-                  </Button>
+
 
                   {/* Moon Wisdom */}
                   <Button
