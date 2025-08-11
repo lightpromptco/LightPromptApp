@@ -158,29 +158,7 @@ export default function Store() {
   }
 
   const handleContactSales = () => {
-    const subject = encodeURIComponent('Enterprise Plan Inquiry - LightPrompt');
-    const body = encodeURIComponent(`Hi,
-
-I'm interested in learning more about the LightPrompt Enterprise plan ($199/month) which includes:
-
-• Team & organization management
-• Custom AI training  
-• Advanced analytics dashboard
-• API access
-• White-label options
-• Dedicated account manager
-
-Please contact me to discuss our specific needs and setup.
-
-Thank you!`);
-    
-    const mailtoLink = `mailto:lightprompt.co@gmail.com?subject=${subject}&body=${body}`;
-    window.location.href = mailtoLink;
-    
-    toast({
-      title: "Opening Email Client",
-      description: "We'll get back to you within 24 hours!",
-    });
+    window.location.href = '/contact-sales';
   };
 
   return (

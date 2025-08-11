@@ -20,6 +20,7 @@ import {
 import multer from "multer";
 import { z } from "zod";
 import Stripe from "stripe";
+import sgMail from '@sendgrid/mail';
 
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -33,6 +34,11 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-07-30.basil",
 });
+
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 // Sun sign compatibility calculation
 function calculateSunSignCompatibility(sign1: string, sign2: string) {
@@ -2831,6 +2837,57 @@ Please provide astrological insights based on available data.`;
     } catch (error) {
       console.error('Course payment error:', error);
       res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Contact Sales endpoint for Enterprise inquiries
+  app.post("/api/contact-sales", async (req, res) => {
+    try {
+      const { name, email, company, phone, message, plan } = req.body;
+      
+      // Validate required fields
+      if (!name || !email || !company || !message) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      
+      // Prepare email content
+      const emailContent = `
+New Enterprise Sales Inquiry
+
+Contact Details:
+• Name: ${name}
+• Email: ${email}
+• Company: ${company}
+• Phone: ${phone || 'Not provided'}
+• Interested Plan: ${plan || 'Enterprise'}
+
+Message:
+${message}
+
+---
+Sent from LightPrompt Contact Sales Form
+${new Date().toLocaleString()}
+      `.trim();
+
+      // Send email using SendGrid if available
+      if (process.env.SENDGRID_API_KEY) {
+        const msg = {
+          to: 'lightprompt.co@gmail.com',
+          from: 'noreply@lightprompt.co', // This should be your verified sender
+          subject: `Enterprise Sales Inquiry - ${company}`,
+          text: emailContent,
+        };
+        
+        await sgMail.send(msg);
+        console.log('✅ Enterprise sales inquiry sent via SendGrid');
+      } else {
+        console.log('⚠️ SendGrid not configured, would send:', emailContent);
+      }
+      
+      res.json({ success: true, message: 'Inquiry submitted successfully' });
+    } catch (error: any) {
+      console.error('Contact sales error:', error);
+      res.status(500).json({ error: 'Failed to submit inquiry' });
     }
   });
 

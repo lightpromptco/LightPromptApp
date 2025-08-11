@@ -42,6 +42,7 @@ import SoulSyncPage from "@/pages/soul-sync";
 import StorePage from "@/pages/store";
 import CheckoutPage from "@/pages/checkout";
 import CheckoutSuccess from "@/pages/checkout/success";
+import ContactSalesPage from "@/pages/contact-sales";
 import { SimpleOraclePage } from "@/pages/simple-oracle";
 
 import CosmicDebugConsole from "@/pages/cosmic-debug";
@@ -256,6 +257,11 @@ function Router() {
       <Route path="/product-info" component={() => (
         <MainLayout>
           <ProductInfo />
+        </MainLayout>
+      )} />
+      <Route path="/contact-sales" component={() => (
+        <MainLayout>
+          <ContactSalesPage />
         </MainLayout>
       )} />
       <Route path="/checkout" component={() => (
