@@ -1,49 +1,62 @@
-import { useEffect, useState } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+
+interface CircadianContextType {
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
+}
+
+const CircadianContext = createContext<CircadianContextType>({
+  theme: 'light',
+  setTheme: () => {},
+  timeOfDay: 'morning',
+});
 
 export function useCircadian() {
-  const [temperature, setTemperature] = useState(0);
-  const [circadianColor, setCircadianColor] = useState('#667eea');
+  return useContext(CircadianContext);
+}
+
+interface CircadianProviderProps {
+  children: ReactNode;
+}
+
+export function CircadianProvider({ children }: CircadianProviderProps) {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
   useEffect(() => {
-    const updateCircadianColors = () => {
-      const hour = new Date().getHours();
-      let newTemperature = 0;
-      let color = '#667eea'; // Default soul-blue
-      
-      if (hour >= 6 && hour < 12) {
-        // Morning: cool tones
-        newTemperature = -0.3;
-        color = '#667eea'; // soul-blue
-      } else if (hour >= 12 && hour < 18) {
-        // Afternoon: neutral
-        newTemperature = 0;
-        color = '#06d6a0'; // soul-mint
-      } else if (hour >= 18 && hour < 22) {
-        // Evening: warm tones
-        newTemperature = 0.3;
-        color = '#ff9a9e'; // soul-pink
-      } else {
-        // Night: very warm tones
-        newTemperature = 0.5;
-        color = '#764ba2'; // soul-purple
-      }
-      
-      setTemperature(newTemperature);
-      setCircadianColor(color);
-      
-      // Update CSS variables
-      document.documentElement.style.setProperty('--bg-temperature', newTemperature.toString());
-      document.documentElement.style.setProperty('--circadian-color', color);
-    };
-
-    // Initial update
-    updateCircadianColors();
+    // Get current time and set appropriate theme
+    const hour = new Date().getHours();
     
-    // Update every minute
-    const interval = setInterval(updateCircadianColors, 60000);
-    
-    return () => clearInterval(interval);
+    if (hour >= 6 && hour < 12) {
+      setTimeOfDay('morning');
+      setTheme('light');
+    } else if (hour >= 12 && hour < 17) {
+      setTimeOfDay('afternoon');
+      setTheme('light');
+    } else if (hour >= 17 && hour < 21) {
+      setTimeOfDay('evening');
+      setTheme('light');
+    } else {
+      setTimeOfDay('night');
+      setTheme('dark');
+    }
   }, []);
 
-  return { temperature, circadianColor };
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const value = {
+    theme,
+    setTheme,
+    timeOfDay,
+  };
+
+  return (
+    <CircadianContext.Provider value={value}>
+      {children}
+    </CircadianContext.Provider>
+  );
 }

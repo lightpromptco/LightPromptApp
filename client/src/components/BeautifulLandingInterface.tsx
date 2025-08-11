@@ -18,18 +18,32 @@ import { Link } from 'wouter';
 
 const FEATURES = [
   {
-    title: 'Developer Tools',
-    description: 'Discord-style powerful functionality with Apple\'s sleek design - API management, webhooks, analytics',
-    icon: Terminal,
-    href: '/dev-tools',
-    status: 'new'
+    title: 'Soul Map Explorer',
+    description: 'Professional-grade astrological birth chart with career path guidance and cosmic insights',
+    icon: Sparkles,
+    href: '/soul-map-explorer',
+    status: 'active'
+  },
+  {
+    title: 'Soul Sync Connections',
+    description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
+    icon: Users,
+    href: '/soul-sync',
+    status: 'active'
+  },
+  {
+    title: 'Vision Quest',
+    description: 'Interactive self-discovery journey with challenges and personal growth tracking',
+    icon: Target,
+    href: '/vision-quest',
+    status: 'active'
   },
   {
     title: 'Community Hub',
-    description: 'Real-time community with channels, voice rooms, and soul connections - Discord meets wellness',
+    description: 'Real-time community with Discord-style functionality for soul-tech enthusiasts',
     icon: Users,
-    href: '/community-hub',
-    status: 'new'
+    href: '/community',
+    status: 'active'
   },
   {
     title: 'Reflective Conversations',
@@ -39,17 +53,17 @@ const FEATURES = [
     status: 'active'
   },
   {
-    title: 'Vision Quest',
-    description: 'Interactive self-discovery journey with challenges and cosmic insights',
-    icon: Target,
-    href: '/vision-quest',
+    title: 'Vibe Matching',
+    description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
+    icon: Heart,
+    href: '/vibe-match',
     status: 'active'
   },
   {
-    title: 'Soul Map Navigator',
-    description: 'Explore your astrological profile and cosmic patterns for deeper self-understanding',
-    icon: Sparkles,
-    href: '/soul-map-explorer',
+    title: 'GeoPrompt',
+    description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
+    icon: MapPin,
+    href: '/geoprompt',
     status: 'active'
   },
   {
@@ -58,34 +72,6 @@ const FEATURES = [
     icon: Heart,
     href: '/dashboard',
     status: 'beta'
-  },
-  {
-    title: 'Soul Sync Connections',
-    description: 'Connect with fellow consciousness explorers in authentic, vulnerable spaces',
-    icon: Users,
-    href: '/soul-sync',
-    status: 'beta'
-  },
-  {
-    title: 'Vibe Matching',
-    description: 'Find souls who resonate at your frequency—deep connection through conscious compatibility',
-    icon: Sparkles,
-    href: '/vibe-match',
-    status: 'coming-soon'
-  },
-  {
-    title: 'GeoPrompt',
-    description: 'Let your location inspire reflection. Every place holds wisdom—even that corner coffee shop',
-    icon: MapPin,
-    href: '/geoprompt',
-    status: 'beta'
-  },
-  {
-    title: 'Prism Points',
-    description: 'Track your growth journey with conscious gamification that honors genuine transformation',
-    icon: Gem,
-    href: '/prism-points',
-    status: 'coming-soon'
   }
 ];
 
@@ -129,32 +115,22 @@ export function BeautifulLandingInterface() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link href="/dev-tools">
+            <Link href="/soul-map-explorer">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200 shadow-lg"
+                className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200"
               >
-                <Terminal className="mr-2 h-5 w-5" />
-                Developer Tools
+                <Sparkles className="mr-2 h-5 w-5" />
+                Explore Your Soul Map
               </Button>
             </Link>
-            <Link href="/community-hub">
+            <Link href="/chat">
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="border-2 border-teal-500 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950 px-8 py-4 rounded-full text-lg font-medium"
               >
-                <Users className="mr-2 h-5 w-5" />
-                Community Hub
-              </Button>
-            </Link>
-            <Link href="/chat">
-              <Button 
-                variant="ghost" 
-                size="lg" 
-                className="text-teal-500 hover:text-teal-600 px-8 py-4 text-lg font-medium"
-              >
-                Classic Chat <ChevronRight className="ml-1 h-5 w-5" />
+                Start Reflecting <ChevronRight className="ml-1 h-5 w-5" />
               </Button>
             </Link>
           </div>

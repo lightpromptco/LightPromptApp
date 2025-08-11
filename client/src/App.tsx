@@ -1,69 +1,22 @@
 import { Switch, Route } from "wouter";
-import { queryClient, apiRequest } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useToast } from "@/hooks/use-toast";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { EasterEggProvider } from "@/components/EasterEgg";
+import { CircadianProvider } from "@/hooks/useCircadian";
 import { MainLayout } from "@/components/MainLayoutWithHierarchy";
 import { CartProvider } from "@/hooks/use-cart";
 import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
-import AdminPage from "@/pages/admin";
-import AdminDashboard from "@/pages/admin/dashboard";
-import PrivacyPage from "@/pages/privacy";
-import CourseAccessPage from "@/pages/course-access";
-import DashboardPage from "@/pages/dashboard";
-import ChallengesPage from "@/pages/challenges";
-import SignupPage from "@/pages/signup";
-import PlansPage from "@/pages/plans";
+import SoulMapExplorerPage from "@/pages/soul-map-explorer";
+import SoulSyncPage from "@/pages/soul-sync";
+import VisionQuestPage from "@/pages/vision-quest";
+import CommunityPage from "@/pages/community";
 import VibeMatchPage from "@/pages/vibe-match";
 import GeoPromptPage from "@/pages/geoprompt";
-import AdminBlog from "@/pages/admin/blog";
-import UniversalEditor from "@/pages/admin/universal-editor";
-import BlogPage from "@/pages/blog";
-import PrismPointsPage from "@/pages/prism-points";
-import HelpPage from "@/pages/help";
-import BookPage from "@/pages/book";
-import CoursePage from "@/pages/course";
-import ProductsPage from "@/pages/products";
-import ProductInfo from "@/pages/product-info";
-import B2BPage from "@/pages/b2b";
-import SettingsPage from "@/pages/settings";
-import AdminSettingsPage from "@/pages/admin-settings";
-import { AccountSettingsWrapper } from "@/pages/account-settings-wrapper";
-import WooWooPage from "@/pages/woo-woo";
-import SoulMapExplorerPage from "@/pages/soul-map-explorer";
-import VisionQuestPage from "@/pages/vision-quest";
-import VisionQuestIndexPage from "@/pages/vision-quest/index";
-import VisionQuestStagePage from "@/pages/vision-quest/stage";
-import ContentManagement from "@/pages/admin/content";
-import AdminSettings from "@/pages/admin/settings";
-import KnowledgeAdminPage from "@/pages/admin/knowledge";
-import CommunityPage from "@/pages/community";
-
-import SoulSyncPage from "@/pages/soul-sync";
-import StorePage from "@/pages/store";
-import CheckoutPage from "@/pages/checkout";
-import CheckoutSuccess from "@/pages/checkout/success";
-import ContactSalesPage from "@/pages/contact-sales";
-import { SimpleOraclePage } from "@/pages/simple-oracle";
-import Features from "@/pages/Features";
-import DevTools from "@/pages/DevTools";
-import DiscordStyleDashboard from "@/pages/DiscordStyleDashboard";
-
-import CosmicDebugConsole from "@/pages/cosmic-debug";
-import ApiExplorer from "@/pages/api-explorer";
-import DataViewer from "@/pages/data-viewer";
-import SystemStatus from "@/pages/system-status";
-import PageEditor from "@/pages/admin/page-editor";
-import EnhancedPageEditor from "@/pages/admin/enhanced-page-editor";
-import AnalyticsPage from "@/pages/admin/analytics";
-import EmailMarketingAdmin from "@/pages/admin/email-marketing";
+import DashboardPage from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
-import TermsPage from "@/pages/terms";
-import AICompanionsPage from "@/pages/ai-companions";
-import DataPrivacyPage from "@/pages/data-privacy";
-import NotificationsPage from "@/pages/notifications";
 import { useEffect } from "react";
 
 function Router() {
@@ -75,49 +28,19 @@ function Router() {
           <ChatPage />
         </MainLayout>
       )} />
-      <Route path="/admin" component={() => (
+      <Route path="/soul-map-explorer" component={() => (
         <MainLayout>
-          <AdminPage />
+          <SoulMapExplorerPage />
         </MainLayout>
       )} />
-      <Route path="/admin/dashboard" component={() => (
+      <Route path="/soul-sync" component={() => (
         <MainLayout>
-          <AdminDashboard />
+          <SoulSyncPage />
         </MainLayout>
       )} />
-      <Route path="/privacy" component={() => (
+      <Route path="/vision-quest" component={() => (
         <MainLayout>
-          <PrivacyPage />
-        </MainLayout>
-      )} />
-      <Route path="/terms" component={() => (
-        <MainLayout>
-          <TermsPage />
-        </MainLayout>
-      )} />
-      <Route path="/course-access" component={() => (
-        <MainLayout>
-          <CourseAccessPage />
-        </MainLayout>
-      )} />
-      <Route path="/dashboard" component={() => (
-        <MainLayout>
-          <DashboardPage />
-        </MainLayout>
-      )} />
-      <Route path="/challenges" component={() => (
-        <MainLayout>
-          <ChallengesPage />
-        </MainLayout>
-      )} />
-      <Route path="/signup" component={() => (
-        <MainLayout>
-          <SignupPage />
-        </MainLayout>
-      )} />
-      <Route path="/plans" component={() => (
-        <MainLayout>
-          <PlansPage />
+          <VisionQuestPage />
         </MainLayout>
       )} />
       <Route path="/community" component={() => (
@@ -130,265 +53,38 @@ function Router() {
           <VibeMatchPage />
         </MainLayout>
       )} />
-      <Route path="/features" component={() => (
-        <MainLayout>
-          <Features />
-        </MainLayout>
-      )} />
-      
-      {/* Discord + Apple Hybrid Interface */}
-      <Route path="/dev-tools" component={DevTools} />
-      <Route path="/community-hub" component={DiscordStyleDashboard} />
       <Route path="/geoprompt" component={() => (
         <MainLayout>
           <GeoPromptPage />
         </MainLayout>
       )} />
-      <Route path="/blog" component={() => (
+      <Route path="/dashboard" component={() => (
         <MainLayout>
-          <BlogPage />
+          <DashboardPage />
         </MainLayout>
       )} />
-      <Route path="/prism-points" component={() => (
-        <MainLayout>
-          <PrismPointsPage />
-        </MainLayout>
-      )} />
-      <Route path="/help" component={() => (
-        <MainLayout>
-          <HelpPage />
-        </MainLayout>
-      )} />
-      <Route path="/book" component={() => (
-        <MainLayout>
-          <BookPage />
-        </MainLayout>
-      )} />
-      <Route path="/course" component={() => (
-        <MainLayout>
-          <CoursePage />
-        </MainLayout>
-      )} />
-      <Route path="/products" component={() => (
-        <MainLayout>
-          <ProductsPage />
-        </MainLayout>
-      )} />
-      <Route path="/product-info" component={() => (
-        <MainLayout>
-          <ProductInfo />
-        </MainLayout>
-      )} />
-      <Route path="/b2b" component={() => (
-        <MainLayout>
-          <B2BPage />
-        </MainLayout>
-      )} />
-      <Route path="/settings" component={() => (
-        <MainLayout>
-          <SettingsPage />
-        </MainLayout>
-      )} />
-      <Route path="/ai-companions" component={() => (
-        <MainLayout>
-          <AICompanionsPage />
-        </MainLayout>
-      )} />
-      <Route path="/data-privacy" component={() => (
-        <MainLayout>
-          <DataPrivacyPage />
-        </MainLayout>
-      )} />
-      <Route path="/notifications" component={() => (
-        <MainLayout>
-          <NotificationsPage />
-        </MainLayout>
-      )} />
-      <Route path="/account-settings" component={() => (
-        <MainLayout>
-          <AccountSettingsWrapper />
-        </MainLayout>
-      )} />
-      <Route path="/woo-woo" component={() => (
-        <MainLayout>
-          <WooWooPage />
-        </MainLayout>
-      )} />
-      <Route path="/soul-map-explorer" component={() => (
-        <MainLayout>
-          <SoulMapExplorerPage />
-        </MainLayout>
-      )} />
-      <Route path="/vision-quest" component={() => (
-        <MainLayout>
-          <VisionQuestPage />
-        </MainLayout>
-      )} />
-      <Route path="/vision-quest/index" component={() => (
-        <MainLayout>
-          <VisionQuestIndexPage />
-        </MainLayout>
-      )} />
-      <Route path="/vision-quest/stage/:stageId" component={() => (
-        <MainLayout>
-          <VisionQuestStagePage />
-        </MainLayout>
-      )} />
-      <Route path="/soul-sync" component={() => (
-        <MainLayout>
-          <SoulSyncPage />
-        </MainLayout>
-      )} />
-      <Route path="/oracle" component={() => (
-        <MainLayout>
-          <SimpleOraclePage />
-        </MainLayout>
-      )} />
-
-      <Route path="/cosmic-debug" component={CosmicDebugConsole} />
-      <Route path="/api-explorer" component={ApiExplorer} />
-      <Route path="/data-viewer" component={DataViewer} />
-      <Route path="/system-status" component={SystemStatus} />
-      <Route path="/store" component={() => (
-        <MainLayout>
-          <StorePage />
-        </MainLayout>
-      )} />
-      <Route path="/product-info" component={() => (
-        <MainLayout>
-          <ProductInfo />
-        </MainLayout>
-      )} />
-      <Route path="/contact-sales" component={() => (
-        <MainLayout>
-          <ContactSalesPage />
-        </MainLayout>
-      )} />
-      <Route path="/checkout" component={() => (
-        <MainLayout>
-          <CheckoutPage />
-        </MainLayout>
-      )} />
-      <Route path="/checkout/success" component={() => (
-        <MainLayout>
-          <CheckoutSuccess />
-        </MainLayout>
-      )} />
-      <Route path="/checkout/success" component={() => <CheckoutSuccess />} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// Global Easter Egg System
-function useEasterEggs() {
-  const { toast } = useToast();
-
+export default function App() {
   useEffect(() => {
-    // Konami Code Easter Egg
-    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-    let konamiProgress = 0;
+    document.title = "LightPrompt - Soul-Tech Wellness Platform";
+  }, []);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === konamiCode[konamiProgress]) {
-        konamiProgress++;
-        if (konamiProgress === konamiCode.length) {
-          discoverEasterEgg('konami-code', 'The Ancient Sequence', 'You remember the old ways...', 30);
-          konamiProgress = 0;
-        }
-      } else {
-        konamiProgress = 0;
-      }
-    };
-
-    // Midnight Visitor Easter Egg
-    const checkMidnightVisitor = () => {
-      const now = new Date();
-      const hour = now.getHours();
-      if (hour >= 2 && hour <= 4) {
-        // Check if user hasn't discovered this egg recently
-        const lastMidnightEgg = localStorage.getItem('lastMidnightEgg');
-        const lastTime = lastMidnightEgg ? new Date(lastMidnightEgg) : null;
-        const today = now.toDateString();
-        
-        if (!lastTime || lastTime.toDateString() !== today) {
-          localStorage.setItem('lastMidnightEgg', now.toISOString());
-          setTimeout(() => {
-            discoverEasterEgg('midnight-visitor', 'Night Owl Wisdom', 'The night holds special insights.', 40);
-          }, 3000); // Delay a bit for mystery
-        }
-      }
-    };
-
-    const discoverEasterEgg = async (eggId: string, name: string, description: string, points: number) => {
-      try {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (!currentUser.id) return;
-
-        // Check if already discovered
-        const discovered = localStorage.getItem(`egg-${eggId}`);
-        if (discovered) return;
-
-        // Mark as discovered locally
-        localStorage.setItem(`egg-${eggId}`, 'true');
-
-        // Award the discovery
-        await apiRequest('POST', '/api/easter-eggs/discover', {
-          userId: currentUser.id,
-          eggId: eggId
-        });
-
-        // Show magical notification
-        toast({
-          title: `🥚 ${name} Discovered!`,
-          description: `${description} (+${points} points)`,
-          className: "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none",
-        });
-
-        // Add sparkle animation to body
-        document.body.classList.add('easter-egg-sparkle');
-        setTimeout(() => {
-          document.body.classList.remove('easter-egg-sparkle');
-        }, 3000);
-
-        console.log(`🥚 Easter Egg Discovered: ${name}`);
-      } catch (error) {
-        console.error('Error discovering easter egg:', error);
-      }
-    };
-
-    // Add event listeners
-    document.addEventListener('keydown', handleKeyDown);
-    checkMidnightVisitor();
-    
-    // Expose easter egg function globally for other components
-    (window as any).discoverEasterEgg = discoverEasterEgg;
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      delete (window as any).discoverEasterEgg;
-    };
-  }, [toast]);
-}
-
-function EasterEggProvider({ children }: { children: React.ReactNode }) {
-  useEasterEggs();
-  return <>{children}</>;
-}
-
-function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CartProvider>
+    <CartProvider>
+      <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <EasterEggProvider>
-            <Toaster />
-            <Router />
-          </EasterEggProvider>
+          <CircadianProvider>
+            <EasterEggProvider>
+              <Router />
+              <Toaster />
+            </EasterEggProvider>
+          </CircadianProvider>
         </TooltipProvider>
-      </CartProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </CartProvider>
   );
 }
-
-export default App;
