@@ -1405,9 +1405,11 @@ Please provide astrological insights based on available data.`;
         price.recurring?.interval === 'month'
       );
 
+
+
       if (!matchingPrice) {
         return res.status(400).json({ 
-          error: `No matching price found for ${tier} tier ($${targetAmount/100})` 
+          error: `No matching price found for ${tier} tier ($${targetAmount/100}). Available prices: ${prices.data.map(p => `${p.id}:$${p.unit_amount/100}`).join(', ')}` 
         });
       }
 
@@ -1420,8 +1422,8 @@ Please provide astrological insights based on available data.`;
             quantity: 1,
           },
         ],
-        success_url: `${req.headers.origin}/dashboard?success=true&tier=${tier}`,
-        cancel_url: `${req.headers.origin}/store?canceled=true`,
+        success_url: `${req.headers.origin || 'https://localhost:5000'}/dashboard?success=true&tier=${tier}`,
+        cancel_url: `${req.headers.origin || 'https://localhost:5000'}/store?canceled=true`,
         metadata: {
           tier: tier
         }
