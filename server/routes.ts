@@ -784,7 +784,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
-  // Get comprehensive astrological chart
+  // Get comprehensive astrological chart using Swiss Ephemeris
   app.post("/api/astrology/chart", async (req, res) => {
     try {
       const { birthData } = req.body;
@@ -793,21 +793,60 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         return res.status(400).json({ error: "Complete birth data (date, latitude, longitude) is required" });
       }
 
+      // Try Swiss Ephemeris Python API for maximum accuracy
+      try {
+        const response = await fetch('http://localhost:8000/chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: birthData.date,
+            time: birthData.time || "12:00",
+            place_name: birthData.location || "Temple, TX, USA",
+            latitude: birthData.lat,
+            longitude: birthData.lng
+          })
+        });
+        
+        if (response.ok) {
+          const swissData = await response.json();
+          console.log('✅ Swiss Ephemeris calculation successful');
+          
+          res.json({
+            chart: swissData.chart,
+            houses: swissData.houses,
+            accuracy: swissData.accuracy,
+            method: 'Swiss Ephemeris',
+            timezone: swissData.timezone,
+            recommendations: [
+              "Chart calculated using Swiss Ephemeris for maximum accuracy",
+              "Planetary positions accurate to within arc-seconds", 
+              "Houses calculated using Placidus system"
+            ]
+          });
+          return;
+        }
+      } catch (pythonError) {
+        console.warn('⚠️ Swiss Ephemeris API unavailable, falling back to basic calculations');
+      }
+
+      // Fallback to basic calculations
       const { calculateAstrologyChart, validateBirthData } = await import('./astrology');
       
-      // Validate birth data
       const validation = validateBirthData(birthData);
       if (!validation.isValid) {
         return res.status(400).json({ error: "Invalid birth data" });
       }
 
-      // Calculate comprehensive chart
       const chart = calculateAstrologyChart(birthData);
       
       res.json({ 
         chart,
-        accuracy: validation.accuracy,
-        recommendations: validation.recommendations
+        accuracy: 'medium',
+        method: 'Basic calculations',
+        recommendations: [
+          "Chart calculated using basic astronomical formulas",
+          "For maximum accuracy, Swiss Ephemeris is recommended"
+        ]
       });
     } catch (error: any) {
       console.error("Astrology chart error:", error);

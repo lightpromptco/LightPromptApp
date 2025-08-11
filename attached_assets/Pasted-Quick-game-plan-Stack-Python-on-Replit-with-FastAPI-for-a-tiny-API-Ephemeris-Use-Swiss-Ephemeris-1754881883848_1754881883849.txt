@@ -1,0 +1,143 @@
+Quick game plan
+Stack: Python on Replit with FastAPI for a tiny API.
+
+Ephemeris: Use Swiss Ephemeris (via flatlib which wraps it) for accurate planets/houses.
+
+Time & place: Convert birth place → lat/lon → time zone → correct UTC datetime (handles DST).
+
+Endpoints: /chart (natal), /report (human text), /transits, /synastry.
+
+Front-end (optional): Render a wheel in the browser with astrochart (JS) and call your API.
+
+Dependencies to add (Replit → pyproject/poetry or requirements.txt)
+nginx
+Copy
+Edit
+fastapi
+uvicorn
+flatlib
+pyswisseph
+timezonefinder
+pytz
+python-dateutil
+You’ll also need the Swiss Ephemeris data files (sepl_*.se1, etc.). Drop them in a folder like /se/ in your Replit project and point to it in code.
+
+If you prefer JS: there’s swisseph (npm) and astronomia, but Python + flatlib is faster to ship.
+
+Minimal working API (paste into main.py)
+python
+Copy
+Edit
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from datetime import datetime
+from dateutil import parser
+from timezonefinder import TimezoneFinder
+import pytz
+import os
+
+# ---- Swiss Ephemeris / Flatlib setup ----
+import flatlib
+from flatlib import const
+from flatlib.chart import Chart
+from flatlib.geopos import GeoPos
+from flatlib.datetime import Datetime
+
+# Point Swiss Ephemeris to your folder
+os.environ["SE_EPHE_PATH"] = "./se"  # make sure /se exists with ephemeris files
+
+app = FastAPI(title="LightPrompt Astro API")
+
+class BirthData(BaseModel):
+    date: str         # "1990-05-12"
+    time: str         # "14:32" (24h) or "2:32 PM"
+    place_name: str   # optional label, not used for calc
+    latitude: float
+    longitude: float
+
+def to_utc_iso(date_str, time_str, lat, lon):
+    # Parse local naive dt
+    local_dt = parser.parse(f"{date_str} {time_str}")
+    # Find timezone by lat/lon
+    tf = TimezoneFinder()
+    tzname = tf.timezone_at(lng=lon, lat=lat)
+    if not tzname:
+        raise ValueError("Could not resolve timezone from coordinates.")
+    zone = pytz.timezone(tzname)
+    localized = zone.localize(local_dt)
+    return localized.astimezone(pytz.utc)
+
+def build_chart(bd: BirthData):
+    utc_dt = to_utc_iso(bd.date, bd.time, bd.latitude, bd.longitude)
+    fdt = Datetime(utc_dt.strftime("%Y/%m/%d"), utc_dt.strftime("%H:%M"), "+00:00")
+    pos = GeoPos(bd.latitude, bd.longitude)
+    return Chart(fdt, pos, IDs=const.LIST_OBJECTS)  # includes Sun..Pluto, Nodes, etc.
+
+@app.post("/chart")
+def chart_endpoint(bd: BirthData):
+    try:
+        chart = build_chart(bd)
+        planets = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto","ASC","MC"]
+        out = {}
+        for obj in planets:
+            b = chart.get(obj)
+            out[obj] = {
+                "sign": b.sign,
+                "lon": round(b.lon, 4),
+                "house": b.house if hasattr(b, "house") else None,
+            }
+        return {"timezone": TimezoneFinder().timezone_at(lng=bd.longitude, lat=bd.latitude),
+                "objects": out}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/report")
+def report_endpoint(bd: BirthData):
+    chart = build_chart(bd)
+
+    def brief(obj):
+        b = chart.get(obj)
+        return f"{obj} in {b.sign} (House {b.house})"
+
+    big6 = [brief(x) for x in ["Sun","Moon","ASC","Mercury","Venus","Mars"]]
+
+    # Simple aspect scan (major aspects only)
+    aspects = []
+    majors = [(0,"Conjunction"),(60,"Sextile"),(90,"Square"),(120,"Trine"),(180,"Opposition")]
+    ids = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"]
+    for i in range(len(ids)):
+        for j in range(i+1, len(ids)):
+            a = chart.get(ids[i]); b = chart.get(ids[j])
+            diff = abs((a.lon - b.lon + 540) % 360 - 180)  # angular sep
+            for deg,name in majors:
+                if abs(diff - (180 - deg)) <= 3:  # 3° orb (simple)
+                    aspects.append(f"{ids[i]} {name} {ids[j]}")
+
+    summary = (
+        "Here’s your quick, non-woo summary:\n"
+        f"- Big Six: {', '.join(big6)}.\n"
+        f"- Notable aspects: {', '.join(aspects) if aspects else 'None within 3° orb.'}\n"
+        "Remember: this reflects tendencies, not destiny. Use it like a weather report, not a court order."
+    )
+    return {"summary": summary}
+Run with:
+
+nginx
+Copy
+Edit
+uvicorn main:app --host 0.0.0.0 --port 8000
+Replit will expose the web server; you’ll get /chart and /report ready to call from your UI.
+
+Getting lat/lon automatically
+Add a geocoder (e.g., OpenCage, Mapbox, or Google Geocoding). From the front-end, send latitude/longitude + the raw place name you display. (Historical time zone accuracy requires the lat/lon + local date/time → we already handle DST with pytz.)
+
+Front-end chart wheel (optional, pretty)
+Use astrochart (JS) on the client to render the wheel.
+
+Call /chart, feed the returned longitudes/signs/houses into the library to draw.
+
+Notes you should know
+Licensing: Swiss Ephemeris is free under the Astrodienst Public License with attribution; commercial use may require a license. If that’s an issue, we can switch to JPL ephemerides (jplephem) but it’s more work to wrap for astrology.
+
+Accuracy lives or dies on correct birth time and time zone. If time is unknown, offer a “no-time mode” (use noon; skip houses/Asc).
+
