@@ -1080,6 +1080,88 @@ export default function SoulMapExplorerPage() {
           </div>
         )}
 
+        {/* Real-Time Transits Dashboard */}
+        {chartData?.transits && (
+          <div className={`mt-8 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200'} rounded-xl border p-6`}>
+            <h3 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>
+              <Zap className="h-5 w-5 text-indigo-600" />
+              Current Cosmic Weather
+            </h3>
+            
+            {/* Moon Phase */}
+            <div className={`mb-6 p-4 rounded-lg ${zenMode ? 'bg-white/5' : 'bg-white'} border ${zenMode ? 'border-white/10' : 'border-gray-200'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{chartData.transits.moonPhase.phase.split(' ')[0]}</span>
+                  <span className={`font-medium ${zenMode ? 'text-white' : 'text-gray-800'}`}>
+                    {chartData.transits.moonPhase.phase.split(' ').slice(1).join(' ')}
+                  </span>
+                </div>
+                <span className={`text-sm ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
+                  {chartData.transits.moonPhase.illumination}% illuminated
+                </span>
+              </div>
+              <div className={`w-full ${zenMode ? 'bg-white/20' : 'bg-gray-200'} rounded-full h-2`}>
+                <div 
+                  className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                  style={{ width: `${chartData.transits.moonPhase.illumination}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Active Transits */}
+            {chartData.transits.activeTransits.length > 0 && (
+              <div>
+                <h4 className={`font-medium mb-3 ${zenMode ? 'text-white' : 'text-gray-800'}`}>
+                  Active Planetary Influences
+                </h4>
+                <div className="space-y-3">
+                  {chartData.transits.activeTransits.slice(0, 4).map((transit, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-3 rounded-lg border ${
+                        transit.influence === 'harmonious' 
+                          ? zenMode ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'
+                          : transit.influence === 'challenging'
+                          ? zenMode ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'
+                          : zenMode ? 'bg-purple-900/20 border-purple-500/30' : 'bg-purple-50 border-purple-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            transit.influence === 'harmonious' 
+                              ? 'bg-green-100 text-green-800'
+                              : transit.influence === 'challenging'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {transit.transitPlanet.charAt(0).toUpperCase() + transit.transitPlanet.slice(1)} {transit.aspect} {transit.natalPlanet.charAt(0).toUpperCase() + transit.natalPlanet.slice(1)}
+                          </span>
+                        </div>
+                        <span className={`text-xs ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
+                          {transit.duration}
+                        </span>
+                      </div>
+                      <p className={`text-sm ${zenMode ? 'text-white/80' : 'text-gray-700'}`}>
+                        {transit.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Transit Summary */}
+            <div className="mt-4 pt-4 border-t border-gray-200/50">
+              <p className={`text-sm ${zenMode ? 'text-white/70' : 'text-gray-600'}`}>
+                Updated in real-time • Next New Moon: {new Date(chartData.transits.moonPhase.nextNewMoon).toLocaleDateString()} • 
+                Next Full Moon: {new Date(chartData.transits.moonPhase.nextFullMoon).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Enhanced Oracle Interface */}
           <div className="lg:col-span-2">

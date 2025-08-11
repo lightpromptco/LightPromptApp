@@ -854,6 +854,30 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
+  // Real-time transits API endpoint
+  app.post("/api/astrology/transits", async (req, res) => {
+    try {
+      const { natalChart } = req.body;
+      
+      if (!natalChart) {
+        return res.status(400).json({ error: 'Natal chart data required' });
+      }
+
+      const { calculateTransits } = await import('./astrology');
+      const transits = calculateTransits(natalChart);
+      
+      res.json({ 
+        transits,
+        timestamp: new Date().toISOString(),
+        accuracy: 'high',
+        method: 'Real-time planetary positions'
+      });
+    } catch (error: any) {
+      console.error('Error calculating transits:', error);
+      res.status(500).json({ error: 'Failed to calculate transits' });
+    }
+  });
+
   // Get detailed interpretation for specific planet/sign combination
   app.post("/api/astrology/interpret", async (req, res) => {
     try {

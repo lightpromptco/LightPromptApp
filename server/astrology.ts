@@ -67,6 +67,25 @@ export interface AstrologyChart {
       remaining: string;
     };
   };
+  transits?: {
+    currentPlanets: AstrologyChart;
+    activeTransits: Array<{
+      transitPlanet: string;
+      natalPlanet: string;
+      aspect: string;
+      orb: number;
+      influence: 'harmonious' | 'challenging' | 'transformative';
+      description: string;
+      peakDate: string;
+      duration: string;
+    }>;
+    moonPhase: {
+      phase: string;
+      illumination: number;
+      nextNewMoon: string;
+      nextFullMoon: string;
+    };
+  };
   ayanamsa?: number; // For Vedic calculations
 }
 
@@ -492,6 +511,11 @@ export function calculateAstrologyChart(birthData: BirthData): AstrologyChart {
   // Add career guidance based on chart
   chartData.careerGuidance = calculateCareerGuidance(chartData);
   
+  // Add real-time transits if this is a natal chart calculation
+  if (birthData.location !== 'Current') {
+    chartData.transits = calculateTransits(chartData);
+  }
+  
   return chartData;
 }
 
@@ -634,6 +658,208 @@ function calculateCareerGuidance(chart: any): {
     naturalTalents: getNaturalTalents(sun.sign, mercury.sign, venus.sign),
     vibeMatchScore: vibeScore,
     soulSyncAreas: getSoulSyncAreas(moon.sign, jupiter.sign)
+  };
+}
+
+// Calculate current transits affecting the natal chart
+export function calculateTransits(natalChart: AstrologyChart): {
+  currentPlanets: AstrologyChart;
+  activeTransits: Array<{
+    transitPlanet: string;
+    natalPlanet: string;
+    aspect: string;
+    orb: number;
+    influence: 'harmonious' | 'challenging' | 'transformative';
+    description: string;
+    peakDate: string;
+    duration: string;
+  }>;
+  moonPhase: {
+    phase: string;
+    illumination: number;
+    nextNewMoon: string;
+    nextFullMoon: string;
+  };
+} {
+  const now = new Date();
+  const currentChart = calculateAstrologyChart({
+    date: now.toISOString().split('T')[0],
+    time: '12:00',
+    lat: 0,
+    lng: 0,
+    location: 'Current'
+  });
+
+  const activeTransits = [];
+  const transitPlanets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'];
+  const natalPlanets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'ascendant'];
+
+  // Check for significant transits (within orb)
+  for (const tPlanet of transitPlanets) {
+    for (const nPlanet of natalPlanets) {
+      const transitPos = currentChart[tPlanet as keyof AstrologyChart] as PlanetPosition;
+      const natalPos = natalChart[nPlanet as keyof AstrologyChart] as PlanetPosition;
+      
+      if (transitPos && natalPos) {
+        const orb = calculateOrb(transitPos.degree, natalPos.degree);
+        const aspectType = getAspectType(orb);
+        
+        if (aspectType && orb <= getMaxOrb(aspectType)) {
+          const influence = getTransitInfluence(tPlanet, nPlanet, aspectType);
+          const description = getTransitDescription(tPlanet, nPlanet, aspectType);
+          
+          activeTransits.push({
+            transitPlanet: tPlanet,
+            natalPlanet: nPlanet,
+            aspect: aspectType,
+            orb,
+            influence,
+            description,
+            peakDate: calculatePeakDate(now, orb).toISOString().split('T')[0],
+            duration: getTransitDuration(tPlanet, aspectType)
+          });
+        }
+      }
+    }
+  }
+
+  const moonPhase = calculateMoonPhase(now);
+
+  return {
+    currentPlanets: currentChart,
+    activeTransits: activeTransits.slice(0, 8), // Limit to most significant
+    moonPhase
+  };
+}
+
+function calculateOrb(degree1: number, degree2: number): number {
+  const diff = Math.abs(degree1 - degree2);
+  return Math.min(diff, 360 - diff);
+}
+
+function getAspectType(orb: number): string | null {
+  if (orb <= 8) return 'conjunction';
+  if (Math.abs(orb - 60) <= 6) return 'sextile';
+  if (Math.abs(orb - 90) <= 8) return 'square';
+  if (Math.abs(orb - 120) <= 8) return 'trine';
+  if (Math.abs(orb - 180) <= 8) return 'opposition';
+  return null;
+}
+
+function getMaxOrb(aspect: string): number {
+  const orbs = { conjunction: 8, sextile: 6, square: 8, trine: 8, opposition: 8 };
+  return orbs[aspect as keyof typeof orbs] || 5;
+}
+
+function getTransitInfluence(transitPlanet: string, natalPlanet: string, aspect: string): 'harmonious' | 'challenging' | 'transformative' {
+  const harmonious = ['trine', 'sextile'];
+  const challenging = ['square', 'opposition'];
+  const transformative = ['conjunction'];
+  
+  if (harmonious.includes(aspect)) return 'harmonious';
+  if (challenging.includes(aspect)) return 'challenging';
+  return 'transformative';
+}
+
+function getTransitDescription(transitPlanet: string, natalPlanet: string, aspect: string): string {
+  const descriptions: { [key: string]: { [key: string]: { [key: string]: string } } } = {
+    jupiter: {
+      sun: {
+        conjunction: "Expansion of identity and confidence - excellent time for leadership roles",
+        trine: "Natural flow of optimism and growth opportunities in career",
+        square: "Overconfidence may lead to overcommitment - balance ambition with reality"
+      },
+      moon: {
+        conjunction: "Emotional expansion and heightened intuition - trust your feelings",
+        trine: "Harmonious emotional growth and positive relationships",
+        square: "Emotional excess or mood swings - practice moderation"
+      }
+    },
+    saturn: {
+      sun: {
+        conjunction: "Major life restructuring and taking on serious responsibilities",
+        trine: "Steady progress through disciplined effort and mature decisions",
+        square: "Authority challenges and need for greater self-discipline"
+      },
+      moon: {
+        conjunction: "Emotional maturity through facing responsibilities and limitations",
+        trine: "Stable emotional foundation through practical security",
+        square: "Emotional restrictions or depression - seek support and structure"
+      }
+    }
+  };
+  
+  return descriptions[transitPlanet]?.[natalPlanet]?.[aspect] || 
+    `${transitPlanet.charAt(0).toUpperCase() + transitPlanet.slice(1)} ${aspect} your natal ${natalPlanet} - significant planetary influence`;
+}
+
+function calculatePeakDate(baseDate: Date, orb: number): Date {
+  const daysToExact = orb * 2; // Rough approximation
+  return new Date(baseDate.getTime() + daysToExact * 24 * 60 * 60 * 1000);
+}
+
+function getTransitDuration(planet: string, aspect: string): string {
+  const durations: { [key: string]: string } = {
+    sun: '2-3 days',
+    moon: '6-8 hours',
+    mercury: '1-2 days',
+    venus: '2-4 days',
+    mars: '1-2 weeks',
+    jupiter: '2-3 weeks',
+    saturn: '2-3 months'
+  };
+  
+  return durations[planet] || '1-2 weeks';
+}
+
+function calculateMoonPhase(date: Date): {
+  phase: string;
+  illumination: number;
+  nextNewMoon: string;
+  nextFullMoon: string;
+} {
+  const jd = getJulianDay(date);
+  const moonAge = (jd - 2451550.1) % 29.530588853;
+  
+  let phase = '';
+  let illumination = 0;
+  
+  if (moonAge < 1.84566) {
+    phase = '🌑 New Moon';
+    illumination = 0;
+  } else if (moonAge < 5.53699) {
+    phase = '🌒 Waxing Crescent';
+    illumination = moonAge / 29.530588853 * 100;
+  } else if (moonAge < 9.22831) {
+    phase = '🌓 First Quarter';
+    illumination = 50;
+  } else if (moonAge < 12.91963) {
+    phase = '🌔 Waxing Gibbous';
+    illumination = moonAge / 29.530588853 * 100;
+  } else if (moonAge < 16.61096) {
+    phase = '🌕 Full Moon';
+    illumination = 100;
+  } else if (moonAge < 20.30228) {
+    phase = '🌖 Waning Gibbous';
+    illumination = 100 - ((moonAge - 14.765) / 14.765 * 100);
+  } else if (moonAge < 23.99361) {
+    phase = '🌗 Last Quarter';
+    illumination = 50;
+  } else {
+    phase = '🌘 Waning Crescent';
+    illumination = 100 - (moonAge / 29.530588853 * 100);
+  }
+  
+  // Calculate next new and full moon dates (approximations)
+  const nextNewMoon = new Date(date.getTime() + (29.530588853 - moonAge) * 24 * 60 * 60 * 1000);
+  const daysToFullMoon = moonAge < 14.765 ? (14.765 - moonAge) : (29.530588853 - moonAge + 14.765);
+  const nextFullMoon = new Date(date.getTime() + daysToFullMoon * 24 * 60 * 60 * 1000);
+  
+  return {
+    phase,
+    illumination: Math.round(illumination),
+    nextNewMoon: nextNewMoon.toISOString().split('T')[0],
+    nextFullMoon: nextFullMoon.toISOString().split('T')[0]
   };
 }
 
