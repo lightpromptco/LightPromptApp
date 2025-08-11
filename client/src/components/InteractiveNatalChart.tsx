@@ -113,61 +113,7 @@ export function InteractiveNatalChart({ birthData, onPlanetClick }: InteractiveN
     try {
       console.log('Loading chart data for any user with birth data:', birthData);
       
-      // Try Swiss Ephemeris Python API first (with timeout)
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
-        
-        const pythonResponse = await fetch('http://localhost:8000/chart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            date: birthData.date,
-            time: birthData.time || '12:00',
-            place_name: birthData.location || 'Temple, TX, USA',
-            latitude: birthData.lat || 31.0982,
-            longitude: birthData.lng || -97.3428
-          }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (pythonResponse.ok) {
-          const pythonData = await pythonResponse.json();
-          console.log('✅ Using Swiss Ephemeris calculations:', pythonData);
-          
-          // Transform Python API response to match our interface
-          const transformedData: ChartData = {
-            planets: Object.entries(pythonData.chart).filter(([key]) => 
-              ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'].includes(key)
-            ).map(([key, planet]: [string, any]) => ({
-              planet: key.charAt(0).toUpperCase() + key.slice(1),
-              sign: planet.sign,
-              degree: planet.degree,
-              house: planet.house,
-              symbol: PLANET_SYMBOLS[key.charAt(0).toUpperCase() + key.slice(1)] || '?'
-            })),
-            houses: pythonData.houses || Array.from({ length: 12 }, (_, i) => ({
-              house: i + 1,
-              sign: ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'][i],
-              degree: i * 30
-            })),
-            sun: pythonData.chart.sun,
-            moon: pythonData.chart.moon,
-            mercury: pythonData.chart.mercury,
-            venus: pythonData.chart.venus,
-            mars: pythonData.chart.mars,
-            jupiter: pythonData.chart.jupiter,
-            saturn: pythonData.chart.saturn
-          };
-          
-          setChartData(transformedData);
-          return;
-        }
-      } catch (pythonError) {
-        // Silently fall back to Node.js calculations without logging error
-      }
+      // Use reliable Node.js calculations directly
       
       // Fallback to Node.js API calculations
       const response = await apiRequest('POST', '/api/astrology/chart', {

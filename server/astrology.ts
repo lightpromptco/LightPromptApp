@@ -482,14 +482,19 @@ export function calculateAstrologyChart(birthData: BirthData): AstrologyChart {
   return chartData;
 }
 
-// Calculate yogas (simplified implementation)
+// Calculate yogas (simplified implementation)  
 function calculateYogas(positions: { [key: string]: { sign: string; degree: number } }): Array<{
   name: string;
-  type: string;
+  type: "raja" | "dhana" | "spiritual" | "malefic";
   description: string;
   planets: string[];
 }> {
-  const yogas = [];
+  const yogas: Array<{
+    name: string;
+    type: "raja" | "dhana" | "spiritual" | "malefic";
+    description: string;
+    planets: string[];
+  }> = [];
   
   // Simple conjunction yoga detection
   const planets = Object.keys(positions);
@@ -503,7 +508,7 @@ function calculateYogas(positions: { [key: string]: { sign: string; degree: numb
         if (degreesDiff < 10) { // Close conjunction
           yogas.push({
             name: `${planet1}-${planet2} Conjunction`,
-            type: 'conjunction',
+            type: 'spiritual',
             description: `Close alignment between ${planet1} and ${planet2} in ${positions[planet1].sign}`,
             planets: [planet1, planet2]
           });
