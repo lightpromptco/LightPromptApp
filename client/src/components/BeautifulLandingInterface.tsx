@@ -10,11 +10,27 @@ import {
   Gem,
   ArrowRight,
   Play,
-  ChevronRight
+  ChevronRight,
+  Terminal,
+  Code
 } from 'lucide-react';
 import { Link } from 'wouter';
 
 const FEATURES = [
+  {
+    title: 'Developer Tools',
+    description: 'Discord-style powerful functionality with Apple\'s sleek design - API management, webhooks, analytics',
+    icon: Terminal,
+    href: '/dev-tools',
+    status: 'new'
+  },
+  {
+    title: 'Community Hub',
+    description: 'Real-time community with channels, voice rooms, and soul connections - Discord meets wellness',
+    icon: Users,
+    href: '/community-hub',
+    status: 'new'
+  },
   {
     title: 'Reflective Conversations',
     description: 'AI that mirrors back your wisdom—like having Socrates as a reflection partner who never judges',
