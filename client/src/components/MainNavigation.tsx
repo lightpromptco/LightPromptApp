@@ -30,7 +30,7 @@ const NAV_ITEMS = [
     description: "Self-Discovery & Growth", 
     glyph: "✦",
     subItems: [
-      { path: "/woo-woo", label: "Soul Map Navigator", icon: Compass, description: "Cosmic Alignment & Insights" },
+      { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
       { path: "/geoprompt", label: "GeoPrompt (Beta)", icon: Map, description: "Location-Based Mindfulness" }
     ]

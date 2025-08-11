@@ -33,7 +33,7 @@ const FEATURES = [
     title: 'Soul Map Navigator',
     description: 'Explore your astrological profile and cosmic patterns for deeper self-understanding',
     icon: Sparkles,
-    href: '/woo-woo',
+    href: '/soul-map-explorer',
     status: 'active'
   },
   {

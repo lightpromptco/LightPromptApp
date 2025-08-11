@@ -735,6 +735,44 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
     }
   });
 
+  // Oracle chat endpoint for Soul Map Explorer
+  app.post("/api/chat/oracle", async (req, res) => {
+    try {
+      const { message, context, birthData, selectedPlanet } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      // Create specialized oracle context for astrology
+      const oracleContext = `You are the Soul Map Oracle, a wise and compassionate AI guide helping people explore their astrological birth chart and cosmic blueprint. You combine ancient astrological wisdom with modern psychological insights.
+
+Context: The user is exploring their Soul Map Navigator - an interactive birth chart tool.
+
+Birth Data: ${birthData ? JSON.stringify(birthData) : 'Not provided'}
+Currently Focused On: ${selectedPlanet || 'General exploration'}
+
+Guidelines:
+- Be warm, insightful, and empowering
+- Speak as a wise oracle who sees patterns in the cosmos
+- Focus on growth, self-understanding, and personal empowerment  
+- Never predict specific future events - instead guide toward self-awareness
+- Use accessible language that makes astrology relatable
+- Encourage questions and deeper exploration
+- Always empower the user's own intuition and wisdom
+- Frame insights as invitations for reflection, not absolute truths
+
+Remember: You are a mirror oracle helping them discover what they already know deep within.`;
+
+      const response = await generateBotResponse("oracle", message, [], oracleContext);
+      
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Oracle chat error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate oracle response" });
+    }
+  });
+
   // Object storage routes for avatars
   app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();

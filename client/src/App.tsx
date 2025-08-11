@@ -31,6 +31,7 @@ import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
 import AdminSettingsPage from "@/pages/admin-settings";
 import WooWooPage from "@/pages/woo-woo";
+import SoulMapExplorerPage from "@/pages/soul-map-explorer";
 import VisionQuestPage from "@/pages/vision-quest";
 import VisionQuestIndexPage from "@/pages/vision-quest/index";
 import VisionQuestStagePage from "@/pages/vision-quest/stage";
@@ -170,6 +171,11 @@ function Router() {
       <Route path="/woo-woo" component={() => (
         <MainLayout>
           <WooWooPage />
+        </MainLayout>
+      )} />
+      <Route path="/soul-map-explorer" component={() => (
+        <MainLayout>
+          <SoulMapExplorerPage />
         </MainLayout>
       )} />
       <Route path="/vision-quest" component={() => (
