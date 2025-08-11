@@ -95,6 +95,80 @@ export const accessCodes = pgTable("access_codes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// User Settings - Comprehensive settings storage for all LightPrompt features
+export const userSettings = pgTable("user_settings", {
+  userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Soul Map Settings
+  soulMapEnabled: boolean("soul_map_enabled").notNull().default(true),
+  soulMapAutoInsights: boolean("soul_map_auto_insights").notNull().default(true),
+  soulMapNotifications: boolean("soul_map_notifications").notNull().default(true),
+  soulMapPrivacy: text("soul_map_privacy").default("private"), // private, friends, public
+  
+  // VibeMatch Settings
+  vibeMatchEnabled: boolean("vibe_match_enabled").notNull().default(true),
+  vibeMatchCareerAlerts: boolean("vibe_match_career_alerts").notNull().default(true),
+  vibeMatchFrequency: text("vibe_match_frequency").default("weekly"), // daily, weekly, monthly
+  vibeMatchIndustries: text("vibe_match_industries").array().default([]),
+  
+  // GeoPrompt Settings
+  geoPromptEnabled: boolean("geo_prompt_enabled").notNull().default(false),
+  geoPromptLocationSharing: boolean("geo_prompt_location_sharing").notNull().default(false),
+  geoPromptNotifications: boolean("geo_prompt_notifications").notNull().default(true),
+  geoPromptRadius: integer("geo_prompt_radius").default(5), // miles
+  
+  // Vision Quest Settings
+  visionQuestEnabled: boolean("vision_quest_enabled").notNull().default(true),
+  visionQuestReminders: boolean("vision_quest_reminders").notNull().default(true),
+  visionQuestDifficulty: text("vision_quest_difficulty").default("intermediate"), // beginner, intermediate, advanced
+  visionQuestCategories: text("vision_quest_categories").array().default([]),
+  
+  // Course Settings
+  courseNotifications: boolean("course_notifications").notNull().default(true),
+  courseAutoProgress: boolean("course_auto_progress").notNull().default(false),
+  courseEmailUpdates: boolean("course_email_updates").notNull().default(true),
+  coursePreferredLearningStyle: text("course_preferred_learning_style").default("mixed"), // visual, auditory, kinesthetic, reading, mixed
+  
+  // AI Companions Settings
+  aiCompanionsEnabled: boolean("ai_companions_enabled").notNull().default(true),
+  preferredCompanion: text("preferred_companion").default("lightpromptbot"),
+  companionPersonality: text("companion_personality").default("balanced"), // formal, casual, balanced, inspiring
+  companionResponseLength: text("companion_response_length").default("medium"), // short, medium, long, detailed
+  companionProactivity: boolean("companion_proactivity").notNull().default(true),
+  
+  // Notification Settings
+  pushNotifications: boolean("push_notifications").notNull().default(true),
+  emailNotifications: boolean("email_notifications").notNull().default(true),
+  smsNotifications: boolean("sms_notifications").notNull().default(false),
+  notificationFrequency: text("notification_frequency").default("daily"), // realtime, daily, weekly, never
+  quietHoursStart: text("quiet_hours_start").default("22:00"),
+  quietHoursEnd: text("quiet_hours_end").default("07:00"),
+  timezone: text("timezone").default("auto"),
+  
+  // Privacy Settings
+  dataCollection: boolean("data_collection").notNull().default(true),
+  conversationHistory: boolean("conversation_history").notNull().default(true),
+  usageAnalytics: boolean("usage_analytics").notNull().default(true),
+  marketingEmails: boolean("marketing_emails").notNull().default(false),
+  profileVisibility: text("profile_visibility").default("private"), // private, friends, public
+  
+  // Display & Interface Settings
+  theme: text("theme").default("system"), // light, dark, system
+  circadianMode: boolean("circadian_mode").notNull().default(true),
+  fontSize: text("font_size").default("medium"), // small, medium, large
+  language: text("language").default("en"),
+  animationsEnabled: boolean("animations_enabled").notNull().default(true),
+  
+  // Advanced Settings
+  developerMode: boolean("developer_mode").notNull().default(false),
+  betaFeatures: boolean("beta_features").notNull().default(false),
+  apiAccess: boolean("api_access").notNull().default(false),
+  dataExportFormat: text("data_export_format").default("json"), // json, csv, xml
+  
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Wellness Dashboard Tables
 export const wellnessMetrics = pgTable("wellness_metrics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -593,6 +667,17 @@ export const insertOrganizationMemberSchema = createInsertSchema(organizationMem
   permissions: true,
 });
 
+export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateUserSettingsSchema = createInsertSchema(userSettings).omit({
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 export const redeemAccessCodeSchema = z.object({
   code: z.string().min(1, "Access code is required"),
   email: z.string().email("Valid email is required"),
@@ -635,6 +720,9 @@ export type CommunityLike = typeof communityLikes.$inferSelect;
 export type AstrologyProfile = typeof astrologyProfiles.$inferSelect;
 export type InsertAstrologyProfile = z.infer<typeof insertAstrologyProfileSchema>;
 export type DailyHoroscope = typeof dailyHoroscopes.$inferSelect;
+export type UserSettings = typeof userSettings.$inferSelect;
+export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
+export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;
 // VibeMatch tables for soul connection discovery
 export const vibeProfiles = pgTable("vibe_profiles", {
   userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),

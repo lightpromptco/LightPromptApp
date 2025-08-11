@@ -8,7 +8,9 @@ import knowledgeRoutes from "./routes/knowledge";
 import pagesRoutes from "./routes/pages";
 import contentRoutes from "./routes/content";
 import aiContentRoutes from "./routes/ai-content";
+import { adminRoutes } from "./routes/admin";
 import { lightpromptKnowledge } from "./lightpromptKnowledge";
+import { registerSettingsRoutes } from "./routes/settings";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
@@ -171,6 +173,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // AI content generation routes
   app.use('/api', aiContentRoutes);
+  
+  // Admin routes
+  app.use('/api/admin', adminRoutes);
+
+  // Settings routes
+  registerSettingsRoutes(app);
 
   // Admin Visual Editor API Routes
   app.get('/api/admin/scan-dom', async (req, res) => {

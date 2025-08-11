@@ -61,90 +61,59 @@ export default function Settings() {
     authenticateUser();
   }, []);
 
-  // Fetch user profile from Supabase
+  // Fetch user settings from new API endpoints
   const { data: profile, isLoading: profileLoading, refetch } = useQuery({
-    queryKey: ['/api/auth/profile', currentUser?.id],
+    queryKey: ['/api/settings', currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return null;
       try {
-        const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
+        const response = await fetch(`/api/settings/${currentUser.id}`);
         if (!response.ok) {
-          // Create default profile if doesn't exist
-          const createResponse = await fetch('/api/auth/profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: currentUser.id,
-              soulSyncEnabled: false,
-              soulSyncVisibility: 'private',
-              matchingPreferences: {},
-              privacySettings: {
-                dataSharing: 'private',
-                profileVisibility: 'friends',
-                locationSharing: false,
-                activityVisible: false
-              },
-              preferences: {
-                notifications: {
-                  email: true,
-                  push: true,
-                  soulSyncUpdates: true,
-                  weeklyReports: false
-                },
-                theme: 'auto'
-              }
-            })
-          });
-          if (createResponse.ok) {
-            return await createResponse.json();
-          }
-        }
-        return await response.json();
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        // Return default profile structure
-        return {
-          userId: currentUser.id,
-          soulSyncEnabled: false,
-          soulSyncVisibility: 'private',
-          matchingPreferences: {},
-          privacySettings: {
-            dataSharing: 'private',
-            profileVisibility: 'friends',
-            locationSharing: false,
-            activityVisible: true,
-          },
-          preferences: {
-            notifications: {
-              email: true,
-              push: true,
-              soulSyncUpdates: true,
-              weeklyReports: false,
+          // Return default settings if doesn't exist
+          return {
+            userId: currentUser.id,
+            soulSyncEnabled: false,
+            soulSyncVisibility: 'private',
+            matchingPreferences: {},
+            privacySettings: {
+              dataSharing: 'private',
+              profileVisibility: 'private',
+              locationSharing: false,
+              activityVisible: false
             },
-            theme: 'light',
-          },
-        };
+            preferences: {
+              notifications: {
+                email: true,
+                push: false,
+                soulSyncUpdates: true,
+                weeklyReports: false
+              },
+              theme: 'light'
+            }
+          };
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        return null;
       }
-      return response.json();
     },
-    enabled: !!currentUser?.id,
+    enabled: !!currentUser?.id
   });
 
-  // Update Soul Sync settings mutation
+  // Update user settings mutation
   const updateSettingsMutation = useMutation({
     mutationFn: async (settings: Partial<UserProfile>) => {
-      const response = await fetch('/api/auth/soul-sync-settings', {
+      const response = await fetch(`/api/settings/${currentUser?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: currentUser?.id,
-          settings,
-        }),
+        body: JSON.stringify(settings),
       });
       if (!response.ok) throw new Error('Failed to update settings');
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/settings', currentUser?.id] });
       toast({
         title: "Settings Updated",
         description: "Your Soul Sync preferences have been saved to Supabase database.",
@@ -464,7 +433,12 @@ export default function Settings() {
                   </span>
                 </div>
                 {currentUser?.courseAccess && (
-                  <Button variant="outline" size="sm" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
+                    onClick={() => window.location.href = '/course'}
+                  >
                     Continue Course
                   </Button>
                 )}
@@ -795,7 +769,10 @@ export default function Settings() {
             </div>
             
             <div className="divide-y divide-gray-100">
-              <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <button 
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                onClick={() => window.location.href = '/soul-sync'}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <Users className="w-4 h-4 text-blue-600" />
@@ -805,9 +782,13 @@ export default function Settings() {
                     <div className="text-sm text-gray-500">View your connections and shared data</div>
                   </div>
                 </div>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </button>
               
-              <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <button 
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                onClick={() => window.location.href = '/feedback'}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <Shield className="w-4 h-4 text-green-600" />
@@ -817,6 +798,7 @@ export default function Settings() {
                     <div className="text-sm text-gray-500">Help us improve LightPrompt</div>
                   </div>
                 </div>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>

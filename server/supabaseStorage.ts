@@ -14,7 +14,8 @@ import {
   CircleActivity, InsertCircleActivity, HabitProgram, InsertHabitProgram,
   HabitEnrollment, InsertHabitEnrollment, HabitCheckIn, InsertHabitCheckIn,
   AdminSetting, InsertAdminSetting, ContentBlock, InsertContentBlock,
-  GeoPromptCheckIn, InsertGeoPromptCheckIn
+  GeoPromptCheckIn, InsertGeoPromptCheckIn,
+  UserSettings, InsertUserSettings, UpdateUserSettings
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import {
@@ -1284,5 +1285,97 @@ export class SupabaseStorage implements IStorage {
 
     if (error) throw error;
     return data || [];
+  }
+
+  // User Settings methods
+  async getUserSettings(userId: string): Promise<UserSettings | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('userSettings')
+        .select('*')
+        .eq('userId', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error getting user settings:', error);
+        return undefined;
+      }
+
+      return data || undefined;
+    } catch (error) {
+      console.error('Error getting user settings:', error);
+      return undefined;
+    }
+  }
+
+  async createOrUpdateUserSettings(settings: InsertUserSettings): Promise<UserSettings> {
+    try {
+      const { data, error } = await supabase
+        .from('userSettings')
+        .upsert(settings, { onConflict: 'userId' })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating/updating user settings:', error);
+      throw error;
+    }
+  }
+
+  async updateUserSettings(userId: string, updates: UpdateUserSettings): Promise<UserSettings | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('userSettings')
+        .update(updates)
+        .eq('userId', userId)
+        .select()
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error updating user settings:', error);
+        return undefined;
+      }
+
+      return data || undefined;
+    } catch (error) {
+      console.error('Error updating user settings:', error);
+      return undefined;
+    }
+  }
+
+  async deleteUserSettings(userId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('userSettings')
+        .delete()
+        .eq('userId', userId);
+
+      if (error) {
+        console.error('Error deleting user settings:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error deleting user settings:', error);
+      throw error;
+    }
+  }
+
+  // Soul Map and Vision Quest (placeholder methods)
+  async getSoulMap(userId: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createSoulMap(soulMapData: any): Promise<any> {
+    return soulMapData;
+  }
+
+  async getVisionQuest(userId: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async createVisionQuest(questData: any): Promise<any> {
+    return questData;
   }
 }

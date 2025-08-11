@@ -9,6 +9,7 @@ import { CartProvider } from "@/hooks/use-cart";
 import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
 import AdminPage from "@/pages/admin";
+import AdminDashboard from "@/pages/admin/dashboard";
 import PrivacyPage from "@/pages/privacy";
 import CourseAccessPage from "@/pages/course-access";
 import DashboardPage from "@/pages/dashboard";
@@ -57,6 +58,9 @@ import AnalyticsPage from "@/pages/admin/analytics";
 import EmailMarketingAdmin from "@/pages/admin/email-marketing";
 import NotFound from "@/pages/not-found";
 import TermsPage from "@/pages/terms";
+import AICompanionsPage from "@/pages/ai-companions";
+import DataPrivacyPage from "@/pages/data-privacy";
+import NotificationsPage from "@/pages/notifications";
 import { useEffect } from "react";
 
 function Router() {
@@ -71,6 +75,11 @@ function Router() {
       <Route path="/admin" component={() => (
         <MainLayout>
           <AdminPage />
+        </MainLayout>
+      )} />
+      <Route path="/admin/dashboard" component={() => (
+        <MainLayout>
+          <AdminDashboard />
         </MainLayout>
       )} />
       <Route path="/privacy" component={() => (
@@ -186,6 +195,21 @@ function Router() {
       <Route path="/settings" component={() => (
         <MainLayout>
           <SettingsPage />
+        </MainLayout>
+      )} />
+      <Route path="/ai-companions" component={() => (
+        <MainLayout>
+          <AICompanionsPage />
+        </MainLayout>
+      )} />
+      <Route path="/data-privacy" component={() => (
+        <MainLayout>
+          <DataPrivacyPage />
+        </MainLayout>
+      )} />
+      <Route path="/notifications" component={() => (
+        <MainLayout>
+          <NotificationsPage />
         </MainLayout>
       )} />
       <Route path="/account-settings" component={() => (
