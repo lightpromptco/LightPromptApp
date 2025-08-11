@@ -1120,6 +1120,57 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Update user profile data
+  app.put("/api/users/:userId/profile", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const profileData = req.body;
+
+      // Update basic user info if provided
+      if (profileData.name || profileData.email) {
+        const userUpdates: any = {};
+        if (profileData.name) userUpdates.name = profileData.name;
+        if (profileData.email) userUpdates.email = profileData.email;
+        
+        await storage.updateUser(userId, userUpdates);
+      }
+
+      // Store profile-specific data as user preferences
+      const userPreferences = {
+        ...profileData.preferences || {},
+        profile: {
+          bio: profileData.bio,
+          location: profileData.location,
+          timezone: profileData.timezone,
+          birthDate: profileData.birthDate,
+          occupation: profileData.occupation,
+          interests: profileData.interests
+        }
+      };
+
+      await storage.updateUser(userId, { preferences: userPreferences });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  // Update basic user information
+  app.put("/api/users/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+
+      const updatedUser = await storage.updateUser(userId, updates);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
   // Admin middleware to check if user is admin
   const requireAdmin = async (req: any, res: any, next: any) => {
     try {

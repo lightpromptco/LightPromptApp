@@ -29,6 +29,7 @@ import ProductInfo from "@/pages/product-info";
 import B2BPage from "@/pages/b2b";
 import SettingsPage from "@/pages/settings";
 import AdminSettingsPage from "@/pages/admin-settings";
+import { AccountSettingsWrapper } from "@/pages/account-settings-wrapper";
 import WooWooPage from "@/pages/woo-woo";
 import SoulMapExplorerPage from "@/pages/soul-map-explorer";
 import VisionQuestPage from "@/pages/vision-quest";
@@ -178,6 +179,11 @@ function Router() {
       <Route path="/settings" component={() => (
         <MainLayout>
           <SettingsPage />
+        </MainLayout>
+      )} />
+      <Route path="/account-settings" component={() => (
+        <MainLayout>
+          <AccountSettingsWrapper />
         </MainLayout>
       )} />
       <Route path="/admin/settings" component={() => (
