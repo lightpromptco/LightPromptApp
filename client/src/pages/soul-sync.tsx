@@ -130,10 +130,10 @@ export default function SoulSyncPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => window.location.href = '/login'}
+                  onClick={() => window.location.href = '/store'}
                   className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg"
                 >
-                  Get Started <ArrowRight className="ml-2 w-5 h-5" />
+                  Start Now <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <Button 
                   variant="outline"
@@ -219,11 +219,11 @@ export default function SoulSyncPage() {
                   </li>
                 </ul>
                 <Button 
-                  onClick={() => window.location.href = '/login'}
+                  onClick={() => window.location.href = '/store'}
                   variant="outline" 
                   className="w-full border-teal-600 text-teal-600 hover:bg-teal-50"
                 >
-                  Get Started Free
+                  Start Now
                 </Button>
               </Card>
 
@@ -258,7 +258,7 @@ export default function SoulSyncPage() {
                   </li>
                 </ul>
                 <Button 
-                  onClick={() => window.location.href = '/login'}
+                  onClick={() => window.location.href = '/checkout'}
                   className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                 >
                   Upgrade to Growth
@@ -275,7 +275,7 @@ export default function SoulSyncPage() {
             Join the LightPrompt community and start connecting your wellness journey with others today.
           </p>
           <Button 
-            onClick={() => window.location.href = '/login'}
+            onClick={() => window.location.href = '/store'}
             className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg"
           >
             Sign Up Now <ArrowRight className="ml-2 w-5 h-5" />
