@@ -155,6 +155,32 @@ export default function Store() {
         variant: "destructive",
       });
     }
+  }
+
+  const handleContactSales = () => {
+    const subject = encodeURIComponent('Enterprise Plan Inquiry - LightPrompt');
+    const body = encodeURIComponent(`Hi,
+
+I'm interested in learning more about the LightPrompt Enterprise plan ($199/month) which includes:
+
+• Team & organization management
+• Custom AI training  
+• Advanced analytics dashboard
+• API access
+• White-label options
+• Dedicated account manager
+
+Please contact me to discuss our specific needs and setup.
+
+Thank you!`);
+    
+    const mailtoLink = `mailto:lightprompt.co@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+    
+    toast({
+      title: "Opening Email Client",
+      description: "We'll get back to you within 24 hours!",
+    });
   };
 
   return (
@@ -401,8 +427,8 @@ export default function Store() {
             </div>
             
             <Button 
-              className="w-full mt-4 bg-teal-500 hover:bg-teal-600"
-              onClick={() => handleSubscriptionUpgrade('enterprise')}
+              className="w-full mt-4 bg-purple-500 hover:bg-purple-600"
+              onClick={() => handleContactSales()}
             >
               Contact Sales
             </Button>
