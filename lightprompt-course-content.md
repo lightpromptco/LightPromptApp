@@ -80,3 +80,14 @@ LightPrompt is about using AI as a conscious mirror and reflection tool, not as 
 - Lifetime access and updates
 - Trauma-informed approach to AI-assisted inner work
 - Ethical framework for AI use in personal and professional contexts
+
+## IMPORTANT: Core Knowledge Now Stored in Database
+The complete LightPrompt knowledge base (brand identity, product descriptions, bot personalities, ethics guidelines, and detailed course structure) is now systematically stored in the server's knowledge storage system. 
+
+This ensures all LightPrompt information is preserved and accessible for:
+- Bot responses that maintain brand consistency
+- Course delivery that follows the exact curriculum
+- Accurate product information without errors
+- Ethical guidelines for all AI interactions
+
+Access via API: `/api/knowledge/:category/:key` or browse all at `/api/knowledge`

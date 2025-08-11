@@ -37,6 +37,7 @@ import VisionQuestIndexPage from "@/pages/vision-quest/index";
 import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
 import AdminSettings from "@/pages/admin/settings";
+import KnowledgeAdminPage from "@/pages/admin/knowledge";
 import CommunityPage from "@/pages/community";
 
 import SoulSyncPage from "@/pages/soul-sync";
@@ -188,6 +189,9 @@ function Router() {
       )} />
       <Route path="/admin/settings" component={() => (
         <AdminSettings />
+      )} />
+      <Route path="/admin/knowledge" component={() => (
+        <KnowledgeAdminPage />
       )} />
       <Route path="/woo-woo" component={() => (
         <MainLayout>

@@ -24,6 +24,7 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - Admin access controls and security settings
 - Email marketing integrations (SendGrid, ConvertKit)
 - Existing API routes that power core functionality
+- **LightPrompt Knowledge System** - Core reference materials for brand integrity
 
 **Only work on:**
 - New features explicitly requested by user
@@ -93,6 +94,7 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - **Admin Access**: `lightprompt.co@gmail.com` has developer mode for full platform control.
 - **Content Management System**: Admin panel for editing any page content, sections, buttons, links, colors, and metadata.
 - **Blog Integration**: Full article management and search functionality.
+- **LightPrompt Knowledge System**: Comprehensive core reference database storing brand identity, product descriptions, bot personalities, ethics guidelines, and course content. Prevents misinformation and maintains brand integrity through systematic knowledge storage accessible at `/admin/knowledge` and via API endpoints (`/api/knowledge/:category/:key`).
 
 ### Advanced Developer Features (Power User Tools)
 - **Cosmic Debug Console** (`/cosmic-debug`): Real-time system monitoring, astrological calculation debugging, API performance metrics, and live data visualization for technical analysis

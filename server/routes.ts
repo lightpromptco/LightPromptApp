@@ -7,6 +7,7 @@ import knowledgeRoutes from "./routes/knowledge";
 import pagesRoutes from "./routes/pages";
 import contentRoutes from "./routes/content";
 import aiContentRoutes from "./routes/ai-content";
+import { lightpromptKnowledge } from "./lightpromptKnowledge";
 import { generateBotResponse, transcribeAudio, generateSpeech, analyzeSentiment } from "./openai";
 // Removed old astrology imports - using new comprehensive system
 import OpenAI from 'openai';
@@ -3701,6 +3702,36 @@ ${new Date().toLocaleString()}
       res.status(500).json({ success: false, error: error.message });
     }
   });
+
+  // LightPrompt Knowledge API endpoints
+  app.get("/api/knowledge/:category?/:key?", async (req, res) => {
+    try {
+      const { category, key } = req.params;
+      
+      if (category && key) {
+        const knowledge = await lightpromptKnowledge.getKnowledgeItem(category, key);
+        res.json(knowledge);
+      } else if (category) {
+        const knowledge = await lightpromptKnowledge.getKnowledgeCategory(category);
+        res.json(knowledge);
+      } else {
+        const allKnowledge = await lightpromptKnowledge.getAllKnowledge();
+        res.json(allKnowledge);
+      }
+    } catch (error) {
+      console.error("Error fetching LightPrompt knowledge:", error);
+      res.status(500).json({ error: "Failed to fetch knowledge" });
+    }
+  });
+
+  // Initialize LightPrompt core knowledge on server startup
+  console.log("🧠 Initializing LightPrompt Core Knowledge System...");
+  try {
+    await lightpromptKnowledge.initializeCoreKnowledge();
+    console.log("✅ LightPrompt Knowledge System ready");
+  } catch (error) {
+    console.error("❌ Failed to initialize LightPrompt knowledge:", error);
+  }
 
   const httpServer = createServer(app);
   return httpServer;
