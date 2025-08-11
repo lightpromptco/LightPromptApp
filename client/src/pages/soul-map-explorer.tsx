@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ProfessionalNatalChart } from "@/components/ProfessionalNatalChart";
+import { InteractiveNatalChart } from "@/components/InteractiveNatalChart";
 
 // Soul-tech helper functions
 const getCurrentMoonPhase = () => {
@@ -987,30 +987,42 @@ export default function SoulMapExplorerPage() {
           </div>
         </div>
 
-        {/* Professional Natal Chart Widget - DivineAPI Style */}
-        <ProfessionalNatalChart birthData={birthData} />
+        {/* Interactive Natal Chart Widget */}
+        <InteractiveNatalChart 
+          birthData={birthData} 
+          onPlanetClick={(planet, sign) => {
+            setSelectedPlanet(sign);
+            setCurrentMessage(`Tell me about ${planet} in ${sign} and how it influences my soul journey and personality.`);
+            setCurrentView('chat');
+          }}
+        />
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Oracle Chat Quick Actions */}
           <div className="lg:col-span-2">
-            <Card className={`p-6 text-center ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : ''}`}>
-              <CardHeader>
-                <CardTitle className={zenMode ? 'text-white' : ''}>Ask Your Soul Oracle</CardTitle>
-                <p className={zenMode ? 'text-white/80' : 'text-muted-foreground'}>
-                  Your professional natal chart is displaying above. Click the buttons below to explore deeper insights.
+            <Card className={`transition-all duration-300 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-white border-gray-200 shadow-sm'}`}>
+              <CardHeader className="text-center pb-4">
+                <CardTitle className={`text-2xl font-bold mb-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>
+                  Ask Your Soul Oracle
+                </CardTitle>
+                <p className={`text-sm leading-relaxed ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
+                  Your interactive natal chart is displaying above. Click the buttons below to explore deeper insights.
                 </p>
               </CardHeader>
               
-              <CardContent className="grid grid-cols-2 gap-4">
+              <CardContent className="grid grid-cols-2 gap-4 p-6 pt-0">
                 <Button
                   onClick={() => {
                     setCurrentMessage("What does the current moon phase mean for my spiritual journey and how does it interact with my birth chart?");
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
+                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
+                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-blue-200 hover:bg-blue-50 hover:border-blue-300'
+                  }`}
                 >
-                  🌙 Moon Wisdom
+                  <div className="text-2xl">🌙</div>
+                  <span>Moon Wisdom</span>
                 </Button>
                 <Button
                   onClick={() => {
@@ -1018,9 +1030,12 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
+                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
+                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-purple-200 hover:bg-purple-50 hover:border-purple-300'
+                  }`}
                 >
-                  🔮 Mayan Sync
+                  <div className="text-2xl">🔮</div>
+                  <span>Mayan Sync</span>
                 </Button>
                 <Button
                   onClick={() => {
@@ -1028,9 +1043,12 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
+                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
+                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-yellow-200 hover:bg-yellow-50 hover:border-yellow-300'
+                  }`}
                 >
-                  ⚡ Live Aspects
+                  <div className="text-2xl">⚡</div>
+                  <span>Live Aspects</span>
                 </Button>
                 <Button
                   onClick={() => {
@@ -1038,9 +1056,12 @@ export default function SoulMapExplorerPage() {
                     setCurrentView('chat');
                   }}
                   variant="outline"
-                  className={`flex items-center gap-2 ${zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : ''}`}
+                  className={`flex items-center justify-start gap-3 h-16 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
+                    zenMode ? 'bg-white/10 text-white border-white/30 hover:bg-white/20' : 'border-green-200 hover:bg-green-50 hover:border-green-300'
+                  }`}
                 >
-                  ✨ Daily Guidance
+                  <div className="text-2xl">✨</div>
+                  <span>Daily Guidance</span>
                 </Button>
               </CardContent>
             </Card>
@@ -1210,17 +1231,19 @@ export default function SoulMapExplorerPage() {
               </Card>
             )}
 
-            {/* Daily Oracle Link */}
-            <Card className="bg-white border-gray-200 shadow-sm">
+            {/* Modern Daily Oracle Widget */}
+            <Card className={`border border-orange-200 transition-all duration-300 hover:shadow-lg hover:border-orange-300 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-gradient-to-br from-orange-50 to-amber-50'}`}>
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-orange-500 flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Daily Oracle</h3>
-                <p className="text-sm text-gray-600 mb-4">Get your personalized cosmic guidance for today</p>
+                <h3 className={`text-xl font-bold mb-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>Daily Oracle</h3>
+                <p className={`text-sm mb-5 leading-relaxed ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
+                  Get your personalized cosmic guidance for today
+                </p>
                 <Button 
                   onClick={() => window.location.href = '/daily-oracle'}
-                  className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2"
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium px-6 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                   size="sm"
                 >
                   Get Daily Guidance
