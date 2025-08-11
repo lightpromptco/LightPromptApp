@@ -1371,6 +1371,53 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Create Stripe checkout session for subscription tiers
+  app.post("/api/create-subscription-checkout", async (req, res) => {
+    try {
+      const { tier } = req.body;
+      
+      if (!tier) {
+        return res.status(400).json({ error: "Subscription tier is required" });
+      }
+
+      // Map subscription tiers to your Stripe price IDs
+      const tierPricing = {
+        "growth": "price_1QRxXYF3h4T5U6v7X8Y9Z0", // Growth Tier - $29/month (replace with actual price ID)
+        "resonance": "price_1QRxXZF3h4T5U6v7X8Y9Z1", // Resonance Tier - $49/month (replace with actual price ID)
+        "enterprise": "price_1QRxXaF3h4T5U6v7X8Y9Z2" // Enterprise Tier - $199/month (replace with actual price ID)
+      };
+
+      const priceId = tierPricing[tier as keyof typeof tierPricing];
+      if (!priceId) {
+        return res.status(400).json({ error: "Invalid subscription tier" });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${req.headers.origin}/dashboard?success=true&tier=${tier}`,
+        cancel_url: `${req.headers.origin}/store?canceled=true`,
+        metadata: {
+          tier: tier
+        }
+      });
+
+      res.json({ 
+        checkoutUrl: session.url,
+        sessionId: session.id 
+      });
+    } catch (error: any) {
+      console.error('Subscription checkout error:', error);
+      res.status(500).json({ error: "Failed to create checkout session: " + error.message });
+    }
+  });
+
   // Confirm payment and upgrade user tier
   app.post("/api/confirm-payment", async (req, res) => {
     try {

@@ -123,6 +123,33 @@ export default function Store() {
     return item?.quantity || 0;
   };
 
+  const handleSubscriptionUpgrade = async (tier: string) => {
+    try {
+      const response = await fetch('/api/create-subscription-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast({
+        title: "Subscription Error",
+        description: "Unable to start subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
       <div className="container mx-auto px-4 py-8">
@@ -249,7 +276,10 @@ export default function Store() {
               <div>GeoPrompts: Unlimited/month</div>
             </div>
             
-            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+            <Button 
+              className="w-full mt-4 bg-teal-500 hover:bg-teal-600"
+              onClick={() => handleSubscriptionUpgrade('growth')}
+            >
               Upgrade Now
             </Button>
           </div>
@@ -303,7 +333,10 @@ export default function Store() {
               <div>GeoPrompts: 0/month</div>
             </div>
             
-            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+            <Button 
+              className="w-full mt-4 bg-teal-500 hover:bg-teal-600"
+              onClick={() => handleSubscriptionUpgrade('resonance')}
+            >
               Upgrade Now
             </Button>
           </div>
@@ -360,7 +393,10 @@ export default function Store() {
               <div>GeoPrompts: 0/month</div>
             </div>
             
-            <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600">
+            <Button 
+              className="w-full mt-4 bg-teal-500 hover:bg-teal-600"
+              onClick={() => handleSubscriptionUpgrade('enterprise')}
+            >
               Contact Sales
             </Button>
           </div>
