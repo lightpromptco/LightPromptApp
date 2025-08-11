@@ -130,17 +130,17 @@ export default function SoulSyncPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => window.location.href = '/store'}
+                  onClick={() => window.location.href = '/signup'}
                   className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg"
                 >
-                  Start Now <ArrowRight className="ml-2 w-5 h-5" />
+                  Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => window.location.href = '/store'}
                   className="border-teal-600 text-teal-600 hover:bg-teal-50 px-8 py-3 text-lg"
                 >
-                  Learn More
+                  View Pricing
                 </Button>
               </div>
             </div>
@@ -219,11 +219,11 @@ export default function SoulSyncPage() {
                   </li>
                 </ul>
                 <Button 
-                  onClick={() => window.location.href = '/store'}
+                  onClick={() => window.location.href = '/signup'}
                   variant="outline" 
                   className="w-full border-teal-600 text-teal-600 hover:bg-teal-50"
                 >
-                  Start Now
+                  Get Started Free
                 </Button>
               </Card>
 
@@ -275,7 +275,7 @@ export default function SoulSyncPage() {
             Join the LightPrompt community and start connecting your wellness journey with others today.
           </p>
           <Button 
-            onClick={() => window.location.href = '/store'}
+            onClick={() => window.location.href = '/signup'}
             className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg"
           >
             Sign Up Now <ArrowRight className="ml-2 w-5 h-5" />
