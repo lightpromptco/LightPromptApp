@@ -82,9 +82,13 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
     try {
       let longitude;
       if (body === Body.Sun) {
-        // For the Sun, use a simpler geocentric calculation
-        const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 1).getTime()) / (24 * 60 * 60 * 1000));
-        longitude = (dayOfYear * 360 / 365.25 + 280) % 360;
+        // Calculate Sun position using simple orbital mechanics
+        const year = date.getFullYear();
+        const dayOfYear = Math.floor((date.getTime() - new Date(year, 0, 1).getTime()) / (24 * 60 * 60 * 1000)) + 1;
+        
+        // Mean longitude of Sun (approximate formula)
+        const L = (280.460 + 0.9856474 * dayOfYear) % 360;
+        longitude = L < 0 ? L + 360 : L;
       } else {
         longitude = EclipticLongitude(body, date);
       }
@@ -102,14 +106,25 @@ export function getCurrentAstronomicalData(date: Date = new Date()): Astronomica
       };
     } catch (error) {
       console.warn(`Error calculating ${body.toString()}:`, error);
-      // Provide fallback data for essential planets
+      // Provide fallback data for essential planets using the calculated longitude
       if (body === Body.Sun) {
         const bodyName = body.toString().toLowerCase();
+        const sign = getZodiacSign(longitude);
         planets[bodyName] = {
-          longitude: 322.5,
-          sign: 'aquarius',
-          signName: 'Aquarius', 
-          degree: 22.5,
+          longitude: longitude,
+          sign: sign.toLowerCase(),
+          signName: sign,
+          degree: longitude % 30,
+          retrograde: false
+        };
+      } else {
+        // For other planets, provide basic fallback
+        const bodyName = body.toString().toLowerCase();
+        planets[bodyName] = {
+          longitude: 0,
+          sign: 'aries',
+          signName: 'Aries',
+          degree: 0,
           retrograde: false
         };
       }

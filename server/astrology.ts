@@ -437,7 +437,7 @@ function calculateAspects(positions: { [key: string]: PlanetPosition }): Array<{
 }
 
 // Main function to calculate complete astrological chart for ANY USER
-export function calculateAstrologyChart(birthData: BirthData): AstrologyChart {
+export function calculateAstrologyChart(birthData: any): any {
   console.log('Calculating astrology chart for any user:', birthData);
   
   // Calculate accurate positions for any birth date and location

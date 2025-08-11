@@ -1,160 +1,148 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, Star, BookOpen, Sparkles } from "lucide-react";
 
 export default function PaymentSuccess() {
   const [, setLocation] = useLocation();
-  const [paymentStatus, setPaymentStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [product, setProduct] = useState<string>('');
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const paymentIntent = urlParams.get('payment_intent');
-    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
-    const redirectStatus = urlParams.get('redirect_status');
-
-    if (redirectStatus === 'succeeded') {
-      setPaymentStatus('success');
-    } else if (redirectStatus === 'failed') {
-      setPaymentStatus('error');
-    } else {
-      // Fallback check
-      setTimeout(() => setPaymentStatus('success'), 1000);
-    }
+    const productId = urlParams.get('product') || '';
+    setProduct(productId);
   }, []);
 
-  if (paymentStatus === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-300">Confirming your payment...</p>
-        </div>
-      </div>
-    );
-  }
+  const getProductDetails = () => {
+    switch (product) {
+      case 'course':
+        return {
+          title: 'Soul Map & Cosmos Course',
+          description: 'You now have lifetime access to the complete astrological career guidance course.',
+          nextSteps: [
+            'Access your course materials in the dashboard',
+            'Complete your birth chart analysis',
+            'Start your personalized career journey',
+            'Join the exclusive course community'
+          ],
+          cta: 'Start Your Course'
+        };
+      case 'ebook':
+        return {
+          title: 'Digital Guidebook',
+          description: 'Your comprehensive career astrology guide is ready for download.',
+          nextSteps: [
+            'Download your PDF guidebook',
+            'Explore the quick reference charts',
+            'Begin self-guided exercises',
+            'Apply basic compatibility insights'
+          ],
+          cta: 'Download Guidebook'
+        };
+      case 'bundle':
+        return {
+          title: 'Complete Soul-Tech Bundle',
+          description: 'You have access to everything needed for conscious career transformation.',
+          nextSteps: [
+            'Access your complete course curriculum',
+            'Download your digital guidebook',
+            'Unlock premium Oracle consultations',
+            'Start advanced VibeMatch scoring'
+          ],
+          cta: 'Access Everything'
+        };
+      default:
+        return {
+          title: 'Payment Successful',
+          description: 'Thank you for your purchase! Your access has been activated.',
+          nextSteps: [
+            'Check your email for confirmation',
+            'Access your new features',
+            'Explore your dashboard',
+            'Contact support if needed'
+          ],
+          cta: 'Go to Dashboard'
+        };
+    }
+  };
 
-  if (paymentStatus === 'error') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
-        <Card className="max-w-lg mx-4">
-          <CardContent className="text-center py-12">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-red-500 text-2xl">❌</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Payment Failed
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              There was an issue processing your payment. Please try again.
-            </p>
-            <Button onClick={() => setLocation('/store')} variant="outline">
-              Return to Store
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const details = getProductDetails();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto">
-          <Card className="shadow-xl bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20">
-            <CardContent className="text-center py-12">
-              <div className="w-20 h-20 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-12 h-12 text-teal-500" />
-              </div>
-              
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Payment Successful!
-              </h1>
-              
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                Welcome to LightPrompt Soul-Tech! Your cosmic journey begins now.
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-teal-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
+        <CardHeader className="text-center pb-6">
+          <div className="mx-auto mb-4 w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+          </div>
+          <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {details.title}
+          </CardTitle>
+          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+            {details.description}
+          </CardDescription>
+        </CardHeader>
 
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 mb-8">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                  What happens next:
-                </h3>
-                <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-teal-500 flex-shrink-0" />
-                    <span>Your purchase has been confirmed</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-teal-500 flex-shrink-0" />
-                    <span>You now have full access to your purchased content</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-teal-500 flex-shrink-0" />
-                    <span>Explore the Soul Map Explorer with premium features</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-teal-500 flex-shrink-0" />
-                    <span>Access your personalized Oracle consultations</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  onClick={() => setLocation('/soul-map-explorer')}
-                  className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Explore Your Soul Map
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-                
-                <Button
-                  onClick={() => setLocation('/chat')}
-                  variant="outline"
-                  className="border-teal-500 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Chat with Oracle
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Additional Resources */}
-          <div className="mt-12 bg-teal-50 dark:bg-teal-900/20 rounded-xl p-8">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-              Your LightPrompt Journey
+        <CardContent className="space-y-6">
+          <div className="bg-gradient-to-r from-teal-50 to-purple-50 dark:from-teal-900/20 dark:to-purple-900/20 rounded-xl p-6">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-teal-600" />
+              What's Next
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Sparkles className="w-6 h-6 text-teal-500" />
+            <div className="space-y-3">
+              {details.nextSteps.map((step, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-teal-600 dark:bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-sm font-semibold">{index + 1}</span>
+                  </div>
+                  <span className="text-gray-700 dark:text-gray-300">{step}</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Real Astronomical Data
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-start gap-3">
+              <Star className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium text-amber-900 dark:text-amber-100 mb-1">
+                  Welcome to Your Conscious AI Journey
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Experience live planetary positions and current cosmic weather for authentic readings
-                </p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="w-6 h-6 text-teal-500" />
-                </div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Career-Focused Guidance
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Discover your ideal career path through VibeMatch scoring and SoulSync alignment
+                <p className="text-amber-800 dark:text-amber-200 text-sm">
+                  You've joined a community focused on authentic self-discovery through AI as a tool for reflection, not replacement of human wisdom.
                 </p>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={() => setLocation('/dashboard')}
+              className="flex-1 bg-teal-600 hover:bg-teal-700 text-white h-12"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              {details.cta}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation('/soul-map-explorer')}
+              className="flex-1 h-12"
+            >
+              Explore Soul Map
+            </Button>
+          </div>
+
+          <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Questions? Email us at{' '}
+              <a href="mailto:support@lightprompt.co" className="text-teal-600 hover:underline">
+                support@lightprompt.co
+              </a>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

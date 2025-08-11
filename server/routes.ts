@@ -3173,6 +3173,24 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Stripe one-time payment route
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, productName } = req.body;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          productName: productName
+        }
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error("Payment intent creation error:", error);
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
   // Stripe subscription route
   app.post("/api/create-subscription", async (req, res) => {
     try {
