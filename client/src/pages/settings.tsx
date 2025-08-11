@@ -1,443 +1,361 @@
 import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import type { UploadResult } from "@uppy/core";
-import { apiRequest } from "@/lib/queryClient";
-import { 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Moon, 
-  Sun, 
-  Volume2, 
-  VolumeX,
-  Mail,
-  Phone,
-  Lock,
-  Camera,
-  Save,
-  Loader2
-} from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Settings as SettingsIcon, Shield, Users, Bell, User, RefreshCw } from "lucide-react";
 
-export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState({
-    reflection: true,
-    community: true,
-    challenges: false,
-    marketing: false
-  });
-  const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    bio: "",
-    location: "",
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    avatarUrl: ""
-  });
+interface UserProfile {
+  userId: string;
+  soulSyncEnabled: boolean;
+  soulSyncVisibility: 'private' | 'friends' | 'public';
+  matchingPreferences: {
+    ageRange?: [number, number];
+    location?: string;
+    interests?: string[];
+    wellnessGoals?: string[];
+  };
+  privacySettings: {
+    dataSharing: 'private' | 'friends' | 'public';
+    profileVisibility: 'private' | 'friends' | 'public';
+    locationSharing: boolean;
+    activityVisible: boolean;
+  };
+  preferences: {
+    notifications?: {
+      email: boolean;
+      push: boolean;
+      soulSyncUpdates: boolean;
+      weeklyReports: boolean;
+    };
+    theme?: 'light' | 'dark' | 'auto';
+  };
+}
+
+export default function Settings() {
   const { toast } = useToast();
-
-  // Load user data on mount
+  const queryClient = useQueryClient();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  // Load current user from storage
   useEffect(() => {
-    const initializeUser = async () => {
-      try {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-          setProfile({
-            name: parsedUser.name || "",
-            email: parsedUser.email || "",
-            bio: parsedUser.bio || "",
-            location: parsedUser.location || "",
-            timezone: parsedUser.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-            avatarUrl: parsedUser.avatarUrl || ""
-          });
-        }
-      } catch (error) {
-        console.error('Failed to load user:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load user data",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // Fetch user profile from Supabase
+  const { data: profile, isLoading: profileLoading, refetch } = useQuery({
+    queryKey: ['/api/auth/profile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
+      if (!response.ok) {
+        // Create default profile if doesn't exist
+        return {
+          userId: currentUser.id,
+          soulSyncEnabled: false,
+          soulSyncVisibility: 'private',
+          matchingPreferences: {},
+          privacySettings: {
+            dataSharing: 'private',
+            profileVisibility: 'friends',
+            locationSharing: false,
+            activityVisible: true,
+          },
+          preferences: {
+            notifications: {
+              email: true,
+              push: true,
+              soulSyncUpdates: true,
+              weeklyReports: false,
+            },
+            theme: 'light',
+          },
+        };
       }
+      return response.json();
+    },
+    enabled: !!currentUser?.id,
+  });
+
+  // Update Soul Sync settings mutation
+  const updateSettingsMutation = useMutation({
+    mutationFn: async (settings: Partial<UserProfile>) => {
+      const response = await fetch('/api/auth/soul-sync-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser?.id,
+          settings,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to update settings');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Settings Updated",
+        description: "Your Soul Sync preferences have been saved to Supabase database.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/profile'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Settings update error:', error);
+    },
+  });
+
+  const handleSoulSyncToggle = (enabled: boolean) => {
+    updateSettingsMutation.mutate({
+      soulSyncEnabled: enabled,
+      privacySettings: profile?.privacySettings || {
+        dataSharing: 'private',
+        profileVisibility: 'friends',
+        locationSharing: false,
+        activityVisible: true,
+      },
+    });
+  };
+
+  const handleVisibilityChange = (visibility: 'private' | 'friends' | 'public') => {
+    updateSettingsMutation.mutate({
+      soulSyncVisibility: visibility,
+      privacySettings: {
+        ...profile?.privacySettings,
+        profileVisibility: visibility,
+      },
+    });
+  };
+
+  const handlePrivacyChange = (key: string, value: any) => {
+    const newPrivacySettings = {
+      ...profile?.privacySettings,
+      [key]: value,
     };
-
-    initializeUser();
-  }, []);
-
-  // Initialize theme on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('lightprompt-theme');
-    if (savedTheme === 'dark') {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    } else {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  const handleSaveProfile = async () => {
-    if (!user) return;
     
-    setSaving(true);
-    try {
-      const response = await apiRequest('PUT', `/api/users/${user.id}/profile`, profile);
-      
-      // Update local storage and user state
-      const updatedUser = { ...user, ...profile };
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been saved successfully.",
-      });
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save profile. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setSaving(false);
-    }
+    updateSettingsMutation.mutate({
+      privacySettings: newPrivacySettings,
+    });
   };
 
-  const handleSaveNotifications = async () => {
-    if (!user) return;
-    
-    try {
-      await apiRequest('PUT', `/api/users/${user.id}/notifications`, notifications);
-      
-      toast({
-        title: "Notification Settings Updated",
-        description: "Your preferences have been saved.",
-      });
-    } catch (error) {
-      console.error('Failed to save notifications:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save notification settings.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest('POST', '/api/objects/upload');
-    return {
-      method: 'PUT' as const,
-      url: response.uploadURL,
-    };
-  };
-
-  const handleAvatarUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    if (!user || result.successful.length === 0) return;
-    
-    setUploading(true);
-    try {
-      const uploadURL = result.successful[0].uploadURL;
-      
-      // Update user avatar
-      const updatedProfile = { ...profile, avatarUrl: uploadURL };
-      setProfile(updatedProfile);
-      
-      // Save to backend
-      await apiRequest('PUT', `/api/users/${user.id}/avatar`, { avatarUrl: uploadURL });
-      
-      // Update local storage
-      const updatedUser = { ...user, avatarUrl: uploadURL };
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      
-      toast({
-        title: "Avatar Updated",
-        description: "Your profile photo has been uploaded successfully.",
-      });
-    } catch (error) {
-      console.error('Failed to save avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save profile photo.",
-        variant: "destructive"
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  if (loading) {
+  if (!currentUser) {
     return (
-      <div className="max-w-4xl mx-auto p-6 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-4xl mx-auto p-6 flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
-          <p className="text-gray-600">Please sign in to access your settings.</p>
-        </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Card className="p-8 text-center">
+          <User className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <h2 className="text-xl font-bold mb-2">Sign In Required</h2>
+          <p className="text-gray-600 mb-4">You need to be signed in to access settings.</p>
+          <Button onClick={() => window.location.href = '/chat'}>
+            Sign In
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Account Settings</h1>
-        <p className="text-muted-foreground">Manage your LightPrompt experience</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <SettingsIcon className="w-8 h-8 text-teal-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={profileLoading}
+              className="ml-auto"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${profileLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+          <p className="text-gray-600">
+            Manage your LightPrompt account and Soul Sync preferences stored in Supabase
+          </p>
+          {currentUser.email && (
+            <p className="text-sm text-teal-600 mt-1">
+              Signed in as: {currentUser.email}
+            </p>
+          )}
+        </div>
 
-      {/* Profile Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Profile Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Avatar className="w-20 h-20">
-                <AvatarImage src={profile.avatarUrl} />
-                <AvatarFallback className="text-xl">
-                  {profile.name ? profile.name.charAt(0).toUpperCase() : 'LP'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-1 -right-1">
-                <ObjectUploader
-                  maxNumberOfFiles={1}
-                  maxFileSize={5242880} // 5MB
-                  onGetUploadParameters={handleGetUploadParameters}
-                  onComplete={handleAvatarUploadComplete}
-                  buttonClassName="w-8 h-8 p-0 bg-teal-600 hover:bg-teal-700 rounded-full"
-                >
-                  {uploading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  ) : (
-                    <Camera className="w-4 h-4 text-white" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Soul Sync Settings */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Users className="w-6 h-6 text-teal-600" />
+                <h2 className="text-xl font-bold">Soul Sync Settings</h2>
+              </div>
+
+              {profileLoading ? (
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Enable Soul Sync */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-sm font-medium">Enable Soul Sync</Label>
+                      <p className="text-sm text-gray-600">
+                        Connect with wellness buddies and share your journey
+                      </p>
+                    </div>
+                    <Switch
+                      checked={profile?.soulSyncEnabled || false}
+                      onCheckedChange={handleSoulSyncToggle}
+                      disabled={updateSettingsMutation.isPending}
+                    />
+                  </div>
+
+                  {profile?.soulSyncEnabled && (
+                    <>
+                      {/* Profile Visibility */}
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">
+                          Profile Visibility
+                        </Label>
+                        <Select
+                          value={profile.soulSyncVisibility}
+                          onValueChange={handleVisibilityChange}
+                          disabled={updateSettingsMutation.isPending}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select visibility" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="private">Private - Only me</SelectItem>
+                            <SelectItem value="friends">Friends - Connected users only</SelectItem>
+                            <SelectItem value="public">Public - Anyone can find me</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Data Sharing */}
+                      <div>
+                        <Label className="text-sm font-medium mb-3 block">
+                          Data Sharing Preferences
+                        </Label>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Share wellness metrics</span>
+                            <Switch
+                              checked={profile.privacySettings?.activityVisible !== false}
+                              onCheckedChange={(checked) =>
+                                handlePrivacyChange('activityVisible', checked)
+                              }
+                              disabled={updateSettingsMutation.isPending}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Share location data</span>
+                            <Switch
+                              checked={profile.privacySettings?.locationSharing || false}
+                              onCheckedChange={(checked) =>
+                                handlePrivacyChange('locationSharing', checked)
+                              }
+                              disabled={updateSettingsMutation.isPending}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   )}
-                </ObjectUploader>
+                </div>
+              )}
+            </Card>
+
+            {/* Privacy Settings */}
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Shield className="w-6 h-6 text-teal-600" />
+                <h2 className="text-xl font-bold">Privacy & Security</h2>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Badge variant="secondary" className="text-xs">
-                {user.tier === 'admin' ? 'Admin' : user.tier === 'free' ? 'Free Tier' : 'Premium'}
-              </Badge>
-              <p className="text-sm text-muted-foreground">
-                Click camera icon to upload photo
-              </p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Display Name</Label>
-              <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({...profile, name: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={profile.email}
-                onChange={(e) => setProfile({...profile, email: e.target.value})}
-              />
-            </div>
-          </div>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Data Retention Policy
+                  </Label>
+                  <p className="text-sm text-gray-600">
+                    All data is stored securely in Supabase with end-to-end encryption.
+                    You can request data deletion at any time.
+                  </p>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                placeholder="Tell us about your journey..."
-                value={profile.bio}
-                onChange={(e) => setProfile({...profile, bio: e.target.value})}
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                placeholder="Where are you based?"
-                value={profile.location}
-                onChange={(e) => setProfile({...profile, location: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="timezone">Timezone</Label>
-            <Input
-              id="timezone"
-              value={profile.timezone}
-              onChange={(e) => setProfile({...profile, timezone: e.target.value})}
-              placeholder="e.g., America/Los_Angeles"
-            />
-          </div>
-
-          <Button onClick={handleSaveProfile} disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Profile
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Notification Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notification Preferences
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base">Daily Reflection Reminders</Label>
-                <p className="text-sm text-muted-foreground">
-                  Get gentle nudges for your reflection practice
-                </p>
+                <div className="pt-4 border-t">
+                  <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+                    Request Data Deletion
+                  </Button>
+                </div>
               </div>
-              <Switch
-                checked={notifications.reflection}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, reflection: checked})
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base">Community Updates</Label>
-                <p className="text-sm text-muted-foreground">
-                  New posts, comments, and connections
-                </p>
-              </div>
-              <Switch
-                checked={notifications.community}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, community: checked})
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base">Challenge Notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Updates on your wellness challenges
-                </p>
-              </div>
-              <Switch
-                checked={notifications.challenges}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, challenges: checked})
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base">Newsletter & Updates</Label>
-                <p className="text-sm text-muted-foreground">
-                  Product updates and conscious tech insights
-                </p>
-              </div>
-              <Switch
-                checked={notifications.marketing}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, marketing: checked})
-                }
-              />
-            </div>
+            </Card>
           </div>
 
-          <Button onClick={handleSaveNotifications}>
-            <Save className="w-4 h-4 mr-2" />
-            Save Notification Settings
-          </Button>
-        </CardContent>
-      </Card>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Account Status */}
+            <Card className="p-6">
+              <h3 className="font-bold mb-4">Account Status</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Plan:</span>
+                  <span className="font-medium">{currentUser.tier || 'Free'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Storage:</span>
+                  <span className="text-teal-600 font-medium">Supabase</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Auth Status:</span>
+                  <span className="text-green-600 font-medium">Connected</span>
+                </div>
+              </div>
+            </Card>
 
-      {/* Appearance Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Appearance
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-base">Dark Mode</Label>
-              <p className="text-sm text-muted-foreground">
-                Switch to dark theme for better evening reflection
-              </p>
-            </div>
-            <Switch
-              checked={isDarkMode}
-              onCheckedChange={(checked) => {
-                setIsDarkMode(checked);
-                // Apply theme immediately
-                if (checked) {
-                  document.documentElement.classList.add('dark');
-                  localStorage.setItem('lightprompt-theme', 'dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                  localStorage.setItem('lightprompt-theme', 'light');
-                }
-              }}
-            />
+            {/* Quick Actions */}
+            <Card className="p-6">
+              <h3 className="font-bold mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => window.location.href = '/soul-sync'}
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  View Soul Sync
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => window.location.href = '/chat'}
+                >
+                  <SettingsIcon className="w-4 h-4 mr-2" />
+                  Chat Settings
+                </Button>
+              </div>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="text-center pt-6">
-        <p className="text-sm text-muted-foreground">
-          Changes are saved automatically to your LightPrompt account.
-        </p>
+        </div>
       </div>
     </div>
   );

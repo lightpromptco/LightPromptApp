@@ -47,6 +47,39 @@ export const userProfiles = pgTable("user_profiles", {
   badges: text("badges").array().default([]),
   evolutionScore: integer("evolution_score").default(0),
   privacySettings: jsonb("privacy_settings").default({}), // privacy and consent settings
+  soulSyncEnabled: boolean("soul_sync_enabled").notNull().default(false),
+  soulSyncVisibility: text("soul_sync_visibility").default("private"), // private, friends, public
+  matchingPreferences: jsonb("matching_preferences").default({}), // Soul Sync matching criteria
+  birthData: jsonb("birth_data").default({}), // astrological birth information
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Soul Sync Connection Requests and Management
+export const soulSyncConnections = pgTable("soul_sync_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requesterId: varchar("requester_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  targetId: varchar("target_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected, blocked
+  connectionType: text("connection_type").default("wellness_buddy"), // wellness_buddy, accountability_partner, etc.
+  sharedDataTypes: text("shared_data_types").array().default([]), // mood, habits, wellness_metrics, etc.
+  privacyLevel: text("privacy_level").default("basic"), // basic, detailed, full
+  approvedAt: timestamp("approved_at"),
+  blockedAt: timestamp("blocked_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Soul Sync Data Sharing Permissions
+export const soulSyncPermissions = pgTable("soul_sync_permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  connectionId: varchar("connection_id").notNull().references(() => soulSyncConnections.id, { onDelete: "cascade" }),
+  dataType: text("data_type").notNull(), // wellness_metrics, habits, mood, goals, etc.
+  accessLevel: text("access_level").notNull().default("read"), // read, write, none
+  autoSync: boolean("auto_sync").notNull().default(false),
+  syncFrequency: text("sync_frequency").default("daily"), // realtime, hourly, daily, weekly
+  expiresAt: timestamp("expires_at"), // optional expiry for temporary sharing
+  createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
@@ -382,6 +415,29 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
   badges: true,
   evolutionScore: true,
   privacySettings: true,
+  soulSyncEnabled: true,
+  soulSyncVisibility: true,
+  matchingPreferences: true,
+  birthData: true,
+});
+
+export const insertSoulSyncConnectionSchema = createInsertSchema(soulSyncConnections).pick({
+  requesterId: true,
+  targetId: true,
+  status: true,
+  connectionType: true,
+  sharedDataTypes: true,
+  privacyLevel: true,
+});
+
+export const insertSoulSyncPermissionSchema = createInsertSchema(soulSyncPermissions).pick({
+  userId: true,
+  connectionId: true,
+  dataType: true,
+  accessLevel: true,
+  autoSync: true,
+  syncFrequency: true,
+  expiresAt: true,
 });
 
 export const insertAccessCodeSchema = createInsertSchema(accessCodes).pick({

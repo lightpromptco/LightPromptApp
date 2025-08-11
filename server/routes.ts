@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { registerAuthRoutes } from "./routes/auth.js";
 import { storage } from "./storage";
 import { analyticsRouter } from "./routes/analytics";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
@@ -113,6 +114,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })();
 
+  
+  // Register authentication routes for Supabase integration
+  registerAuthRoutes(app);
   
   // Analytics and admin routes
   app.use('/api', analyticsRouter);
