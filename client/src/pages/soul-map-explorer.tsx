@@ -1179,30 +1179,8 @@ export default function SoulMapExplorerPage() {
               </CardHeader>
               
               <CardContent className="p-6">
-                {/* Modern Oracle Grid - Professional Design */}
-                <div className="grid grid-cols-3 gap-4">
-                  {/* Daily Oracle */}
-                  <Button
-                    onClick={() => {
-                      setCurrentMessage("What cosmic guidance does my chart offer for today's energy and how can I align with my highest self?");
-                      setCurrentView('chat');
-                    }}
-                    variant="ghost"
-                    className="h-32 p-4 bg-gradient-to-br from-white to-amber-50 border-2 border-amber-200 hover:border-amber-300 hover:from-amber-50 hover:to-amber-100 transition-all duration-300 rounded-lg"
-                  >
-                    <div className="flex flex-col items-center justify-center h-full space-y-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
-                        <Sun className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-amber-900">Daily Oracle</div>
-                        <div className="text-xs text-amber-700 opacity-80">Today's cosmic guidance</div>
-                      </div>
-                    </div>
-                  </Button>
-
-
-
+                {/* Modern Oracle Grid - 2 Column Design */}
+                <div className="grid grid-cols-2 gap-6">
                   {/* Moon Wisdom */}
                   <Button
                     onClick={() => {
@@ -1210,15 +1188,15 @@ export default function SoulMapExplorerPage() {
                       setCurrentView('chat');
                     }}
                     variant="ghost"
-                    className="h-32 p-4 bg-gradient-to-br from-white to-purple-50 border-2 border-purple-200 hover:border-purple-300 hover:from-purple-50 hover:to-purple-100 transition-all duration-300 rounded-lg"
+                    className="h-36 p-6 bg-gradient-to-br from-white to-purple-50 border-2 border-purple-200 hover:border-purple-300 hover:from-purple-50 hover:to-purple-100 transition-all duration-300 rounded-lg"
                   >
-                    <div className="flex flex-col items-center justify-center h-full space-y-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
-                        <Moon className="w-4 h-4 text-white" />
+                    <div className="flex flex-col items-center justify-center h-full space-y-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
+                        <Moon className="w-5 h-5 text-white" />
                       </div>
                       <div className="text-center">
-                        <div className="font-semibold text-purple-900">Moon Wisdom</div>
-                        <div className="text-xs text-purple-700 opacity-80">Lunar cycle guidance</div>
+                        <div className="font-semibold text-purple-900 text-lg">Moon Wisdom</div>
+                        <div className="text-sm text-purple-700 opacity-80">Lunar cycle guidance</div>
                       </div>
                     </div>
                   </Button>
@@ -1230,15 +1208,15 @@ export default function SoulMapExplorerPage() {
                       setCurrentView('chat');
                     }}
                     variant="ghost"
-                    className="h-32 p-4 bg-gradient-to-br from-white to-emerald-50 border-2 border-emerald-200 hover:border-emerald-300 hover:from-emerald-50 hover:to-emerald-100 transition-all duration-300 rounded-lg"
+                    className="h-36 p-6 bg-gradient-to-br from-white to-emerald-50 border-2 border-emerald-200 hover:border-emerald-300 hover:from-emerald-50 hover:to-emerald-100 transition-all duration-300 rounded-lg"
                   >
-                    <div className="flex flex-col items-center justify-center h-full space-y-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
-                        <Target className="w-4 h-4 text-white" />
+                    <div className="flex flex-col items-center justify-center h-full space-y-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
+                        <Target className="w-5 h-5 text-white" />
                       </div>
                       <div className="text-center">
-                        <div className="font-semibold text-emerald-900">Career Path</div>
-                        <div className="text-xs text-emerald-700 opacity-80">Professional guidance</div>
+                        <div className="font-semibold text-emerald-900 text-lg">Career Path</div>
+                        <div className="text-sm text-emerald-700 opacity-80">Professional guidance</div>
                       </div>
                     </div>
                   </Button>
@@ -1337,60 +1315,61 @@ export default function SoulMapExplorerPage() {
                     if (sign) {
                       return (
                         <>
-                          <div className="text-center space-y-3">
-                            <div className="text-6xl mb-2">{sign.symbol}</div>
-                            <div>
-                              <h3 className="text-xl font-bold">{sign.name}</h3>
+                          {/* Header with sign info */}
+                          <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
+                            <div className="text-5xl">{sign.symbol}</div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-1">
+                                <h3 className="text-2xl font-bold">{sign.name}</h3>
+                                <Badge className={`bg-gradient-to-r ${sign.color} text-white text-sm px-3 py-1`}>
+                                  {sign.element} Sign
+                                </Badge>
+                              </div>
                               <p className="text-sm text-muted-foreground">{sign.dates}</p>
-                            </div>
-                            <Badge className={`bg-gradient-to-r ${sign.color} text-white text-sm px-3 py-1`}>
-                              {sign.element} Sign
-                            </Badge>
-                          </div>
-
-                          <div className="space-y-4">
-                            <div>
-                              <h4 className="font-medium mb-2 flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 text-yellow-500" />
-                                Core Traits
-                              </h4>
-                              <div className="flex flex-wrap gap-1">
-                                {sign.traits.map((trait, index) => (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {sign.traits.slice(0, 4).map((trait, index) => (
                                   <Badge key={index} variant="secondary" className="text-xs">
                                     {trait}
                                   </Badge>
                                 ))}
                               </div>
                             </div>
-
-                            <div>
-                              <h4 className="font-medium mb-2 flex items-center gap-2">
-                                <Target className="w-4 h-4 text-blue-500" />
-                                Soul Purpose
-                              </h4>
-                              <p className="text-sm text-muted-foreground leading-relaxed">{sign.soulPurpose}</p>
-                            </div>
-
-                            <div>
-                              <h4 className="font-medium mb-2 flex items-center gap-2">
-                                <TrendingUp className="w-4 h-4 text-green-500" />
-                                Growth Challenge
-                              </h4>
-                              <p className="text-sm text-muted-foreground leading-relaxed">{sign.challenge}</p>
-                            </div>
-
-                            <Button
-                              onClick={() => {
-                                setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life. I'd like to understand this sign's influence on my personality and soul purpose.`);
-                                setCurrentView('chat');
-                              }}
-                              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                              size="sm"
-                            >
-                              <Bot className="w-3 h-3 mr-2" />
-                              Ask Oracle About {sign.name}
-                            </Button>
                           </div>
+
+                          {/* Compact Content Grid */}
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="font-medium mb-2 flex items-center gap-2">
+                                  <Target className="w-4 h-4 text-blue-500" />
+                                  Soul Purpose
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{sign.soulPurpose}</p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="font-medium mb-2 flex items-center gap-2">
+                                  <TrendingUp className="w-4 h-4 text-green-500" />
+                                  Growth Challenge
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{sign.challenge}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => {
+                              setCurrentMessage(`Tell me more about ${sign.name} energy and how it shows up in my life. I'd like to understand this sign's influence on my personality and soul purpose.`);
+                              setCurrentView('chat');
+                            }}
+                            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                            size="sm"
+                          >
+                            <Bot className="w-3 h-3 mr-2" />
+                            Ask Oracle About {sign.name}
+                          </Button>
                         </>
                       );
                     }
