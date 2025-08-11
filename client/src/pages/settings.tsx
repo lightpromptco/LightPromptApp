@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Settings as SettingsIcon, Shield, Users, Bell, User, RefreshCw, HelpCircle, Mail, ChevronRight } from "lucide-react";
+import { Settings as SettingsIcon, Shield, Users, Bell, User, RefreshCw, HelpCircle, Mail, ChevronRight, Star, Heart, MapPin, Mountain, BookOpen, Bot } from "lucide-react";
 
 interface UserProfile {
   userId: string;
@@ -184,14 +184,24 @@ export default function Settings() {
   };
 
   const handlePrivacyChange = (key: string, value: any) => {
-    const newPrivacySettings = {
-      ...profile?.privacySettings,
-      [key]: value,
-    };
-    
-    updateSettingsMutation.mutate({
-      privacySettings: newPrivacySettings,
-    });
+    if (key === 'astrology' || key === 'vibeMatch' || key === 'geoPrompt' || key === 'visionQuest' || key === 'bots' || key === 'notifications') {
+      const updatedSettings = {
+        preferences: {
+          ...profile?.preferences,
+          [key]: value,
+        },
+      };
+      updateSettingsMutation.mutate(updatedSettings);
+    } else {
+      const newPrivacySettings = {
+        ...profile?.privacySettings,
+        [key]: value,
+      };
+      
+      updateSettingsMutation.mutate({
+        privacySettings: newPrivacySettings,
+      });
+    }
   };
 
   if (!currentUser) {
@@ -241,6 +251,318 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="space-y-6">
           
+          {/* Soul Map & Astrology - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Star className="w-4 h-4 text-purple-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Soul Map & Astrology</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Personalized astrological insights and birth chart analysis</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Birth Chart Calculations</div>
+                  <div className="text-sm text-gray-500">High-precision Swiss Ephemeris calculations</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.astrology?.enableCalculations !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('astrology', { 
+                    ...profile?.preferences?.astrology, 
+                    enableCalculations: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Career Path Guidance</div>
+                  <div className="text-sm text-gray-500">AI-powered career insights based on your chart</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.astrology?.careerGuidance !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('astrology', { 
+                    ...profile?.preferences?.astrology, 
+                    careerGuidance: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* VibeMatch - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                  <Heart className="w-4 h-4 text-pink-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">VibeMatch</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Resonance-based connections and compatibility scoring</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4">
+                <div className="text-base font-medium text-gray-900 mb-3">Profile Photo</div>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                      Upload Photo
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-1">Only shown after mutual resonance match</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">VibeMatch Discovery</div>
+                  <div className="text-sm text-gray-500">Allow others to find you for connections</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.vibeMatch?.discoverable !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('vibeMatch', { 
+                    ...profile?.preferences?.vibeMatch, 
+                    discoverable: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-pink-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* GeoPrompt - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <MapPin className="w-4 h-4 text-green-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">GeoPrompt</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Location-based mindfulness and reflection</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Location Tracking</div>
+                  <div className="text-sm text-gray-500">Enable GPS for location-based check-ins</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.geoPrompt?.locationEnabled !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('geoPrompt', { 
+                    ...profile?.preferences?.geoPrompt, 
+                    locationEnabled: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-green-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Public Check-ins</div>
+                  <div className="text-sm text-gray-500">Share your location reflections publicly</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.geoPrompt?.publicCheckins !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('geoPrompt', { 
+                    ...profile?.preferences?.geoPrompt, 
+                    publicCheckins: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-green-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Vision Quest - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                  <Mountain className="w-4 h-4 text-orange-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Vision Quest</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Gamified inner development and spiritual practices</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Quest Notifications</div>
+                  <div className="text-sm text-gray-500">Reminders for daily practices and stages</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.visionQuest?.notifications !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('visionQuest', { 
+                    ...profile?.preferences?.visionQuest, 
+                    notifications: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-orange-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Progress Sharing</div>
+                  <div className="text-sm text-gray-500">Share your quest achievements publicly</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.visionQuest?.shareProgress !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('visionQuest', { 
+                    ...profile?.preferences?.visionQuest, 
+                    shareProgress: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-orange-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Course Access & Purchases - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-4 h-4 text-indigo-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Course & Purchases</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Manage your LightPrompt course access and products</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="text-base font-medium text-gray-900">Course Access</div>
+                    <div className="text-sm text-gray-500">LightPrompt:Ed Conscious AI Course</div>
+                  </div>
+                  <span className={`px-3 py-1 text-xs rounded-full ${
+                    currentUser?.courseAccess ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {currentUser?.courseAccess ? 'Active' : 'No Access'}
+                  </span>
+                </div>
+                {currentUser?.courseAccess && (
+                  <Button variant="outline" size="sm" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50">
+                    Continue Course
+                  </Button>
+                )}
+              </div>
+              
+              <div className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="text-base font-medium text-gray-900">Account Tier</div>
+                    <div className="text-sm text-gray-500">Current subscription level</div>
+                  </div>
+                  <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 capitalize">
+                    {currentUser?.tier || 'Free'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Bots & Companions - Apple-style card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-cyan-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">AI Companions</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Configure your AI bot interactions and preferences</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">LightPromptBot</div>
+                  <div className="text-sm text-gray-500">Conscious AI companion for reflection</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.bots?.lightpromptbot !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('bots', { 
+                    ...profile?.preferences?.bots, 
+                    lightpromptbot: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-cyan-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">BodyMirror</div>
+                  <div className="text-sm text-gray-500">Wellness tracker and energy reflection</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.bots?.bodymirror !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('bots', { 
+                    ...profile?.preferences?.bots, 
+                    bodymirror: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-cyan-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">SoulMap Oracle</div>
+                  <div className="text-sm text-gray-500">Astrological guidance and insights</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.bots?.soulmap !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('bots', { 
+                    ...profile?.preferences?.bots, 
+                    soulmap: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-cyan-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">VisionQuest Guide</div>
+                  <div className="text-sm text-gray-500">Inner development and quest guidance</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.bots?.visionquest !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('bots', { 
+                    ...profile?.preferences?.bots, 
+                    visionquest: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-cyan-600"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Soul Sync - Apple-style card */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
@@ -426,6 +748,38 @@ export default function Settings() {
                   onCheckedChange={(checked) => handlePrivacyChange('notifications', { 
                     ...profile?.preferences?.notifications, 
                     weeklyReports: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-blue-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">Astrological Events</div>
+                  <div className="text-sm text-gray-500">Moon phases, planetary transits, and cosmic events</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.notifications?.astrology !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('notifications', { 
+                    ...profile?.preferences?.notifications, 
+                    astrology: checked 
+                  })}
+                  disabled={updateSettingsMutation.isPending}
+                  className="data-[state=checked]:bg-blue-600"
+                />
+              </div>
+              
+              <div className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-base font-medium text-gray-900">VibeMatch Connections</div>
+                  <div className="text-sm text-gray-500">New resonance matches and messages</div>
+                </div>
+                <Switch
+                  checked={profile?.preferences?.notifications?.vibeMatch !== false}
+                  onCheckedChange={(checked) => handlePrivacyChange('notifications', { 
+                    ...profile?.preferences?.notifications, 
+                    vibeMatch: checked 
                   })}
                   disabled={updateSettingsMutation.isPending}
                   className="data-[state=checked]:bg-blue-600"
