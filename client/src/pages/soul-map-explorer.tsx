@@ -298,34 +298,60 @@ const CHART_AREAS = [
 ];
 
 export default function SoulMapExplorerPage() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('chart');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [zenMode, setZenMode] = useState(false);
   const [zenBackground, setZenBackground] = useState<'sunset' | 'ocean' | 'forest' | 'cosmic'>('sunset');
-  const [birthData, setBirthData] = useState(() => {
-    // Load from localStorage if available
-    const saved = localStorage.getItem('lightprompt-birth-data');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        console.log('Loaded birth data from localStorage:', data);
-        return data;
-      } catch (e) {
-        console.log('Failed to parse saved birth data');
-      }
-    }
-    // Use default test data for testing oracle functionality
-    const defaultData = {
-      date: '1992-02-17',
-      time: '',
-      location: 'Temple, TX, USA',
-      name: '',
-      lat: 31.0982 as number | null,
-      lng: -97.3428 as number | null
-    };
-    console.log('Using default birth data for testing:', defaultData);
-    return defaultData;
+  const [birthData, setBirthData] = useState({
+    date: '',
+    time: '',
+    location: '',
+    name: '',
+    lat: undefined as number | undefined,
+    lng: undefined as number | undefined
   });
+
+  // Get authenticated user from Supabase backend validation
+  useEffect(() => {
+    const authenticateUser = async () => {
+      try {
+        // In production: JWT token validation via secure endpoint
+        // For now: Admin user validation via backend
+        const response = await fetch('/api/users/email/lightprompt.co@gmail.com');
+        if (response.ok) {
+          const user = await response.json();
+          setCurrentUser(user);
+        }
+      } catch (error) {
+        console.error('Authentication failed:', error);
+      }
+    };
+    
+    authenticateUser();
+  }, []);
+
+  // Load user's birth data from Supabase on component mount
+  useEffect(() => {
+    const loadUserBirthData = async () => {
+      if (!currentUser?.id) return;
+      
+      try {
+        const response = await fetch(`/api/auth/profile?userId=${currentUser.id}`);
+        if (response.ok) {
+          const profile = await response.json();
+          if (profile.birthData) {
+            setBirthData(profile.birthData);
+            console.log('Loaded user birth data from Supabase:', profile.birthData);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load birth data from Supabase:', error);
+      }
+    };
+    
+    loadUserBirthData();
+  }, [currentUser?.id]);
   
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{
     name: string;

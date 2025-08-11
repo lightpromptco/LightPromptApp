@@ -51,17 +51,20 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - **API Design**: RESTful API for users, chat sessions, messages, and file uploads
 - **Development**: Hot reload via Vite middleware integration
 
-### Data Storage
-- **CRITICAL: SUPABASE IS THE STORAGE FOR EVERYTHING** - All user data, dashboard elements, VibeMatch, SoulSync, GeoPrompt, and every piece of user information MUST be pulled from Supabase
-- **Database**: PostgreSQL (Supabase) via Drizzle ORM - PRIMARY AND ONLY storage source
+### Data Storage Architecture 
+- **CRITICAL DISTINCTION: USER DATA vs LIGHTPROMPT KNOWLEDGE**
+  - **USER DATA (Supabase)**: Birth data, profiles, connections, wellness metrics, settings, chat sessions - ALL stored in Supabase PostgreSQL
+  - **LIGHTPROMPT KNOWLEDGE (Local)**: Astrology calculations, oracle responses, product info, bot personalities, course content - stored locally for accuracy and performance
+- **Database**: PostgreSQL (Supabase) via Drizzle ORM for USER DATA ONLY
 - **Schema Management**: Drizzle Kit for migrations  
-- **Storage Strategy**: DatabaseStorage implementation for data persistence - NO localStorage usage
+- **Storage Strategy**: DatabaseStorage implementation for user data persistence - NO localStorage for user data
 - **File Storage**: Google Cloud Storage with object access control
 - **Privacy Architecture**: User-isolated data with UUID-based account separation in Supabase
-- **Birth Data**: Stored EXCLUSIVELY in Supabase userProfiles table, never localStorage
-- **Chat Privacy**: All conversations tied to individual user sessions in Supabase database
-- **Dashboard Data**: ALL dashboard elements pull from Supabase - wellness metrics, connections, profiles, settings
-- **DATA INTEGRITY GUARANTEE**: Every data point displayed to users must be sourced from authenticated Supabase database queries - zero tolerance for mock, placeholder, synthetic data, or localStorage fallbacks. Real user connections, real wellness metrics, real astrological calculations, real profile data only from Supabase.
+- **Birth Data**: User birth data stored in Supabase userProfiles table, astrology calculations performed locally
+- **Chat Privacy**: User conversations stored in Supabase, oracle responses generated locally
+- **Dashboard Data**: ALL user dashboard elements pull from Supabase - wellness metrics, connections, profiles, settings
+- **Two-Way Sync**: Supabase updates user data across all widgets and visible data on lightprompt.co
+- **DATA INTEGRITY GUARANTEE**: Every USER data point displayed must be sourced from authenticated Supabase database queries - zero tolerance for mock, placeholder, synthetic data, or localStorage fallbacks for user information.
 
 ### Authentication and Authorization
 - **User Management**: Simple user creation and retrieval with email-based identification
