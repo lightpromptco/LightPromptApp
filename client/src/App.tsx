@@ -48,6 +48,8 @@ import CheckoutSuccess from "@/pages/checkout/success";
 import ContactSalesPage from "@/pages/contact-sales";
 import { SimpleOraclePage } from "@/pages/simple-oracle";
 import Features from "@/pages/Features";
+import DevTools from "@/pages/DevTools";
+import DiscordStyleDashboard from "@/pages/DiscordStyleDashboard";
 
 import CosmicDebugConsole from "@/pages/cosmic-debug";
 import ApiExplorer from "@/pages/api-explorer";
@@ -133,6 +135,10 @@ function Router() {
           <Features />
         </MainLayout>
       )} />
+      
+      {/* Discord + Apple Hybrid Interface */}
+      <Route path="/dev-tools" component={DevTools} />
+      <Route path="/community-hub" component={DiscordStyleDashboard} />
       <Route path="/geoprompt" component={() => (
         <MainLayout>
           <GeoPromptPage />

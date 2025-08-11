@@ -5,7 +5,7 @@ LightPrompt is a privacy-first, soul-tech wellness platform evolved into a digit
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic, Stripe-style navigation.
+Design preferences: **DISCORD + APPLE HYBRID** - Discord's powerful functionality and developer tools combined with Apple's sleek, polished design aesthetic. User wants "Discord's functionality, developer tools for users and everything" with "the look and sleekness of Apple".
 Content personality: Alan Watts meets Yuval Noah Harari meets Ologies podcast host - witty, philosophical, accessible science.
 Core philosophy: AI as conscious tool for human reflection and self-connection - never AI becoming human. AI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection.
 **ABSOLUTE DATA INTEGRITY MANDATE: LightPrompt is 1000000% honest - ALL data must be real user data from authenticated sources. NO mock data, placeholder data, fake data, or synthetic fallbacks EVER. Every metric, connection, wellness data point, astrological calculation, and user profile element must be sourced from actual database queries and authentic user input.**
@@ -88,6 +88,14 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - `/admin/settings` provides a developer mode toggle for `lightprompt.co@gmail.com` for Wix.com-style editing capabilities.
 
 ### Feature Specifications
+
+#### **Discord + Apple Hybrid Interface**
+- **Developer Tools (`/dev-tools`)**: Discord-style powerful functionality with Apple's sleek design - API keys management, webhooks, analytics dashboard, integrations panel
+- **Community Hub (`/community-hub`)**: Discord-style real-time community interface with channels, voice rooms, user presence, but Apple's clean aesthetic
+- **DiscordAppleNavigation**: Premium navigation bar combining Discord's feature richness with Apple's minimalist design
+- **Developer Console**: Professional-grade tools for API exploration, database viewing, system monitoring - like Discord's bot developer tools but for wellness/AI
+
+#### **Core Features**
 - **Soul Map Explorer**: Interactive astrological birth chart with cosmic aesthetics, accurate sun sign calculation, and expert oracle responses. Streamlined interface with Aquarius Soul Summary integrated at top, eliminating duplicate information throughout sidebar and redundant sections.
 - **Career Path Guidance**: Integrated VibeMatch and SoulSync systems providing personalized career direction based on astrological analysis, including ideal careers, natural talents, work styles, and professional timing insights
 - **Oracle System**: Fixed JSON parsing bug, now provides complete astrological readings with birth data context and traditional meanings, enhanced with career-focused guidance
