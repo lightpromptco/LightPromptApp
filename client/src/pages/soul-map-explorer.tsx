@@ -1162,67 +1162,92 @@ export default function SoulMapExplorerPage() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Enhanced Oracle Interface */}
-          <div className="lg:col-span-2">
-            <Card className={`transition-all duration-300 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-white border-gray-200 shadow-sm'}`}>
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                    <Stars className="w-6 h-6 text-white" />
+        {/* Integrated Soul Summary - Moved from separate Aquarius card */}
+        {chartData?.sun && (() => {
+          const sunSign = ZODIAC_SIGNS.find(s => s.id === chartData.sun.sign);
+          return sunSign ? (
+            <Card className="bg-gradient-to-br from-slate-50 to-white border-slate-200 shadow-sm mb-8">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl">{sunSign.symbol}</div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                        {sunSign.name} Soul Summary
+                        <Badge className={`bg-gradient-to-r ${sunSign.color} text-white text-sm px-3 py-1`}>
+                          {sunSign.element} Sign
+                        </Badge>
+                      </CardTitle>
+                      <p className="text-sm text-gray-600">{sunSign.dates} • Your Cosmic Blueprint</p>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-xl font-bold text-gray-900">Soul Oracle Gateway</CardTitle>
-                    <p className="text-sm text-gray-600">Deep cosmic insights tailored to your unique chart</p>
+                  <div className="flex flex-wrap gap-1">
+                    {sunSign.traits.slice(0, 4).map((trait, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {trait}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               </CardHeader>
               
-              <CardContent className="p-6">
-                {/* Modern Oracle Grid - 2 Column Design */}
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Moon Wisdom */}
-                  <Button
-                    onClick={() => {
-                      setCurrentMessage(`What does the current moon phase "${getCurrentMoonPhase()}" mean for my spiritual journey and how does it interact with my birth chart?`);
-                      setCurrentView('chat');
-                    }}
-                    variant="ghost"
-                    className="h-36 p-6 bg-gradient-to-br from-white to-purple-50 border-2 border-purple-200 hover:border-purple-300 hover:from-purple-50 hover:to-purple-100 transition-all duration-300 rounded-lg"
-                  >
-                    <div className="flex flex-col items-center justify-center h-full space-y-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
-                        <Moon className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-purple-900 text-lg">Moon Wisdom</div>
-                        <div className="text-sm text-purple-700 opacity-80">Lunar cycle guidance</div>
-                      </div>
+              <CardContent className="pt-0">
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-500" />
+                      Soul Purpose
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed">{sunSign.soulPurpose}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      Growth Challenge
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed">{sunSign.challenge}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Bot className="w-4 h-4 text-purple-500" />
+                      Oracle Access
+                    </h4>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => {
+                          setCurrentMessage(`What does the current moon phase "${getCurrentMoonPhase()}" mean for my spiritual journey and how does it interact with my birth chart?`);
+                          setCurrentView('chat');
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start text-xs"
+                      >
+                        <Moon className="w-3 h-3 mr-2" />
+                        Moon Wisdom
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setCurrentMessage("Based on my astrological chart, what career paths and professional opportunities align with my soul purpose? How can I find work that feels deeply fulfilling and matches my natural talents?");
+                          setCurrentView('chat');
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start text-xs"
+                      >
+                        <Target className="w-3 h-3 mr-2" />
+                        Career Path
+                      </Button>
                     </div>
-                  </Button>
-
-                  {/* Career Path */}
-                  <Button
-                    onClick={() => {
-                      setCurrentMessage("Based on my astrological chart, what career paths and professional opportunities align with my soul purpose? How can I find work that feels deeply fulfilling and matches my natural talents?");
-                      setCurrentView('chat');
-                    }}
-                    variant="ghost"
-                    className="h-36 p-6 bg-gradient-to-br from-white to-emerald-50 border-2 border-emerald-200 hover:border-emerald-300 hover:from-emerald-50 hover:to-emerald-100 transition-all duration-300 rounded-lg"
-                  >
-                    <div className="flex flex-col items-center justify-center h-full space-y-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
-                        <Target className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-emerald-900 text-lg">Career Path</div>
-                        <div className="text-sm text-emerald-700 opacity-80">Professional guidance</div>
-                      </div>
-                    </div>
-                  </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          ) : null;
+        })()}
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Simplified layout without duplicate oracle section */}
+          <div className="lg:col-span-2">
           </div>
 
           {/* Planet/Sign Details */}
@@ -1389,26 +1414,6 @@ export default function SoulMapExplorerPage() {
                 </CardContent>
               </Card>
             )}
-
-            {/* Modern Daily Oracle Widget */}
-            <Card className={`border border-orange-200 transition-all duration-300 hover:shadow-lg hover:border-orange-300 ${zenMode ? 'bg-white/10 backdrop-blur-md border-white/20' : 'bg-gradient-to-br from-orange-50 to-amber-50'}`}>
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-7 h-7 text-white" />
-                </div>
-                <h3 className={`text-xl font-bold mb-2 ${zenMode ? 'text-white' : 'text-gray-900'}`}>Daily Oracle</h3>
-                <p className={`text-sm mb-5 leading-relaxed ${zenMode ? 'text-white/80' : 'text-gray-600'}`}>
-                  Get your personalized cosmic guidance for today
-                </p>
-                <Button 
-                  onClick={() => window.location.href = '/daily-oracle'}
-                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium px-6 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
-                  size="sm"
-                >
-                  Get Daily Guidance
-                </Button>
-              </CardContent>
-            </Card>
 
           </div>
         </div>
