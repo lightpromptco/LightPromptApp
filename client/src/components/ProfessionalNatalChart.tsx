@@ -235,8 +235,8 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
           </CardContent>
         </Card>
       ) : chartData ? (
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="chart">Chart Wheel</TabsTrigger>
             <TabsTrigger value="planets">Planets</TabsTrigger>
             <TabsTrigger value="houses">Houses</TabsTrigger>
@@ -329,11 +329,12 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
                     {/* Planets */}
                     {chartData.planets.map((planet, i) => {
                       // Calculate angle based on sign and degree
-                      const signIndex = Object.keys(ZODIAC_SYMBOLS).indexOf(planet.sign);
-                      const totalDegree = (signIndex * 30) + planet.degree;
+                      const signOrder = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
+                      const signIndex = signOrder.indexOf(planet.sign);
+                      const totalDegree = (signIndex * 30) + (planet.degree % 30);
                       const angle = totalDegree - 90;
                       const radian = (angle * Math.PI) / 180;
-                      const radius = 140 - (i * 3); // Stagger planets slightly
+                      const radius = 140 - (i * 4); // Stagger planets more for visibility
                       const x = 200 + Math.cos(radian) * radius;
                       const y = 200 + Math.sin(radian) * radius;
                       
@@ -342,17 +343,19 @@ export function ProfessionalNatalChart({ birthData }: ProfessionalNatalChartProp
                           <circle
                             cx={x}
                             cy={y}
-                            r="12"
+                            r="14"
                             fill="white"
                             stroke="#4f46e5"
                             strokeWidth="2"
+                            className="drop-shadow-sm"
                           />
                           <text
                             x={x}
                             y={y}
                             textAnchor="middle"
                             dominantBaseline="central"
-                            className="text-sm font-bold fill-indigo-600"
+                            className="text-base font-bold fill-indigo-600 select-none"
+                            title={`${planet.planet} in ${planet.sign} at ${formatDegree(planet.degree)} - House ${planet.house}`}
                           >
                             {planet.symbol}
                           </text>
