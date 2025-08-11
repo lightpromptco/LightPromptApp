@@ -3786,5 +3786,73 @@ ${new Date().toLocaleString()}
   }
 
   const httpServer = createServer(app);
+  // Admin dashboard endpoints - REAL DATA ONLY
+  app.get("/api/admin/platform-stats", async (req, res) => {
+    try {
+      // Get real user count from database
+      const totalUsers = await storage.getUserCount();
+      const newUsersToday = await storage.getNewUsersToday();
+      const activeSessions = await storage.getActiveSessionsCount();
+      const avgSessionLength = await storage.getAverageSessionLength();
+
+      res.json({
+        totalUsers,
+        newUsersToday,
+        activeSessions,
+        avgSessionLength
+      });
+    } catch (error) {
+      console.error('Error fetching platform stats:', error);
+      res.status(500).json({ error: 'Failed to fetch platform statistics' });
+    }
+  });
+
+  app.get("/api/admin/user-activity", async (req, res) => {
+    try {
+      // Get real recent user activity from database
+      const users = await storage.getRecentUserActivity(20);
+      res.json({ users });
+    } catch (error) {
+      console.error('Error fetching user activity:', error);
+      res.status(500).json({ error: 'Failed to fetch user activity' });
+    }
+  });
+
+  app.get("/api/admin/connections-stats", async (req, res) => {
+    try {
+      // Get real Soul Sync connection data from database
+      const totalConnections = await storage.getSoulSyncConnectionsCount();
+      const activeConnections = await storage.getActiveSoulSyncConnections();
+      const connections = await storage.getRecentSoulSyncConnections(10);
+
+      res.json({
+        totalConnections,
+        activeConnections,
+        connections
+      });
+    } catch (error) {
+      console.error('Error fetching connections stats:', error);
+      res.status(500).json({ error: 'Failed to fetch connections statistics' });
+    }
+  });
+
+  app.get("/api/admin/system-health", async (req, res) => {
+    try {
+      // Check real system health metrics
+      const dbHealth = await storage.checkDatabaseHealth();
+      const apiHealth = await storage.checkApiHealth();
+
+      res.json({
+        status: dbHealth.connected && apiHealth.healthy ? 'healthy' : 'warning',
+        uptime: Math.floor((Date.now() - startTime) / 1000 / 60), // minutes
+        database: dbHealth,
+        api: apiHealth
+      });
+    } catch (error) {
+      console.error('Error checking system health:', error);
+      res.status(500).json({ error: 'Failed to check system health' });
+    }
+  });
+
   return httpServer;
 }

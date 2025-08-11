@@ -8,6 +8,7 @@ Preferred communication style: Simple, everyday language.
 Design preferences: Apple-style modern structure with teal accents, clean minimalist aesthetic, Stripe-style navigation.
 Content personality: Alan Watts meets Yuval Noah Harari meets Ologies podcast host - witty, philosophical, accessible science.
 Core philosophy: AI as conscious tool for human reflection and self-connection - never AI becoming human. AI serves as a mirror to help humans connect to their highest selves, nature, and each other through honest reflection.
+**ABSOLUTE DATA INTEGRITY MANDATE: LightPrompt is 1000000% honest - ALL data must be real user data from authenticated sources. NO mock data, placeholder data, fake data, or synthetic fallbacks EVER. Every metric, connection, wellness data point, astrological calculation, and user profile element must be sourced from actual database queries and authentic user input.**
 Navigation: Clean "Store" section only, hates "Products" terminology, prefers professional simplicity.
 Pricing: Course $120, Ebook $11, Bundle $125 (saves $99) - no "WooWoo" terminology, now called "CosmosBot" and "Soul Map & Cosmos".
 Domain transition: Moving to lightprompt.co as main landing page.
@@ -58,6 +59,7 @@ Soul Sync Architecture: Operates like Apple Health for sharing wellness data, NO
 - **Privacy Architecture**: User-isolated data with UUID-based account separation
 - **Birth Data**: Stored in browser localStorage + optional userProfiles table (user-specific only)
 - **Chat Privacy**: All conversations tied to individual user sessions, no cross-user data access
+- **DATA INTEGRITY GUARANTEE**: Every data point displayed to users must be sourced from authenticated database queries - zero tolerance for mock, placeholder, or synthetic data. Real user connections, real wellness metrics, real astrological calculations, real profile data only.
 
 ### Authentication and Authorization
 - **User Management**: Simple user creation and retrieval with email-based identification
