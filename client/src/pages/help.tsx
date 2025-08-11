@@ -183,10 +183,10 @@ export default function HelpPage() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => window.open('mailto:support@lightprompt.co')}
+                onClick={() => window.open('mailto:lightprompt.co@gmail.com')}
                 className="border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950"
               >
-                support@lightprompt.co
+                lightprompt.co@gmail.com
               </Button>
             </CardContent>
           </Card>
