@@ -320,6 +320,36 @@ export default function SoulMapExplorerPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
+  // Calculate sun sign from birth date
+  const calculateSunSign = (birthDate: string): string => {
+    const date = new Date(birthDate);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return 'aries';
+    else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return 'taurus';
+    else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return 'gemini';
+    else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return 'cancer';
+    else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return 'leo';
+    else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return 'virgo';
+    else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return 'libra';
+    else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return 'scorpio';
+    else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return 'sagittarius';
+    else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return 'capricorn';
+    else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return 'aquarius';
+    else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return 'pisces';
+    return 'aquarius'; // default for edge cases
+  };
+
+  // Auto-select user's sun sign when birth data is available
+  useEffect(() => {
+    if (birthData.date && !selectedPlanet) {
+      const sunSign = calculateSunSign(birthData.date);
+      setSelectedPlanet(sunSign);
+      console.log(`Auto-selected sun sign: ${sunSign} for birth date: ${birthData.date}`);
+    }
+  }, [birthData.date, selectedPlanet]);
+
   // Save birth data to localStorage whenever it changes
   useEffect(() => {
     if (birthData.date || birthData.time || birthData.location || birthData.name) {
