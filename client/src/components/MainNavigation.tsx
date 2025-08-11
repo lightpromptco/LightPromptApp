@@ -336,10 +336,10 @@ export function MainNavigation() {
             </div>
           )}
 
-          {/* Products Section */}
+          {/* Solutions Section */}
           <div className="space-y-2 border-t pt-4">
             <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Products
+              Solutions
             </div>
             {PRODUCT_ITEMS.map((item) => {
               const active = isActive(item.path);
