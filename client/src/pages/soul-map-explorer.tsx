@@ -275,7 +275,7 @@ const CHART_AREAS = [
 ];
 
 export default function SoulMapExplorerPage() {
-  const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('welcome');
+  const [currentView, setCurrentView] = useState<'welcome' | 'chart' | 'chat'>('chart');
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [birthData, setBirthData] = useState(() => {
     // Load from localStorage if available
@@ -679,6 +679,7 @@ export default function SoulMapExplorerPage() {
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                 style={{ left: `${x}%`, top: `${y}%` }}
                 onClick={() => {
+                  console.log('Zodiac sign clicked:', sign.name);
                   setSelectedPlanet(sign.id);
                   setCurrentMessage(`Tell me about ${sign.name} in my birth chart and how it influences my soul journey`);
                   setCurrentView('chat');
@@ -707,6 +708,7 @@ export default function SoulMapExplorerPage() {
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                 style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
                 onClick={() => {
+                  console.log('Planet clicked:', planet.name);
                   setSelectedPlanet(planet.id);
                   setCurrentMessage(`Tell me about ${planet.name} in my birth chart and how it shapes my cosmic blueprint`);
                   setCurrentView('chat');
@@ -780,6 +782,9 @@ export default function SoulMapExplorerPage() {
     
     const userMessage = currentMessage;
     setCurrentMessage('');
+    console.log('Sending oracle message:', userMessage);
+    console.log('Birth data:', birthData);
+    console.log('Selected planet:', selectedPlanet);
     setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     
     setIsGenerating(true);
@@ -791,8 +796,10 @@ export default function SoulMapExplorerPage() {
         selectedPlanet
       });
       
+      console.log('Oracle response:', response);
       setChatMessages(prev => [...prev, { role: 'assistant', content: response.response }]);
     } catch (error) {
+      console.error('Oracle error:', error);
       toast({
         title: "Oracle Unavailable",
         description: "The cosmic oracle is temporarily offline. Try again soon.",
@@ -931,6 +938,14 @@ export default function SoulMapExplorerPage() {
             <Button variant="outline" onClick={() => setCurrentView('welcome')}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Edit Birth Data
+            </Button>
+            <Button variant="outline" onClick={() => {
+              console.log('Debug: Test button clicked');
+              setSelectedPlanet('aries');
+              setCurrentMessage('Tell me about Aries in my birth chart');
+              setCurrentView('chat');
+            }}>
+              Test Oracle
             </Button>
           </div>
         </div>
