@@ -43,7 +43,7 @@ import StorePage from "@/pages/store";
 import CheckoutPage from "@/pages/checkout";
 import CheckoutSuccess from "@/pages/checkout/success";
 import { SimpleOraclePage } from "@/pages/simple-oracle";
-import CleanOraclePage from "@/pages/clean-oracle";
+
 import CosmicDebugConsole from "@/pages/cosmic-debug";
 import ApiExplorer from "@/pages/api-explorer";
 import DataViewer from "@/pages/data-viewer";
@@ -243,7 +243,7 @@ function Router() {
           <SimpleOraclePage />
         </MainLayout>
       )} />
-      <Route path="/daily-oracle" component={CleanOraclePage} />
+
       <Route path="/cosmic-debug" component={CosmicDebugConsole} />
       <Route path="/api-explorer" component={ApiExplorer} />
       <Route path="/data-viewer" component={DataViewer} />
