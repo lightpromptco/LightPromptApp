@@ -647,7 +647,7 @@ export default function SoulMapExplorerPage() {
   const InteractiveChart = () => (
     <div className="relative w-[500px] h-[500px] mx-auto">
       {/* Cosmic background with animated starfield */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-black overflow-hidden shadow-2xl border-4 border-gradient-to-r from-yellow-400 via-purple-500 to-cyan-400">
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-slate-800 via-purple-900 to-indigo-900 overflow-hidden shadow-2xl border-4 border-teal-400/60">
         {/* Animated cosmic dust */}
         <div className="absolute inset-0 opacity-30">
           {[...Array(30)].map((_, i) => (
@@ -665,7 +665,7 @@ export default function SoulMapExplorerPage() {
         </div>
         
         {/* Zodiac outer ring */}
-        <div className="absolute inset-8 border-2 border-yellow-400/50 rounded-full bg-gradient-to-br from-purple-800/20 to-blue-800/20 backdrop-blur-sm">
+        <div className="absolute inset-8 border-2 border-teal-400/60 rounded-full bg-gradient-to-br from-teal-800/10 to-purple-800/10 backdrop-blur-sm">
           {/* Zodiac wheel segments with enhanced interaction */}
           {ZODIAC_SIGNS.map((sign, index) => {
             const angle = (index * 30) - 90; // 30 degrees per sign, starting at top
@@ -680,12 +680,12 @@ export default function SoulMapExplorerPage() {
                 style={{ left: `${x}%`, top: `${y}%` }}
                 onClick={() => setSelectedPlanet(sign.id)}
               >
-                <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${sign.color} shadow-2xl flex items-center justify-center text-white text-2xl font-bold transform transition-all duration-500 hover:scale-125 hover:rotate-12 border-2 border-white/30 ${selectedPlanet === sign.id ? 'ring-4 ring-yellow-400/60 scale-125 shadow-yellow-400/50' : ''}`}>
+                <div className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${sign.color} shadow-2xl flex items-center justify-center text-white text-2xl font-bold transform transition-all duration-500 hover:scale-125 hover:rotate-12 border-2 border-teal-200/40 ${selectedPlanet === sign.id ? 'ring-4 ring-teal-400/80 scale-125 shadow-teal-400/50' : ''}`}>
                   {/* Glowing effect */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
                   <span className="relative z-10 drop-shadow-lg">{sign.emoji}</span>
                 </div>
-                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-2 rounded-lg shadow-lg">
+                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-teal-600 to-purple-600 text-white px-3 py-2 rounded-lg shadow-lg border border-teal-400/30">
                   <div className="font-bold">{sign.name}</div>
                   <div className="text-xs opacity-80">{sign.dates}</div>
                 </div>
@@ -695,7 +695,7 @@ export default function SoulMapExplorerPage() {
         </div>
 
         {/* Inner planetary system */}
-        <div className="absolute inset-16 rounded-full bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-white/20">
+        <div className="absolute inset-16 rounded-full bg-gradient-to-br from-teal-600/5 to-purple-600/5 border border-teal-400/20">
           {CHART_AREAS.map((planet) => {
             return (
               <div
@@ -704,12 +704,12 @@ export default function SoulMapExplorerPage() {
                 style={{ left: `${planet.coordinates.x}%`, top: `${planet.coordinates.y}%` }}
                 onClick={() => setSelectedPlanet(planet.id)}
               >
-                <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl flex items-center justify-center transform transition-all duration-500 hover:scale-125 hover:-translate-y-1 border-2 border-white/40 ${selectedPlanet === planet.id ? 'ring-4 ring-cyan-400/60 scale-125 shadow-cyan-400/50' : ''}`}>
+                <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 shadow-xl flex items-center justify-center transform transition-all duration-500 hover:scale-125 hover:-translate-y-1 border-2 border-teal-400/40 ${selectedPlanet === planet.id ? 'ring-4 ring-teal-400/80 scale-125 shadow-teal-400/50' : ''}`}>
                   {/* Planet glow effect */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
                   <planet.icon className={`w-6 h-6 ${planet.color} relative z-10 drop-shadow-lg`} />
                 </div>
-                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-2 rounded-lg shadow-lg border border-white/20">
+                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-sm font-medium text-center whitespace-nowrap bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-2 rounded-lg shadow-lg border border-teal-400/30">
                   <div className="font-bold">{planet.name}</div>
                   <div className="text-xs opacity-80">{planet.description.split(' ').slice(0, 3).join(' ')}...</div>
                 </div>
@@ -728,7 +728,7 @@ export default function SoulMapExplorerPage() {
             }}
           >
             {/* Multi-layered glow effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-200/50 via-orange-300/50 to-red-400/50 animate-spin" style={{ animationDuration: '8s' }}></div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-200/50 via-orange-300/50 to-purple-400/50 animate-spin" style={{ animationDuration: '8s' }}></div>
             <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/40 to-transparent animate-pulse"></div>
             <Sun className="w-12 h-12 text-white relative z-10 animate-pulse drop-shadow-2xl" />
             
@@ -736,7 +736,7 @@ export default function SoulMapExplorerPage() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-0.5 h-8 bg-gradient-to-t from-transparent to-yellow-300 origin-bottom opacity-60"
+                className="absolute w-0.5 h-8 bg-gradient-to-t from-transparent to-teal-300 origin-bottom opacity-60"
                 style={{
                   transform: `rotate(${i * 45}deg) translateY(-40px)`,
                   animationDelay: `${i * 0.2}s`
@@ -748,21 +748,21 @@ export default function SoulMapExplorerPage() {
         
         {/* Mystical corner elements */}
         <div className="absolute top-8 left-8 transform -rotate-12">
-          <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse drop-shadow-lg" />
+          <Sparkles className="w-8 h-8 text-teal-400 animate-pulse drop-shadow-lg" />
         </div>
         <div className="absolute bottom-8 right-8 transform rotate-12">
-          <Stars className="w-8 h-8 text-blue-400 animate-pulse drop-shadow-lg" />
+          <Stars className="w-8 h-8 text-purple-400 animate-pulse drop-shadow-lg" />
         </div>
         <div className="absolute top-8 right-8 transform rotate-12">
           <Moon className="w-8 h-8 text-indigo-300 animate-bounce drop-shadow-lg" />
         </div>
         <div className="absolute bottom-8 left-8 transform -rotate-12">
-          <Eye className="w-8 h-8 text-teal-400 animate-pulse drop-shadow-lg" />
+          <Eye className="w-8 h-8 text-cyan-400 animate-pulse drop-shadow-lg" />
         </div>
         
         {/* Cosmic energy rings */}
-        <div className="absolute inset-12 border border-white/10 rounded-full animate-spin" style={{ animationDuration: '30s' }}></div>
-        <div className="absolute inset-20 border border-purple-400/20 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}></div>
+        <div className="absolute inset-12 border border-teal-400/15 rounded-full animate-spin" style={{ animationDuration: '30s' }}></div>
+        <div className="absolute inset-20 border border-purple-400/15 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}></div>
       </div>
     </div>
   );
@@ -776,7 +776,7 @@ export default function SoulMapExplorerPage() {
     
     setIsGenerating(true);
     try {
-      const response = await apiRequest('POST', '/api/chat/oracle', {
+      const response = await apiRequest('POST', '/api/chat/soulmap', {
         message: userMessage,
         context: 'soul_map_exploration',
         birthData,
