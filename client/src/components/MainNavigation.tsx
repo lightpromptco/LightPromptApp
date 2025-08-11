@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronRight
 } from "lucide-react";
+import { DevToolsMenu } from "./DevToolsMenu";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
@@ -94,7 +95,8 @@ export function MainNavigation() {
   return (
     <>
       {/* Navigation Menu Button - Top Right Corner */}
-      <div className="fixed top-3 right-3 z-50">
+      <div className="fixed top-3 right-3 z-50 flex items-center gap-2">
+        {isAdmin && <DevToolsMenu />}
         <Button
           variant="outline"
           size="sm"
@@ -235,7 +237,7 @@ export function MainNavigation() {
           {isAdmin && (
             <div className="space-y-2 border-t pt-4">
               <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Admin
+                Admin & Developer Tools
               </div>
               <Link href="/admin/content">
                 <Button
@@ -255,6 +257,36 @@ export function MainNavigation() {
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
                   Universal Visual Editor
+                </Button>
+              </Link>
+              <Link href="/cosmic-debug">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Cosmic Debug Console
+                </Button>
+              </Link>
+              <Link href="/api-explorer">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  API Explorer
+                </Button>
+              </Link>
+              <Link href="/data-viewer">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  variant="ghost"
+                  className="w-full justify-start text-sm"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Database Viewer
                 </Button>
               </Link>
             </div>

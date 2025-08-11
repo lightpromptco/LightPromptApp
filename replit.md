@@ -73,6 +73,14 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - **Content Management System**: Admin panel for editing any page content, sections, buttons, links, colors, and metadata.
 - **Blog Integration**: Full article management and search functionality.
 
+### Advanced Developer Features (Power User Tools)
+- **Cosmic Debug Console** (`/cosmic-debug`): Real-time system monitoring, astrological calculation debugging, API performance metrics, and live data visualization for technical analysis
+- **API Explorer** (`/api-explorer`): Interactive API documentation and testing interface with request/response analysis, cURL generation, endpoint testing, and comprehensive API schema exploration
+- **Database Viewer** (`/data-viewer`): Complete database structure explorer with live data viewing, query analytics, table relationships, and sensitive data masking capabilities
+- **Visual Page Editor** (`/admin/page-editor`): Advanced content management with drag-and-drop editing, live preview, and WYSIWYG capabilities for non-technical content updates
+- **DevTools Menu**: Terminal-style developer navigation accessible to admin users, providing quick access to all technical tools and system monitoring features
+- **Enhanced Soul Map Explorer**: Advanced mode with technical data overlays, calculation breakdowns, and detailed astrological computation analysis for power users
+
 ## External Dependencies
 - **Database**: Supabase (PostgreSQL)
 - **Payments**: Stripe
