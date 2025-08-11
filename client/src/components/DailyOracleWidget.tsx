@@ -76,7 +76,7 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
 
   if (!birthData) {
     return (
-      <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm">
+      <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm oracle-widget-v2">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <Sparkles className="w-5 h-5 text-amber-500" />
@@ -101,11 +101,11 @@ export function DailyOracleWidget({ birthData }: DailyOracleProps) {
   }
 
   return (
-    <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm">
+    <Card className="bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 shadow-sm oracle-widget-v2">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200 text-base">
           <Sparkles className="w-5 h-5 text-amber-500" />
-          Daily Oracle
+          Daily Oracle ✨
         </CardTitle>
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <Calendar className="w-3 h-3" />
