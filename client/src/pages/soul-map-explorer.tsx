@@ -52,6 +52,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { InteractiveNatalChart } from "@/components/InteractiveNatalChart";
+import { CareerModeWidget } from "@/components/CareerModeWidget";
 
 // Soul-tech helper functions
 const getCurrentMoonPhase = () => {
@@ -1316,6 +1317,9 @@ export default function SoulMapExplorerPage() {
 
           {/* Planet/Sign Details */}
           <div className="space-y-6">
+            {/* Career Mode Widget */}
+            <CareerModeWidget />
+            
             {(() => {
               // Check if it's a sign (zodiac sign) first, and don't render anything
               const isSign = ZODIAC_SIGNS.find(s => s.id === selectedPlanet);

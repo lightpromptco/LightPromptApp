@@ -31,7 +31,6 @@ const NAV_ITEMS = [
     glyph: "✦",
     subItems: [
       { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
-      { path: "/career-mode", label: "Career Mode", icon: Compass, description: "Astrological Career Guidance" },
       { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
       { path: "/geoprompt", label: "GeoPrompt (Beta)", icon: Map, description: "Location-Based Mindfulness" }
     ]
