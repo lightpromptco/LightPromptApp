@@ -1381,6 +1381,68 @@ export default function SoulMapExplorerPage() {
 
           {/* Planet/Sign Details */}
           <div className="space-y-6">
+            {/* Career Blueprint Section - Always Visible */}
+            <div className="bg-gradient-to-br from-teal-50 to-blue-50 rounded-xl border border-teal-200 p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                <Briefcase className="h-5 w-5 text-teal-600" />
+                Your Cosmic Career Blueprint
+              </h3>
+              
+              {/* VibeMatch Score */}
+              <div className="mb-4 p-4 bg-white rounded-lg border border-teal-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      VM
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">VibeMatch Score</h4>
+                      <p className="text-xs text-gray-600">Career-path compatibility with your cosmic blueprint</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-teal-600">65%</div>
+                </div>
+              </div>
+
+              {/* Career Details */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2 text-gray-800">Soul Purpose</h4>
+                  <p className="text-sm text-gray-600">
+                    Revolutionary and humanitarian, advancing society through innovation
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 text-gray-800">Ideal Careers</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Technology', 'Science', 'Social Activism', 'Innovation'].map((career, index) => (
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                        {career}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 text-gray-800">Natural Talents</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Innovation', 'Systems thinking', 'Social awareness'].map((talent, index) => (
+                      <span key={index} className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
+                        {talent}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 text-gray-800">Work Style</h4>
+                  <p className="text-sm text-gray-600">
+                    Innovative, humanitarian, works best with cutting-edge ideas
+                  </p>
+                </div>
+              </div>
+            </div>
             {(() => {
               // Check if it's a sign (zodiac sign) first, and don't render anything
               const isSign = ZODIAC_SIGNS.find(s => s.id === selectedPlanet);
