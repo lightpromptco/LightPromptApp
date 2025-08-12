@@ -38,6 +38,7 @@ import VisionQuestStagePage from "@/pages/vision-quest/stage";
 import ContentManagement from "@/pages/admin/content";
 import AdminSettings from "@/pages/admin/settings";
 import CommunityPage from "@/pages/community";
+import CareerModePage from "@/pages/career-mode";
 
 import SoulSyncPage from "@/pages/soul-sync";
 import StorePage from "@/pages/store";
@@ -178,6 +179,11 @@ function Router() {
       <Route path="/soul-map-explorer" component={() => (
         <MainLayout>
           <SoulMapExplorerPage />
+        </MainLayout>
+      )} />
+      <Route path="/career-mode" component={() => (
+        <MainLayout>
+          <CareerModePage />
         </MainLayout>
       )} />
       <Route path="/vision-quest" component={() => (
