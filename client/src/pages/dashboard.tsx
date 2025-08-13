@@ -113,6 +113,7 @@ export default function DashboardPage() {
     // Parse URL parameters to set initial view
     const urlParams = new URLSearchParams(window.location.search);
     const viewParam = urlParams.get('view');
+    // Force home view to show the widget dashboard by default
     return viewParam || 'home';
   });
   const [isAdmin, setIsAdmin] = useState(() => {
@@ -370,7 +371,12 @@ export default function DashboardPage() {
           {/* Use the main navigation instead of dropdown - it's redundant */}
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">{getViewName()}</h2>
-            <p className="text-gray-600">Use the sidebar navigation to explore different features</p>
+            <p className="text-gray-600">Current view: {activeView}</p>
+            {activeView !== 'home' && (
+              <Button onClick={() => setActiveView('home')} variant="outline" className="mt-2">
+                Go to Dashboard Home
+              </Button>
+            )}
           </div>
 
 
