@@ -42,12 +42,66 @@ type Quote = { text: string; author: string } | null;
 type CalEvent = { dt: Date; title: string };
 
 /** Get geolocation with fallback (USA center) */
-async function getGeo(): Promise<Geo> {
+// Enhanced location system with caching and privacy-first approach
+async function getGeo(userId?: string): Promise<Geo & { cached?: boolean; permission?: string }> {
+  // Check localStorage cache first (30 minute TTL)
+  const cacheKey = 'lightprompt_location_cache';
+  const cached = localStorage.getItem(cacheKey);
+  
+  if (cached) {
+    try {
+      const { lat, lon, timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      const thirtyMinutes = 30 * 60 * 1000;
+      
+      if (now - timestamp < thirtyMinutes) {
+        return { lat, lon, cached: true, permission: 'granted' };
+      }
+    } catch (e) {
+      localStorage.removeItem(cacheKey);
+    }
+  }
+
   return new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve({ lat: 39.8283, lon: -98.5795 });
+    if (!navigator.geolocation) {
+      return resolve({ lat: 40.0, lon: -100.0, permission: 'unavailable' });
+    }
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      () => resolve({ lat: 39.8283, lon: -98.5795 }),
+      (pos) => {
+        const location = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          permission: 'granted' as const
+        };
+        
+        // Cache location for 30 minutes
+        localStorage.setItem(cacheKey, JSON.stringify({
+          lat: location.lat,
+          lon: location.lon,
+          timestamp: Date.now()
+        }));
+        
+        // Optionally save to user profile (if userId provided)
+        if (userId) {
+          fetch(`/api/users/${userId}/location`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              latitude: location.lat,
+              longitude: location.lon,
+              locationPermission: 'granted',
+              locationLastUpdated: Date.now()
+            })
+          }).catch(err => console.log('Profile location update failed:', err));
+        }
+        
+        resolve(location);
+      },
+      (error) => {
+        const permission = error.code === 1 ? 'denied' : 'unknown';
+        resolve({ lat: 40.0, lon: -100.0, permission });
+      },
       { enableHighAccuracy: true, timeout: 6000 }
     );
   });
@@ -169,24 +223,28 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
   });
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Live data state
-  const [geo, setGeo] = useState<Geo | null>(null);
+  // Live data state with location status
+  const [geo, setGeo] = useState<(Geo & { cached?: boolean; permission?: string }) | null>(null);
   const [weather, setWeather] = useState<Weather>(null);
   const [quote, setQuote] = useState<Quote>(null);
   const [events, setEvents] = useState<CalEvent[]>([]);
+  const [locationStatus, setLocationStatus] = useState<'loading' | 'granted' | 'denied' | 'unavailable'>('loading');
 
   // Persist layout
   useEffect(() => {
     sessionStorage.setItem(`dashboard-layout-${userId}`, JSON.stringify(widgets));
   }, [widgets, userId]);
 
-  // Fetch live data
+  // Fetch live data with enhanced location handling
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const g = await getGeo();
+      setLocationStatus('loading');
+      const g = await getGeo(userId);
       if (!mounted) return;
       setGeo(g);
+      setLocationStatus(g.permission || 'unknown');
+      
       const [w, ev] = await Promise.all([
         fetchWeather(g.lat, g.lon),
         fetchCalendar(user?.calendarUrl),
@@ -198,7 +256,7 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       setEvents(ev);
     })();
     return () => { mounted = false; };
-  }, [user?.calendarUrl]);
+  }, [user?.calendarUrl, userId]);
 
   // --------------- DnD ---------------
   const handleDragEnd = (result: DropResult) => {
@@ -491,14 +549,39 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
 
   // ------- Weather (live) -------
   const renderWeatherWidget = (widget: Widget) => {
+    const getLocationStatusBadge = () => {
+      const badgeStyles = {
+        loading: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: '⏳' },
+        granted: { bg: 'bg-green-100', text: 'text-green-800', icon: '📍' },
+        denied: { bg: 'bg-red-100', text: 'text-red-800', icon: '🚫' },
+        unavailable: { bg: 'bg-gray-100', text: 'text-gray-800', icon: '❓' }
+      };
+      
+      const style = badgeStyles[locationStatus] || badgeStyles.unavailable;
+      const labels = {
+        loading: 'Getting Location',
+        granted: geo?.cached ? 'Location Cached' : 'Location Active',
+        denied: 'Location Denied',
+        unavailable: 'Location Unavailable'
+      };
+      
+      return (
+        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${style.bg} ${style.text} mb-2`}>
+          <span className="mr-1">{style.icon}</span>
+          {labels[locationStatus]}
+        </div>
+      );
+    };
+
     return (
       <div className="space-y-3 text-center">
+        {getLocationStatusBadge()}
         <div className="text-2xl mb-1">{weather?.emoji ?? '🌤️'}</div>
         <div className="text-lg font-semibold">{weather ? `${weather.tempF}°F` : '—'}</div>
         <div className="text-xs text-gray-600">{weather?.label ?? 'Locating…'}</div>
         {geo && (
           <div className="bg-cyan-50 p-2 rounded text-center text-xs text-cyan-700 mt-2">
-            {(Math.abs(geo.lat).toFixed(2))}°, {(Math.abs(geo.lon).toFixed(2))}°
+            {(Math.abs(geo.lat).toFixed(2))}°{geo.lat >= 0 ? 'N' : 'S'}, {(Math.abs(geo.lon).toFixed(2))}°{geo.lon >= 0 ? 'E' : 'W'}
           </div>
         )}
       </div>

@@ -61,6 +61,7 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - **Soul Map Birth Chart**: Implemented robust fallback system for birth chart calculations, now working with `/api/birth-chart` endpoint
 - **Payment Success Page**: Created comprehensive onboarding flow with product-specific guidance at `/payment-success`
 - **VibeMatch Settings Complete (August 13, 2025)**: Fully implemented Instagram-style settings page with complete Supabase integration across 6 sections - Profile Information, VibeMatch Profile, Notifications, Privacy & Security, Appearance, and Account. All settings persist to database with comprehensive user profiling system.
+- **Enhanced Location System (August 13, 2025)**: Implemented privacy-first location handling with 30-minute browser caching, optional profile storage, real-time permission status badges, and smart coordinate management for location-based features like weather, air quality, and circadian data
 - Daily Oracle redesigned with modern white/amber gradient design, accessible at `/daily-oracle` standalone page
 - Admin panel at `/admin/content` for editing pages, images, and fonts
 
