@@ -23,21 +23,121 @@ import {
 type Geo = { lat: number; lon: number };
 type AQ = { pm25: number; usAqi: number; source: string };
 type SunTimes = { sunriseISO: string; sunsetISO: string };
+type LocationStatus = 'granted' | 'denied' | 'unknown' | 'loading';
 
-// ---------- Helpers (simulated data for demo) ----------
-const getGeo = (): Promise<Geo> =>
-  new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve({ lat: 40.0, lon: -100.0 }); // US fallback
+// ---------- Location Storage and Caching ----------
+const LOCATION_CACHE_KEY = 'lightprompt_location_cache';
+const LOCATION_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+interface LocationCache {
+  lat: number;
+  lon: number;
+  timestamp: number;
+  permission: LocationStatus;
+}
+
+// Save location to localStorage cache
+const saveLocationCache = (location: Geo, permission: LocationStatus) => {
+  const cache: LocationCache = {
+    lat: location.lat,
+    lon: location.lon,
+    timestamp: Date.now(),
+    permission
+  };
+  localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(cache));
+};
+
+// Get location from localStorage cache
+const getLocationCache = (): LocationCache | null => {
+  try {
+    const cached = localStorage.getItem(LOCATION_CACHE_KEY);
+    if (!cached) return null;
+    
+    const cache: LocationCache = JSON.parse(cached);
+    const isExpired = Date.now() - cache.timestamp > LOCATION_CACHE_DURATION;
+    
+    if (isExpired) {
+      localStorage.removeItem(LOCATION_CACHE_KEY);
+      return null;
+    }
+    
+    return cache;
+  } catch {
+    return null;
+  }
+};
+
+// Save location to user profile (optional convenience storage)
+const saveLocationToProfile = async (userId: string, location: Geo, permission: LocationStatus) => {
+  try {
+    await fetch(`/api/users/${userId}/location`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        latitude: location.lat,
+        longitude: location.lon,
+        locationPermission: permission,
+        locationLastUpdated: new Date().toISOString()
+      })
+    });
+  } catch (error) {
+    console.log('Location profile save failed (non-critical):', error);
+  }
+};
+
+// Enhanced location getter with caching and status tracking
+const getGeo = async (userId?: string): Promise<{ location: Geo; status: LocationStatus }> => {
+  // Check cache first
+  const cached = getLocationCache();
+  if (cached && cached.permission === 'granted') {
+    return {
+      location: { lat: cached.lat, lon: cached.lon },
+      status: cached.permission
+    };
+  }
+
+  // If no geolocation support, return fallback
+  if (!navigator.geolocation) {
+    const fallback = { lat: 40.0, lon: -100.0 };
+    saveLocationCache(fallback, 'denied');
+    return { location: fallback, status: 'denied' };
+  }
+
+  return new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        resolve({
+      (pos) => {
+        const location = {
           lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-        }),
-      () => resolve({ lat: 40.0, lon: -100.0 }),
+          lon: pos.coords.longitude
+        };
+        
+        // Cache the location
+        saveLocationCache(location, 'granted');
+        
+        // Optionally save to user profile for convenience
+        if (userId) {
+          saveLocationToProfile(userId, location, 'granted');
+        }
+        
+        resolve({ location, status: 'granted' });
+      },
+      (error) => {
+        console.log('Geolocation error:', error.message);
+        const fallback = { lat: 40.0, lon: -100.0 };
+        const status: LocationStatus = error.code === 1 ? 'denied' : 'unknown';
+        
+        saveLocationCache(fallback, status);
+        
+        if (userId) {
+          saveLocationToProfile(userId, fallback, status);
+        }
+        
+        resolve({ location: fallback, status });
+      },
       { enableHighAccuracy: true, timeout: 6000 }
     );
   });
+};
 
 // Fetch real Kp index via server proxy (safe from CORS)
 async function fetchKp(): Promise<number> {
@@ -165,6 +265,7 @@ interface BodyMirrorProps {
 
 export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
   const [geo, setGeo] = useState<Geo | null>(null);
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('loading');
   const [kp, setKp] = useState<number>(0);
   const [wind, setWind] = useState<number>(0);
   const [aq, setAQ] = useState<AQ>({ pm25: 0, usAqi: 0, source: "Loading..." });
@@ -182,15 +283,16 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
     let mounted = true;
     (async () => {
       setLoading(true);
-      const g = await getGeo();
+      const { location, status } = await getGeo(userId);
       if (!mounted) return;
-      setGeo(g);
+      setGeo(location);
+      setLocationStatus(status);
 
       const [kpVal, windVal, aqVal, sunVal] = await Promise.all([
         fetchKp(),
         fetchSolarWind(),
-        fetchAirQuality(g.lat, g.lon),
-        fetchSunTimes(g.lat, g.lon),
+        fetchAirQuality(location.lat, location.lon),
+        fetchSunTimes(location.lat, location.lon),
       ]);
       if (!mounted) return;
 
@@ -203,7 +305,7 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [userId]);
 
   // Display helpers
   const formatWind = (v: number) => `${Math.round(v)} km/s`;
@@ -229,9 +331,27 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             BodyMirror Dashboard
           </h2>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
               LIVE DATA
+            </Badge>
+            {/* Location Status Indicator */}
+            <Badge 
+              variant="outline" 
+              className={`text-xs ${
+                locationStatus === 'granted' 
+                  ? 'border-green-500 text-green-700 bg-green-50' 
+                  : locationStatus === 'denied'
+                  ? 'border-red-500 text-red-700 bg-red-50'
+                  : locationStatus === 'loading'
+                  ? 'border-yellow-500 text-yellow-700 bg-yellow-50'
+                  : 'border-gray-500 text-gray-700 bg-gray-50'
+              }`}
+            >
+              {locationStatus === 'granted' ? '📍 Location Active' : 
+               locationStatus === 'denied' ? '🚫 Location Denied' :
+               locationStatus === 'loading' ? '⏳ Getting Location' : 
+               '❓ Location Unknown'}
             </Badge>
             <span className="text-sm text-muted-foreground">
               Real space weather, air quality, circadian & lunar tracking

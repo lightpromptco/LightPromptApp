@@ -3483,6 +3483,10 @@ Please provide astrological insights based on available data.`;
     }
   });
 
+  // Register location routes
+  const { registerLocationRoutes } = await import('./routes/location');
+  registerLocationRoutes(app);
+
   const httpServer = createServer(app);
   return httpServer;
 }

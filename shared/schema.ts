@@ -49,7 +49,11 @@ export const userProfiles = pgTable("user_profiles", {
   profileImageUrl: text("profile_image_url"),
   phone: text("phone"),
   website: text("website"),
-  location: text("location"),
+  location: text("location"), // Human-readable location (city, country)
+  latitude: real("latitude"), // GPS coordinates for location-based features
+  longitude: real("longitude"), // GPS coordinates for location-based features
+  locationPermission: text("location_permission").default("unknown"), // "granted", "denied", "unknown"
+  locationLastUpdated: timestamp("location_last_updated"),
   timezone: text("timezone").default("UTC-8"),
   language: text("language").default("en"),
   
