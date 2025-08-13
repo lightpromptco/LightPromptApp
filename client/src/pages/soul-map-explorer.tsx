@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { InteractiveNatalChart } from "@/components/InteractiveNatalChart";
+import { useUser } from "@/hooks/use-user"; // Assuming useUser hook provides user data
 
 /** ---------- config ---------- */
 const SOULMAP_BOT_ID = "soulmap"; // <- your bot key in the multi-bot system
@@ -60,15 +61,27 @@ type BirthData = { date: string; time?: string; location?: string; name?: string
 /** ---------- component ---------- */
 export default function SoulMapExplorerPage() {
   const { toast } = useToast();
+  const { user } = useUser(); // Get user data
 
-  const [currentView, setCurrentView] = useState<"welcome" | "chart" | "chat">("chart");
+  const [currentView, setCurrentView] = useState<"welcome" | "chart" | "chat">("welcome"); // Default to welcome
   const [zenMode, setZenMode] = useState(false);
   const [zenBackground, setZenBackground] = useState<"sunset" | "ocean" | "forest" | "cosmic">("sunset");
 
+  // Initialize birthData with default or fetched user data if available
   const [birthData, setBirthData] = useState<BirthData>(() => {
-    try { return JSON.parse(localStorage.getItem("lightprompt-birth-data") || "null") ?? {
-      date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428
-    }; } catch { return { date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428 }; }
+    try {
+      const localData = localStorage.getItem("lightprompt-birth-data");
+      if (localData) {
+        return JSON.parse(localData);
+      }
+      // If no local data, check if user is logged in and has birth data
+      // This part would ideally fetch user profile data, but for now, we use a default
+      return {
+        date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428
+      };
+    } catch {
+      return { date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428 };
+    }
   });
 
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{ name: string; lat: number; lng: number; country?: string }>>([]);
@@ -79,18 +92,88 @@ export default function SoulMapExplorerPage() {
   const [astronomicalData, setAstronomicalData] = useState<any>(null);
 
   // chat state
-  const CHAT_KEY = "soulmap-chat";
-  const [chatMessages, setChatMessages] = useState<Array<{role:"user"|"assistant"; content:string}>>(() => {
-    try { return JSON.parse(localStorage.getItem(CHAT_KEY) || "null") ?? [
-      { role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I’ll ground it in your chart." }
-    ]; } catch { return [{ role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I’ll ground it in your chart." }]; }
-  });
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const CHAT_KEY = `soulmap-chat-${user?.id || 'guest'}`;
+  const [chatMessages, setChatMessages] = useState<Array<{role:"user"|"assistant"; content:string}>>([
+    { role: "assistant", content: "Welcome to your Soul Map. I'm connecting to your cosmic database..." }
+  ]);
+
+  // Load user's chat history from server
+  useEffect(() => {
+    if (!user?.id) {
+      // If no user, load from local storage for guests
+      try {
+        const localMessages = localStorage.getItem(CHAT_KEY);
+        if (localMessages) {
+          setChatMessages(JSON.parse(localMessages));
+        } else {
+          setChatMessages([
+            { role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
+          ]);
+        }
+      } catch {
+        setChatMessages([
+          { role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
+        ]);
+      }
+      return;
+    }
+
+    const loadChatHistory = async () => {
+      try {
+        const sessionId = localStorage.getItem(`soulmap-session-${user.id}`);
+        if (sessionId) {
+          const resp = await apiRequest("GET", `/api/sessions/${sessionId}/messages`);
+          if (resp.ok) {
+            const messages = await resp.json();
+            const formattedMessages = messages.map((msg: any) => ({
+              role: msg.role,
+              content: msg.content
+            }));
+
+            if (formattedMessages.length > 0) {
+              setChatMessages(formattedMessages);
+            } else {
+              setChatMessages([
+                { role: "assistant", content: `Welcome back to your Soul Map, ${user.name}. I remember our previous conversations and your cosmic journey. How can I guide you today?` }
+              ]);
+            }
+          } else {
+             // If session exists but messages fetch failed, fall back to local or default
+             setChatMessages(JSON.parse(localStorage.getItem(CHAT_KEY) || JSON.stringify([{ role: "assistant", content: `Welcome to your Soul Map, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }])));
+          }
+        } else {
+          // No session found, create one and set initial welcome message
+          const sessionResp = await apiRequest("POST", "/api/sessions", {
+            userId: user.id,
+            botId: SOULMAP_BOT_ID,
+            title: "Soul Map Exploration"
+          });
+          const sessionData = await sessionResp.json();
+          localStorage.setItem(`soulmap-session-${user.id}`, sessionData.id);
+          setChatMessages([
+            { role: "assistant", content: `Welcome to your Soul Map, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }
+          ]);
+        }
+      } catch (e) {
+        console.error('Failed to load chat history:', e);
+        setChatMessages([
+          { role: "assistant", content: "Welcome to your Soul Map. I'm here to guide you through your cosmic journey." }
+        ]);
+      }
+    };
+
+    loadChatHistory();
+  }, [user?.id, user?.name]); // Depend on user?.id and user?.name
 
   /** ---------- effects ---------- */
   useEffect(() => { localStorage.setItem("lightprompt-birth-data", JSON.stringify(birthData)); }, [birthData]);
-  useEffect(() => { localStorage.setItem(CHAT_KEY, JSON.stringify(chatMessages)); }, [chatMessages]);
+  // Save messages to local storage only if user is not logged in, otherwise rely on server sync
+  useEffect(() => {
+    if (!user?.id) {
+      localStorage.setItem(CHAT_KEY, JSON.stringify(chatMessages));
+    }
+  }, [chatMessages, user?.id]);
+
 
   useEffect(() => {
     let ignore = false;
@@ -185,39 +268,66 @@ export default function SoulMapExplorerPage() {
 
   /** ---------- chat ---------- */
   const sendToBot = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || !user?.id) return;
+
     setChatMessages((prev) => [...prev, { role: "user", content: text }]);
     setCurrentMessage("");
     setIsGenerating(true);
+
     try {
-      // prefer unified chat endpoint with botId; gracefully fall back to oracle route
-      let resp = await apiRequest("POST", "/api/chat", {
+      // Get or create a SoulMap session for this user
+      let sessionId = localStorage.getItem(`soulmap-session-${user.id}`);
+
+      if (!sessionId) {
+        const sessionResp = await apiRequest("POST", "/api/sessions", {
+          userId: user.id,
+          botId: SOULMAP_BOT_ID,
+          title: "Soul Map Exploration"
+        });
+        const sessionData = await sessionResp.json();
+        sessionId = sessionData.id;
+        localStorage.setItem(`soulmap-session-${user.id}`, sessionId);
+      }
+
+      // Send message through the main chat endpoint for proper persistence
+      const resp = await apiRequest("POST", "/api/chat", {
+        userId: user.id,
+        sessionId: sessionId,
         botId: SOULMAP_BOT_ID,
-        messages: [{ role: "user", content: text }],
+        content: text,
         context: {
           intent: "soul_map_exploration",
           birthData,
-          selected: selectedPlanet,
-          chart: chartContext,
-          astroNow: astronomicalData
+          selectedPlanet,
+          chartData: chartContext,
+          astronomicalData,
+          userProfile: user
         }
       });
-      if (!resp.ok) {
-        resp = await apiRequest("POST", "/api/chat/oracle", {
-          message: text,
-          context: "soul_map_exploration",
-          birthData,
-          selectedPlanet,
-          chart: chartContext,
-          astroNow: astronomicalData
-        });
 
+      if (!resp.ok) {
+        throw new Error('Failed to send message');
       }
+
       const data = await resp.json();
-      const reply = data?.response ?? data?.message ?? "I’m here. Could you try that once more?";
+      const reply = data?.message?.content ?? "I'm processing your cosmic inquiry. Please try again.";
+
       setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+
+      // Update local storage with new messages
+      const updatedMessages = [...chatMessages,
+        { role: "user", content: text },
+        { role: "assistant", content: reply }
+      ];
+      localStorage.setItem(CHAT_KEY, JSON.stringify(updatedMessages));
+
     } catch (e) {
-      toast({ title: "Oracle unavailable", description: "Please try again soon.", variant: "destructive" });
+      console.error('SoulMap Oracle error:', e);
+      toast({
+        title: "Oracle Connection Lost",
+        description: "Your cosmic guide is temporarily unavailable. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -416,10 +526,33 @@ export default function SoulMapExplorerPage() {
                 </div>
               )}
             </div>
-            <Button onClick={()=>setCurrentView("chart")}
-              className="w-full bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600" disabled={!birthData.date}>
+            <Button onClick={()=>{
+              // If user is logged in, switch to chart view directly
+              // If not logged in, prompt them to log in or continue as guest (and then switch to chart)
+              if (user?.id) {
+                setCurrentView("chart");
+              } else {
+                // Here you might want to trigger a login modal or direct to a login page
+                // For now, we'll just show a toast and keep them on the welcome screen
+                toast({
+                  title: "Login Required",
+                  description: "Please log in to save your Soul Map and access full features.",
+                  variant: "info"
+                });
+                // Optionally, you could navigate to a login page:
+                // router.push('/login');
+              }
+            }}
+              className="w-full bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600"
+              disabled={!birthData.date || !user?.id} // Disable if no date or user is not logged in
+              >
               <Wand2 className="w-4 h-4 mr-2" />Explore My Soul Map
             </Button>
+            {!user?.id && (
+              <Button variant="outline" className="w-full" onClick={() => { /* Trigger login modal or navigate */ }}>
+                Login to Save Your Map
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -434,16 +567,16 @@ export default function SoulMapExplorerPage() {
             <h1 className="text-3xl font-bold flex items-center gap-2"><Bot className="w-8 h-8 text-purple-500" />Soul Map Oracle</h1>
             <p className="text-muted-foreground">Your questions → chart-aware replies from the SoulMap bot.</p>
           </div>
-          <Button variant="outline" onClick={()=>setCurrentView("chart")}><ArrowRight className="w-4 h-4 mr-2" />Back to Chart</Button>
+          <Button variant="outline" onClick={() => setCurrentView("chart")}><ArrowRight className="w-4 h-4 mr-2" />Back to Chart</Button>
         </div>
 
         <Card className="h-[600px] flex flex-col">
           <CardContent className="flex-1 p-6 overflow-auto space-y-4">
-            {chatMessages.map((m, i)=>(
-              <div key={i} className={`flex ${m.role==="user"?"justify-end":"justify-start"}`}>
-                <div className={`max-w-[80%] rounded-lg p-3 ${m.role==="user"?"bg-purple-500 text-white ml-4":"bg-gray-100 dark:bg-gray-800 mr-4"}`}>
+            {chatMessages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[80%] rounded-lg p-3 ${m.role === "user" ? "bg-purple-500 text-white ml-4" : "bg-gray-100 dark:bg-gray-800 mr-4"}`}>
                   <div className="flex items-start gap-2">
-                    {m.role==="assistant"? <Bot className="w-4 h-4 text-purple-500 mt-0.5" /> : <User className="w-4 h-4 text-purple-100 mt-0.5" />}
+                    {m.role === "assistant" ? <Bot className="w-4 h-4 text-purple-500 mt-0.5" /> : <User className="w-4 h-4 text-purple-100 mt-0.5" />}
                     <p className="text-sm">{m.content}</p>
                   </div>
                 </div>
@@ -456,8 +589,8 @@ export default function SoulMapExplorerPage() {
                     <Bot className="w-4 h-4 text-purple-500 animate-pulse" />
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay:"0.1s"}} />
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay:"0.2s"}} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
                     </div>
                   </div>
                 </div>
@@ -469,11 +602,11 @@ export default function SoulMapExplorerPage() {
               <Input
                 placeholder="Ask about your Sun, Moon, Rising, relationships, career, timing…"
                 value={currentMessage}
-                onChange={(e)=>setCurrentMessage(e.target.value)}
-                onKeyDown={(e)=>{ if (e.key==="Enter") sendToBot(currentMessage); }}
+                onChange={(e) => setCurrentMessage(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") sendToBot(currentMessage); }}
                 className="flex-1"
               />
-              <Button onClick={()=>sendToBot(currentMessage)} disabled={!currentMessage.trim()||isGenerating}><Send className="w-4 h-4" /></Button>
+              <Button onClick={() => sendToBot(currentMessage)} disabled={!currentMessage.trim() || isGenerating || !user?.id}><Send className="w-4 h-4" /></Button>
             </div>
             {/* quick chips */}
             <div className="mt-3 flex flex-wrap gap-2">
@@ -481,8 +614,8 @@ export default function SoulMapExplorerPage() {
                 "What are my next 30 days of transits?",
                 `How does my ${selectedPlanet ?? "Sun"} placement show up in relationships?`,
                 "What rituals suit this moon phase?",
-              ].map((q)=>(
-                <Button key={q} size="sm" variant="outline" className="h-7 text-xs" onClick={()=>sendToBot(q)}>{q}</Button>
+              ].map((q) => (
+                <Button key={q} size="sm" variant="outline" className="h-7 text-xs" onClick={() => sendToBot(q)}>{q}</Button>
               ))}
             </div>
           </div>

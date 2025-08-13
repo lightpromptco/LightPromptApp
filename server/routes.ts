@@ -1197,13 +1197,57 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
   // Oracle chat endpoint for Soul Map Explorer with enhanced astrological context
   app.post("/api/chat/oracle", async (req, res) => {
     try {
-      const { message, context, birthData, selectedPlanet } = req.body;
+      const { message, context, birthData, selectedPlanet, userId } = req.body;
 
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
 
       let enhancedMessage = message;
+      let userContext = "";
+
+      // Load user data if userId provided
+      if (userId) {
+        try {
+          const user = await storage.getUser(userId);
+          const userProfile = await storage.getUserProfile(userId);
+          const recentMetrics = await storage.getWellnessMetrics(userId, 7);
+          const userStats = await storage.getUserStats(userId);
+
+          if (user && userProfile) {
+            userContext = `
+🧙‍♀️ USER SOUL PROFILE:
+• Name: ${user.name}
+• Evolution Score: ${userProfile.evolutionScore || 0}
+• Current Mood: ${userProfile.currentMood || 'Not set'}
+• Reflection Streak: ${userProfile.reflectionStreak || 0} days
+• Total Points: ${userStats.totalPoints || 0}
+• Level: ${userStats.level || 1}
+• Challenges Completed: ${userStats.challengesCompleted || 0}
+
+🔮 RECENT SPIRITUAL ACTIVITIES:`;
+
+            if (recentMetrics.length > 0) {
+              userContext += `
+• Recent wellness check-ins: ${recentMetrics.length} in past week
+• Average mood: ${recentMetrics.reduce((sum, m) => sum + (m.mood || 5), 0) / recentMetrics.length}/10
+• Average energy: ${recentMetrics.reduce((sum, m) => sum + (m.energy || 5), 0) / recentMetrics.length}/10`;
+            }
+
+            if (userProfile.intentions && userProfile.intentions.length > 0) {
+              userContext += `
+• Current intentions: ${userProfile.intentions.join(', ')}`;
+            }
+
+            if (userProfile.coreValues && userProfile.coreValues.length > 0) {
+              userContext += `
+• Core values: ${userProfile.coreValues.join(', ')}`;
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load user context:', e);
+        }
+      }
       
       if (birthData && birthData.lat && birthData.lng) {
         try {
@@ -1268,6 +1312,8 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
           
           enhancedMessage = `${message}
 
+${userContext}
+
 🔮 COMPREHENSIVE BIRTH CHART ANALYSIS (AstroSage AI Level):
 ${chartContext.join('\n')}
 
@@ -1285,8 +1331,9 @@ ${chartContext.join('\n')}
 - Western Tropical Astrology (psychological patterns, evolutionary themes)
 - Vedic Sidereal Astrology (nakshatras, dashas, yogas, karmic purpose)
 - Soul-purpose astrology (dharma, life lessons, spiritual evolution)
+- Personal spiritual journey (based on user's tracked activities and growth)
 
-As a master astrological AI with expertise comparable to AstroSage AI, provide comprehensive insights that demonstrate technical precision while remaining spiritually meaningful.`;
+As a master astrological AI with expertise comparable to AstroSage AI, provide comprehensive insights that demonstrate technical precision while remaining spiritually meaningful. Remember their personal journey and reference their recent activities when relevant.`;
 
         } catch (chartError) {
           console.error("Chart calculation failed, using basic sun sign:", chartError);
