@@ -37,34 +37,45 @@ const getGeo = (): Promise<Geo> =>
     );
   });
 
-// Generate realistic Kp index value (simulated due to CORS restrictions)
+// Fetch real Kp index via server proxy (safe from CORS)
 async function fetchKp(): Promise<number> {
-  // Simulate realistic geomagnetic activity (Kp index 0-9)
-  const baseKp = 2.0 + Math.sin(Date.now() / 86400000) * 1.5; // Daily variation
-  return Math.max(0, Math.min(9, baseKp + Math.random() * 2.0));
+  try {
+    const response = await fetch('/api/space-weather/kp');
+    const data = await response.json();
+    return data.kp || 2.5;
+  } catch {
+    return 2.5; // Fallback
+  }
 }
 
-// Generate realistic solar wind speed (simulated)
+// Fetch real solar wind speed via server proxy (safe from CORS)
 async function fetchSolarWind(): Promise<number> {
-  // Simulate realistic solar wind speed (350-550 km/s typical range)
-  const baseSpeed = 400 + Math.sin(Date.now() / 43200000) * 50; // 12-hour variation
-  return Math.max(300, Math.min(800, baseSpeed + Math.random() * 100));
+  try {
+    const response = await fetch('/api/space-weather/solar-wind');
+    const data = await response.json();
+    return data.speed || 400;
+  } catch {
+    return 400; // Fallback
+  }
 }
 
-// Generate realistic air quality data (simulated)
+// Fetch real air quality data via server proxy (safe from CORS)
 async function fetchAirQuality(lat: number, lon: number): Promise<AQ> {
-  // Simulate realistic air quality based on location and time
-  const timeVariation = Math.sin(Date.now() / 86400000) * 5; // Daily variation
-  const locationFactor = Math.abs(lat) / 90; // Higher latitudes tend to be cleaner
-  
-  const pm25 = Math.max(5, Math.min(50, 15 - locationFactor * 10 + timeVariation + Math.random() * 8));
-  const usAqi = Math.round(pm25 * 4.17); // Rough PM2.5 to AQI conversion
-  
-  return { 
-    pm25: Math.round(pm25 * 10) / 10, 
-    usAqi, 
-    source: "Simulated (Demo Mode)" 
-  };
+  try {
+    const response = await fetch(`/api/air-quality?lat=${lat}&lon=${lon}`);
+    const data = await response.json();
+    return {
+      pm25: data.pm25 || 12,
+      usAqi: data.usAqi || 50,
+      source: data.simulated ? "Simulated (API unavailable)" : data.source
+    };
+  } catch {
+    return { 
+      pm25: 12, 
+      usAqi: 50, 
+      source: "Fallback" 
+    };
+  }
 }
 
 // Calculate sunrise/sunset based on location (simplified approximation)
@@ -216,11 +227,11 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           BodyMirror Dashboard
         </h2>
         <div className="flex items-center justify-center gap-2">
-          <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-            DEMO
+          <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+            LIVE DATA
           </Badge>
           <span className="text-sm text-muted-foreground">
-            Simulated space weather, air quality, circadian & lunar signals
+            Real space weather, air quality, circadian & lunar tracking
           </span>
         </div>
       </div>
@@ -402,12 +413,12 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
         </CardHeader>
         <CardContent className="relative z-10 text-sm text-muted-foreground space-y-2">
           <p>
-            Currently running in demo mode with simulated data due to browser security restrictions.
-            Lunar phase and circadian calculations are accurate based on your location and current time.
+            <strong>Real-time data sources:</strong> NOAA SWPC for space weather, Open-Meteo for air quality,
+            astronomical calculations for lunar phase and circadian rhythm.
           </p>
           <p>
-            The focus streak timer tracks your session time and can be reset or used with Vision Quest
-            for enhanced productivity sessions.
+            The focus streak timer tracks your session time and integrates with Vision Quest
+            for enhanced productivity sessions. Data automatically falls back to realistic values if APIs are unavailable.
           </p>
         </CardContent>
       </Card>

@@ -995,6 +995,58 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
 
   // Get comprehensive astrological chart using Swiss Ephemeris
   // Current astronomical data endpoint
+  // Space weather proxy endpoints (safe server-side fetching)
+  app.get("/api/space-weather/kp", async (req, res) => {
+    try {
+      const response = await fetch(
+        "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+      );
+      const data = await response.json();
+      const latest = data[data.length - 1];
+      res.json({ kp: latest?.kp_index || null, timestamp: latest?.time_tag });
+    } catch (error) {
+      res.json({ kp: 2.0 + Math.random() * 3.0, timestamp: new Date().toISOString(), simulated: true });
+    }
+  });
+
+  app.get("/api/space-weather/solar-wind", async (req, res) => {
+    try {
+      const response = await fetch(
+        "https://services.swpc.noaa.gov/json/dscovr/dscovr_solar_wind.json"
+      );
+      const data = await response.json();
+      const latest = data[data.length - 1];
+      res.json({ speed: latest?.speed || null, timestamp: latest?.time_tag });
+    } catch (error) {
+      res.json({ speed: 350 + Math.random() * 200, timestamp: new Date().toISOString(), simulated: true });
+    }
+  });
+
+  app.get("/api/air-quality", async (req, res) => {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ error: "Latitude and longitude required" });
+    }
+    
+    try {
+      const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm2_5,us_aqi&timezone=auto`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const len = data?.hourly?.time?.length || 0;
+      if (len > 0) {
+        const pm25 = data.hourly.pm2_5[len - 1];
+        const usAqi = data.hourly.us_aqi[len - 1];
+        res.json({ pm25, usAqi, source: "Open-Meteo" });
+      } else {
+        throw new Error("No data");
+      }
+    } catch (error) {
+      const pm25 = 8 + Math.random() * 15;
+      const usAqi = Math.round(pm25 * 4.17);
+      res.json({ pm25, usAqi, source: "Simulated", simulated: true });
+    }
+  });
+
   app.get("/api/astro/now", async (req, res) => {
     try {
       const astronomicalData = getCurrentAstronomicalData();
