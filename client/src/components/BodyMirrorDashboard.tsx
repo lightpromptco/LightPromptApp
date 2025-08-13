@@ -248,17 +248,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Orbit className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>Kp Index (0-9):</strong> Measures Earth's magnetic field disturbance caused by solar wind interactions. 
-                      Data from NOAA SWPC's real-time magnetometer network. Higher values (5+) indicate geomagnetic storms that can affect satellites, GPS, and create auroras at lower latitudes.
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">Kp Index (0-9)</div>
+                      <p>Measures Earth's magnetic field disturbance caused by solar wind interactions. Data from NOAA SWPC's real-time magnetometer network. Higher values (5+) indicate geomagnetic storms that can affect satellites, GPS, and create auroras at lower latitudes.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -288,17 +288,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>Solar Wind Speed (km/s):</strong> Measured by DSCOVR satellite at L1 Lagrange point, 1.5 million km from Earth. 
-                      Normal speeds: 300-400 km/s. High-speed streams (500+ km/s) from coronal holes can trigger geomagnetic activity when they interact with Earth's magnetosphere.
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">Solar Wind Speed (km/s)</div>
+                      <p>Measured by DSCOVR satellite at L1 Lagrange point, 1.5 million km from Earth. Normal speeds: 300-400 km/s. High-speed streams (500+ km/s) from coronal holes can trigger geomagnetic activity when they interact with Earth's magnetosphere.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -326,17 +326,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>US AQI & PM2.5:</strong> Air Quality Index from Open-Meteo using EPA standards. PM2.5 measures particles ≤2.5 micrometers that penetrate deep into lungs. 
-                      AQI: 0-50 Good, 51-100 Moderate, 101+ Unhealthy. Location-based using GPS coordinates.
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">US AQI & PM2.5</div>
+                      <p>Air Quality Index from Open-Meteo using EPA standards. PM2.5 measures particles ≤2.5 micrometers that penetrate deep into lungs. AQI: 0-50 Good, 51-100 Moderate, 101+ Unhealthy. Location-based using GPS coordinates.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -366,17 +366,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sun className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>Circadian Alignment (%):</strong> Calculated from your location's sunrise/sunset times vs. current time. 
-                      Algorithm considers natural light exposure peaks and optimal energy windows. Based on chronobiology research - highest energy typically 2-3 hours post-sunrise.
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">Circadian Alignment (%)</div>
+                      <p>Calculated from your location's sunrise/sunset times vs. current time. Algorithm considers natural light exposure peaks and optimal energy windows. Based on chronobiology research - highest energy typically 2-3 hours post-sunrise.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -404,17 +404,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Moon className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>Lunar Phase:</strong> Calculated using astronomical algorithms based on current date. 
-                      Moon phases affect tides and may correlate with circadian rhythms. New Moon (0%) to Full Moon (100%). No external API required - pure mathematical calculation.
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">Lunar Phase</div>
+                      <p>Calculated using astronomical algorithms based on current date. Moon phases affect tides and may correlate with circadian rhythms. New Moon (0%) to Full Moon (100%). No external API required - pure mathematical calculation.</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -442,17 +442,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Gauge className="h-5 w-5 text-muted-foreground" />
-                <Tooltip>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                      <Info className="h-3 w-3 text-muted-foreground" />
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0 hover:bg-gray-100">
+                      <Info className="h-3 w-3 text-muted-foreground hover:text-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">
-                      <strong>Focus Streak:</strong> Client-side timer tracking current session time. Integrates with Vision Quest productivity challenges. 
-                      Target: 50+ minutes for optimal focus flow. Based on Pomodoro research and ultradian rhythm studies (90-120 min natural cycles).
-                    </p>
+                  <TooltipContent className="max-w-xs p-3 text-xs" side="top">
+                    <div>
+                      <div className="font-semibold mb-1">Focus Streak</div>
+                      <p>Client-side timer tracking current session time. Integrates with Vision Quest productivity challenges. Target: 50+ minutes for optimal focus flow. Based on Pomodoro research and ultradian rhythm studies (90-120 min natural cycles).</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </div>
