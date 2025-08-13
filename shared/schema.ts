@@ -41,12 +41,58 @@ export const messages = pgTable("messages", {
 
 export const userProfiles = pgTable("user_profiles", {
   userId: varchar("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Basic Profile Info
+  displayName: text("display_name"),
+  username: text("username"),
+  bio: text("bio"),
+  profileImageUrl: text("profile_image_url"),
+  phone: text("phone"),
+  website: text("website"),
+  location: text("location"),
+  timezone: text("timezone").default("UTC-8"),
+  language: text("language").default("en"),
+  
+  // VibeMatch Profile Data
   currentMood: text("current_mood").default("neutral"),
   moodDescription: text("mood_description"),
-  preferences: jsonb("preferences"), // circadian settings, bot preferences, etc.
+  emotionalTone: text("emotional_tone"), // warm, cool, intense, gentle, etc.
+  coreValues: text("core_values").array().default([]), // authenticity, growth, compassion, etc.
+  archetypes: text("archetypes").array().default([]), // creator, healer, seeker, etc.
+  intentions: text("intentions").array().default([]), // friendship, collaboration, love, etc.
+  vibeMatchEnabled: boolean("vibe_match_enabled").default(false),
+  vibeMatchBio: text("vibe_match_bio"), // special bio for VibeMatch
+  resonanceFrequency: integer("resonance_frequency"), // AI-calculated based on patterns
+  
+  // Settings
+  preferences: jsonb("preferences").default({}), // UI preferences, circadian, etc.
+  notificationSettings: jsonb("notification_settings").default({
+    reflection: true,
+    community: true,
+    challenges: false,
+    marketing: false,
+    email: true,
+    push: true,
+    sound: true
+  }),
+  privacySettings: jsonb("privacy_settings").default({
+    profileVisibility: "public",
+    showActivity: true,
+    allowMessages: true,
+    dataSharing: false
+  }),
+  appearanceSettings: jsonb("appearance_settings").default({
+    darkMode: false,
+    circadianSync: true,
+    soundEffects: true
+  }),
+  
+  // Tracking
   badges: text("badges").array().default([]),
   evolutionScore: integer("evolution_score").default(0),
-  privacySettings: jsonb("privacy_settings").default({}), // privacy and consent settings
+  reflectionStreak: integer("reflection_streak").default(0),
+  lastActiveAt: timestamp("last_active_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
@@ -351,6 +397,37 @@ export const verificationCodes = pgTable("verification_codes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// VibeMatch Connection Tables
+export const vibeMatches = pgTable("vibe_matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  user1Id: varchar("user1_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  user2Id: varchar("user2_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  resonanceScore: integer("resonance_score").notNull(), // AI-calculated compatibility 0-100
+  matchType: text("match_type").notNull(), // friendship, collaboration, romance, soul_family
+  status: text("status").notNull().default("pending"), // pending, accepted, revealed, blocked
+  sharedValues: text("shared_values").array().default([]),
+  toneAlignment: integer("tone_alignment"), // emotional tone compatibility
+  prismPointUnlocked: boolean("prism_point_unlocked").default(false),
+  revealedAt: timestamp("revealed_at"),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const reflectionEntries = pgTable("reflection_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  prompt: text("prompt").notNull(),
+  response: text("response").notNull(),
+  emotionalTone: text("emotional_tone"), // extracted by AI
+  valuesExpressed: text("values_expressed").array().default([]),
+  archetypeAlignment: text("archetype_alignment"),
+  sentiment: text("sentiment"),
+  sentimentScore: integer("sentiment_score"),
+  isPrivate: boolean("is_private").default(true),
+  useForMatching: boolean("use_for_matching").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -376,12 +453,53 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
 
 export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
   userId: true,
+  displayName: true,
+  username: true,
+  bio: true,
+  profileImageUrl: true,
+  phone: true,
+  website: true,
+  location: true,
+  timezone: true,
+  language: true,
   currentMood: true,
   moodDescription: true,
+  emotionalTone: true,
+  coreValues: true,
+  archetypes: true,
+  intentions: true,
+  vibeMatchEnabled: true,
+  vibeMatchBio: true,
   preferences: true,
+  notificationSettings: true,
+  privacySettings: true,
+  appearanceSettings: true,
   badges: true,
   evolutionScore: true,
-  privacySettings: true,
+  reflectionStreak: true,
+});
+
+export const insertVibeMatchSchema = createInsertSchema(vibeMatches).pick({
+  user1Id: true,
+  user2Id: true,
+  resonanceScore: true,
+  matchType: true,
+  sharedValues: true,
+  toneAlignment: true,
+  metadata: true,
+});
+
+export const insertReflectionEntrySchema = createInsertSchema(reflectionEntries).pick({
+  userId: true,
+  prompt: true,
+  response: true,
+  emotionalTone: true,
+  valuesExpressed: true,
+  archetypeAlignment: true,
+  sentiment: true,
+  sentimentScore: true,
+  isPrivate: true,
+  useForMatching: true,
 });
 
 export const insertAccessCodeSchema = createInsertSchema(accessCodes).pick({
@@ -596,18 +714,7 @@ export const vibeProfiles = pgTable("vibe_profiles", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const vibeMatches = pgTable("vibe_matches", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId1: varchar("user_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
-  userId2: varchar("user_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
-  matchScore: integer("match_score").notNull(), // 0-100 compatibility score
-  status: text("status").notNull().default("pending"), // pending, liked, passed, matched
-  user1Action: text("user1_action"), // like, pass, null
-  user2Action: text("user2_action"), // like, pass, null
-  resonanceCount: integer("resonance_count").default(0), // tracks interaction quality
-  lastInteraction: timestamp("last_interaction").notNull().defaultNow(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+// Using the earlier vibeMatches definition with better VibeMatch concept integration
 
 export const prismPoints = pgTable("prism_points", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -981,7 +1088,7 @@ export const userPreferences = pgTable("user_preferences", {
 
 // Insert schemas
 export const insertVibeProfileSchema = createInsertSchema(vibeProfiles);
-export const insertVibeMatchSchema = createInsertSchema(vibeMatches);
+// Using the earlier insertVibeMatchSchema definition
 export const insertPrismPointSchema = createInsertSchema(prismPoints);
 export const insertResonanceInteractionSchema = createInsertSchema(resonanceInteractions);
 export const insertMatchChatSchema = createInsertSchema(matchChats);

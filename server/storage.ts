@@ -387,12 +387,30 @@ export class MemStorage implements IStorage {
   async createUserProfile(insertProfile: InsertUserProfile): Promise<UserProfile> {
     const profile: UserProfile = {
       userId: insertProfile.userId,
+      displayName: insertProfile.displayName || null,
+      username: insertProfile.username || null,
+      bio: insertProfile.bio || null,
+      profileImageUrl: insertProfile.profileImageUrl || null,
+      phone: insertProfile.phone || null,
+      website: insertProfile.website || null,
+      location: insertProfile.location || null,
+      timezone: insertProfile.timezone || null,
+      language: insertProfile.language || null,
       currentMood: insertProfile.currentMood || null,
       moodDescription: insertProfile.moodDescription || null,
+      emotionalTone: insertProfile.emotionalTone || null,
+      coreValues: insertProfile.coreValues || [],
+      archetypes: insertProfile.archetypes || [],
+      intentions: insertProfile.intentions || [],
+      vibeMatchEnabled: insertProfile.vibeMatchEnabled || false,
+      vibeMatchBio: insertProfile.vibeMatchBio || null,
       preferences: insertProfile.preferences || {},
+      notificationSettings: insertProfile.notificationSettings || {},
+      privacySettings: insertProfile.privacySettings || {},
+      appearanceSettings: insertProfile.appearanceSettings || {},
       badges: insertProfile.badges || null,
       evolutionScore: insertProfile.evolutionScore || null,
-      privacySettings: insertProfile.privacySettings || {},
+      reflectionStreak: insertProfile.reflectionStreak || 0,
       updatedAt: new Date()
     };
     this.userProfiles.set(insertProfile.userId, profile);
