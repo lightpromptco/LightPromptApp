@@ -33,7 +33,7 @@ import { AIHelpInterface } from '@/components/AIHelpInterface';
 import { AdminToggle } from '@/components/AdminToggle';
 import { ExternalLinksCodeSection } from '@/components/ExternalLinksCodeSection';
 import { DashboardWidgets } from '@/components/DashboardWidgets';
-import { SoulTechDashboard } from '@/components/SoulTechDashboard';
+import { BodyMirrorDashboard } from '@/components/SoulTechDashboard';
 
 interface DashboardData {
   metrics: WellnessMetric[];
@@ -391,7 +391,7 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="relative z-10">
-                  <SoulTechDashboard userId={userId!} />
+                  <BodyMirrorDashboard userId={userId!} />
                 </CardContent>
               </Card>
 
