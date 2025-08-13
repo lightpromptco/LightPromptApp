@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 interface Widget {
   id: string;
   title: string;
-  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar' | 'book-store';
+  type: 'metric' | 'progress' | 'activity' | 'chart' | 'quick-action' | 'weather' | 'quotes' | 'calendar' | 'book-store' | 'uv' | 'pollen' | 'breathing' | 'gratitude' | 'dream';
   content: any;
   size: 'small' | 'medium' | 'large';
   enabled: boolean;
@@ -33,6 +33,11 @@ const DEFAULT_WIDGETS: Widget[] = [
   { id: 'weather-now',       title: 'Local Weather',      type: 'weather', content: {}, size: 'small', enabled: true },
   { id: 'quote-today',       title: 'Quote of the Moment', type: 'quotes', content: {}, size: 'medium', enabled: true },
   { id: 'calendar-today',    title: 'Today’s Calendar',   type: 'calendar', content: {}, size: 'medium', enabled: true },
+  { id: 'uv-index',          title: 'UV Index',           type: 'uv', content: {}, size: 'small', enabled: true },
+  { id: 'pollen',            title: 'Pollen Count',       type: 'pollen', content: {}, size: 'medium', enabled: true },
+  { id: 'breathing',         title: 'Breathing Exercise (4-7-8)', type: 'breathing', content: {}, size: 'medium', enabled: true },
+  { id: 'gratitude',         title: 'Daily Gratitude',    type: 'gratitude', content: {}, size: 'medium', enabled: true },
+  { id: 'dream',             title: 'Dream Journal',      type: 'dream', content: {}, size: 'medium', enabled: true },
 ];
 
 // ----------------------- Helpers: data & utils -----------------------
@@ -40,6 +45,8 @@ type Geo = { lat: number; lon: number };
 type Weather = { tempF: number; code: number; label: string; emoji: string } | null;
 type Quote = { text: string; author: string } | null;
 type CalEvent = { dt: Date; title: string };
+type UV = { index: number; risk: string; color: string } | null;
+type Pollen = { total: number; grass: number; tree: number; weed: number } | null;
 
 /** Get geolocation with fallback (USA center) */
 // Enhanced location system with caching and privacy-first approach
@@ -150,6 +157,45 @@ async function fetchWeather(lat: number, lon: number): Promise<Weather> {
   }
 }
 
+async function fetchUV(lat: number, lon: number): Promise<UV> {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=uv_index_max&timezone=auto&forecast_days=1`;
+    const res = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    const uvIndex = data?.daily?.uv_index_max?.[0];
+    if (uvIndex == null) return null;
+    
+    const index = Math.round(Number(uvIndex));
+    let risk = 'Low';
+    let color = 'green';
+    
+    if (index >= 11) { risk = 'Extreme'; color = 'purple'; }
+    else if (index >= 8) { risk = 'Very High'; color = 'red'; }
+    else if (index >= 6) { risk = 'High'; color = 'orange'; }
+    else if (index >= 3) { risk = 'Moderate'; color = 'yellow'; }
+    
+    return { index, risk, color };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchPollen(lat: number, lon: number): Promise<Pollen> {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=grass_pollen_max,tree_pollen_max,weed_pollen_max&timezone=auto&forecast_days=1`;
+    const res = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    const grass = data?.daily?.grass_pollen_max?.[0] || 0;
+    const tree = data?.daily?.tree_pollen_max?.[0] || 0;
+    const weed = data?.daily?.weed_pollen_max?.[0] || 0;
+    const total = Math.round((grass + tree + weed) / 3);
+    
+    return { total, grass: Math.round(grass), tree: Math.round(tree), weed: Math.round(weed) };
+  } catch {
+    return null;
+  }
+}
+
 // Local inspirational quotes for soul-tech wellness
 const SOUL_TECH_QUOTES = [
   { text: "Your inner wisdom is your greatest technology.", author: "LightPrompt" },
@@ -228,6 +274,8 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
   const [weather, setWeather] = useState<Weather>(null);
   const [quote, setQuote] = useState<Quote>(null);
   const [events, setEvents] = useState<CalEvent[]>([]);
+  const [uv, setUV] = useState<UV>(null);
+  const [pollen, setPollen] = useState<Pollen>(null);
   const [locationStatus, setLocationStatus] = useState<'loading' | 'granted' | 'denied' | 'unavailable'>('loading');
 
   // Persist layout
@@ -245,15 +293,19 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       setGeo(g);
       setLocationStatus(g.permission || 'unknown');
       
-      const [w, ev] = await Promise.all([
+      const [w, ev, uvData, pollenData] = await Promise.all([
         fetchWeather(g.lat, g.lon),
         fetchCalendar(user?.calendarUrl),
+        fetchUV(g.lat, g.lon),
+        fetchPollen(g.lat, g.lon),
       ]);
       const q = fetchQuote();
       if (!mounted) return;
       setWeather(w);
       setQuote(q);
       setEvents(ev);
+      setUV(uvData);
+      setPollen(pollenData);
     })();
     return () => { mounted = false; };
   }, [user?.calendarUrl, userId]);
@@ -301,6 +353,11 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       weather:     <i className="fas fa-cloud-sun text-cyan-500" />,
       calendar:    <i className="fas fa-calendar text-indigo-500" />,
       'book-store':<i className="fas fa-book text-emerald-500" />,
+      uv:          <i className="fas fa-sun text-yellow-600" />,
+      pollen:      <i className="fas fa-leaf text-green-600" />,
+      breathing:   <i className="fas fa-lungs text-blue-600" />,
+      gratitude:   <i className="fas fa-heart text-red-500" />,
+      dream:       <i className="fas fa-moon text-purple-600" />,
     };
     return map[type] ?? <i className="fas fa-square text-gray-500" />;
   };
@@ -364,6 +421,11 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       case 'weather':     return renderWeatherWidget(widget);
       case 'calendar':    return renderCalendarWidget(widget);
       case 'book-store':  return renderBookStoreWidget(widget);
+      case 'uv':          return renderUVWidget(widget);
+      case 'pollen':      return renderPollenWidget(widget);
+      case 'breathing':   return renderBreathingWidget(widget);
+      case 'gratitude':   return renderGratitudeWidget(widget);
+      case 'dream':       return renderDreamWidget(widget);
       default:            return <div className="text-gray-500">Widget content</div>;
     }
   };
@@ -660,6 +722,190 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
         <div className="text-xs text-center text-gray-500 bg-emerald-50 p-2 rounded">
           💫 <strong>Foundation first:</strong> Start with the book, then explore the tools that call to you.
         </div>
+      </div>
+    );
+  };
+
+  // UV Widget
+  const renderUVWidget = (widget: Widget) => {
+    if (!uv) {
+      return (
+        <div className="text-center text-gray-500">
+          <i className="fas fa-sun text-yellow-600 text-2xl mb-2"></i>
+          <div className="text-sm">UV data loading...</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-center">
+        <div className="text-3xl font-bold mb-2" style={{ color: uv.color }}>
+          {uv.index}
+        </div>
+        <div className="text-sm text-gray-600 mb-2">{uv.risk} Risk</div>
+        <div className="text-xs text-gray-500">UV Index</div>
+      </div>
+    );
+  };
+
+  // Pollen Widget
+  const renderPollenWidget = (widget: Widget) => {
+    if (!pollen) {
+      return (
+        <div className="text-center text-gray-500">
+          <i className="fas fa-leaf text-green-600 text-2xl mb-2"></i>
+          <div className="text-sm">Pollen data loading...</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">{pollen.total}</div>
+          <div className="text-xs text-gray-500">Total Pollen</div>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center">
+            <div className="font-semibold">{pollen.grass}</div>
+            <div className="text-gray-500">Grass</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold">{pollen.tree}</div>
+            <div className="text-gray-500">Tree</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold">{pollen.weed}</div>
+            <div className="text-gray-500">Weed</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Breathing Exercise Widget
+  const renderBreathingWidget = (widget: Widget) => {
+    const [isActive, setIsActive] = useState(false);
+    const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale' | 'rest'>('inhale');
+    const [count, setCount] = useState(0);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const startBreathing = () => {
+      setIsActive(true);
+      setPhase('inhale');
+      setCount(4);
+      
+      const breathingCycle = () => {
+        setCount(prev => {
+          if (prev > 1) return prev - 1;
+          
+          setPhase(current => {
+            if (current === 'inhale') { setCount(7); return 'hold'; }
+            if (current === 'hold') { setCount(8); return 'exhale'; }
+            if (current === 'exhale') { setCount(4); return 'inhale'; }
+            return 'inhale';
+          });
+          return prev;
+        });
+      };
+      
+      intervalRef.current = setInterval(breathingCycle, 1000);
+    };
+
+    const stopBreathing = () => {
+      setIsActive(false);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+
+    useEffect(() => {
+      return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    }, []);
+
+    return (
+      <div className="text-center space-y-4">
+        <div className="text-lg font-semibold capitalize text-blue-600">{phase}</div>
+        <div className="text-3xl font-bold">{count}</div>
+        <Button
+          onClick={isActive ? stopBreathing : startBreathing}
+          variant={isActive ? "destructive" : "default"}
+          className="w-full"
+        >
+          {isActive ? 'Stop' : 'Start'} Breathing
+        </Button>
+      </div>
+    );
+  };
+
+  // Gratitude Widget
+  const renderGratitudeWidget = (widget: Widget) => {
+    const [gratitude, setGratitude] = useState('');
+    const [saved, setSaved] = useState(false);
+
+    const saveGratitude = () => {
+      if (gratitude.trim()) {
+        const gratitudes = JSON.parse(localStorage.getItem('lp-gratitude') || '[]');
+        gratitudes.push({ text: gratitude, date: new Date().toISOString() });
+        localStorage.setItem('lp-gratitude', JSON.stringify(gratitudes));
+        setGratitude('');
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    };
+
+    return (
+      <div className="space-y-3">
+        <textarea
+          value={gratitude}
+          onChange={(e) => setGratitude(e.target.value)}
+          placeholder="What are you grateful for today?"
+          className="w-full p-2 border rounded text-sm resize-none"
+          rows={3}
+        />
+        <Button 
+          onClick={saveGratitude} 
+          disabled={!gratitude.trim() || saved}
+          className="w-full"
+          variant={saved ? "default" : "outline"}
+        >
+          {saved ? 'Saved! 💚' : 'Save Gratitude'}
+        </Button>
+      </div>
+    );
+  };
+
+  // Dream Journal Widget
+  const renderDreamWidget = (widget: Widget) => {
+    const [dream, setDream] = useState('');
+    const [saved, setSaved] = useState(false);
+
+    const saveDream = () => {
+      if (dream.trim()) {
+        const dreams = JSON.parse(localStorage.getItem('lp-dreams') || '[]');
+        dreams.push({ text: dream, date: new Date().toISOString() });
+        localStorage.setItem('lp-dreams', JSON.stringify(dreams));
+        setDream('');
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    };
+
+    return (
+      <div className="space-y-3">
+        <textarea
+          value={dream}
+          onChange={(e) => setDream(e.target.value)}
+          placeholder="Describe your dream..."
+          className="w-full p-2 border rounded text-sm resize-none"
+          rows={3}
+        />
+        <Button 
+          onClick={saveDream} 
+          disabled={!dream.trim() || saved}
+          className="w-full"
+          variant={saved ? "default" : "outline"}
+        >
+          {saved ? 'Saved! 🌙' : 'Save Dream'}
+        </Button>
       </div>
     );
   };
