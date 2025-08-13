@@ -3487,6 +3487,28 @@ Please provide astrological insights based on available data.`;
   const { registerLocationRoutes } = await import('./routes/location');
   registerLocationRoutes(app);
 
+  // Widget data endpoint for LightPrompt AI analysis
+  app.post("/api/widget-data", async (req, res) => {
+    try {
+      const { userId, widgetType, data, timestamp } = req.body;
+      
+      if (!userId || !widgetType || !data) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Log widget data for AI pattern analysis
+      console.log(`📊 Widget Data [${widgetType}] User: ${userId.substring(0, 8)}...`, {
+        timestamp: timestamp || new Date().toISOString(),
+        dataKeys: Object.keys(data)
+      });
+      
+      res.json({ success: true, message: "Widget data logged for AI analysis" });
+    } catch (error) {
+      console.error("Error saving widget data:", error);
+      res.status(500).json({ error: "Failed to save widget data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

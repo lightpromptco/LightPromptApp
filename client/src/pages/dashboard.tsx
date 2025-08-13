@@ -33,7 +33,7 @@ import { AIHelpInterface } from '@/components/AIHelpInterface';
 import { AdminToggle } from '@/components/AdminToggle';
 import { ExternalLinksCodeSection } from '@/components/ExternalLinksCodeSection';
 import { DashboardWidgets } from '@/components/DashboardWidgets';
-import { BodyMirrorDashboard } from '@/components/BodyMirrorDashboard';
+import { BodyMirrorDashboard } from '@/components/BodyMirrorDashboardSimple';
 
 interface DashboardData {
   metrics: WellnessMetric[];

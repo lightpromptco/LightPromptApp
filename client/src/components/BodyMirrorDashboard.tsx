@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import {
   Activity,
   Atom,
@@ -24,6 +25,14 @@ type Geo = { lat: number; lon: number };
 type AQ = { pm25: number; usAqi: number; source: string };
 type SunTimes = { sunriseISO: string; sunsetISO: string };
 type LocationStatus = 'granted' | 'denied' | 'unknown' | 'loading';
+
+interface SoulTechWidget {
+  id: string;
+  title: string;
+  type: string;
+  enabled: boolean;
+  order: number;
+}
 
 // ---------- Location Storage and Caching ----------
 const LOCATION_CACHE_KEY = 'lightprompt_location_cache';
@@ -263,6 +272,16 @@ interface BodyMirrorProps {
   userId: string;
 }
 
+// Default Soul-Tech widgets configuration
+const DEFAULT_SOULTECH_WIDGETS: SoulTechWidget[] = [
+  { id: 'geomagnetic', title: 'Geomagnetic Activity (Kp)', type: 'space-weather', enabled: true, order: 0 },
+  { id: 'solar-wind', title: 'Solar Wind Speed', type: 'space-weather', enabled: true, order: 1 },
+  { id: 'air-quality', title: 'Air Quality', type: 'environment', enabled: true, order: 2 },
+  { id: 'circadian', title: 'Circadian Alignment', type: 'biological', enabled: true, order: 3 },
+  { id: 'lunar-phase', title: 'Lunar Phase', type: 'cosmic', enabled: true, order: 4 },
+  { id: 'focus-streak', title: 'Focus Streak', type: 'personal', enabled: true, order: 5 },
+];
+
 export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
   const [geo, setGeo] = useState<Geo | null>(null);
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('loading');
@@ -271,6 +290,67 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
   const [aq, setAQ] = useState<AQ>({ pm25: 0, usAqi: 0, source: "Loading..." });
   const [sun, setSun] = useState<SunTimes | undefined>();
   const [loading, setLoading] = useState(true);
+  const [widgets, setWidgets] = useState<SoulTechWidget[]>(() => {
+    const saved = sessionStorage.getItem(`soultech-layout-${userId}`);
+    return saved ? JSON.parse(saved) : DEFAULT_SOULTECH_WIDGETS;
+  });
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Persist layout
+  useEffect(() => {
+    sessionStorage.setItem(`soultech-layout-${userId}`, JSON.stringify(widgets));
+  }, [widgets, userId]);
+
+  // Save widget data to Supabase for LightPrompt analysis
+  const saveWidgetDataToSupabase = async (widgetData: any) => {
+    try {
+      await fetch('/api/widget-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          widgetType: 'soultech',
+          data: widgetData,
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (error) {
+      console.log('Widget data save failed:', error);
+    }
+  };
+
+  // Save data whenever important values change
+  useEffect(() => {
+    if (!loading && geo) {
+      saveWidgetDataToSupabase({
+        geomagnetic: { kp, intensity: kp >= 5 ? 'high' : kp >= 3 ? 'moderate' : 'low' },
+        solarWind: { speed: wind, status: wind > 400 ? 'fast' : 'normal' },
+        airQuality: { pm25: aq.pm25, usAqi: aq.usAqi, source: aq.source },
+        location: geo,
+        locationStatus
+      });
+    }
+  }, [kp, wind, aq, loading, geo, locationStatus]);
+
+  // Drag and drop handlers
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    const items = Array.from(widgets);
+    const [reordered] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reordered);
+    // Update order
+    const reorderedWidgets = items.map((widget, index) => ({ ...widget, order: index }));
+    setWidgets(reorderedWidgets);
+  };
+
+  const toggleWidget = (widgetId: string) => {
+    setWidgets(widgets.map(w => w.id === widgetId ? { ...w, enabled: !w.enabled } : w));
+  };
+
+  const resetLayout = () => {
+    setWidgets(DEFAULT_SOULTECH_WIDGETS);
+    sessionStorage.removeItem(`soultech-layout-${userId}`);
+  };
 
   const focusMin = useFocusStreak();
   const moon = useMemo(() => lunarPhase(), []);
@@ -331,36 +411,75 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             BodyMirror Dashboard
           </h2>
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
-              LIVE DATA
-            </Badge>
-            {/* Location Status Indicator */}
-            <Badge 
-              variant="outline" 
-              className={`text-xs ${
-                locationStatus === 'granted' 
-                  ? 'border-green-500 text-green-700 bg-green-50' 
-                  : locationStatus === 'denied'
-                  ? 'border-red-500 text-red-700 bg-red-50'
-                  : locationStatus === 'loading'
-                  ? 'border-yellow-500 text-yellow-700 bg-yellow-50'
-                  : 'border-gray-500 text-gray-700 bg-gray-50'
-              }`}
-            >
-              {locationStatus === 'granted' ? '📍 Location Active' : 
-               locationStatus === 'denied' ? '🚫 Location Denied' :
-               locationStatus === 'loading' ? '⏳ Getting Location' : 
-               '❓ Location Unknown'}
-            </Badge>
-            <span className="text-sm text-muted-foreground">
-              Real space weather, air quality, circadian & lunar tracking
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+                LIVE DATA
+              </Badge>
+              {/* Location Status Indicator */}
+              <Badge 
+                variant="outline" 
+                className={`text-xs ${
+                  locationStatus === 'granted' 
+                    ? 'border-green-500 text-green-700 bg-green-50' 
+                    : locationStatus === 'denied'
+                    ? 'border-red-500 text-red-700 bg-red-50'
+                    : locationStatus === 'loading'
+                    ? 'border-yellow-500 text-yellow-700 bg-yellow-50'
+                    : 'border-gray-500 text-gray-700 bg-gray-50'
+                }`}
+              >
+                {locationStatus === 'granted' ? '📍 Location Active' : 
+                 locationStatus === 'denied' ? '🚫 Location Denied' :
+                 locationStatus === 'loading' ? '⏳ Getting Location' : 
+                 '❓ Location Unknown'}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                Real space weather, air quality, circadian & lunar tracking
+              </span>
+            </div>
+            {/* Edit Mode Controls */}
+            <div className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                variant={isEditMode ? "default" : "outline"}
+                onClick={() => setIsEditMode(!isEditMode)}
+                className={isEditMode ? "bg-teal-600 hover:bg-teal-700" : ""}
+              >
+                <i className={`fas ${isEditMode ? 'fa-check' : 'fa-edit'} mr-2`}></i>
+                {isEditMode ? 'Done' : 'Customize'}
+              </Button>
+              {isEditMode && (
+                <Button size="sm" variant="ghost" onClick={resetLayout}>
+                  <i className="fas fa-undo mr-2"></i> Reset
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
+      {isEditMode && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <div className="flex items-center text-blue-800">
+            <i className="fas fa-info-circle mr-2"></i>
+            <span className="text-sm">Drag widgets to reorder them. Click the × to hide widgets.</span>
+          </div>
+        </div>
+      )}
+
       {/* Widgets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="soultech-widgets">
+          {(provided, snapshot) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className={`
+                grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4
+                ${snapshot.isDraggingOver ? 'bg-blue-50' : ''}
+                transition-colors duration-200
+              `}
+            >
         {/* Geomagnetic Activity (Kp) */}
         <Card className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-5" />
@@ -611,7 +730,11 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             </div>
           </CardContent>
         </Card>
-      </div>
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {/* Info / Sources */}
       <Card className="relative overflow-hidden">
