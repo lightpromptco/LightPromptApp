@@ -291,7 +291,7 @@ export function DashboardWidgets({ userId, dashboardData, user }: DashboardWidge
       const g = await getGeo(userId);
       if (!mounted) return;
       setGeo(g);
-      setLocationStatus(g.permission || 'unknown');
+      setLocationStatus((g.permission as 'granted' | 'denied' | 'unavailable') || 'loading');
       
       const [w, ev, uvData, pollenData] = await Promise.all([
         fetchWeather(g.lat, g.lon),
