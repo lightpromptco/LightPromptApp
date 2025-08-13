@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,17 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
   const [aq, setAQ] = useState<AQ>({ pm25: 0, usAqi: 0, source: "Loading..." });
   const [sun, setSun] = useState<SunTimes | undefined>();
   const [loading, setLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  
+  // Widget order state
+  const [widgetOrder, setWidgetOrder] = useState([
+    'geomagnetic',
+    'solar-wind', 
+    'air-quality',
+    'circadian',
+    'lunar-phase',
+    'focus-streak'
+  ]);
 
   // Save widget data to Supabase for LightPrompt analysis
   const saveWidgetDataToSupabase = async (widgetData: any) => {
@@ -54,6 +66,37 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
     } catch (error) {
       console.log('Widget data save failed:', error);
     }
+  };
+
+  // Handle drag end
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const newOrder = Array.from(widgetOrder);
+    const [reorderedItem] = newOrder.splice(result.source.index, 1);
+    newOrder.splice(result.destination.index, 0, reorderedItem);
+    
+    setWidgetOrder(newOrder);
+    
+    // Save reorder action
+    saveWidgetDataToSupabase({
+      action: 'reorder',
+      oldOrder: widgetOrder,
+      newOrder: newOrder,
+      movedWidget: reorderedItem,
+      fromIndex: result.source.index,
+      toIndex: result.destination.index
+    });
+  };
+
+  // Reset widget layout
+  const resetLayout = () => {
+    const defaultOrder = ['geomagnetic', 'solar-wind', 'air-quality', 'circadian', 'lunar-phase', 'focus-streak'];
+    setWidgetOrder(defaultOrder);
+    saveWidgetDataToSupabase({
+      action: 'reset',
+      newOrder: defaultOrder
+    });
   };
 
   // Focus streak timer
@@ -245,6 +288,240 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
     : aq.usAqi <= 150 ? { text: "Unhealthy (SG)", class: "bg-orange-500" }
     : { text: "Unhealthy", class: "bg-red-600" };
 
+  // Widget components
+  const renderWidget = (widgetId: string) => {
+    const widgetComponents = {
+      'geomagnetic': (
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-5" />
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Orbit className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <div>
+                      <div className="font-semibold mb-1">Kp Index (0-9)</div>
+                      <p>Measures Earth's magnetic field disturbance from solar activity.</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className="bg-indigo-600 text-white text-xs">
+                Space Weather
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Geomagnetic Activity (Kp)</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">
+                {loading ? "—" : kp.toFixed(1)}
+              </span>
+              <Progress value={loading ? 0 : (kp / 9) * 100} className="w-24 h-2" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Higher Kp can correlate with auroras & geomagnetic disturbances.
+            </p>
+          </CardContent>
+        </Card>
+      ),
+      'solar-wind': (
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 opacity-5" />
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <p>Solar wind speed from NOAA DSCOVR satellite data.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className="bg-cyan-600 text-white text-xs">
+                DSCOVR
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Solar Wind Speed</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">
+                {loading ? "—" : `${Math.round(wind)} km/s`}
+              </span>
+              <TrendingUp className="h-6 w-6 text-cyan-500" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Increased wind speed can precede geomagnetic activity.
+            </p>
+          </CardContent>
+        </Card>
+      ),
+      'air-quality': (
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 opacity-5" />
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Leaf className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <p>US AQI and PM2.5 levels from Open-Meteo API.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className={`${aqiBadge.class} text-white text-xs`}>
+                {aqiBadge.text}
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Air Quality (US AQI / PM2.5)</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">
+                {loading ? "—" : Math.round(aq.usAqi)}
+              </span>
+              <div className="text-right text-xs text-muted-foreground">
+                PM2.5: {loading ? "—" : aq.pm25.toFixed(1)} μg/m³<br />
+                Source: {aq.source}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ),
+      'circadian': (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <p>Based on current time vs. today's sunrise/sunset.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className="bg-orange-600 text-white text-xs">
+                Daily Rhythm
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Circadian Alignment</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{circadianAlignment}%</span>
+              <Progress value={circadianAlignment} className="w-24 h-2" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Based on current time vs. today's sunrise/sunset.
+            </p>
+          </CardContent>
+        </Card>
+      ),
+      'lunar-phase': (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Moon className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <p>Local calculation (no API).</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className="bg-purple-600 text-white text-xs">
+                {moonPhase.emoji}
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Lunar Phase</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{moonPhase.phaseName}</span>
+              <span className="text-sm text-muted-foreground">{moonPhase.illumination}%</span>
+            </div>
+          </CardContent>
+        </Card>
+      ),
+      'focus-streak': (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="pb-2 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-3 text-xs">
+                    <p>Session timer tracking your current focus session.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Badge variant="outline" className="bg-rose-600 text-white text-xs">
+                Personal
+              </Badge>
+            </div>
+            <CardTitle className="text-base">Focus Streak</CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{focusTime} min</span>
+              <Progress value={Math.min(100, (focusTime / 50) * 100)} className="w-24 h-2" />
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.reload()}
+              >
+                Reset
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => window.location.href = "/#/vision-quest"}
+              >
+                Boost Focus
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )
+    };
+
+    return widgetComponents[widgetId as keyof typeof widgetComponents] || null;
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-6">
@@ -280,234 +557,73 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           </div>
         </div>
 
-        {/* Widgets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Geomagnetic Activity */}
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-5" />
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Orbit className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <div>
-                        <div className="font-semibold mb-1">Kp Index (0-9)</div>
-                        <p>Measures Earth's magnetic field disturbance from solar activity.</p>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className="bg-indigo-600 text-white text-xs">
-                  Space Weather
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Geomagnetic Activity (Kp)</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">
-                  {loading ? "—" : kp.toFixed(1)}
-                </span>
-                <Progress value={loading ? 0 : (kp / 9) * 100} className="w-24 h-2" />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Higher Kp can correlate with auroras & geomagnetic disturbances.
-              </p>
-            </CardContent>
-          </Card>
+        {/* Edit Mode Controls */}
+        {isEditMode && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center text-blue-800">
+              <i className="fas fa-info-circle mr-2"></i>
+              <span className="text-sm">Drag widgets to reorder them. Changes are automatically saved for LightPrompt AI analysis.</span>
+            </div>
+          </div>
+        )}
 
-          {/* Solar Wind Speed */}
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 opacity-5" />
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <p>Solar wind speed from NOAA DSCOVR satellite data.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className="bg-cyan-600 text-white text-xs">
-                  DSCOVR
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Solar Wind Speed</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">
-                  {loading ? "—" : `${Math.round(wind)} km/s`}
-                </span>
-                <TrendingUp className="h-6 w-6 text-cyan-500" />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Increased wind speed can precede geomagnetic activity.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Air Quality */}
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 opacity-5" />
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <p>US AQI and PM2.5 levels from Open-Meteo API.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className={`${aqiBadge.class} text-white text-xs`}>
-                  {aqiBadge.text}
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Air Quality (US AQI / PM2.5)</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">
-                  {loading ? "—" : Math.round(aq.usAqi)}
-                </span>
-                <div className="text-right text-xs text-muted-foreground">
-                  PM2.5: {loading ? "—" : aq.pm25.toFixed(1)} μg/m³<br />
-                  Source: {aq.source}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Circadian Alignment */}
-          <Card className="relative overflow-hidden">
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sun className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <p>Based on current time vs. today's sunrise/sunset.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className="bg-orange-600 text-white text-xs">
-                  Daily Rhythm
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Circadian Alignment</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">{circadianAlignment}%</span>
-                <Progress value={circadianAlignment} className="w-24 h-2" />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Based on current time vs. today's sunrise/sunset.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Lunar Phase */}
-          <Card className="relative overflow-hidden">
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Moon className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <p>Local calculation (no API).</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className="bg-purple-600 text-white text-xs">
-                  {moonPhase.emoji}
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Lunar Phase</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">{moonPhase.phaseName}</span>
-                <span className="text-sm text-muted-foreground">{moonPhase.illumination}%</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Focus Streak */}
-          <Card className="relative overflow-hidden">
-            <CardHeader className="pb-2 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-muted-foreground" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-3 text-xs">
-                      <p>Session timer tracking your current focus session.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Badge variant="outline" className="bg-rose-600 text-white text-xs">
-                  Personal
-                </Badge>
-              </div>
-              <CardTitle className="text-base">Focus Streak</CardTitle>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">{focusTime} min</span>
-                <Progress value={Math.min(100, (focusTime / 50) * 100)} className="w-24 h-2" />
-              </div>
-              <div className="mt-3 flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.location.reload()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => window.location.href = "/#/vision-quest"}
-                >
-                  Boost Focus
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Edit Mode Toggle */}
+        <div className="flex justify-between items-center mb-4">
+          <div></div>
+          <div className="flex items-center gap-2">
+            <Button 
+              size="sm" 
+              variant={isEditMode ? "default" : "outline"}
+              onClick={() => setIsEditMode(!isEditMode)}
+              className={isEditMode ? "bg-teal-600 hover:bg-teal-700" : ""}
+            >
+              <i className={`fas ${isEditMode ? 'fa-check' : 'fa-edit'} mr-2`}></i>
+              {isEditMode ? 'Done' : 'Customize'}
+            </Button>
+            {isEditMode && (
+              <Button size="sm" variant="ghost" onClick={resetLayout}>
+                <i className="fas fa-undo mr-2"></i> Reset
+              </Button>
+            )}
+          </div>
         </div>
+
+        {/* Drag-and-Drop Widgets */}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="soultech-widgets">
+            {(provided, snapshot) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className={`
+                  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4
+                  ${snapshot.isDraggingOver ? 'bg-blue-50' : ''}
+                  transition-colors duration-200
+                `}
+              >
+                {widgetOrder.map((widgetId, index) => (
+                  <Draggable key={widgetId} draggableId={widgetId} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={`
+                          ${isEditMode ? 'cursor-move' : 'cursor-default'}
+                          ${snapshot.isDragging ? 'rotate-2 scale-105' : ''}
+                          transition-transform duration-200
+                        `}
+                      >
+                        {renderWidget(widgetId)}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         {/* Info Section */}
         <Card className="relative overflow-hidden">
