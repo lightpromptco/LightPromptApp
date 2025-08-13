@@ -12,9 +12,9 @@ export interface Bot {
 export const BOTS: Bot[] = [
   {
     id: "lightpromptbot",
-    name: "Conscious AI Mirror",
-    tagline: "Your AI reflection partner.",
-    description: "Your conscious AI mirror designed to help you reflect, explore thoughts, and connect with your inner wisdom through mindful dialogue and self-discovery prompts.",
+    name: "LightPrompt Bot",
+    tagline: "Octo, your AI reflection partner.",
+    description: "Octo, your conscious AI mirror designed to help you reflect, explore thoughts, and connect with your inner wisdom through mindful dialogue and self-discovery prompts.",
     icon: "fas fa-mirror",
     gradient: "bot-gradient",
     tier: "Free",
@@ -32,9 +32,9 @@ export const BOTS: Bot[] = [
   },
   {
     id: "woowoo",
-    name: "Soul Map Navigator",
-    tagline: "Your inner wisdom guide & astrology companion.",
-    description: "Your highest self reflected through ancient wisdom. Knows personalities, gene keys, astrology, oracle knowledge, and soul insights. Honest, insightful, and fun - never lies or deceives, a true mirror of consciousness.",
+    name: "SoulMap",
+    tagline: "Your inner wisdom, career & astrology companion.",
+    description: "Your highest self reflected through ancient wisdom. Knows personalities, career, gene keys, astrology, oracle knowledge, and soul insights. Honest, insightful, and fun - never lies or deceives, a true mirror of consciousness.",
     icon: "fas fa-star",
     gradient: "bg-gradient-to-br from-purple-400 to-pink-500",
     tier: "Free",

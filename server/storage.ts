@@ -62,6 +62,7 @@ export interface IStorage {
   // Wellness Dashboard
   // Wellness Metrics
   getWellnessMetrics(userId: string, days?: number): Promise<WellnessMetric[]>;
+
   createWellnessMetric(metric: InsertWellnessMetric): Promise<WellnessMetric>;
   updateWellnessMetric(id: string, updates: Partial<WellnessMetric>): Promise<WellnessMetric>;
   
