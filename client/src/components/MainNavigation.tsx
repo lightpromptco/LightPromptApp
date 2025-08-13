@@ -22,7 +22,7 @@ import {
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Home, description: "Welcome & Overview", glyph: "⟐" },
   { path: "/chat", label: "Chat", icon: MessageCircle, description: "AI Conversations", glyph: "◈" },
-  { path: "/store", label: "Store", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
+  { path: "/store", label: "Store & Pricing", icon: BookOpen, description: "Course & Ebook", glyph: "♦" },
   { 
     path: "/wellness-tools", 
     label: "Wellness Tools", 
@@ -36,32 +36,19 @@ const NAV_ITEMS = [
     ]
   },
   { 
-    path: "/soul-sync", 
+    path: "/connect", 
     label: "Connect", 
     icon: Users, 
     description: "Community & Relationships", 
     glyph: "◇",
     subItems: [
       { path: "/soul-sync", label: "Soul Sync (Beta)", icon: Heart, description: "Find Your Connection" },
-      { path: "/vibe-match", label: "VibeMatch (Coming Soon)", icon: Sparkles, description: "AI-Powered Compatibility" },
-      { path: "/community", label: "Community (Coming Soon)", icon: Users, description: "Join Our Discord" }
-    ]
-  },
-  { 
-    path: "/features", 
-    label: "Features", 
-    icon: Sparkles, 
-    description: "Platform Features", 
-    glyph: "⟡",
-    subItems: [
-      { path: "/dashboard", label: "BodyMirror (Beta)", icon: Activity, description: "Your Wellness Overview" },
-      { path: "/blog", label: "Blog", icon: BookOpen, description: "Articles & Insights" },
-      { path: "/prism-points", label: "Prism Points (Coming Soon)", icon: Sparkles, description: "Reward System" }
+      { path: "/vibe-match", label: "VibeMatch", icon: Sparkles, description: "AI-Powered Compatibility" },
+      { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" }
     ]
   },
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
   { path: "/settings", label: "Settings", icon: Settings, description: "User Settings", glyph: "⟣" },
-  { path: "/privacy", label: "Privacy", icon: User, description: "Privacy Policy", glyph: "⟤" },
 ];
 
 const PRODUCT_ITEMS = [
@@ -260,10 +247,10 @@ export function MainNavigation() {
             </div>
           )}
 
-          {/* Products Section */}
+          {/* Solutions Section */}
           <div className="space-y-2 border-t pt-4">
             <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Products
+              Solutions
             </div>
             {PRODUCT_ITEMS.map((item) => {
               const active = isActive(item.path);
@@ -271,8 +258,7 @@ export function MainNavigation() {
                 <Link key={item.path} href={item.path}>
                   <Button
                     onClick={() => setIsOpen(false)}
-                    variant={active ? "default" : "ghost"}
-                    className="w-full justify-start text-sm"
+                    className="w-full justify-start text-sm bg-teal-600 hover:bg-teal-700 text-white"
                   >
                     <item.icon className="h-4 w-4 mr-2" />
                     {item.label}
