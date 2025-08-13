@@ -67,8 +67,7 @@ export class SupabaseStorage implements IStorage {
       const supabaseUser = await createSupabaseUser({
         email: user.email,
         name: user.name,
-        tier: user.tier || 'free',
-        role: user.role || 'user'
+        avatarUrl: user.avatarUrl
       });
       return this.formatUser(supabaseUser);
     } catch (error) {
@@ -111,7 +110,7 @@ export class SupabaseStorage implements IStorage {
   async getUserChatSessions(userId: string): Promise<ChatSession[]> {
     try {
       const sessions = await getSupabaseUserSessions(userId);
-      return sessions.map(session => this.formatChatSession(session));
+      return sessions.map((session: any) => this.formatChatSession(session));
     } catch (error) {
       console.error('Error getting user chat sessions:', error);
       return [];
@@ -387,12 +386,37 @@ export class SupabaseStorage implements IStorage {
   private formatUserProfile(supabaseProfile: any): UserProfile {
     return {
       userId: supabaseProfile.user_id,
+      displayName: supabaseProfile.display_name,
+      username: supabaseProfile.username,
+      bio: supabaseProfile.bio,
+      profileImageUrl: supabaseProfile.profile_image_url,
+      phone: supabaseProfile.phone,
+      website: supabaseProfile.website,
+      location: supabaseProfile.location,
+      latitude: supabaseProfile.latitude,
+      longitude: supabaseProfile.longitude,
+      locationPermission: supabaseProfile.location_permission,
+      locationLastUpdated: supabaseProfile.location_last_updated ? new Date(supabaseProfile.location_last_updated) : null,
+      timezone: supabaseProfile.timezone,
+      language: supabaseProfile.language,
       currentMood: supabaseProfile.current_mood,
       moodDescription: supabaseProfile.mood_description,
+      emotionalTone: supabaseProfile.emotional_tone,
+      coreValues: supabaseProfile.core_values || [],
+      archetypes: supabaseProfile.archetypes || [],
+      intentions: supabaseProfile.intentions || [],
+      vibeMatchEnabled: supabaseProfile.vibe_match_enabled,
+      vibeMatchBio: supabaseProfile.vibe_match_bio,
+      resonanceFrequency: supabaseProfile.resonance_frequency,
       preferences: supabaseProfile.preferences,
-      badges: supabaseProfile.badges,
-      evolutionScore: supabaseProfile.evolution_score,
+      notificationSettings: supabaseProfile.notification_settings,
       privacySettings: supabaseProfile.privacy_settings,
+      appearanceSettings: supabaseProfile.appearance_settings,
+      badges: supabaseProfile.badges || [],
+      evolutionScore: supabaseProfile.evolution_score,
+      reflectionStreak: supabaseProfile.reflection_streak,
+      lastActiveAt: supabaseProfile.last_active_at ? new Date(supabaseProfile.last_active_at) : null,
+      createdAt: new Date(supabaseProfile.created_at),
       updatedAt: new Date(supabaseProfile.updated_at)
     };
   }
