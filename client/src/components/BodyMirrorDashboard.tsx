@@ -3,12 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Activity,
   Atom,
   CloudSun,
   Gauge,
   Heart,
+  Info,
   Moon,
   Orbit,
   Sparkles,
@@ -220,21 +222,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
       : { text: "Hazardous", class: "bg-purple-700" };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          BodyMirror Dashboard
-        </h2>
-        <div className="flex items-center justify-center gap-2">
-          <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
-            LIVE DATA
-          </Badge>
-          <span className="text-sm text-muted-foreground">
-            Real space weather, air quality, circadian & lunar tracking
-          </span>
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            BodyMirror Dashboard
+          </h2>
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
+              LIVE DATA
+            </Badge>
+            <span className="text-sm text-muted-foreground">
+              Real space weather, air quality, circadian & lunar tracking
+            </span>
+          </div>
         </div>
-      </div>
 
       {/* Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -245,6 +248,19 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Orbit className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>Kp Index (0-9):</strong> Measures Earth's magnetic field disturbance caused by solar wind interactions. 
+                      Data from NOAA SWPC's real-time magnetometer network. Higher values (5+) indicate geomagnetic storms that can affect satellites, GPS, and create auroras at lower latitudes.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <Badge variant="outline" className="border-none bg-indigo-600 text-white text-xs">
                 Space Weather
@@ -270,7 +286,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 opacity-5" />
           <CardHeader className="pb-2 relative z-10">
             <div className="flex items-center justify-between">
-              <Zap className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>Solar Wind Speed (km/s):</strong> Measured by DSCOVR satellite at L1 Lagrange point, 1.5 million km from Earth. 
+                      Normal speeds: 300-400 km/s. High-speed streams (500+ km/s) from coronal holes can trigger geomagnetic activity when they interact with Earth's magnetosphere.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Badge variant="outline" className="border-none bg-cyan-600 text-white text-xs">
                 DSCOVR
               </Badge>
@@ -293,7 +324,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-600 opacity-5" />
           <CardHeader className="pb-2 relative z-10">
             <div className="flex items-center justify-between">
-              <Activity className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>US AQI & PM2.5:</strong> Air Quality Index from Open-Meteo using EPA standards. PM2.5 measures particles ≤2.5 micrometers that penetrate deep into lungs. 
+                      AQI: 0-50 Good, 51-100 Moderate, 101+ Unhealthy. Location-based using GPS coordinates.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Badge variant="outline" className={`border-none text-white text-xs ${aqiBadge.class}`}>
                 {aqiBadge.text}
               </Badge>
@@ -318,7 +364,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600 opacity-5" />
           <CardHeader className="pb-2 relative z-10">
             <div className="flex items-center justify-between">
-              <Sun className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>Circadian Alignment (%):</strong> Calculated from your location's sunrise/sunset times vs. current time. 
+                      Algorithm considers natural light exposure peaks and optimal energy windows. Based on chronobiology research - highest energy typically 2-3 hours post-sunrise.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Badge variant="outline" className="border-none bg-amber-600 text-white text-xs">
                 Daily Rhythm
               </Badge>
@@ -341,7 +402,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-600 opacity-5" />
           <CardHeader className="pb-2 relative z-10">
             <div className="flex items-center justify-between">
-              <Moon className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Moon className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>Lunar Phase:</strong> Calculated using astronomical algorithms based on current date. 
+                      Moon phases affect tides and may correlate with circadian rhythms. New Moon (0%) to Full Moon (100%). No external API required - pure mathematical calculation.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Badge variant="outline" className="border-none bg-violet-600 text-white text-xs">
                 {moon.emoji}
               </Badge>
@@ -364,7 +440,22 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-rose-600 opacity-5" />
           <CardHeader className="pb-2 relative z-10">
             <div className="flex items-center justify-between">
-              <Gauge className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Gauge className="h-5 w-5 text-muted-foreground" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      <strong>Focus Streak:</strong> Client-side timer tracking current session time. Integrates with Vision Quest productivity challenges. 
+                      Target: 50+ minutes for optimal focus flow. Based on Pomodoro research and ultradian rhythm studies (90-120 min natural cycles).
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Badge variant="outline" className="border-none bg-rose-600 text-white text-xs">
                 Personal
               </Badge>
@@ -422,6 +513,7 @@ export function BodyMirrorDashboard({ userId }: BodyMirrorProps) {
           </p>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
