@@ -179,14 +179,14 @@ export default function HelpPage() {
               <Mail className="h-12 w-12 mx-auto mb-4 text-teal-600" />
               <h3 className="font-semibold mb-2">Email Support</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Get personal help from our human team
+                Get personal help from our AI Agent, Octo
               </p>
               <Button 
                 variant="outline"
-                onClick={() => window.open('mailto:support@lightprompt.co')}
+                onClick={() => window.open('mailto:lightprompt.co@gmail.com')}
                 className="border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950"
               >
-                support@lightprompt.co
+                lightprompt.co@gmail.com
               </Button>
             </CardContent>
           </Card>
@@ -311,10 +311,10 @@ export default function HelpPage() {
                     AI Support Assistant is currently being set up. 
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    For immediate help, please email us at support@lightprompt.co
+                    For immediate help, please email us at lightprompt.co@gmail.com
                   </p>
                   <Button
-                    onClick={() => window.open('mailto:support@lightprompt.co')}
+                    onClick={() => window.open('mailto:lightprompt.co@gmail.com')}
                     className="mt-4 bg-blue-600 hover:bg-blue-700"
                   >
                     Email Support
@@ -329,7 +329,7 @@ export default function HelpPage() {
         <div className="mt-16 text-center space-y-4">
           <h2 className="text-2xl font-bold">Still Need Help?</h2>
           <p className="text-muted-foreground">
-            Our human support team is here for you
+            Our support team is here for you
           </p>
           
           <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
