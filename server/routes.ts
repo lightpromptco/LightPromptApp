@@ -469,6 +469,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Object storage endpoints for profile image uploads
+  app.post("/api/objects/upload", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  app.put("/api/profile/image", async (req, res) => {
+    try {
+      const { imageURL } = req.body;
+      if (!imageURL) {
+        return res.status(400).json({ error: "imageURL is required" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      
+      // For now, just normalize the path. In a full app, you'd save to user profile
+      const objectPath = objectStorageService.normalizeObjectEntityPath(imageURL);
+      
+      // Note: In a real app, you'd set ACL policy and save to user's profile
+      // await objectStorageService.trySetObjectEntityAclPolicy(imageURL, {
+      //   owner: userId,
+      //   visibility: "public"
+      // });
+
+      res.json({ objectPath });
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+      res.status(500).json({ error: "Failed to update profile image" });
+    }
+  });
+
   // Chat session routes
   app.get("/api/users/:userId/sessions", async (req, res) => {
     try {
