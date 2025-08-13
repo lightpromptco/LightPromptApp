@@ -30,8 +30,8 @@ const NAV_ITEMS = [
     description: "Self-Discovery & Growth", 
     glyph: "✦",
     subItems: [
-      { path: "/soul-map-explorer", label: "Soul Map Navigator", icon: Compass, description: "Interactive Birth Chart Explorer" },
-      { path: "/vision-quest", label: "Vision Quest", icon: Map, description: "Self-Discovery Journey" },
+      { path: "/soul-map-explorer", label: "SoulMap", icon: Compass, description: "Interactive Birth Chart Explorer" },
+      { path: "/vision-quest", label: "VisionQuest", icon: Map, description: "Self-Discovery Journey" },
       { path: "/geoprompt", label: "GeoPrompt (Beta)", icon: Map, description: "Location-Based Mindfulness" }
     ]
   },
@@ -42,9 +42,9 @@ const NAV_ITEMS = [
     description: "Community & Relationships", 
     glyph: "◇",
     subItems: [
-      { path: "/soul-sync", label: "Soul Sync (Beta)", icon: Heart, description: "Find Your Connection" },
+      { path: "/soul-sync", label: "SoulSync (Beta)", icon: Heart, description: "Find Your Connection" },
       { path: "/vibe-match", label: "VibeMatch", icon: Sparkles, description: "AI-Powered Compatibility" },
-      { path: "/community", label: "Community", icon: Users, description: "Join Our Discord" }
+      { path: "/community", label: "SeedCircle", icon: Users, description: "Join Our Discord" }
     ]
   },
   { path: "/help", label: "Help & Support", icon: User, description: "Support & Resources", glyph: "⟢" },
@@ -60,9 +60,9 @@ export function MainNavigation() {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [location] = useLocation();
   
-  // Check if current user is admin
+  // Check if current user is admin (removed admin section per user request)
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const isAdmin = currentUser.email === 'lightprompt.co@gmail.com';
+  const isAdmin = false; // Admin section removed per user request
 
   const isActive = (path: string) => {
     if (path === "/" && location === "/") return true;
@@ -116,7 +116,7 @@ export function MainNavigation() {
                   LightPrompt
                 </h1>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">Soul-Tech</p>
+                  <p className="text-sm text-muted-foreground">SoulTech</p>
                   <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded-full">
                     BETA
                   </span>
@@ -218,34 +218,7 @@ export function MainNavigation() {
             })}
           </div>
 
-          {/* Admin Section */}
-          {isAdmin && (
-            <div className="space-y-2 border-t pt-4">
-              <div className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Admin
-              </div>
-              <Link href="/admin/content">
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  variant="ghost"
-                  className="w-full justify-start text-sm"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Content Manager
-                </Button>
-              </Link>
-              <Link href="/admin/page-editor">
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  variant="ghost"
-                  className="w-full justify-start text-sm"
-                >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Universal Visual Editor
-                </Button>
-              </Link>
-            </div>
-          )}
+
 
           {/* Solutions Section */}
           <div className="space-y-2 border-t pt-4">

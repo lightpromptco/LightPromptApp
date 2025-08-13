@@ -181,6 +181,8 @@ export function BottomNavigation({
                       onGetUploadParameters={handleGetUploadParameters}
                       onComplete={handleUploadComplete}
                       buttonClassName="absolute -bottom-1 -right-1 w-5 h-5 rounded-lg bg-teal-500 hover:bg-teal-600 text-xs border-2 border-white"
+                      storageProvider="supabase"
+                      onUploadSuccess={(url) => onAvatarUpdate(url)}
                     >
                       <i className={`fas ${uploadingAvatar ? 'fa-spinner fa-spin' : 'fa-camera'} text-white text-xs`}></i>
                     </ObjectUploader>
