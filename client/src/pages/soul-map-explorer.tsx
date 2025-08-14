@@ -84,7 +84,7 @@ export default function SoulMapExplorerPage() {
   // chat state
   const CHAT_KEY = `soulmap-chat-${user?.id || 'guest'}`;
   const [chatMessages, setChatMessages] = useState<Array<{role:"user"|"assistant"; content:string}>>([
-    { role: "assistant", content: "Welcome to your Soul Map. I'm connecting to your cosmic database..." }
+    { role: "assistant", content: "Welcome to your SoulMap. I'm connecting to your cosmic database..." }
   ]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -153,12 +153,12 @@ export default function SoulMapExplorerPage() {
           setChatMessages(JSON.parse(localMessages));
         } else {
           setChatMessages([
-            { role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
+            { role: "assistant", content: "Welcome to your SoulMap. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
           ]);
         }
       } catch {
         setChatMessages([
-          { role: "assistant", content: "Welcome to your Soul Map. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
+          { role: "assistant", content: "Welcome to your SoulMap. Ask about any planet, sign, or life theme and I'll ground it in your chart." }
         ]);
       }
       return;
@@ -180,30 +180,30 @@ export default function SoulMapExplorerPage() {
               setChatMessages(formattedMessages);
             } else {
               setChatMessages([
-                { role: "assistant", content: `Welcome back to your Soul Map, ${user.name}. I remember our previous conversations and your cosmic journey. How can I guide you today?` }
+                { role: "assistant", content: `Welcome back to your SoulMap, ${user.name}. I remember our previous conversations and your cosmic journey. How can I guide you today?` }
               ]);
             }
           } else {
              // If session exists but messages fetch failed, fall back to local or default
-             setChatMessages(JSON.parse(localStorage.getItem(CHAT_KEY) || JSON.stringify([{ role: "assistant", content: `Welcome to your Soul Map, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }])));
+             setChatMessages(JSON.parse(localStorage.getItem(CHAT_KEY) || JSON.stringify([{ role: "assistant", content: `Welcome to your SoulMap, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }])));
           }
         } else {
           // No session found, create one and set initial welcome message
           const sessionResp = await apiRequest("POST", "/api/sessions", {
             userId: user.id,
             botId: SOULMAP_BOT_ID,
-            title: "Soul Map Exploration"
+            title: "SoulMaps Exploration"
           });
           const sessionData = await sessionResp.json();
           localStorage.setItem(`soulmap-session-${user.id}`, sessionData.id);
           setChatMessages([
-            { role: "assistant", content: `Welcome to your Soul Map, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }
+            { role: "assistant", content: `Welcome to your SoulMap, ${user.name}. I'm your cosmic guide, ready to explore your astrological blueprint and provide personalized insights. What would you like to discover about yourself?` }
           ]);
         }
       } catch (e) {
         console.error('Failed to load chat history:', e);
         setChatMessages([
-          { role: "assistant", content: "Welcome to your Soul Map. I'm here to guide you through your cosmic journey." }
+          { role: "assistant", content: "Welcome to your SoulMap. I'm here to guide you through your cosmic journey." }
         ]);
       }
     };
@@ -366,7 +366,7 @@ export default function SoulMapExplorerPage() {
           const sessionResp = await apiRequest("POST", "/api/sessions", {
             userId: user.id,
             botId: SOULMAP_BOT_ID,
-            title: "Soul Map Exploration"
+            title: "SoulMap Exploration"
           });
           const sessionData = await sessionResp.json();
           sessionId = sessionData.id;
@@ -823,7 +823,7 @@ export default function SoulMapExplorerPage() {
                   className="w-full bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600"
                   disabled={!birthData.date || !birthDataLoaded}
                   >
-                  <Wand2 className="w-4 h-4 mr-2" />Explore My Soul Map
+                  <Wand2 className="w-4 h-4 mr-2" />Explore My SoulMap
                 </Button>
                 
                 {!user?.id && (

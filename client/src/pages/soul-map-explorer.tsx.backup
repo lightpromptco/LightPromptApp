@@ -308,12 +308,12 @@ export default function SoulMapExplorerPage() {
     }
     // Use default test data for testing oracle functionality
     const defaultData = {
-      date: '1992-02-17',
+      date: '1933-03-03',
       time: '',
-      location: 'Temple, TX, USA',
+      location: 'Milky Way, Space, Hz',
       name: '',
-      lat: 31.0982 as number | null,
-      lng: -97.3428 as number | null
+      lat: 33.033 as number | null,
+      lng: -33.33 as number | null
     };
     console.log('Using default birth data for testing:', defaultData);
     return defaultData;
@@ -330,7 +330,7 @@ export default function SoulMapExplorerPage() {
   const [chatMessages, setChatMessages] = useState([
     {
       role: 'assistant',
-      content: "Welcome to your Soul Map Oracle! I'm here to help you explore your cosmic blueprint. What would you like to discover about yourself today?"
+      content: "Welcome to your SoulMap Oracle! I'm here to help you explore your cosmic blueprint. What would you like to discover about yourself today?"
     }
   ]);
   const [currentMessage, setCurrentMessage] = useState('');
@@ -1109,7 +1109,7 @@ export default function SoulMapExplorerPage() {
                 <InteractiveChart />
               </CardContent>
               
-              {/* Soul-Tech Action Bar */}
+              {/* SoulTech Action Bar */}
               <div className="relative z-10 p-6 border-t border-purple-500/30">
                 <div className="flex justify-center space-x-4 flex-wrap gap-2">
                   <button
@@ -1399,7 +1399,7 @@ export default function SoulMapExplorerPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Bot className="w-8 h-8 text-purple-500" />
-              Soul Map Oracle
+              SoulMap Oracle
             </h1>
             <p className="text-muted-foreground">Ask anything about your cosmic blueprint</p>
           </div>
