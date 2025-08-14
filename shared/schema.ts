@@ -83,7 +83,8 @@ export const userProfiles = pgTable("user_profiles", {
     profileVisibility: "public",
     showActivity: true,
     allowMessages: true,
-    dataSharing: false
+    dataSharing: false,
+    rememberBirthData: true
   }),
   appearanceSettings: jsonb("appearance_settings").default({
     darkMode: false,
@@ -455,6 +456,19 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
   metadata: true,
 });
 
+export const insertAstrologyProfileSchema = createInsertSchema(astrologyProfiles).pick({
+  userId: true,
+  birthDate: true,
+  birthTime: true,
+  birthLocation: true,
+  latitude: true,
+  longitude: true,
+  timezone: true,
+  sunSign: true,
+  moonSign: true,
+  risingSign: true,
+});
+
 export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
   userId: true,
   displayName: true,
@@ -628,16 +642,7 @@ export const insertCommunityCommentSchema = createInsertSchema(communityComments
   parentCommentId: true,
 });
 
-export const insertAstrologyProfileSchema = createInsertSchema(astrologyProfiles).pick({
-  userId: true,
-  birthDate: true,
-  birthTime: true,
-  birthLocation: true,
-  sunSign: true,
-  moonSign: true,
-  risingSign: true,
-  birthChart: true,
-});
+
 
 export const insertOrganizationSchema = createInsertSchema(organizations).pick({
   name: true,

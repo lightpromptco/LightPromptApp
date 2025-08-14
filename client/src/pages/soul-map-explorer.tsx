@@ -67,22 +67,12 @@ export default function SoulMapExplorerPage() {
   const [zenMode, setZenMode] = useState(false);
   const [zenBackground, setZenBackground] = useState<"sunset" | "ocean" | "forest" | "cosmic">("sunset");
 
-  // Initialize birthData with default or fetched user data if available
-  const [birthData, setBirthData] = useState<BirthData>(() => {
-    try {
-      const localData = localStorage.getItem("lightprompt-birth-data");
-      if (localData) {
-        return JSON.parse(localData);
-      }
-      // If no local data, check if user is logged in and has birth data
-      // This part would ideally fetch user profile data, but for now, we use a default
-      return {
-        date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428
-      };
-    } catch {
-      return { date: "1992-02-17", time: "", location: "Temple, TX, USA", name: "", lat: 31.0982, lng: -97.3428 };
-    }
+  // Initialize birthData with empty values - will be loaded from server or user input
+  const [birthData, setBirthData] = useState<BirthData>({
+    date: "", time: "", location: "", name: "", lat: null, lng: null
   });
+  const [birthDataLoaded, setBirthDataLoaded] = useState(false);
+  const [rememberBirthData, setRememberBirthData] = useState(true);
 
   const [locationSuggestions, setLocationSuggestions] = useState<Array<{ name: string; lat: number; lng: number; country?: string }>>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -96,6 +86,37 @@ export default function SoulMapExplorerPage() {
   const [chatMessages, setChatMessages] = useState<Array<{role:"user"|"assistant"; content:string}>>([
     { role: "assistant", content: "Welcome to your Soul Map. I'm connecting to your cosmic database..." }
   ]);
+
+  // Load user's birth data from server
+  useEffect(() => {
+    if (!user?.id) {
+      setBirthDataLoaded(true);
+      return;
+    }
+
+    const loadBirthData = async () => {
+      try {
+        const resp = await apiRequest("GET", `/api/users/${user.id}/birth-data`);
+        if (resp.ok) {
+          const userData = await resp.json();
+          setBirthData({
+            date: userData.date || "",
+            time: userData.time || "",
+            location: userData.location || "",
+            name: userData.name || "",
+            lat: userData.lat,
+            lng: userData.lng
+          });
+        }
+      } catch (e) {
+        console.log('No saved birth data found or remember setting disabled');
+      } finally {
+        setBirthDataLoaded(true);
+      }
+    };
+
+    loadBirthData();
+  }, [user?.id]);
 
   // Load user's chat history from server
   useEffect(() => {
@@ -165,8 +186,42 @@ export default function SoulMapExplorerPage() {
     loadChatHistory();
   }, [user?.id, user?.name]); // Depend on user?.id and user?.name
 
+  /** ---------- birth data save function ---------- */
+  const saveBirthData = async (data: BirthData, remember: boolean = true) => {
+    if (!user?.id) {
+      // For guests, save to localStorage only
+      localStorage.setItem("lightprompt-birth-data", JSON.stringify(data));
+      return;
+    }
+
+    try {
+      await apiRequest("POST", `/api/users/${user.id}/birth-data`, {
+        date: data.date,
+        time: data.time,
+        location: data.location,
+        lat: data.lat,
+        lng: data.lng,
+        timezone: "UTC", // You could make this dynamic based on location
+        rememberData: remember
+      });
+      
+      if (remember) {
+        toast({
+          title: "Birth Data Saved",
+          description: "Your cosmic coordinates have been securely saved.",
+        });
+      }
+    } catch (e) {
+      console.error('Failed to save birth data:', e);
+      toast({
+        title: "Save Failed",
+        description: "Could not save birth data. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   /** ---------- effects ---------- */
-  useEffect(() => { localStorage.setItem("lightprompt-birth-data", JSON.stringify(birthData)); }, [birthData]);
   // Save messages to local storage only if user is not logged in, otherwise rely on server sync
   useEffect(() => {
     if (!user?.id) {
@@ -617,54 +672,92 @@ export default function SoulMapExplorerPage() {
         <Card className="max-w-md mx-auto text-left">
           <CardHeader><CardTitle className="flex items-center gap-2 justify-center"><Stars className="w-5 h-5" />Enter Your Cosmic Coordinates</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <Input type="date" value={birthData.date} onChange={(e)=>setBirthData(p=>({...p, date:e.target.value}))} />
-            <Input type="time" value={birthData.time} onChange={(e)=>setBirthData(p=>({...p, time:e.target.value}))} />
-            <div className="relative">
-              <Input
-                placeholder="Birth Location (City, Country)"
-                value={birthData.location || ""}
-                onChange={(e)=>handleLocationChange(e.target.value)}
-                onFocus={()=>{ if ((birthData.location||"").length>=3) doSearch(birthData.location!); }}
-                onBlur={()=>setTimeout(()=>setShowLocationDropdown(false), 200)}
-              />
-              {showLocationDropdown && locationSuggestions.length>0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg max-h-48 overflow-y-auto">
-                  {locationSuggestions.map((loc, i)=>(
-                    <button key={i} className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
-                            onClick={()=>selectLocation(loc)}>
-                      <div className="font-medium">{loc.name}</div>
-                      {loc.country && <div className="text-xs text-gray-500">{loc.country}</div>}
-                    </button>
-                  ))}
+            {!birthDataLoaded ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
+                <p className="text-sm text-gray-600 mt-2">Loading your saved birth data...</p>
+              </div>
+            ) : (
+              <>
+                <Input type="date" value={birthData.date} onChange={(e)=>setBirthData(p=>({...p, date:e.target.value}))} />
+                <Input type="time" value={birthData.time} onChange={(e)=>setBirthData(p=>({...p, time:e.target.value}))} />
+                <div className="relative">
+                  <Input
+                    placeholder="Birth Location (City, Country)"
+                    value={birthData.location || ""}
+                    onChange={(e)=>handleLocationChange(e.target.value)}
+                    onFocus={()=>{ if ((birthData.location||"").length>=3) doSearch(birthData.location!); }}
+                    onBlur={()=>setTimeout(()=>setShowLocationDropdown(false), 200)}
+                  />
+                  {showLocationDropdown && locationSuggestions.length>0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                      {locationSuggestions.map((loc, i)=>(
+                        <button key={i} className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+                                onClick={()=>selectLocation(loc)}>
+                          <div className="font-medium">{loc.name}</div>
+                          {loc.country && <div className="text-xs text-gray-500">{loc.country}</div>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <Button onClick={()=>{
-              // If user is logged in, switch to chart view directly
-              // If not logged in, prompt them to log in or continue as guest (and then switch to chart)
-              if (user?.id) {
-                setCurrentView("chart");
-              } else {
-                // Here you might want to trigger a login modal or direct to a login page
-                // For now, we'll just show a toast and keep them on the welcome screen
-                toast({
-                  title: "Login Required",
-                  description: "Please log in to save your Soul Map and access full features.",
-                  variant: "info"
-                });
-                // Optionally, you could navigate to a login page:
-                // router.push('/login');
-              }
-            }}
-              className="w-full bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600"
-              disabled={!birthData.date || !user?.id} // Disable if no date or user is not logged in
-              >
-              <Wand2 className="w-4 h-4 mr-2" />Explore My Soul Map
-            </Button>
-            {!user?.id && (
-              <Button variant="outline" className="w-full" onClick={() => { /* Trigger login modal or navigate */ }}>
-                Login to Save Your Map
-              </Button>
+                
+                {user?.id && (
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="rememberData"
+                      checked={rememberBirthData}
+                      onChange={(e) => setRememberBirthData(e.target.checked)}
+                      className="rounded"
+                    />
+                    <label htmlFor="rememberData" className="text-sm text-gray-700 cursor-pointer">
+                      Remember my birth data securely for future sessions
+                    </label>
+                  </div>
+                )}
+                
+                <Button onClick={async ()=>{
+                  if (!birthData.date || birthData.lat == null || birthData.lng == null) {
+                    toast({
+                      title: "Missing Information",
+                      description: "Please enter your birth date and location.",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  if (user?.id) {
+                    // Save birth data if user wants to remember it
+                    await saveBirthData(birthData, rememberBirthData);
+                    setCurrentView("chart");
+                  } else {
+                    // For guests, just save to localStorage and continue
+                    localStorage.setItem("lightprompt-birth-data", JSON.stringify(birthData));
+                    toast({
+                      title: "Using Guest Mode",
+                      description: "Birth data saved locally. Login to sync across devices.",
+                    });
+                    setCurrentView("chart");
+                  }
+                }}
+                  className="w-full bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600"
+                  disabled={!birthData.date || !birthDataLoaded}
+                  >
+                  <Wand2 className="w-4 h-4 mr-2" />Explore My Soul Map
+                </Button>
+                
+                {!user?.id && (
+                  <Button variant="outline" className="w-full" onClick={() => { 
+                    toast({
+                      title: "Login Recommended",
+                      description: "Login to save your Soul Map across all devices and access premium features.",
+                    });
+                  }}>
+                    Login for Full Features
+                  </Button>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

@@ -9,14 +9,14 @@ import OpenAI from 'openai';
 import { getCurrentAstronomicalData, calculateNatalChart } from "./astro-engine";
 import { 
   insertUserSchema, insertChatSessionSchema, insertMessageSchema, 
-  insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
+  insertUserProfileSchema, insertAstrologyProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
   insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
   insertAppleHealthDataSchema, insertHomeKitDataSchema,
   wellnessMetrics, platformEvolution, insertPlatformEvolutionSchema,
   Challenge, InsertChallenge, VibeProfile, ReflectionPrompt, PrismPoint,
   insertChallengeSchema, insertVibeProfileSchema, insertGeoPromptCheckInSchema,
   PartnerConnection, UserPreferences, insertPartnerConnectionSchema,
-  insertUserPreferencesSchema, GeoPromptCheckIn
+  insertUserPreferencesSchema, GeoPromptCheckIn, astrologyProfiles
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -1081,6 +1081,147 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
       };
       
       res.json(fallbackData);
+    }
+  });
+
+  // Birth data management endpoints
+  app.get("/api/users/:userId/birth-data", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Check if user has privacy setting to remember birth data
+      const userProfile = await db.select()
+        .from(storage.userProfiles)
+        .where(eq(storage.userProfiles.userId, userId))
+        .limit(1);
+      
+      if (userProfile.length === 0 || !userProfile[0].privacySettings?.rememberBirthData) {
+        return res.status(404).json({ error: "Birth data not saved or remember setting disabled" });
+      }
+      
+      // Get astrology profile
+      const astrologyProfile = await db.select()
+        .from(astrologyProfiles)
+        .where(eq(astrologyProfiles.userId, userId))
+        .limit(1);
+      
+      if (astrologyProfile.length === 0) {
+        return res.status(404).json({ error: "No birth data found" });
+      }
+      
+      const profile = astrologyProfile[0];
+      res.json({
+        date: profile.birthDate ? new Date(profile.birthDate).toISOString().split('T')[0] : null,
+        time: profile.birthTime || "",
+        location: profile.birthLocation || "",
+        lat: profile.latitude ? parseFloat(profile.latitude) : null,
+        lng: profile.longitude ? parseFloat(profile.longitude) : null,
+        timezone: profile.timezone || ""
+      });
+    } catch (error) {
+      console.error("Error fetching birth data:", error);
+      res.status(500).json({ error: "Failed to fetch birth data" });
+    }
+  });
+
+  app.post("/api/users/:userId/birth-data", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { date, time, location, lat, lng, timezone, rememberData } = req.body;
+      
+      if (!date || lat == null || lng == null) {
+        return res.status(400).json({ error: "Date, latitude, and longitude are required" });
+      }
+      
+      // Calculate sun sign for the birth data
+      const { calculateSunSign } = await import('./astrology');
+      const birthDate = new Date(date);
+      const sunSign = calculateSunSign(birthDate);
+      
+      // Update user privacy settings if specified
+      if (rememberData !== undefined) {
+        await db.update(storage.userProfiles)
+          .set({
+            privacySettings: {
+              rememberBirthData: rememberData,
+              profileVisibility: "public",
+              showActivity: true,
+              allowMessages: true,
+              dataSharing: false
+            },
+            updatedAt: new Date()
+          })
+          .where(eq(storage.userProfiles.userId, userId));
+      }
+      
+      // Only save if user wants to remember the data
+      if (rememberData !== false) {
+        // Upsert astrology profile
+        await db.insert(astrologyProfiles)
+          .values({
+            userId,
+            birthDate: new Date(date),
+            birthTime: time || null,
+            birthLocation: location || "",
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+            timezone: timezone || "UTC",
+            sunSign,
+            lastUpdated: new Date(),
+            createdAt: new Date()
+          })
+          .onConflictDoUpdate({
+            target: astrologyProfiles.userId,
+            set: {
+              birthDate: new Date(date),
+              birthTime: time || null,
+              birthLocation: location || "",
+              latitude: lat.toString(),
+              longitude: lng.toString(),
+              timezone: timezone || "UTC",
+              sunSign,
+              lastUpdated: new Date()
+            }
+          });
+      }
+      
+      res.json({ 
+        success: true, 
+        message: rememberData === false ? "Birth data not saved (remember disabled)" : "Birth data saved successfully",
+        sunSign 
+      });
+    } catch (error) {
+      console.error("Error saving birth data:", error);
+      res.status(500).json({ error: "Failed to save birth data" });
+    }
+  });
+
+  app.delete("/api/users/:userId/birth-data", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Delete astrology profile
+      await db.delete(astrologyProfiles)
+        .where(eq(astrologyProfiles.userId, userId));
+      
+      // Update privacy settings to not remember birth data
+      await db.update(storage.userProfiles)
+        .set({
+          privacySettings: {
+            rememberBirthData: false,
+            profileVisibility: "public",
+            showActivity: true,
+            allowMessages: true,
+            dataSharing: false
+          },
+          updatedAt: new Date()
+        })
+        .where(eq(storage.userProfiles.userId, userId));
+      
+      res.json({ success: true, message: "Birth data deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting birth data:", error);
+      res.status(500).json({ error: "Failed to delete birth data" });
     }
   });
 

@@ -208,6 +208,27 @@ export default function SettingsPage() {
     updateProfileMutation.mutate(updates);
   };
 
+  const handleDeleteBirthData = async () => {
+    if (!currentUserId) return;
+    
+    try {
+      await apiRequest("DELETE", `/api/users/${currentUserId}/birth-data`);
+      toast({
+        title: "Birth Data Deleted",
+        description: "Your birth data has been permanently removed.",
+      });
+      
+      // Update the privacy setting
+      updateNestedField('privacySettings', 'rememberBirthData', false);
+    } catch (error) {
+      toast({
+        title: "Delete Failed",
+        description: "Could not delete birth data. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSaveAppearance = () => {
     const updates = {
       appearanceSettings: userProfile?.appearanceSettings
@@ -745,6 +766,45 @@ export default function SettingsPage() {
                         onCheckedChange={(checked) => updateNestedField('privacySettings', 'dataSharing', checked)}
                         data-testid="switch-privacy-data-sharing"
                       />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Remember Birth Data</p>
+                        <p className="text-sm text-gray-500">Save birth information for Soul Map features</p>
+                      </div>
+                      <Switch
+                        checked={userProfile?.privacySettings?.rememberBirthData || false}
+                        onCheckedChange={(checked) => updateNestedField('privacySettings', 'rememberBirthData', checked)}
+                        data-testid="switch-privacy-birth-data"
+                      />
+                    </div>
+                  </div>
+
+                  <Separator className="my-6" />
+
+                  <div>
+                    <h3 className="text-sm font-medium mb-3">Birth Data Management</h3>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-amber-900">Birth Data Storage</p>
+                            <p className="text-sm text-amber-700 mt-1">
+                              Your birth data is used for Soul Map calculations and astrological insights. 
+                              You can delete this data at any time.
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDeleteBirthData}
+                            className="text-red-600 border-red-300 hover:bg-red-50"
+                            data-testid="button-delete-birth-data"
+                          >
+                            Delete Birth Data
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
