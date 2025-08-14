@@ -413,13 +413,13 @@ export default function SoulMapExplorerPage() {
 
     return (
       <div className={getZenBackgroundStyle()}>
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="flex items-center justify-between mb-8">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
             <div>
-              <h1 className={`text-3xl font-bold ${zenMode ? "text-white" : ""}`}>Your Soul Map</h1>
+              <h1 className={`text-2xl sm:text-3xl font-bold ${zenMode ? "text-white" : ""}`}>Your Soul Map</h1>
               <p className={`${zenMode ? "text-white/80" : "text-muted-foreground"}`}>Click any planet/sign to explore deeper. Ask the Oracle anytime.</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant={zenMode ? "secondary" : "outline"} size="sm" onClick={() => setZenMode(!zenMode)}
                 className={zenMode ? "bg-white/20 text-white hover:bg-white/30 border-white/30" : ""}>
                 {zenMode ? <Minimize2 className="w-4 h-4 mr-2" /> : <Maximize2 className="w-4 h-4 mr-2" />}
@@ -458,7 +458,7 @@ export default function SoulMapExplorerPage() {
 
           {/* Sun sign summary */}
           {sunSign && (
-            <Card className="bg-gradient-to-br from-slate-50 to-white border-slate-200 shadow-sm mt-8">
+            <Card className="bg-gradient-to-br from-slate-50 to-white border-slate-200 shadow-sm mt-6 sm:mt-8">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -477,7 +477,7 @@ export default function SoulMapExplorerPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   <div>
                     <h4 className="font-medium mb-2 flex items-center gap-2"><Target className="w-4 h-4 text-blue-500" />Soul Purpose</h4>
                     <p className="text-sm text-gray-600">{sunSign.soulPurpose}</p>
@@ -490,9 +490,10 @@ export default function SoulMapExplorerPage() {
                     <h4 className="font-medium mb-2 flex items-center gap-2"><Bot className="w-4 h-4 text-purple-500" />Oracle Shortcuts</h4>
                     <div className="space-y-2">
                       {quickIntents.map((q) => (
-                        <Button key={q} variant="outline" size="sm" className="w-full justify-start text-xs"
+                        <Button key={q} variant="outline" size="sm" className="w-full justify-start text-xs text-left"
                           onClick={() => { setCurrentMessage(q); setCurrentView("chat"); }}>
-                          <MessageCircle className="w-3 h-3 mr-2" />{q}
+                          <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                          <span className="truncate">{q}</span>
                         </Button>
                       ))}
                     </div>
@@ -503,7 +504,7 @@ export default function SoulMapExplorerPage() {
           )}
 
           {/* Real-time cosmic weather with comprehensive nerd statistics */}
-          <div className={`mt-8 ${zenMode ? "bg-white/10 backdrop-blur-md border-white/20" : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200"} rounded-xl border p-6`}>
+          <div className={`mt-6 sm:mt-8 ${zenMode ? "bg-white/10 backdrop-blur-md border-white/20" : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200"} rounded-xl border p-4 sm:p-6`}>
             <h3 className={`text-xl font-semibold mb-6 flex items-center gap-2 ${zenMode ? "text-white" : "text-gray-900"}`}>
               <Zap className="h-5 w-5 text-indigo-600" />Current Cosmic Weather & Astronomical Data
             </h3>
@@ -626,7 +627,7 @@ export default function SoulMapExplorerPage() {
 
             {/* Coordinates & Timing */}
             <div className={`mb-4 p-3 rounded-lg ${zenMode ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-100"} border`}>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 text-xs">
                 <div>
                   <span className={`${zenMode ? "text-white/60" : "text-gray-500"}`}>Timestamp:</span>
                   <span className={`ml-1 font-mono ${zenMode ? "text-white" : "text-gray-800"}`}>
@@ -657,19 +658,19 @@ export default function SoulMapExplorerPage() {
 
   if (currentView === "welcome") {
     return (
-      <div className="max-w-4xl mx-auto p-6 text-center space-y-8">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 text-center space-y-6 sm:space-y-8">
         <div className="space-y-4">
           <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 via-blue-500 to-teal-500 rounded-full flex items-center justify-center shadow-xl">
             <Compass className="h-10 w-10 text-white" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-light">Soul Map Navigator</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-light">Soul Map Navigator</h1>
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
             Discover your cosmic blueprint. The bot weaves live sky + your chart into practical guidance.
           </p>
           <Badge className="bg-gradient-to-r from-purple-500 to-teal-500 text-white">Interactive Astrology Explorer</Badge>
         </div>
 
-        <Card className="max-w-md mx-auto text-left">
+        <Card className="max-w-md mx-auto text-left mx-4 sm:mx-auto">
           <CardHeader><CardTitle className="flex items-center gap-2 justify-center"><Stars className="w-5 h-5" />Enter Your Cosmic Coordinates</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             {!birthDataLoaded ? (
@@ -767,20 +768,20 @@ export default function SoulMapExplorerPage() {
 
   if (currentView === "chat") {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2"><Bot className="w-8 h-8 text-purple-500" />Soul Map Oracle</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2"><Bot className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />Soul Map Oracle</h1>
             <p className="text-muted-foreground">Your questions → chart-aware replies from the SoulMap bot.</p>
           </div>
           <Button variant="outline" onClick={() => setCurrentView("chart")}><ArrowRight className="w-4 h-4 mr-2" />Back to Chart</Button>
         </div>
 
-        <Card className="h-[600px] flex flex-col">
-          <CardContent className="flex-1 p-6 overflow-auto space-y-4">
+        <Card className="h-[500px] sm:h-[600px] flex flex-col">
+          <CardContent className="flex-1 p-3 sm:p-6 overflow-auto space-y-4">
             {chatMessages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] rounded-lg p-3 ${m.role === "user" ? "bg-purple-500 text-white ml-4" : "bg-gray-100 dark:bg-gray-800 mr-4"}`}>
+                <div className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${m.role === "user" ? "bg-purple-500 text-white ml-2 sm:ml-4" : "bg-gray-100 dark:bg-gray-800 mr-2 sm:mr-4"}`}>
                   <div className="flex items-start gap-2">
                     {m.role === "assistant" ? <Bot className="w-4 h-4 text-purple-500 mt-0.5" /> : <User className="w-4 h-4 text-purple-100 mt-0.5" />}
                     <p className="text-sm">{m.content}</p>
@@ -815,13 +816,15 @@ export default function SoulMapExplorerPage() {
               <Button onClick={() => sendToBot(currentMessage)} disabled={!currentMessage.trim() || isGenerating || !user?.id}><Send className="w-4 h-4" /></Button>
             </div>
             {/* quick chips */}
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-1 sm:gap-2">
               {[
                 "What are my next 30 days of transits?",
                 `How does my ${selectedPlanet ?? "Sun"} placement show up in relationships?`,
                 "What rituals suit this moon phase?",
               ].map((q) => (
-                <Button key={q} size="sm" variant="outline" className="h-7 text-xs" onClick={() => sendToBot(q)}>{q}</Button>
+                <Button key={q} size="sm" variant="outline" className="h-7 text-xs text-left px-2 flex-shrink-0" onClick={() => sendToBot(q)}>
+                  <span className="truncate max-w-[120px] sm:max-w-none">{q}</span>
+                </Button>
               ))}
             </div>
           </div>
