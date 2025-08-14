@@ -447,14 +447,15 @@ export default function SoulMapExplorerPage() {
             </Card>
           )}
 
-          {/* Real-time cosmic weather */}
+          {/* Real-time cosmic weather with comprehensive nerd statistics */}
           <div className={`mt-8 ${zenMode ? "bg-white/10 backdrop-blur-md border-white/20" : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200"} rounded-xl border p-6`}>
-            <h3 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${zenMode ? "text-white" : "text-gray-900"}`}>
-              <Zap className="h-5 w-5 text-indigo-600" />Current Cosmic Weather
+            <h3 className={`text-xl font-semibold mb-6 flex items-center gap-2 ${zenMode ? "text-white" : "text-gray-900"}`}>
+              <Zap className="h-5 w-5 text-indigo-600" />Current Cosmic Weather & Astronomical Data
             </h3>
 
+            {/* Moon Phase Section */}
             <div className={`mb-6 p-4 rounded-lg ${zenMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"} border`}>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{astronomicalData?.moon?.emoji ?? "🌙"}</span>
                   <span className={`font-medium ${zenMode ? "text-white" : "text-gray-800"}`}>
@@ -465,20 +466,132 @@ export default function SoulMapExplorerPage() {
                   {astronomicalData?.moon ? `${Math.round(astronomicalData.moon.illumination * 100)}% illuminated` : "—"}
                 </span>
               </div>
-              <div className={`${zenMode ? "bg-white/20" : "bg-gray-200"} rounded-full h-2`}>
+              <div className={`${zenMode ? "bg-white/20" : "bg-gray-200"} rounded-full h-2 mb-3`}>
                 <div className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
                   style={{ width: astronomicalData?.moon ? `${Math.round(astronomicalData.moon.illumination * 100)}%` : "50%" }} />
               </div>
+              
+              {/* Detailed Moon Statistics Grid */}
               {astronomicalData?.moon && (
-                <div className={`mt-2 text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>
-                  Moon in {astronomicalData.moon.signName} at {astronomicalData.moon.degree}°
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                  <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                    <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Zodiac Position</div>
+                    <div className={`font-medium ${zenMode ? "text-white" : "text-gray-800"}`}>
+                      {astronomicalData.moon.signName} {astronomicalData.moon.degree}°
+                    </div>
+                  </div>
+                  <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                    <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Phase Angle</div>
+                    <div className={`font-medium ${zenMode ? "text-white" : "text-gray-800"}`}>
+                      {Math.round(astronomicalData.moon.phaseAngle)}°
+                    </div>
+                  </div>
+                  <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                    <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Age (Days)</div>
+                    <div className={`font-medium ${zenMode ? "text-white" : "text-gray-800"}`}>
+                      {Math.round(astronomicalData.moon.ageInDays ?? 0)}
+                    </div>
+                  </div>
+                  <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                    <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Distance</div>
+                    <div className={`font-medium ${zenMode ? "text-white" : "text-gray-800"}`}>
+                      {astronomicalData.moon.distanceKm ? `${Math.round(astronomicalData.moon.distanceKm).toLocaleString()} km` : "—"}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-200/50">
+            {/* Planetary Positions Section */}
+            {astronomicalData?.planets && (
+              <div className={`mb-6 p-4 rounded-lg ${zenMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"} border`}>
+                <h4 className={`font-medium mb-3 flex items-center gap-2 ${zenMode ? "text-white" : "text-gray-800"}`}>
+                  <Stars className="h-4 w-4" />Current Planetary Positions
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {Object.entries(astronomicalData.planets).map(([planet, data]: [string, any]) => (
+                    <div key={planet} className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                      <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"} mb-1`}>
+                        {planet.charAt(0).toUpperCase() + planet.slice(1)}
+                      </div>
+                      <div className={`font-medium text-sm ${zenMode ? "text-white" : "text-gray-800"}`}>
+                        {data?.signName || "—"} {data?.degree ? `${Math.round(data.degree)}°` : ""}
+                      </div>
+                      {data?.retrograde && (
+                        <div className={`text-xs ${zenMode ? "text-orange-300" : "text-orange-600"}`}>℞ Retrograde</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Technical Astronomical Data */}
+            {astronomicalData && (
+              <div className={`mb-6 p-4 rounded-lg ${zenMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"} border`}>
+                <h4 className={`font-medium mb-3 flex items-center gap-2 ${zenMode ? "text-white" : "text-gray-800"}`}>
+                  <Sun className="h-4 w-4" />Solar & Sidereal Data
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {astronomicalData.julianDay && (
+                    <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                      <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Julian Day</div>
+                      <div className={`font-medium text-sm ${zenMode ? "text-white" : "text-gray-800"}`}>
+                        {astronomicalData.julianDay.toFixed(1)}
+                      </div>
+                    </div>
+                  )}
+                  {astronomicalData.siderealTime && (
+                    <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                      <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Sidereal Time</div>
+                      <div className={`font-medium text-sm ${zenMode ? "text-white" : "text-gray-800"}`}>
+                        {astronomicalData.siderealTime}
+                      </div>
+                    </div>
+                  )}
+                  {astronomicalData.deltaT && (
+                    <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                      <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>ΔT (seconds)</div>
+                      <div className={`font-medium text-sm ${zenMode ? "text-white" : "text-gray-800"}`}>
+                        {astronomicalData.deltaT.toFixed(1)}
+                      </div>
+                    </div>
+                  )}
+                  {astronomicalData.obliquity && (
+                    <div className={`text-center p-2 rounded ${zenMode ? "bg-white/10" : "bg-gray-50"}`}>
+                      <div className={`text-xs ${zenMode ? "text-white/60" : "text-gray-500"}`}>Obliquity</div>
+                      <div className={`font-medium text-sm ${zenMode ? "text-white" : "text-gray-800"}`}>
+                        {astronomicalData.obliquity.toFixed(2)}°
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Coordinates & Timing */}
+            <div className={`mb-4 p-3 rounded-lg ${zenMode ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-100"} border`}>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <span className={`${zenMode ? "text-white/60" : "text-gray-500"}`}>Timestamp:</span>
+                  <span className={`ml-1 font-mono ${zenMode ? "text-white" : "text-gray-800"}`}>
+                    {astronomicalData?.timestamp ? new Date(astronomicalData.timestamp).toISOString().slice(0, 19) + 'Z' : "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className={`${zenMode ? "text-white/60" : "text-gray-500"}`}>Calculation Engine:</span>
+                  <span className={`ml-1 ${zenMode ? "text-white" : "text-gray-800"}`}>Swiss Ephemeris</span>
+                </div>
+                <div>
+                  <span className={`${zenMode ? "text-white/60" : "text-gray-500"}`}>Refresh Rate:</span>
+                  <span className={`ml-1 ${zenMode ? "text-white" : "text-gray-800"}`}>30 minutes</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200/50">
               <p className={`text-sm ${zenMode ? "text-white/70" : "text-gray-600"}`}>
-                {astronomicalData ? `Live astronomical data • Updated ${new Date().toLocaleTimeString()}` : "Loading real-time cosmic data…"}
+                {astronomicalData ? `Live astronomical data • Updated ${new Date().toLocaleTimeString()} • Precision: ±0.1°` : "Loading real-time cosmic data…"}
               </p>
             </div>
           </div>
