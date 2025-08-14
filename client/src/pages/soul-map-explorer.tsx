@@ -680,16 +680,25 @@ export default function SoulMapExplorerPage() {
               </div>
             ) : (
               <>
-                <Input type="date" value={birthData.date} onChange={(e)=>setBirthData(p=>({...p, date:e.target.value}))} />
-                <Input type="time" value={birthData.time} onChange={(e)=>setBirthData(p=>({...p, time:e.target.value}))} />
-                <div className="relative">
-                  <Input
-                    placeholder="Birth Location (City, Country)"
-                    value={birthData.location || ""}
-                    onChange={(e)=>handleLocationChange(e.target.value)}
-                    onFocus={()=>{ if ((birthData.location||"").length>=3) doSearch(birthData.location!); }}
-                    onBlur={()=>setTimeout(()=>setShowLocationDropdown(false), 200)}
-                  />
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Birth Date *</label>
+                  <Input type="date" value={birthData.date} onChange={(e)=>setBirthData(p=>({...p, date:e.target.value}))} required />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Birth Time (if known)</label>
+                  <Input type="time" value={birthData.time} onChange={(e)=>setBirthData(p=>({...p, time:e.target.value}))} placeholder="Optional - improves accuracy" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Birth Location *</label>
+                  <div className="relative">
+                    <Input
+                      placeholder="e.g., Los Angeles, CA, USA"
+                      value={birthData.location || ""}
+                      onChange={(e)=>handleLocationChange(e.target.value)}
+                      onFocus={()=>{ if ((birthData.location||"").length>=3) doSearch(birthData.location!); }}
+                      onBlur={()=>setTimeout(()=>setShowLocationDropdown(false), 200)}
+                      required
+                    />
                   {showLocationDropdown && locationSuggestions.length>0 && (
                     <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg max-h-48 overflow-y-auto">
                       {locationSuggestions.map((loc, i)=>(
@@ -701,6 +710,7 @@ export default function SoulMapExplorerPage() {
                       ))}
                     </div>
                   )}
+                  </div>
                 </div>
                 
                 {user?.id && (
@@ -750,12 +760,9 @@ export default function SoulMapExplorerPage() {
                 
                 {!user?.id && (
                   <Button variant="outline" className="w-full" onClick={() => { 
-                    toast({
-                      title: "Login Recommended",
-                      description: "Login to save your Soul Map across all devices and access premium features.",
-                    });
+                    window.location.href = "/api/login";
                   }}>
-                    Login for Full Features
+                    Login to Save Your Data
                   </Button>
                 )}
               </>
