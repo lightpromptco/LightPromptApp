@@ -261,7 +261,10 @@ export default function SoulMapExplorerPage() {
 
     (async () => {
       try {
-        const resp = await apiRequest("POST", "/api/astrology/chart", { birthData });
+        const resp = await apiRequest("POST", "/api/astrology/chart", { 
+          birthData,
+          userId: user?.id 
+        });
         const json = await resp.json();
         if (ignore) return;
         setChartData(json.chart ?? json);

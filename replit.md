@@ -62,6 +62,7 @@ Domain transition: Moving to lightprompt.co as main landing page.
 - **Payment Success Page**: Created comprehensive onboarding flow with product-specific guidance at `/payment-success`
 - **VibeMatch Settings Complete (August 13, 2025)**: Fully implemented Instagram-style settings page with complete Supabase integration across 6 sections - Profile Information, VibeMatch Profile, Notifications, Privacy & Security, Appearance, and Account. All settings persist to database with comprehensive user profiling system.
 - **Enhanced Location System (August 13, 2025)**: Implemented privacy-first location handling with 30-minute browser caching, optional profile storage, real-time permission status badges, and smart coordinate management for location-based features like weather, air quality, and circadian data
+- **Personalized Astrological System (August 14, 2025)**: Fixed accuracy issues by implementing individual user birth data retrieval from Supabase. Oracle bot and chart calculations now use each user's specific birth data stored in astrology_profiles table, ensuring personalized horoscope readings instead of generic fallback data. System supports both real astronomical calculations and accurate fallback based on individual birth dates.
 - Daily Oracle redesigned with modern white/amber gradient design, accessible at `/daily-oracle` standalone page
 - Admin panel at `/admin/content` for editing pages, images, and fonts
 

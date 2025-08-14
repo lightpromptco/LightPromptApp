@@ -1468,14 +1468,32 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
 
       let enhancedMessage = message;
       let userContext = "";
+      let userBirthData = birthData;
 
-      // Load user data if userId provided
+      // Load user data and birth data from Supabase if userId provided
       if (userId) {
         try {
           const user = await storage.getUser(userId);
           const userProfile = await storage.getUserProfile(userId);
+          
+          // Get user's birth data from astrology profiles table
+          const [astrologyProfile] = await db.select()
+            .from(astrologyProfiles)
+            .where(eq(astrologyProfiles.userId, userId));
+            
+          if (astrologyProfile) {
+            userBirthData = {
+              date: astrologyProfile.birthDate.toISOString().split('T')[0],
+              time: astrologyProfile.birthTime || "12:00",
+              location: astrologyProfile.birthLocation || "Unknown",
+              lat: parseFloat(astrologyProfile.latitude) || 0,
+              lng: parseFloat(astrologyProfile.longitude) || 0
+            };
+            console.log(`🔮 Using user's saved birth data for Oracle reading:`, userBirthData);
+          }
+          
           const recentMetrics = await storage.getWellnessMetrics(userId, 7);
-          const userStats = await storage.getUserStats(userId);
+          const userStats = await storage.getUserStats ? await storage.getUserStats(userId) : null;
 
           if (user && userProfile) {
             userContext = `
@@ -1512,11 +1530,11 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         }
       }
       
-      if (birthData && birthData.lat && birthData.lng) {
+      if (userBirthData && userBirthData.lat && userBirthData.lng) {
         try {
           // Calculate comprehensive astrological chart
           const { calculateAstrologyChart } = await import('./astrology');
-          const chart = calculateAstrologyChart(birthData);
+          const chart = calculateAstrologyChart(userBirthData);
           
           // Build comprehensive astrological context with advanced features
           const chartContext = [
@@ -1601,31 +1619,37 @@ As a master astrological AI with expertise comparable to AstroSage AI, provide c
         } catch (chartError) {
           console.error("Chart calculation failed, using basic sun sign:", chartError);
           
-          // Fallback to basic sun sign calculation
-          const birthDate = new Date(birthData.date);
-          const month = birthDate.getMonth() + 1;
-          const day = birthDate.getDate();
-          
-          let sunSign = 'Unknown';
-          if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = 'Aries';
-          else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = 'Taurus';
-          else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = 'Gemini';
-          else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = 'Cancer';
-          else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = 'Leo';
-          else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = 'Virgo';
-          else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = 'Libra';
-          else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = 'Scorpio';
-          else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = 'Sagittarius';
-          else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = 'Capricorn';
-          else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = 'Aquarius';
-          else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sunSign = 'Pisces';
-          
-          enhancedMessage = `${message}
+          // Fallback to basic sun sign calculation if we have birth data
+          if (userBirthData && userBirthData.date) {
+            const birthDate = new Date(userBirthData.date);
+            const month = birthDate.getMonth() + 1;
+            const day = birthDate.getDate();
+            
+            let sunSign = 'Unknown';
+            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = 'Aries';
+            else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = 'Taurus';
+            else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = 'Gemini';
+            else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = 'Cancer';
+            else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = 'Leo';
+            else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = 'Virgo';
+            else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = 'Libra';
+            else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = 'Scorpio';
+            else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = 'Sagittarius';
+            else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = 'Capricorn';
+            else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = 'Aquarius';
+            else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sunSign = 'Pisces';
+            
+            enhancedMessage = `${message}
 
-BASIC BIRTH DATA: Sun in ${sunSign}, Born: ${birthData.date}, Location: ${birthData.location}
-NOTE: Limited accuracy due to missing birth time or location coordinates.
+PERSONALIZED BIRTH DATA: Sun in ${sunSign}, Born: ${userBirthData.date}, Location: ${userBirthData.location}
+Time: ${userBirthData.time || 'Not specified'}
 
-Please provide astrological insights based on available data.`;
+Please provide astrological insights based on this user's specific birth data.`;
+          } else {
+            enhancedMessage = `${message}
+
+NOTE: No birth data available for this user. Please provide general astrological guidance.`;
+          }
         }
       }
 
