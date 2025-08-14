@@ -1224,14 +1224,25 @@ export const userInsights = pgTable("user_insights", {
 
 // Platform Evolution - Track how LightPrompt grows and improves
 export const platformEvolution = pgTable("platform_evolution", {
-  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   version: text("version").notNull(),
   feature: text("feature").notNull(),
   impact: text("impact").notNull(),
   userFeedback: jsonb("user_feedback"),
   metrics: jsonb("metrics"),
-  timestamp: timestamp("timestamp").defaultNow(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
+
+export const insertPlatformEvolutionSchema = createInsertSchema(platformEvolution).pick({
+  version: true,
+  feature: true,
+  impact: true,
+  userFeedback: true,
+  metrics: true,
+});
+
+export type PlatformEvolution = typeof platformEvolution.$inferSelect;
+export type InsertPlatformEvolution = z.infer<typeof insertPlatformEvolutionSchema>;
 
 // Bot Learning - AI bot improvements and learning
 export const botLearning = pgTable("bot_learning", {

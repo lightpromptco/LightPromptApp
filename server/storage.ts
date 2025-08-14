@@ -94,13 +94,19 @@ export interface IStorage {
   
   // Challenges
   getChallenges(): Promise<Challenge[]>;
+  getActiveChallenges(): Promise<Challenge[]>;
   getChallenge(id: string): Promise<Challenge | undefined>;
+  getChallengeById(id: string): Promise<Challenge | undefined>;
   createChallenge(challenge: InsertChallenge): Promise<Challenge>;
   joinChallenge(userId: string, challengeId: string): Promise<any>;
   getUserChallenges(userId: string): Promise<any[]>;
   updateChallengeProgress(challengeId: string, userId: string, day: number, completed: boolean, notes?: string): Promise<void>;
   getUserStats(userId: string): Promise<any>;
   awardPoints(userId: string, points: number, source: string, sourceId?: string, description?: string): Promise<void>;
+  awardReward(userId: string, rewardId: string, source: string, sourceId?: string): Promise<void>;
+  getRewardDefinitions(): Promise<RewardDefinition[]>;
+  getUserUnlocks(userId: string): Promise<UserReward[]>;
+  discoverEasterEgg(userId: string, eggType: string, triggerType: string, triggerValue: number, title: string, description: string, content: any): Promise<EasterEggUnlock>;
   createRecommendation(recommendation: InsertRecommendation): Promise<Recommendation>;
   updateRecommendation(id: string, updates: Partial<Recommendation>): Promise<Recommendation>;
   generateRecommendations(userId: string): Promise<Recommendation[]>;
@@ -123,6 +129,42 @@ export interface IStorage {
   
   // Matching
   getPotentialMatches(userId: string): Promise<any[]>;
+  getCurrentMatches(userId: string): Promise<any[]>;
+  processMatchAction(userId: string, matchId: string, action: string): Promise<any>;
+  
+  // Match Communication
+  getMatchChatMessages(matchId: string): Promise<MatchChat[]>;
+  createMatchChatMessage(message: InsertMatchChat): Promise<MatchChat>;
+  updateMatchResonance(matchId: string, resonanceScore: number): Promise<void>;
+  
+  // Safety & Moderation
+  createChatSafetyLog(log: InsertChatSafetyLog): Promise<ChatSafetyLog>;
+  
+  // Reflection System
+  getReflectionPrompts(category?: string): Promise<ReflectionPrompt[]>;
+  getPrismPoints(userId: string): Promise<PrismPoint[]>;
+  setupVibeMatchTestData(): Promise<void>;
+  
+  // GeoPrompt
+  createGeoPromptCheckIn(checkIn: InsertGeoPromptCheckIn): Promise<GeoPromptCheckIn>;
+  getGeoPromptCheckInsByUser(userId: string): Promise<GeoPromptCheckIn[]>;
+  updateCrossComponentData(userId: string, data: any): Promise<void>;
+  getIntegratedUserData(userId: string): Promise<any>;
+  
+  // Partner Connections
+  getPartnerConnections(userId: string): Promise<PartnerConnection[]>;
+  invitePartner(userId: string, partnerEmail: string, relationshipType: string): Promise<PartnerConnection>;
+  updatePartnerConnection(connectionId: string, updates: Partial<PartnerConnection>): Promise<PartnerConnection>;
+  
+  // User Preferences
+  getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
+  createOrUpdateUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  
+  // Soul Map & Vision Quest
+  getSoulMap(userId: string): Promise<any>;
+  createSoulMap(userId: string, data: any): Promise<any>;
+  getVisionQuest(userId: string): Promise<any>;
+  createVisionQuest(userId: string, data: any): Promise<any>;
   getCurrentMatches(userId: string): Promise<VibeMatch[]>;
   processMatchAction(userId: string, matchUserId: string, action: string): Promise<any>;
   updateMatchResonance(matchId: string, resonanceContribution: number): Promise<void>;
