@@ -257,7 +257,7 @@ export default function SoulMapExplorerPage() {
 
   useEffect(() => {
     let ignore = false;
-    if (!birthData.date || birthData.lat == null || birthData.lng == null) return;
+    if (!birthData.date) return;
 
     (async () => {
       try {
