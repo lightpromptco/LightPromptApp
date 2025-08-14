@@ -127,12 +127,10 @@ export default function SoulMapExplorerPage() {
             lng: userData.lng
           });
           
-          // If user has birth data and they've previously viewed the chart, go directly to chart view
+          // If user has complete birth data, go directly to chart view
           if (userData.date && userData.lat && userData.lng) {
-            const hasVisitedChart = localStorage.getItem(`soulmap-visited-${user.id}`);
-            if (hasVisitedChart) {
-              setCurrentView("chart");
-            }
+            console.log("Loading chart data for logged-in user with saved birth data:", userData);
+            setCurrentView("chart");
           }
         }
       } catch (e) {

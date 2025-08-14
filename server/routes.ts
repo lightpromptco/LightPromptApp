@@ -1106,9 +1106,77 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
   });
 
   // Birth data management endpoints
+  // Save birth data endpoint
+  app.post("/api/users/:userId/birth-data", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { date, time, location, lat, lng, timezone, rememberData } = req.body;
+      
+      console.log(`Saving birth data for user ${userId}:`, { date, time, location, lat, lng, rememberData });
+      
+      // Create or update user profile with privacy setting
+      try {
+        await db.insert(storage.userProfiles)
+          .values({
+            userId,
+            currentMood: "neutral",
+            moodDescription: "Getting started",
+            preferences: {},
+            badges: [],
+            evolutionScore: 0,
+            privacySettings: { rememberBirthData: rememberData ?? true }
+          })
+          .onConflictDoUpdate({
+            target: storage.userProfiles.userId,
+            set: {
+              privacySettings: { rememberBirthData: rememberData ?? true },
+              updatedAt: new Date()
+            }
+          });
+      } catch (profileError: any) {
+        console.log("Profile update error:", profileError.message);
+      }
+      
+      // Create or update astrology profile
+      const astrologyData = {
+        userId,
+        birthDate: new Date(date),
+        birthTime: time || "",
+        birthLocation: location || "",
+        latitude: lat?.toString() || "",
+        longitude: lng?.toString() || "",
+        timezone: timezone || "UTC"
+      };
+      
+      await db.insert(astrologyProfiles)
+        .values(astrologyData)
+        .onConflictDoUpdate({
+          target: astrologyProfiles.userId,
+          set: {
+            birthDate: new Date(date),
+            birthTime: time || "",
+            birthLocation: location || "",
+            latitude: lat?.toString() || "",
+            longitude: lng?.toString() || "",
+            timezone: timezone || "UTC",
+            updatedAt: new Date()
+          }
+        });
+      
+      console.log(`✅ Birth data saved successfully for user ${userId}`);
+      res.json({ success: true, message: "Birth data saved successfully" });
+      
+    } catch (error: any) {
+      console.error("Error saving birth data:", error);
+      res.status(500).json({ error: "Failed to save birth data" });
+    }
+  });
+
   app.get("/api/users/:userId/birth-data", async (req, res) => {
     try {
       const { userId } = req.params;
+      
+      console.log(`Fetching birth data for user ${userId}`);
       
       // Check if user has privacy setting to remember birth data
       const userProfile = await db.select()
@@ -1117,6 +1185,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         .limit(1);
       
       if (userProfile.length === 0 || !userProfile[0].privacySettings?.rememberBirthData) {
+        console.log(`User ${userId} has no profile or rememberBirthData disabled`);
         return res.status(404).json({ error: "Birth data not saved or remember setting disabled" });
       }
       
@@ -1127,95 +1196,29 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         .limit(1);
       
       if (astrologyProfile.length === 0) {
+        console.log(`No astrology profile found for user ${userId}`);
         return res.status(404).json({ error: "No birth data found" });
       }
       
       const profile = astrologyProfile[0];
-      res.json({
+      const birthData = {
         date: profile.birthDate ? new Date(profile.birthDate).toISOString().split('T')[0] : null,
         time: profile.birthTime || "",
         location: profile.birthLocation || "",
         lat: profile.latitude ? parseFloat(profile.latitude) : null,
         lng: profile.longitude ? parseFloat(profile.longitude) : null,
         timezone: profile.timezone || ""
-      });
+      };
+      
+      console.log(`✅ Birth data found for user ${userId}:`, birthData);
+      res.json(birthData);
     } catch (error) {
       console.error("Error fetching birth data:", error);
       res.status(500).json({ error: "Failed to fetch birth data" });
     }
   });
 
-  app.post("/api/users/:userId/birth-data", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const { date, time, location, lat, lng, timezone, rememberData } = req.body;
-      
-      if (!date || lat == null || lng == null) {
-        return res.status(400).json({ error: "Date, latitude, and longitude are required" });
-      }
-      
-      // Calculate sun sign for the birth data
-      const { calculateSunSign } = await import('./astrology');
-      const birthDate = new Date(date);
-      const sunSign = calculateSunSign(birthDate);
-      
-      // Update user privacy settings if specified
-      if (rememberData !== undefined) {
-        await db.update(storage.userProfiles)
-          .set({
-            privacySettings: {
-              rememberBirthData: rememberData,
-              profileVisibility: "public",
-              showActivity: true,
-              allowMessages: true,
-              dataSharing: false
-            },
-            updatedAt: new Date()
-          })
-          .where(eq(storage.userProfiles.userId, userId));
-      }
-      
-      // Only save if user wants to remember the data
-      if (rememberData !== false) {
-        // Upsert astrology profile
-        await db.insert(astrologyProfiles)
-          .values({
-            userId,
-            birthDate: new Date(date),
-            birthTime: time || null,
-            birthLocation: location || "",
-            latitude: lat.toString(),
-            longitude: lng.toString(),
-            timezone: timezone || "UTC",
-            sunSign,
-            lastUpdated: new Date(),
-            createdAt: new Date()
-          })
-          .onConflictDoUpdate({
-            target: astrologyProfiles.userId,
-            set: {
-              birthDate: new Date(date),
-              birthTime: time || null,
-              birthLocation: location || "",
-              latitude: lat.toString(),
-              longitude: lng.toString(),
-              timezone: timezone || "UTC",
-              sunSign,
-              lastUpdated: new Date()
-            }
-          });
-      }
-      
-      res.json({ 
-        success: true, 
-        message: rememberData === false ? "Birth data not saved (remember disabled)" : "Birth data saved successfully",
-        sunSign 
-      });
-    } catch (error) {
-      console.error("Error saving birth data:", error);
-      res.status(500).json({ error: "Failed to save birth data" });
-    }
-  });
+
 
   app.delete("/api/users/:userId/birth-data", async (req, res) => {
     try {
