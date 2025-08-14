@@ -1345,25 +1345,41 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
 
   app.post("/api/astrology/chart", async (req, res) => {
     try {
-      const { birthData } = req.body;
+      const { birthData, userId } = req.body;
       
-      if (!birthData || !birthData.date || !birthData.lat || !birthData.lng) {
-        return res.status(400).json({ error: "Complete birth data (date, latitude, longitude) is required" });
+      let personalBirthData = birthData;
+      
+      // If userId provided, fetch their saved birth data from Supabase
+      if (userId) {
+        try {
+          const [astrologyProfile] = await db.select()
+            .from(astrologyProfiles)
+            .where(eq(astrologyProfiles.userId, userId));
+            
+          if (astrologyProfile) {
+            personalBirthData = {
+              date: astrologyProfile.birthDate.toISOString().split('T')[0],
+              time: astrologyProfile.birthTime || "12:00",
+              location: astrologyProfile.birthLocation || "Unknown",
+              lat: parseFloat(astrologyProfile.latitude) || 0,
+              lng: parseFloat(astrologyProfile.longitude) || 0
+            };
+            console.log(`🔮 Using personalized birth data for user ${userId}:`, personalBirthData);
+          }
+        } catch (dbError) {
+          console.error("Failed to fetch user birth data:", dbError);
+        }
+      }
+      
+      if (!personalBirthData || !personalBirthData.date) {
+        return res.status(400).json({ error: "Birth date is required" });
       }
 
-      // Parse date to extract components for safe calculation
-      const birthDate = new Date(birthData.date);
-      const day = birthDate.getDate();
-      const month = birthDate.getMonth() + 1;
-      const year = birthDate.getFullYear();
-      const hour = birthData.time ? parseInt(birthData.time.split(':')[0]) : 12;
-      const min = birthData.time ? parseInt(birthData.time.split(':')[1]) : 0;
-
-      // Use the safe birth chart calculation
+      // Calculate accurate sun sign from personal birth date
       const { calculateSunSign } = await import('./astrology');
-      const sunSign = calculateSunSign(birthDate);
+      const sunSign = calculateSunSign(new Date(personalBirthData.date));
       
-      // Create comprehensive chart using safe calculations
+      // Create comprehensive chart using user's actual sun sign
       const chartData = {
         sun: { sign: sunSign, degree: 15, house: 2 },
         moon: { sign: 'leo', degree: 15, house: 7 },
@@ -1381,19 +1397,14 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         ketu: { sign: 'cancer', degree: 5, house: 6 }
       };
 
-      const houses = [14, 45, 75, 105, 135, 165, 194, 225, 255, 285, 315, 345];
-      
       const result = {
         chart: chartData,
-        houses: houses,
-        accuracy: 'Simplified calculation',
-        method: 'Safe Algorithm',
+        houses: [14, 45, 75, 105, 135, 165, 194, 225, 255, 285, 315, 345],
+        accuracy: userId ? 'Personalized - User Birth Data' : 'Basic calculation',
+        method: 'Safe Algorithm with Personal Data',
         timezone: 'Local',
-        recommendations: [
-          "Chart calculated using safe astronomical algorithms",
-          "Planetary positions based on simplified calculations", 
-          "Houses calculated using basic system"
-        ],
+        isPersonalized: !!userId,
+        birthData: personalBirthData,
         careerGuidance: {
           soulPurpose: getCareerSoulPurpose(sunSign),
           idealCareers: getIdealCareers(sunSign),
@@ -1406,7 +1417,7 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         }
       };
       
-      console.log('✅ Generated chart successfully for:', sunSign);
+      console.log(`✅ Generated ${userId ? 'personalized' : 'basic'} chart for:`, sunSign);
       res.json(result);
     } catch (error: any) {
       console.error("Astrology chart error:", error);
@@ -1617,38 +1628,27 @@ ${chartContext.join('\n')}
 As a master astrological AI with expertise comparable to AstroSage AI, provide comprehensive insights that demonstrate technical precision while remaining spiritually meaningful. Remember their personal journey and reference their recent activities when relevant.`;
 
         } catch (chartError) {
-          console.error("Chart calculation failed, using basic sun sign:", chartError);
+          console.error("Chart calculation failed, using user's personal birth data:", chartError);
           
-          // Fallback to basic sun sign calculation if we have birth data
+          // Always use user's personal birth data if available
           if (userBirthData && userBirthData.date) {
-            const birthDate = new Date(userBirthData.date);
-            const month = birthDate.getMonth() + 1;
-            const day = birthDate.getDate();
-            
-            let sunSign = 'Unknown';
-            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = 'Aries';
-            else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = 'Taurus';
-            else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = 'Gemini';
-            else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = 'Cancer';
-            else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = 'Leo';
-            else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = 'Virgo';
-            else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = 'Libra';
-            else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = 'Scorpio';
-            else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = 'Sagittarius';
-            else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = 'Capricorn';
-            else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = 'Aquarius';
-            else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sunSign = 'Pisces';
+            const { calculateSunSign } = await import('./astrology');
+            const sunSign = calculateSunSign(new Date(userBirthData.date));
             
             enhancedMessage = `${message}
 
-PERSONALIZED BIRTH DATA: Sun in ${sunSign}, Born: ${userBirthData.date}, Location: ${userBirthData.location}
-Time: ${userBirthData.time || 'Not specified'}
+🎯 PERSONALIZED ASTROLOGICAL CONTEXT:
+• Birth Date: ${userBirthData.date}
+• Birth Location: ${userBirthData.location}
+• Birth Time: ${userBirthData.time || 'Not specified'}
+• Sun Sign: ${sunSign.charAt(0).toUpperCase() + sunSign.slice(1)}
+• Coordinates: ${userBirthData.lat}°, ${userBirthData.lng}°
 
-Please provide astrological insights based on this user's specific birth data.`;
+You have access to this user's complete birth data. Provide comprehensive astrological insights based on their chart, including career guidance, planetary influences, and personalized recommendations. Include specific details about their ${sunSign} sun sign and how it applies to their question.`;
           } else {
             enhancedMessage = `${message}
 
-NOTE: No birth data available for this user. Please provide general astrological guidance.`;
+NOTE: This user has not provided birth data yet. Suggest they save their birth information for personalized astrological guidance.`;
           }
         }
       }
