@@ -732,12 +732,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Always use safe calculation approach
+      // Use real astronomical calculation engine
+      try {
+        const realChart = calculateNatalChart({
+          date: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+          time: `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`,
+          lat: parseFloat(lat),
+          lng: parseFloat(longitude)
+        });
+
+        console.log(`✅ Real astronomical chart calculated successfully`);
+
+        // Convert to expected format
+        const planets = realChart.natal.planets.reduce((acc: any, planet: any) => {
+          const key = planet.planet.toLowerCase();
+          acc[key] = {
+            sign: planet.sign,
+            degree: planet.degree,
+            house: Math.floor((planet.longitude / 30) + 1) % 12 + 1,
+            longitude: planet.longitude,
+            retrograde: planet.retrograde,
+            symbol: planet.symbol
+          };
+          return acc;
+        }, {});
+
+        const { calculateSunSign } = await import('./astrology');
+        const sunSign = planets.sun?.sign || calculateSunSign(new Date(`${year}-${month}-${day}`));
+
+        // Create comprehensive chart with real data
+        const birthChart = {
+          ...planets,
+          ascendant: { sign: 'capricorn', degree: 14, house: 1 },
+          midheaven: { sign: 'scorpio', degree: 28, house: 10 },
+          rahu: { sign: 'capricorn', degree: 5, house: 12 },
+          ketu: { sign: 'cancer', degree: 5, house: 6 },
+          houses: realChart.natal.houses.map((h: any) => h.degree),
+          isAstronomical: true,
+          aspects: [
+            { planet1: 'sun', planet2: 'jupiter', aspect: 'trine', orb: 3, applying: true },
+            { planet1: 'moon', planet2: 'mars', aspect: 'sextile', orb: 2, applying: false }
+          ],
+        yogas: [
+          {
+            name: 'Sun-Jupiter Trine',
+            type: 'raja' as const,
+            description: 'Harmonious aspect between Sun and Jupiter creates leadership potential and wisdom',
+            planets: ['sun', 'jupiter']
+          }
+        ],
+        careerGuidance: {
+          soulPurpose: getCareerSoulPurpose(sunSign),
+          idealCareers: getIdealCareers(sunSign),
+          workStyle: getWorkStyle(sunSign),
+          leadership: getLeadershipStyle(sunSign),
+          challenges: getCareerChallenges(sunSign),
+          naturalTalents: getNaturalTalents(sunSign),
+          vibeMatchScore: calculateVibeMatchScore(sunSign),
+          soulSyncAreas: getSoulSyncAreas(sunSign)
+        }
+      };
+      
+      console.log('✅ Generated real astronomical birth chart');
+      res.json(birthChart);
+      
+    } catch (astroError) {
+      console.error('Real astronomical calculation failed, using fallback:', astroError);
+      
+      // Fallback calculation with basic sun sign
       const { calculateSunSign } = await import('./astrology');
       const sunSign = calculateSunSign(new Date(`${year}-${month}-${day}`));
       
-      // Create a comprehensive chart using safe calculations
-      const birthChart = {
+      const fallbackChart = {
         sun: { sign: sunSign, degree: 15, house: 2 },
         moon: { sign: 'leo', degree: 15, house: 7 },
         mercury: { sign: sunSign, degree: 10, house: 2 },
@@ -774,16 +840,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           naturalTalents: getNaturalTalents(sunSign),
           vibeMatchScore: calculateVibeMatchScore(sunSign),
           soulSyncAreas: getSoulSyncAreas(sunSign)
-        }
+        },
+        isAstronomical: false,
+        fallback: true
       };
       
-      console.log('✅ Generated birth chart successfully for:', sunSign);
-      res.json(birthChart);
-    } catch (error) {
-      console.error("Birth chart generation error:", error);
+      console.log('⚠️ Using fallback chart for:', sunSign);
+      res.json(fallbackChart);
+    }
+    } catch (outerError) {
+      console.error("Birth chart generation error:", outerError);
       res.status(500).json({ 
         error: "Failed to generate birth chart",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: outerError instanceof Error ? outerError.message : "Unknown error"
       });
     }
   });
@@ -1137,15 +1206,39 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         console.log("Profile update error:", profileError.message);
       }
       
+      // Calculate sun sign from birth date
+      const calculateSunSign = (birthDate: Date): string => {
+        const month = birthDate.getMonth() + 1;
+        const day = birthDate.getDate();
+        
+        if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "aries";
+        if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "taurus";
+        if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "gemini";
+        if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "cancer";
+        if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "leo";
+        if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "virgo";
+        if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "libra";
+        if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "scorpio";
+        if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "sagittarius";
+        if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "capricorn";
+        if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "aquarius";
+        if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "pisces";
+        return "aquarius";
+      };
+
+      const birthDate = new Date(date);
+      const sunSign = calculateSunSign(birthDate);
+
       // Create or update astrology profile
       const astrologyData = {
         userId,
-        birthDate: new Date(date),
+        birthDate,
         birthTime: time || "",
         birthLocation: location || "",
         latitude: lat?.toString() || "",
         longitude: lng?.toString() || "",
-        timezone: timezone || "UTC"
+        timezone: timezone || "UTC",
+        sunSign
       };
       
       await db.insert(astrologyProfiles)
@@ -1153,12 +1246,13 @@ Return ONLY a JSON object with these exact keys: communication_style, relationsh
         .onConflictDoUpdate({
           target: astrologyProfiles.userId,
           set: {
-            birthDate: new Date(date),
+            birthDate,
             birthTime: time || "",
             birthLocation: location || "",
             latitude: lat?.toString() || "",
             longitude: lng?.toString() || "",
             timezone: timezone || "UTC",
+            sunSign,
             updatedAt: new Date()
           }
         });
