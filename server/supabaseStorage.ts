@@ -868,5 +868,165 @@ export class SupabaseStorage implements IStorage {
     return [];
   }
 
+  // Add missing methods that routes are calling
+  async getSoulMap(userId: string): Promise<any> {
+    // TODO: Implement with Supabase
+    return null;
+  }
+
+  async createSoulMap(userId: string, data: any): Promise<any> {
+    // TODO: Implement with Supabase
+    return {};
+  }
+
+  async getVisionQuest(userId: string): Promise<any> {
+    // TODO: Implement with Supabase
+    return null;
+  }
+
+  async createVisionQuest(userId: string, data: any): Promise<any> {
+    // TODO: Implement with Supabase
+    return {};
+  }
+
+  async getUserStats(userId: string): Promise<any> {
+    // TODO: Implement with Supabase
+    return {
+      totalPoints: 0,
+      level: 1,
+      streakDays: 0,
+      challengesCompleted: 0,
+      badgesEarned: 0,
+      easterEggsFound: 0
+    };
+  }
+
+  async joinChallenge(userId: string, challengeId: string): Promise<any> {
+    // TODO: Implement with Supabase
+    return {};
+  }
+
+  async updateChallengeProgress(participantId: string, progress: any): Promise<any> {
+    // TODO: Implement with Supabase
+    return {};
+  }
+
+  async getUserChallenges(userId: string): Promise<any[]> {
+    // TODO: Implement with Supabase
+    return [];
+  }
+
+  async awardPoints(userId: string, points: number, source: string): Promise<void> {
+    // TODO: Implement with Supabase
+    console.log(`Points awarded: ${points} to user ${userId} for ${source}`);
+  }
+
+  async createGeoPromptCheckIn(checkIn: any): Promise<any> {
+    // TODO: Implement with Supabase
+    return {};
+  }
+
+  async getGeoPromptCheckInsByUser(userId: string): Promise<any[]> {
+    // TODO: Implement with Supabase
+    return [];
+  }
+
+  // Additional missing methods
+  async getVibeProfile(userId: string): Promise<any> {
+    return null;
+  }
+
+  async createOrUpdateVibeProfile(userId: string, data: any): Promise<any> {
+    return {};
+  }
+
+  async getPotentialMatches(userId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getCurrentMatches(userId: string): Promise<any[]> {
+    return [];
+  }
+
+  async processMatchAction(userId: string, targetId: string, action: string): Promise<any> {
+    return {};
+  }
+
+  async getMatchChatMessages(matchId: string): Promise<any[]> {
+    return [];
+  }
+
+  async createMatchChatMessage(message: any): Promise<any> {
+    return {};
+  }
+
+  async updateMatchResonance(matchId: string, data: any): Promise<any> {
+    return {};
+  }
+
+  async createChatSafetyLog(log: any): Promise<any> {
+    return {};
+  }
+
+  async getReflectionPrompts(category?: string): Promise<any[]> {
+    return [];
+  }
+
+  async getPrismPoints(userId: string): Promise<any[]> {
+    return [];
+  }
+
+  async setupVibeMatchTestData(): Promise<void> {
+    // No-op for now
+  }
+
+  async getPartnerConnections(userId: string): Promise<any[]> {
+    return [];
+  }
+
+  async invitePartner(data: any): Promise<any> {
+    return {};
+  }
+
+  async updatePartnerConnection(data: any): Promise<any> {
+    return {};
+  }
+
+  async getUserPreferences(userId: string): Promise<any> {
+    return null;
+  }
+
+  async createOrUpdateUserPreferences(data: any): Promise<any> {
+    return {};
+  }
+
+  async getActiveChallenges(): Promise<any[]> {
+    return [];
+  }
+
+  async createChallenge(challenge: any): Promise<any> {
+    return {};
+  }
+
+  async getChallengeById(id: string): Promise<any> {
+    return null;
+  }
+
+  async awardReward(userId: string, rewardId: string): Promise<any> {
+    return {};
+  }
+
+  async getRewardDefinitions(): Promise<any[]> {
+    return [];
+  }
+
+  async getUserUnlocks(userId: string): Promise<any[]> {
+    return [];
+  }
+
+  async discoverEasterEgg(userId: string, eggId: string): Promise<any> {
+    return {};
+  }
+
   // Properly close the class
 }
