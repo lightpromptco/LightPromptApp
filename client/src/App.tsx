@@ -47,6 +47,7 @@ import { SimpleOraclePage } from "@/pages/simple-oracle";
 import CleanOraclePage from "@/pages/clean-oracle";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
+import { UserProvider } from "@/hooks/use-user";
 
 function Router() {
   return (
@@ -270,7 +271,7 @@ function useEasterEggs() {
         const lastMidnightEgg = localStorage.getItem('lastMidnightEgg');
         const lastTime = lastMidnightEgg ? new Date(lastMidnightEgg) : null;
         const today = now.toDateString();
-        
+
         if (!lastTime || lastTime.toDateString() !== today) {
           localStorage.setItem('lastMidnightEgg', now.toISOString());
           setTimeout(() => {
@@ -320,7 +321,7 @@ function useEasterEggs() {
     // Add event listeners
     document.addEventListener('keydown', handleKeyDown);
     checkMidnightVisitor();
-    
+
     // Expose easter egg function globally for other components
     (window as any).discoverEasterEgg = discoverEasterEgg;
 
@@ -339,16 +340,53 @@ function EasterEggProvider({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <TooltipProvider>
-          <EasterEggProvider>
-            <Toaster />
-            <Router />
-          </EasterEggProvider>
-        </TooltipProvider>
-      </CartProvider>
+      <UserProvider>
+        <div className="min-h-screen bg-background">
+          <MainNavigation />
+          <div className="main-content">
+            <Switch>
+              <Route path="/" component={LandingPage} />
+              <Route path="/chat" component={ChatPage} />
+              <Route path="/dashboard" component={DashboardPage} />
+              <Route path="/settings" component={SettingsPage} />
+              <Route path="/help" component={HelpPage} />
+              <Route path="/vision-quest" component={VisionQuestPage} />
+              <Route path="/vision-quest/:stageId" component={VisionQuestStagePage} />
+              <Route path="/soul-map-explorer" component={SoulMapExplorerPage} />
+              <Route path="/community" component={CommunityPage} />
+              <Route path="/store" component={StorePage} />
+              <Route path="/checkout" component={CheckoutPage} />
+              <Route path="/checkout/success" component={CheckoutSuccessPage} />
+              <Route path="/product-info" component={ProductInfoPage} />
+              <Route path="/soul-sync" component={SoulSyncPage} />
+              <Route path="/vibe-match" component={VibeMatchPage} />
+              <Route path="/geoprompt" component={GeoPromptPage} />
+              <Route path="/prism-points" component={PrismPointsPage} />
+              <Route path="/challenges" component={ChallengesPage} />
+              <Route path="/payment-success" component={PaymentSuccessPage} />
+              <Route path="/admin" component={AdminPage} />
+              <Route path="/admin-settings" component={AdminSettingsPage} />
+              <Route path="/admin/content" component={AdminContentPage} />
+              <Route path="/admin/blog" component={AdminBlogPage} />
+              <Route path="/admin/page-editor" component={AdminPageEditorPage} />
+              <Route path="/admin/universal-editor" component={AdminUniversalEditorPage} />
+              <Route path="/admin/settings" component={AdminSettingsPageNew} />
+              <Route path="/course-access" component={CourseAccessPage} />
+              <Route path="/course" component={CoursePage} />
+              <Route path="/plans" component={PricingPage} />
+              <Route path="/b2b" component={B2BPage} />
+              <Route path="/partner-mode" component={PartnerModePage} />
+              <Route path="/privacy" component={PrivacyPage} />
+              <Route path="/products" component={ProductsPage} />
+              <Route path="/book" component={BookPage} />
+              <Route path="/blog" component={BlogPage} />
+              <Route path="/signup" component={SignupPage} />
+              <Route component={NotFoundPage} />
+            </Switch>
+          </div>
+          <Toaster />
+        </div>
+      </UserProvider>
     </QueryClientProvider>
   );
 }
-
-export default App;

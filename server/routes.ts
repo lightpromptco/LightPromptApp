@@ -2059,10 +2059,48 @@ Please provide astrological insights based on available data.`;
     try {
       const { userId } = req.params;
       const checkIns = await storage.getGeoPromptCheckInsByUser(userId);
+      
+      // Update cross-component data if recent check-in exists
+      if (checkIns.length > 0) {
+        const latestCheckIn = checkIns[0];
+        await storage.updateCrossComponentData(userId, 'geoprompt', {
+          location: latestCheckIn.location,
+          latitude: latestCheckIn.latitude,
+          longitude: latestCheckIn.longitude,
+          vibe: latestCheckIn.vibe
+        });
+      }
+      
       res.json(checkIns);
     } catch (error) {
       console.error('Get GeoPrompt check-ins error:', error);
       res.status(500).json({ error: 'Failed to get check-ins' });
+    }
+  });
+
+  // Get integrated user data across all components
+  app.get('/api/integrated-data/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const integratedData = await storage.getIntegratedUserData(userId);
+      res.json(integratedData);
+    } catch (error) {
+      console.error('Error getting integrated data:', error);
+      res.status(500).json({ error: 'Failed to get integrated user data' });
+    }
+  });
+
+  // Update cross-component data
+  app.post('/api/integrated-data/:userId/update', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { component, data } = req.body;
+      
+      await storage.updateCrossComponentData(userId, component, data);
+      res.json({ success: true, message: 'Cross-component data updated' });
+    } catch (error) {
+      console.error('Error updating cross-component data:', error);
+      res.status(500).json({ error: 'Failed to update cross-component data' });
     }
   });
 

@@ -769,13 +769,82 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
-  // Vibe Profile methods (stub implementations for now)
+  // Vibe Profile methods - integrated with user data
   async getVibeProfile(userId: string): Promise<VibeProfile | undefined> {
-    return undefined; // TODO: Implement when needed
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (!data) return undefined;
+
+      // Convert user profile to vibe profile format
+      return {
+        id: data.id,
+        userId: data.user_id,
+        bio: data.vibe_match_bio || data.bio,
+        interests: data.interests || [],
+        vibeWords: data.vibe_words || [],
+        lookingFor: data.looking_for || 'friendship',
+        energyLevel: data.energy_level || 5,
+        currentMood: data.current_mood || 'neutral',
+        intentions: data.intentions || [],
+        shareLocation: data.share_location || false,
+        profileComplete: !!(data.vibe_match_bio && data.interests?.length > 0)
+      };
+    } catch (error) {
+      console.error('Error getting vibe profile:', error);
+      return undefined;
+    }
   }
   
   async createOrUpdateVibeProfile(data: any): Promise<VibeProfile> {
-    throw new Error('Vibe profiles not implemented yet');
+    try {
+      const updates = {
+        vibe_match_bio: data.bio,
+        interests: data.interests,
+        vibe_words: data.vibeWords,
+        looking_for: data.lookingFor,
+        energy_level: data.energyLevel,
+        share_location: data.shareLocation,
+        vibe_match_enabled: true,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: result, error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          user_id: data.userId,
+          ...updates
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      return {
+        id: result.id,
+        userId: result.user_id,
+        bio: result.vibe_match_bio,
+        interests: result.interests || [],
+        vibeWords: result.vibe_words || [],
+        lookingFor: result.looking_for,
+        energyLevel: result.energy_level,
+        currentMood: result.current_mood,
+        intentions: result.intentions || [],
+        shareLocation: result.share_location,
+        profileComplete: true
+      };
+    } catch (error) {
+      console.error('Error creating/updating vibe profile:', error);
+      throw error;
+    }
   }
   
   // Vibe Match methods (stub implementations)
@@ -821,9 +890,107 @@ export class SupabaseStorage implements IStorage {
     throw new Error('Partner connections not implemented yet');
   }
   
-  // User Preferences (stub implementation)
+  // User Preferences - integrated with all components
   async createOrUpdateUserPreferences(data: any): Promise<any> {
-    throw new Error('User preferences not implemented yet');
+    try {
+      const updates = {
+        user_id: data.userId,
+        notification_settings: data.notificationSettings,
+        privacy_settings: data.privacySettings,
+        appearance_settings: data.appearanceSettings,
+        vibe_match_enabled: data.vibeMatchEnabled,
+        geo_prompt_enabled: data.geoPromptEnabled,
+        soul_sync_enabled: data.soulSyncEnabled,
+        body_mirror_enabled: data.bodyMirrorEnabled,
+        vision_quest_enabled: data.visionQuestEnabled,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: result, error } = await supabase
+        .from('user_profiles')
+        .upsert(updates)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return this.formatUserProfile(result);
+    } catch (error) {
+      console.error('Error updating user preferences:', error);
+      throw error;
+    }
+  }
+
+  // Cross-component data sharing methods
+  async getIntegratedUserData(userId: string): Promise<any> {
+    try {
+      // Get all user data from different components
+      const [user, profile, vibeProfile, geoCheckins, wellnessMetrics] = await Promise.all([
+        this.getUser(userId),
+        this.getUserProfile(userId),
+        this.getVibeProfile(userId),
+        this.getGeoPromptCheckInsByUser(userId),
+        this.getWellnessMetrics(userId, 30)
+      ]);
+
+      return {
+        user,
+        profile,
+        vibeProfile,
+        recentGeoCheckins: geoCheckins.slice(0, 5),
+        recentWellness: wellnessMetrics.slice(0, 10),
+        integrationStatus: {
+          vibeMatchEnabled: profile?.vibeMatchEnabled || false,
+          geoPromptEnabled: profile?.privacySettings?.shareLocation || false,
+          soulSyncEnabled: true,
+          bodyMirrorEnabled: true,
+          visionQuestEnabled: true
+        }
+      };
+    } catch (error) {
+      console.error('Error getting integrated user data:', error);
+      throw error;
+    }
+  }
+
+  async updateCrossComponentData(userId: string, component: string, data: any): Promise<void> {
+    try {
+      // Update relevant fields across components based on the source
+      const profileUpdates: any = { updated_at: new Date().toISOString() };
+
+      switch (component) {
+        case 'vibematch':
+          profileUpdates.current_mood = data.mood;
+          profileUpdates.energy_level = data.energyLevel;
+          break;
+        case 'geoprompt':
+          profileUpdates.location = data.location;
+          profileUpdates.latitude = data.latitude;
+          profileUpdates.longitude = data.longitude;
+          profileUpdates.current_mood = data.vibe;
+          break;
+        case 'bodymirror':
+          profileUpdates.current_mood = data.mood;
+          profileUpdates.energy_level = data.energy;
+          break;
+        case 'soulsync':
+          profileUpdates.relationship_status = data.relationshipStatus;
+          profileUpdates.core_values = data.coreValues;
+          break;
+        case 'visionquest':
+          profileUpdates.evolution_score = data.progressScore;
+          profileUpdates.reflection_streak = data.streakDays;
+          break;
+      }
+
+      if (Object.keys(profileUpdates).length > 1) {
+        await supabase
+          .from('user_profiles')
+          .update(profileUpdates)
+          .eq('user_id', userId);
+      }
+    } catch (error) {
+      console.error('Error updating cross-component data:', error);
+    }
   }
   
   // Reward System Implementation
@@ -866,166 +1033,6 @@ export class SupabaseStorage implements IStorage {
   async getChallenges(): Promise<Challenge[]> {
     // TODO: Implement with Supabase
     return [];
-  }
-
-  // Add missing methods that routes are calling
-  async getSoulMap(userId: string): Promise<any> {
-    // TODO: Implement with Supabase
-    return null;
-  }
-
-  async createSoulMap(userId: string, data: any): Promise<any> {
-    // TODO: Implement with Supabase
-    return {};
-  }
-
-  async getVisionQuest(userId: string): Promise<any> {
-    // TODO: Implement with Supabase
-    return null;
-  }
-
-  async createVisionQuest(userId: string, data: any): Promise<any> {
-    // TODO: Implement with Supabase
-    return {};
-  }
-
-  async getUserStats(userId: string): Promise<any> {
-    // TODO: Implement with Supabase
-    return {
-      totalPoints: 0,
-      level: 1,
-      streakDays: 0,
-      challengesCompleted: 0,
-      badgesEarned: 0,
-      easterEggsFound: 0
-    };
-  }
-
-  async joinChallenge(userId: string, challengeId: string): Promise<any> {
-    // TODO: Implement with Supabase
-    return {};
-  }
-
-  async updateChallengeProgress(participantId: string, progress: any): Promise<any> {
-    // TODO: Implement with Supabase
-    return {};
-  }
-
-  async getUserChallenges(userId: string): Promise<any[]> {
-    // TODO: Implement with Supabase
-    return [];
-  }
-
-  async awardPoints(userId: string, points: number, source: string): Promise<void> {
-    // TODO: Implement with Supabase
-    console.log(`Points awarded: ${points} to user ${userId} for ${source}`);
-  }
-
-  async createGeoPromptCheckIn(checkIn: any): Promise<any> {
-    // TODO: Implement with Supabase
-    return {};
-  }
-
-  async getGeoPromptCheckInsByUser(userId: string): Promise<any[]> {
-    // TODO: Implement with Supabase
-    return [];
-  }
-
-  // Additional missing methods
-  async getVibeProfile(userId: string): Promise<any> {
-    return null;
-  }
-
-  async createOrUpdateVibeProfile(userId: string, data: any): Promise<any> {
-    return {};
-  }
-
-  async getPotentialMatches(userId: string): Promise<any[]> {
-    return [];
-  }
-
-  async getCurrentMatches(userId: string): Promise<any[]> {
-    return [];
-  }
-
-  async processMatchAction(userId: string, targetId: string, action: string): Promise<any> {
-    return {};
-  }
-
-  async getMatchChatMessages(matchId: string): Promise<any[]> {
-    return [];
-  }
-
-  async createMatchChatMessage(message: any): Promise<any> {
-    return {};
-  }
-
-  async updateMatchResonance(matchId: string, data: any): Promise<any> {
-    return {};
-  }
-
-  async createChatSafetyLog(log: any): Promise<any> {
-    return {};
-  }
-
-  async getReflectionPrompts(category?: string): Promise<any[]> {
-    return [];
-  }
-
-  async getPrismPoints(userId: string): Promise<any[]> {
-    return [];
-  }
-
-  async setupVibeMatchTestData(): Promise<void> {
-    // No-op for now
-  }
-
-  async getPartnerConnections(userId: string): Promise<any[]> {
-    return [];
-  }
-
-  async invitePartner(data: any): Promise<any> {
-    return {};
-  }
-
-  async updatePartnerConnection(data: any): Promise<any> {
-    return {};
-  }
-
-  async getUserPreferences(userId: string): Promise<any> {
-    return null;
-  }
-
-  async createOrUpdateUserPreferences(data: any): Promise<any> {
-    return {};
-  }
-
-  async getActiveChallenges(): Promise<any[]> {
-    return [];
-  }
-
-  async createChallenge(challenge: any): Promise<any> {
-    return {};
-  }
-
-  async getChallengeById(id: string): Promise<any> {
-    return null;
-  }
-
-  async awardReward(userId: string, rewardId: string): Promise<any> {
-    return {};
-  }
-
-  async getRewardDefinitions(): Promise<any[]> {
-    return [];
-  }
-
-  async getUserUnlocks(userId: string): Promise<any[]> {
-    return [];
-  }
-
-  async discoverEasterEgg(userId: string, eggId: string): Promise<any> {
-    return {};
   }
 
   // Properly close the class
