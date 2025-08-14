@@ -86,15 +86,34 @@ export default function SoulMapExplorerPage() {
   const [chatMessages, setChatMessages] = useState<Array<{role:"user"|"assistant"; content:string}>>([
     { role: "assistant", content: "Welcome to your Soul Map. I'm connecting to your cosmic database..." }
   ]);
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Load user's birth data from server
   useEffect(() => {
-    if (!user?.id) {
-      setBirthDataLoaded(true);
-      return;
-    }
-
     const loadBirthData = async () => {
+      if (!user?.id) {
+        // For guests, try to load from localStorage
+        try {
+          const localData = localStorage.getItem("lightprompt-birth-data");
+          if (localData) {
+            const parsed = JSON.parse(localData);
+            setBirthData({
+              date: parsed.date || "",
+              time: parsed.time || "",
+              location: parsed.location || "",
+              name: parsed.name || "",
+              lat: parsed.lat,
+              lng: parsed.lng
+            });
+          }
+        } catch (e) {
+          console.log('No local birth data found');
+        }
+        setBirthDataLoaded(true);
+        return;
+      }
+
       try {
         const resp = await apiRequest("GET", `/api/users/${user.id}/birth-data`);
         if (resp.ok) {
@@ -107,6 +126,14 @@ export default function SoulMapExplorerPage() {
             lat: userData.lat,
             lng: userData.lng
           });
+          
+          // If user has birth data and they've previously viewed the chart, go directly to chart view
+          if (userData.date && userData.lat && userData.lng) {
+            const hasVisitedChart = localStorage.getItem(`soulmap-visited-${user.id}`);
+            if (hasVisitedChart) {
+              setCurrentView("chart");
+            }
+          }
         }
       } catch (e) {
         console.log('No saved birth data found or remember setting disabled');
@@ -323,58 +350,66 @@ export default function SoulMapExplorerPage() {
 
   /** ---------- chat ---------- */
   const sendToBot = async (text: string) => {
-    if (!text.trim() || !user?.id) return;
+    if (!text.trim()) return;
 
     setChatMessages((prev) => [...prev, { role: "user", content: text }]);
     setCurrentMessage("");
     setIsGenerating(true);
 
     try {
-      // Get or create a SoulMap session for this user
-      let sessionId = localStorage.getItem(`soulmap-session-${user.id}`);
+      if (user?.id) {
+        // Get or create a SoulMap session for logged-in users
+        let sessionId = localStorage.getItem(`soulmap-session-${user.id}`);
 
-      if (!sessionId) {
-        const sessionResp = await apiRequest("POST", "/api/sessions", {
-          userId: user.id,
-          botId: SOULMAP_BOT_ID,
-          title: "Soul Map Exploration"
-        });
-        const sessionData = await sessionResp.json();
-        sessionId = sessionData.id;
-        localStorage.setItem(`soulmap-session-${user.id}`, sessionId);
-      }
-
-      // Send message through the main chat endpoint for proper persistence
-      const resp = await apiRequest("POST", "/api/chat", {
-        userId: user.id,
-        sessionId: sessionId,
-        botId: SOULMAP_BOT_ID,
-        content: text,
-        context: {
-          intent: "soul_map_exploration",
-          birthData,
-          selectedPlanet,
-          chartData: chartContext,
-          astronomicalData,
-          userProfile: user
+        if (!sessionId) {
+          const sessionResp = await apiRequest("POST", "/api/sessions", {
+            userId: user.id,
+            botId: SOULMAP_BOT_ID,
+            title: "Soul Map Exploration"
+          });
+          const sessionData = await sessionResp.json();
+          sessionId = sessionData.id;
+          localStorage.setItem(`soulmap-session-${user.id}`, sessionId);
         }
-      });
 
-      if (!resp.ok) {
-        throw new Error('Failed to send message');
+        // Send message through the main chat endpoint for proper persistence
+        const resp = await apiRequest("POST", "/api/chat", {
+          userId: user.id,
+          sessionId: sessionId!,
+          botId: SOULMAP_BOT_ID,
+          content: text,
+          context: {
+            intent: "soul_map_exploration",
+            birthData,
+            selectedPlanet,
+            chartData: chartContext,
+            astronomicalData,
+            userProfile: user
+          }
+        });
+
+        if (!resp.ok) {
+          throw new Error('Failed to send message');
+        }
+
+        const data = await resp.json();
+        const reply = data?.message?.content ?? "I'm processing your cosmic inquiry. Please try again.";
+
+        setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+
+        // Update local storage with new messages
+        const updatedMessages = [...chatMessages,
+          { role: "user", content: text },
+          { role: "assistant", content: reply }
+        ];
+        localStorage.setItem(CHAT_KEY, JSON.stringify(updatedMessages));
+      } else {
+        // For guests, show a message to login
+        setChatMessages((prev) => [...prev, { 
+          role: "assistant", 
+          content: "Please login to access the Soul Map Oracle and save your conversation history across sessions." 
+        }]);
       }
-
-      const data = await resp.json();
-      const reply = data?.message?.content ?? "I'm processing your cosmic inquiry. Please try again.";
-
-      setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-
-      // Update local storage with new messages
-      const updatedMessages = [...chatMessages,
-        { role: "user", content: text },
-        { role: "assistant", content: reply }
-      ];
-      localStorage.setItem(CHAT_KEY, JSON.stringify(updatedMessages));
 
     } catch (e) {
       console.error('SoulMap Oracle error:', e);
@@ -448,7 +483,14 @@ export default function SoulMapExplorerPage() {
 
           {/* Interactive chart */}
           <InteractiveNatalChart
-            birthData={birthData}
+            birthData={{
+              date: birthData.date,
+              time: birthData.time,
+              location: birthData.location,
+              name: birthData.name,
+              lat: birthData.lat ?? undefined,
+              lng: birthData.lng ?? undefined
+            }}
             onPlanetClick={(planet, sign) => {
               setSelectedPlanet(sign);
               setCurrentMessage(`Explain ${planet} in ${sign} in my chart. What strengths, blind spots, and timing cues should I know?`);
@@ -741,6 +783,8 @@ export default function SoulMapExplorerPage() {
                   if (user?.id) {
                     // Save birth data if user wants to remember it
                     await saveBirthData(birthData, rememberBirthData);
+                    // Mark that user has visited the chart
+                    localStorage.setItem(`soulmap-visited-${user.id}`, "true");
                     setCurrentView("chart");
                   } else {
                     // For guests, just save to localStorage and continue
