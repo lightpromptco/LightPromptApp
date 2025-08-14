@@ -194,15 +194,41 @@ Your essence: Conscious spiritual reflection that honors your inner divine wisdo
 export async function generateBotResponse(
   botId: string,
   userMessage: string,
-  conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = []
+  conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [],
+  context?: any
 ): Promise<{ content: string; sentiment?: string; sentimentScore?: number; ethicsValidation?: any }> {
   const bot = BOT_PERSONALITIES[botId];
   if (!bot) {
     throw new Error(`Unknown bot: ${botId}`);
   }
 
+  let systemPrompt = bot.systemPrompt;
+  
+  // Add context for SoulMap bot if available
+  if (botId === "soulmap" && context) {
+    const contextInfo = [];
+    
+    if (context.birthData?.date) {
+      contextInfo.push(`Birth Date: ${context.birthData.date}`);
+      if (context.birthData.time) contextInfo.push(`Birth Time: ${context.birthData.time}`);
+      if (context.birthData.location) contextInfo.push(`Birth Location: ${context.birthData.location}`);
+    }
+    
+    if (context.chartData) {
+      contextInfo.push(`Chart Context: ${JSON.stringify(context.chartData)}`);
+    }
+    
+    if (context.selectedPlanet) {
+      contextInfo.push(`Currently viewing: ${context.selectedPlanet}`);
+    }
+    
+    if (contextInfo.length > 0) {
+      systemPrompt += `\n\nCURRENT CONTEXT:\n${contextInfo.join('\n')}`;
+    }
+  }
+
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: "system", content: bot.systemPrompt },
+    { role: "system", content: systemPrompt },
     ...conversationHistory,
     { role: "user", content: userMessage }
   ];

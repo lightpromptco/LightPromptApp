@@ -404,11 +404,34 @@ export default function SoulMapExplorerPage() {
         ];
         localStorage.setItem(CHAT_KEY, JSON.stringify(updatedMessages));
       } else {
-        // For guests, show a message to login
-        setChatMessages((prev) => [...prev, { 
-          role: "assistant", 
-          content: "Please login to access the Soul Map Oracle and save your conversation history across sessions." 
-        }]);
+        // For guests, use a simplified chat without persistence
+        const resp = await apiRequest("POST", "/api/chat/guest", {
+          botId: SOULMAP_BOT_ID,
+          content: text,
+          context: {
+            intent: "soul_map_exploration",
+            birthData,
+            selectedPlanet,
+            chartData: chartContext,
+            astronomicalData
+          }
+        });
+
+        if (!resp.ok) {
+          throw new Error('Failed to send message');
+        }
+
+        const data = await resp.json();
+        const reply = data?.response ?? "I'm processing your cosmic inquiry. Please try again.";
+
+        setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+
+        // Update local storage for guests
+        const updatedMessages = [...chatMessages,
+          { role: "user", content: text },
+          { role: "assistant", content: reply }
+        ];
+        localStorage.setItem(CHAT_KEY, JSON.stringify(updatedMessages));
       }
 
     } catch (e) {
@@ -864,7 +887,7 @@ export default function SoulMapExplorerPage() {
                 onKeyDown={(e) => { if (e.key === "Enter") sendToBot(currentMessage); }}
                 className="flex-1"
               />
-              <Button onClick={() => sendToBot(currentMessage)} disabled={!currentMessage.trim() || isGenerating || !user?.id}><Send className="w-4 h-4" /></Button>
+              <Button onClick={() => sendToBot(currentMessage)} disabled={!currentMessage.trim() || isGenerating}><Send className="w-4 h-4" /></Button>
             </div>
             {/* quick chips */}
             <div className="mt-3 flex flex-wrap gap-1 sm:gap-2">

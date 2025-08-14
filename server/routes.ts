@@ -572,6 +572,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat completion route
+  // Guest chat endpoint (no persistence, no user required)
+  app.post("/api/chat/guest", async (req, res) => {
+    try {
+      const { botId, content, context } = req.body;
+      
+      console.log('Guest chat request:', { botId, content: content?.substring(0, 50) });
+
+      // For guests, generate response without user/session checks
+      const botResponse = await generateBotResponse(botId, content, [], context);
+      
+      res.json({
+        response: botResponse.content,
+        sentiment: 'neutral'
+      });
+      
+    } catch (error: any) {
+      console.error('Guest chat error:', error);
+      res.status(500).json({ error: "Failed to generate response" });
+    }
+  });
+
   app.post("/api/chat", async (req, res) => {
     try {
       const { userId, sessionId, botId, content } = req.body;
