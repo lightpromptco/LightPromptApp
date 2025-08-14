@@ -5,7 +5,12 @@ import {
   Habit, InsertHabit, HabitEntry, InsertHabitEntry,
   AppleHealthData, InsertAppleHealthData, HomeKitData, InsertHomeKitData,
   WellnessPattern, Recommendation, InsertRecommendation,
-  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration
+  FitnessData, InsertFitnessData, DeviceIntegration, InsertDeviceIntegration,
+  Challenge, InsertChallenge, VibeProfile, InsertVibeProfile,
+  MatchChat, InsertMatchChat, ChatSafetyLog, InsertChatSafetyLog,
+  ReflectionPrompt, PrismPoint, GeoPromptCheckIn, InsertGeoPromptCheckIn,
+  PartnerConnection, UserPreferences, InsertUserPreferences,
+  RewardDefinition, UserReward, EasterEggUnlock
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { 

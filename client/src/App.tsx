@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { MainLayout } from "@/components/MainLayoutWithHierarchy";
+import { MainNavigation } from "@/components/MainNavigation";
 import { CartProvider } from "@/hooks/use-cart";
 import LandingPage from "@/pages/landing";
 import ChatPage from "@/pages/chat";
@@ -356,8 +357,8 @@ function App() {
               <Route path="/community" component={CommunityPage} />
               <Route path="/store" component={StorePage} />
               <Route path="/checkout" component={CheckoutPage} />
-              <Route path="/checkout/success" component={CheckoutSuccessPage} />
-              <Route path="/product-info" component={ProductInfoPage} />
+              <Route path="/checkout/success" component={PaymentSuccessPage} />
+              <Route path="/product-info" component={ProductInfo} />
               <Route path="/soul-sync" component={SoulSyncPage} />
               <Route path="/vibe-match" component={VibeMatchPage} />
               <Route path="/geoprompt" component={GeoPromptPage} />
@@ -366,22 +367,22 @@ function App() {
               <Route path="/payment-success" component={PaymentSuccessPage} />
               <Route path="/admin" component={AdminPage} />
               <Route path="/admin-settings" component={AdminSettingsPage} />
-              <Route path="/admin/content" component={AdminContentPage} />
-              <Route path="/admin/blog" component={AdminBlogPage} />
-              <Route path="/admin/page-editor" component={AdminPageEditorPage} />
-              <Route path="/admin/universal-editor" component={AdminUniversalEditorPage} />
-              <Route path="/admin/settings" component={AdminSettingsPageNew} />
+              <Route path="/admin/content" component={ContentManagement} />
+              <Route path="/admin/blog" component={AdminBlog} />
+              <Route path="/admin/page-editor" component={PageEditor} />
+              <Route path="/admin/universal-editor" component={UniversalEditor} />
+              <Route path="/admin/settings" component={AdminSettings} />
               <Route path="/course-access" component={CourseAccessPage} />
               <Route path="/course" component={CoursePage} />
-              <Route path="/plans" component={PricingPage} />
+              <Route path="/plans" component={PlansPage} />
               <Route path="/b2b" component={B2BPage} />
-              <Route path="/partner-mode" component={PartnerModePage} />
+              <Route path="/partner-mode" component={SoulSyncPage} />
               <Route path="/privacy" component={PrivacyPage} />
               <Route path="/products" component={ProductsPage} />
               <Route path="/book" component={BookPage} />
               <Route path="/blog" component={BlogPage} />
               <Route path="/signup" component={SignupPage} />
-              <Route component={NotFoundPage} />
+              <Route component={NotFound} />
             </Switch>
           </div>
           <Toaster />
@@ -390,3 +391,5 @@ function App() {
     </QueryClientProvider>
   );
 }
+
+export default App;

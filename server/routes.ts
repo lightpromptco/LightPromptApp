@@ -12,7 +12,11 @@ import {
   insertUserProfileSchema, insertAccessCodeSchema, redeemAccessCodeSchema,
   insertWellnessMetricSchema, insertHabitSchema, insertHabitEntrySchema,
   insertAppleHealthDataSchema, insertHomeKitDataSchema,
-  wellnessMetrics, platformEvolution
+  wellnessMetrics, platformEvolution, insertPlatformEvolutionSchema,
+  Challenge, InsertChallenge, VibeProfile, ReflectionPrompt, PrismPoint,
+  insertChallengeSchema, insertVibeProfileSchema, insertGeoPromptCheckInSchema,
+  PartnerConnection, UserPreferences, insertPartnerConnectionSchema,
+  insertUserPreferencesSchema, GeoPromptCheckIn
 } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
@@ -3169,12 +3173,11 @@ Please provide astrological insights based on available data.`;
       const { path, data } = req.body;
       // Save to knowledge base for persistent storage
       const result = await db.insert(platformEvolution).values({
-        category: 'page_content',
-        evolutionType: 'content_update',
-        description: `Page content updated: ${path}`,
+        version: '1.0.0',
+        feature: 'Universal Editor',
         impact: 'Page content modified through Universal Editor',
-        data: { path, pageData: data },
-        confidence: 100
+        userFeedback: { path, pageData: data },
+        metrics: { confidence: 100 }
       }).returning();
       
       console.log(`✅ Page data saved to database for ${path}`);
@@ -3217,12 +3220,11 @@ Please provide astrological insights based on available data.`;
       
       // Save to knowledge base for persistent storage
       const result = await db.insert(platformEvolution).values({
-        category: 'page_content',
-        evolutionType: 'content_update',
-        description: `Page content updated: ${pageData.pagePath}`,
+        version: '1.0.0',
+        feature: 'Page Editor',
         impact: 'Page content modified through Page Editor',
-        data: { pageData },
-        confidence: 100
+        userFeedback: { pageData },
+        metrics: { confidence: 100 }
       }).returning();
       
       console.log(`✅ Page data saved to database for ${pageData.pagePath}`);

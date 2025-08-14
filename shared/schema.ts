@@ -1269,7 +1269,6 @@ export const contentEvolution = pgTable("content_evolution", {
 // Knowledge Storage Schemas
 export const insertFoundationMemorySchema = createInsertSchema(foundationMemory);
 export const insertUserInsightSchema = createInsertSchema(userInsights);
-export const insertPlatformEvolutionSchema = createInsertSchema(platformEvolution);
 export const insertBotLearningSchema = createInsertSchema(botLearning);
 export const insertContentEvolutionSchema = createInsertSchema(contentEvolution);
 
@@ -1278,8 +1277,6 @@ export type FoundationMemory = typeof foundationMemory.$inferSelect;
 export type InsertFoundationMemory = z.infer<typeof insertFoundationMemorySchema>;
 export type UserInsight = typeof userInsights.$inferSelect;
 export type InsertUserInsight = z.infer<typeof insertUserInsightSchema>;
-export type PlatformEvolution = typeof platformEvolution.$inferSelect;
-export type InsertPlatformEvolution = z.infer<typeof insertPlatformEvolutionSchema>;
 export type BotLearning = typeof botLearning.$inferSelect;
 export type InsertBotLearning = z.infer<typeof insertBotLearningSchema>;
 export type ContentEvolution = typeof contentEvolution.$inferSelect;
